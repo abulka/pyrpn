@@ -111,6 +111,30 @@ class RpnCodeGen(unittest.TestCase):
             """)
         self.compare(expected, lines, trace=True, dump=True)
 
+    def test_def_range_with_body_assign(self):
+        lines = self.parse(dedent("""
+            def simple():
+                for i in range(5, 60):
+                    x = 10
+            """))
+        expected = dedent("""
+            LBL "SIMPLE"
+            5
+            60
+            1000
+            /
+            +
+            STO 00
+            LBL 00
+            10
+            STO "X"
+            RDN
+            ISG 00
+            GTO 00
+            RTN
+            """)
+        self.compare(expected, lines, trace=True, dump=True)
+
     @unittest.skip("offline")
     def test_complex(self):
         """
