@@ -63,7 +63,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.program = Program()
         self.var_names = []
         self.params = []
-        self.aug_assign = ''
+        self.aug_assign_symbol = ''
         # self.next_label = 0
         # self.next_variable = 0
 
@@ -78,14 +78,17 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def reset(self):
         self.var_names = []
         self.params = []
-        self.aug_assign = ''
+        self.aug_assign_symbol = ''
+
+    def log_state(self, msg):
+        print(msg, self.var_names, self.params, self.aug_assign_symbol)
 
     def visit_Assign(self,node):
         """ visit a Assign node and visits it recursively"""
         print(type(node).__name__)
         for child in ast.iter_child_nodes(node):
             self.visit(child)
-        print('END ASSIGN', self.var_names, self.params)
+        self.log_state('END ASSIGN')
         self.program.assign(self.var_names[0], self.params[0])
         self.reset()
 
@@ -94,13 +97,13 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         print(type(node).__name__)
         for child in ast.iter_child_nodes(node):
             self.visit(child)
-        print('END AUG ASSIGN', self.var_names, self.params)
+        self.log_state('END AUG ASSIGN')
         if self.params:
             # we are assigning a literal
-            self.program.assign(self.var_names[0], self.params[0], aug_assign=self.aug_assign)
+            self.program.assign(self.var_names[0], self.params[0], aug_assign=self.aug_assign_symbol)
         elif len(self.var_names) >= 2:
             # we are assigning a variable to another variable
-            self.program.assign(self.var_names[0], self.var_names[1], val_is_var=True, aug_assign=self.aug_assign)
+            self.program.assign(self.var_names[0], self.var_names[1], val_is_var=True, aug_assign=self.aug_assign_symbol)
         else:
             raise RuntimeError("yeah dunno what assignment to make")
         self.reset()
@@ -109,13 +112,13 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         print(type(node).__name__)
         for child in ast.iter_child_nodes(node):
             self.visit(child)
-        print('END RETURN', self.var_names, self.params)
+        self.log_state('END RETURN')
         self.program.RCL(self.var_names[0])
 
     @recursive
     def visit_Add(self,node):
         print(type(node).__name__)
-        self.aug_assign = '+'
+        self.aug_assign_symbol = '+'
 
     @recursive
     def visit_BinOp(self, node):
@@ -135,7 +138,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         print(type(node).__name__)
         for child in ast.iter_child_nodes(node):
             self.visit(child)
-        print('END CALL', self.var_names, self.params)
+        self.log_state('END CALL')
         if 'range' in self.var_names:
             self.program.insert(self.params[0])
             self.program.insert(self.params[1])
@@ -189,8 +192,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.program.insert('STO 00')
         self.program.insert('LBL 00')
         self.body_or_else(node)
-        self.write('END FOR body or else')
-        self.write('END FOR ')
+        self.log_state('END FOR')
         self.program.insert('ISG 00')
         self.program.insert('GTO 00')
 
