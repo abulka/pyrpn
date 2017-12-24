@@ -49,6 +49,7 @@ class Program(object):
         self.add_generic('RTN')
 
     def dump(self):
+        print('='*100)
         for line in self.lines:
             print(f'{line.lineno:02d} {line.text}')
 
@@ -177,27 +178,3 @@ def looper(n):
 # visitor.visit(tree)
 # print(visitor.out)
 
-"""
-expected
-
-00 LBL "LOOPER"  // param n
-01 100
-02 STO "X"
-00 RDN
-00 1000  // for i in range....
-00 /
-00 1
-00 +
-00 STO 00  // counter
-00 LBL 00
-00 VIEW 00  // print(i)
-00 RCL 00  // x += n
-00 IP  // integer part
-00 STO+ "X"
-00 ISG 00
-00 GTO 00
-00 RCL "X"
-00 RTN
-
- 
-"""

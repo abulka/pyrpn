@@ -7,9 +7,6 @@ from rpn1 import RecursiveRpnVisitor, Line
 
 class RpnCodeGen(unittest.TestCase):
 
-    # def setUp(self):
-    #     self.visitor = None
-    #
     def parse(self, text=''):
         if not text:
             text = dedent("""
@@ -25,44 +22,80 @@ class RpnCodeGen(unittest.TestCase):
         self.visitor = RecursiveRpnVisitor()
         self.visitor.visit(self.tree)
         self.visitor.program.finish()
+        # self.visitor.program.dump()
+        return self.visitor.program.lines
 
     def dump_ast(self):
         """Pretty dump AST"""
-        # print('-'*100)
-        # print(ast.dump(self.tree))  # very compact - all on one line
-        # print('-'*100)
-        # print(astpretty.pformat(self.tree)) # quite spaced out and verbose
         print('-'*100)
-        print(astunparse.dump(self.tree))  # nice
+        print(astunparse.dump(self.tree))  # nice and compact
         print('-'*100)
 
+    # TESTS
+
     def test_def_empty(self):
-        text = dedent("""
+        lines = self.parse(dedent("""
             def simple():
                 pass
-            """)
-        self.parse(text)
-        print('='*100)
-        self.visitor.program.dump()
-        lines = self.visitor.program.lines
+            """))
         self.assertEqual(lines[0].text, 'LBL "SIMPLE"')
         self.assertEqual(lines[1].text, 'RTN')
 
-    # @unittest.skip("offline")
-    def test_def(self):
-        self.parse()
-        print('='*100)
-        self.visitor.program.dump()
-        # self.assertEqual(out[0].text, 'LBL "FRED"')
-        # self.assertIn('unittest.TestCase <|- AccessParsing', plant_uml_text)
+    @unittest.skip("offline")
+    def test_complex(self):
+        """
+        Expected RPN is:
 
-    def test_attrs(self):
-        from rpn1 import Program
-        a = Program()
-        a.add_generic('FRED')
-        # b = Program(lines=[])
-        b = Program()
-        print(a)
-        print(b)
-        self.assertEqual(1, len(a.lines))
-        self.assertEqual(0, len(b.lines))
+        00 LBL "LOOPER"  // param n
+        01 100
+        02 STO "X"
+        00 RDN
+        00 1000  // for i in range....
+        00 /
+        00 1
+        00 +
+        00 STO 00  // counter
+        00 LBL 00
+        00 VIEW 00  // print(i)
+        00 RCL 00  // x += n
+        00 IP  // integer part
+        00 STO+ "X"
+        00 ISG 00
+        00 GTO 00
+        00 RCL "X"
+        00 RTN
+
+        """
+        lines = self.parse(dedent("""
+            def looper(n):
+                x = 100
+                for i in range(1, n):
+                    print(i)
+                    x += n
+                return x
+            """))
+        expected = dedent("""
+            LBL "LOOPER"
+            100
+            STO "X"
+            RDN
+            1000
+            /
+            1
+            +
+            STO 00
+            LBL 00
+            VIEW 00
+            RCL 00
+            IP
+            STO+ "X"
+            ISG 00
+            GTO 00
+            RCL "X"
+            RTN
+            """).strip().split('\n')
+        for i, line in enumerate(lines):
+            # print(f'expected={expected[i]}, got {line.text}')
+            self.assertEqual(expected[i], line.text)
+
+
