@@ -14,20 +14,26 @@ Whenever we go nested, we create another scope which gets added to a scope stack
 class ScopeStack(object):
     stack = attrib(default=Factory(list))
     _allow_mappings = attrib(default=False)
+    next_reg = attrib(default=0)
 
     def push(self):
-        self.stack.append(Scope())
+        self.stack.append(Scope(start_reg=self.next_reg))
 
     def pop(self):
+        self.next_reg = self.stack[-1].start_reg
         self.stack.pop()
 
-    def add_mapping(self, var, register):
+    def add_mapping(self, var, register=None):
+        if register == None:
+            register = f'{self.next_reg:02d}'
+            self.next_reg += 1
+
         if self._allow_mappings:
-            log.debug('scope mappings allowed')
+            log.debug(f'scope mapping "{var}" to register "{register}" allowed')
             scope = self.stack[-1]
             scope.var_to_registers[var] = register
         else:
-            log.debug('scope mappings NOT allowed')
+            log.debug(f'scope mapping "{var}" to register "{register}" NOT allowed!!')
 
     def get_register(self, var):
         scope = self.stack[-1]
@@ -44,3 +50,4 @@ class ScopeStack(object):
 @attrs
 class Scope(object):
     var_to_registers = attrib(default=Factory(dict))
+    start_reg = attrib(default=0)
