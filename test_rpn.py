@@ -1,4 +1,5 @@
 import unittest
+from test_base import BaseTest
 import ast
 import astunparse
 from textwrap import dedent
@@ -10,37 +11,9 @@ import maya
 log = logging.getLogger(__name__)
 config_log(log)
 
-class RpnCodeGen(unittest.TestCase):
-    LOG_BLANK_LINES = 10
+class RpnCodeGenTests(BaseTest):
 
-    @staticmethod
-    def space():
-        for i in range(RpnCodeGen.LOG_BLANK_LINES):
-            log.info('')
-
-    @classmethod
-    def setUpClass(cls):
-        RpnCodeGen.space()
-        log.info(f'RUN {maya.now()}')
-        RpnCodeGen.space()
-
-    def setUp(self):
-        RpnCodeGen.space()
-        log.info(f'{"BEGIN"*15} {self._testMethodName}')
-
-    def tearDown(self):
-        log.info(f'{"END"*15} {self._testMethodName}')
-
-    def parse(self, text=''):
-        if not text:
-            text = dedent("""
-                def looper(n):
-                    x = 100
-                    for i in range(1, n):
-                        print(i)
-                        x += n
-                    return x
-                """)
+    def parse(self, text):
         self.tree = ast.parse(text)
         self.dump_ast()
         self.visitor = RecursiveRpnVisitor()

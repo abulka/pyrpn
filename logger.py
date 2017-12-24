@@ -1,11 +1,15 @@
 import logging
 import settings
+import os
+
+os.remove(settings.LOG_FILENAME)
 
 def config_log(log):
     log.setLevel(logging.DEBUG)
 
     # formatter = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
-    formatter = logging.Formatter('%(name)10s %(message)s')
+    # formatter = logging.Formatter('%(name)10s %(message)s')
+    formatter = logging.Formatter('%(message)s')
 
     # create the logging file handler
     fh = logging.FileHandler(settings.LOG_FILENAME)

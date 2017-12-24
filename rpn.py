@@ -44,6 +44,7 @@ class Program(object):
 
     def assign(self, var_name, val, val_is_var=False, aug_assign=''):
         if val_is_var:
+            print('val', val)
             self.insert('RCL 00')  # TODO need to look up the register associated with 'val'
         else:
             self.insert(val)
@@ -71,6 +72,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.var_names = []
         self.params = []
         self.aug_assign_symbol = ''
+        self.var_to_register_dict = {}  # maps var names to register numbers
         # self.next_label = 0
         # self.next_variable = 0
 
