@@ -1,13 +1,57 @@
 import ast
 import astunparse
+from attr import attrs, attrib, Factory
+
+@attrs
+class Line(object):
+    text = attrib(default='')
+    lineno = attrib(default=0)
+
+@attrs
+class Program(object):
+    lines = attrib(default=[])
+    next_lineno = attrib(default=0)
+    assign_pending = attrib(default='')
+
+    def add_line(self, line):
+        self.incr_line(line)
+        self.lines.append(line)
+
+    def incr_line(self, line):
+        line.lineno = self.next_lineno
+        self.next_lineno += 1
+
+    def add_rpn_label(self, node):
+        line = Line(text=f'LBL "{node.name.upper()[-7:]}"')
+        self.add_line(line)
+
+    def add_rpn_val(self, val):
+        line = Line(text=f'{val}')
+        self.add_line(line)
+
+    def add_rpn_STO(self, where):
+        line = Line(text=f'STO "{where.upper()[-7:]}"')
+        self.add_line(line)
+
+    def add_rpn_rdn(self):
+        line = Line(text=f'RDN')
+        self.add_line(line)
+
+    def add_rpn_assign(self, val):
+        self.add_rpn_val(val)
+        self.add_rpn_STO(self.assign_pending)
+        self.add_rpn_rdn()
+
+    def dump(self):
+        for line in self.lines:
+            print(f'{line.lineno:02d} {line.text}')
 
 
 class RecursiveRpnVisitor(ast.NodeVisitor):
     """ recursive visitor with RPN generating capability :-) """
 
     def __init__(self):
-        self.lineno = 0
-        self.out = []
+        self.program = Program()
         self.assign_pending = None
         self.for_loop = False
         self.next_label = 0
@@ -47,14 +91,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def visit_FunctionDef(self,node):
         """ visit a Function node and visits it recursively"""
         print(type(node).__name__)
-        self.add_rpn_label(node)
-
-    def add_rpn_label(self, node):
-        self.out.append(f'{self.lineno:02d} LBL "{node.name.upper()[-7:]}"')
-        self.increment_lineno()
-
-    def increment_lineno(self):
-        self.lineno += 1
+        self.program.add_rpn_label(node)
 
     @recursive
     def visit_Module(self,node):
@@ -68,31 +105,24 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def visit_Name(self, node):
         print("visit_Name %s" % node.id)
-        if self.for_loop and node.id == 'range':
-            """
-            00 1000  // for i in range....
-            00 /
-            00 1
-            00 +
-            00 STO 00  // counter
-            00 LBL 00
-            """
-            self.out.append(f'{self.lineno:02d} {node.id}')
-            self.increment_lineno()
-        else:
-            self.assign_pending = node.id
-
-    def add_rpn_assign(self, val):
-        self.out.append(f'{self.lineno:02d} {val}')
-        self.increment_lineno()
-        self.out.append(f'{self.lineno:02d} STO "{self.assign_pending.upper()[-7:]}"')
-        self.increment_lineno()
-        self.out.append(f'{self.lineno:02d} RDN')
-        self.increment_lineno()
+        # if self.for_loop and node.id == 'range':
+        #     """
+        #     00 1000  // for i in range....
+        #     00 /
+        #     00 1
+        #     00 +
+        #     00 STO 00  // counter
+        #     00 LBL 00
+        #     """
+        #     self.out.append(f'{self.lineno:02d} {node.id}')
+        #     self.increment_lineno()
+        # else:
+        #     self.assign_pending = node.id
+        self.program.assign_pending = node.id
 
     def visit_Num(self, node):
         print(f'num {node.n}')
-        self.add_rpn_assign(node.n)
+        self.program.add_rpn_assign(node.n)
 
     def write(self, s):
         print(s)
@@ -135,11 +165,11 @@ def looper(n):
 """
 
 
-visitor = RecursiveRpnVisitor()
-tree = ast.parse(s1)
-print(astunparse.dump(tree))
-visitor.visit(tree)
-print(visitor.out)
+# visitor = RecursiveRpnVisitor()
+# tree = ast.parse(s1)
+# print(astunparse.dump(tree))
+# visitor.visit(tree)
+# print(visitor.out)
 
 """
 expected
