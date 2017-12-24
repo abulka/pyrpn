@@ -2,6 +2,7 @@ import ast
 import logging
 from logger import config_log
 from program import Program
+from scope import ScopeStack
 
 log = logging.getLogger(__name__)
 config_log(log)
@@ -16,6 +17,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.params = []
         self.aug_assign_symbol = ''
         self.var_to_register_dict = {}  # maps var names to register numbers
+        self.scope_stack = ScopeStack()
+
         # self.next_label = 0
         # self.next_variable = 0
 
@@ -34,6 +37,21 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def log_state(self, msg):
         log.info(f'{msg}, {self.var_names}, {self.params}, {self.aug_assign_symbol}')
+
+    # Visit functions
+
+    def visit_FunctionDef(self,node):
+        """ visit a Function node and visits it recursively"""
+        log.info(type(node).__name__)
+        self.program.LBL(node)
+        self.scope_stack.push()
+        log.debug(self.scope_stack)
+        for child in ast.iter_child_nodes(node):
+            self.visit(child)
+        log.info('END DEF')
+        log.debug(self.scope_stack)
+        self.scope_stack.pop()
+        log.debug(self.scope_stack)
 
     def visit_Assign(self,node):
         """ visit a Assign node and visits it recursively"""
@@ -103,12 +121,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def visit_Lambda(self,node):
         """ visit a Function node """
         log.info(type(node).__name__)
-
-    @recursive
-    def visit_FunctionDef(self,node):
-        """ visit a Function node and visits it recursively"""
-        log.info(type(node).__name__)
-        self.program.LBL(node)
 
     @recursive
     def visit_Module(self,node):
