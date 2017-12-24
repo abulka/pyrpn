@@ -137,7 +137,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def visit_Name(self, node):
         log.info("visit_Name %s" % node.id)
         self.var_names.append(node.id)
-        self.scope_stack.add_mapping(node.id, 'BLAH')
+        self.scope_stack.add_mapping(node.id, str(node.id).upper())  # TODO map to number registered not named?
 
     def visit_Num(self, node):
         log.info(f'Num {node.n}')
