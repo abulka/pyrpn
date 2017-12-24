@@ -7,6 +7,7 @@ os.remove(settings.LOG_FILENAME)
 def config_log(log):
     log.setLevel(logging.DEBUG)
 
+    # formatter = logging.Formatter('%(asctime)-15s %(levelname)s %(message)s')
     # formatter = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
     # formatter = logging.Formatter('%(name)10s %(message)s')
     formatter = logging.Formatter('%(message)s')

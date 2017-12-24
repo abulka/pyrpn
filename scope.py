@@ -30,19 +30,10 @@ class ScopeStack(object):
             self.stack[-1].next_reg = val
 
     def push(self):
-        if len(self.stack) == 0:
-            reg = 0
-        else:
-            reg = self.stack[-1].next_reg
-        self.stack.append(Scope(start_reg=reg, next_reg=reg))
+        self.stack.append(Scope(next_reg=self.next_reg))
 
     def pop(self):
-        if len(self.stack) >= 2:
-            reg = self.stack[-1].start_reg
-            self.stack.pop()
-            self.stack[-1].next_reg = reg
-        else:
-            self.stack.pop()
+        self.stack.pop()
 
     def add_mapping(self, var, register=None):
         if not self._allow_mappings:
@@ -71,5 +62,4 @@ class ScopeStack(object):
 @attrs
 class Scope(object):
     var_to_registers = attrib(default=Factory(dict))
-    start_reg = attrib(default=0)
     next_reg = attrib(default=0)
