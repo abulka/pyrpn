@@ -17,6 +17,9 @@ class ScopeStack(object):
     def push(self):
         self.stack.append(Scope())
 
+    def pop(self):
+        self.stack.pop()
+
     def add_mapping(self, var, register):
         scope = self.stack[-1]
         scope.var_to_registers[var] = register
