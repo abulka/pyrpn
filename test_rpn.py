@@ -13,10 +13,10 @@ config_log(log)
 
 class RpnCodeGenTests(BaseTest):
 
-    def parse(self, text):
+    def parse(self, text, use_scope=False):
         self.tree = ast.parse(text)
         self.dump_ast()
-        self.visitor = RecursiveRpnVisitor()
+        self.visitor = RecursiveRpnVisitor(use_scope)
         self.visitor.visit(self.tree)
         self.visitor.program.finish()
         # self.visitor.program.dump()
@@ -65,6 +65,20 @@ class RpnCodeGenTests(BaseTest):
             LBL "SIMPLE"
             100
             STO "X"
+            RDN
+            RTN
+            """)
+        self.compare(expected, lines)
+
+    def test_def_assignment_00(self):
+        lines = self.parse(dedent("""
+            def simple():
+                x = 100
+            """), use_scope=True)
+        expected = dedent("""
+            LBL "SIMPLE"
+            100
+            STO 00
             RDN
             RTN
             """)

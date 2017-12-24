@@ -47,6 +47,12 @@ class ScopeStack(object):
             scope = self.stack[-1]
             scope.var_to_registers[var] = register
 
+    def has_mapping(self, var):
+        if len(self.stack) == 0:
+            return False
+        scope = self.stack[-1]
+        return var in scope.var_to_registers
+
     def get_register(self, var):
         scope = self.stack[-1]
         return scope.var_to_registers[var]

@@ -3,6 +3,7 @@ import logging
 from logger import config_log
 from program import Program
 from scope import ScopeStack
+import settings
 
 log = logging.getLogger(__name__)
 config_log(log)
@@ -11,14 +12,14 @@ config_log(log)
 class RecursiveRpnVisitor(ast.NodeVisitor):
     """ recursive visitor with RPN generating capability :-) """
 
-    def __init__(self):
+    def __init__(self, use_scope=True):
         self.program = Program()
         self.var_names = []
         self.params = []
         self.aug_assign_symbol = ''
         self.var_to_register_dict = {}  # maps var names to register numbers
         self.scope_stack = ScopeStack()
-
+        self.use_scope = use_scope
         # self.next_label = 0
         # self.next_variable = 0
 
@@ -57,11 +58,13 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         """ visit a Assign node and visits it recursively"""
         log.info(type(node).__name__)
         self.scope_stack.allow_mappings = True
+        log.debug(self.scope_stack)
         for child in ast.iter_child_nodes(node):
             self.visit(child)
         self.log_state('END ASSIGN')
         self._assign()
         self.scope_stack.allow_mappings = False
+        log.debug(self.scope_stack)
 
     def visit_AugAssign(self,node):
         """ visit a AugAssign e.g. += node and visits it recursively"""
@@ -72,16 +75,32 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self._assign()
 
     def _assign(self):
+        """
+        var_name might be "x" and we need to map that to a register via our scope system
+        """
+        varname = self.convert_var(self.var_names[0])
         if self.params:
             # we are assigning a literal
-            self.program.assign(self.var_names[0], self.params[0], aug_assign=self.aug_assign_symbol)
+            self.program.assign(varname, self.params[0], aug_assign=self.aug_assign_symbol)
         elif len(self.var_names) >= 2:
             # we are assigning a variable to another variable
-            self.program.assign(self.var_names[0], self.var_names[1], val_is_var=True,
+            self.program.assign(varname, self.var_names[1], val_is_var=True,
                                 aug_assign=self.aug_assign_symbol)
         else:
             raise RuntimeError("yeah dunno what assignment to make")
         self.reset()
+
+    def convert_var(self, varname):
+        if not self.scope_stack.allow_mappings:
+            raise RuntimeError('mappings not enabled')
+        if not self.scope_stack.has_mapping(varname):
+            self.scope_stack.add_mapping(varname)
+        register_name = self.scope_stack.get_register(varname)  # convert name to a register name e.g. "00"
+        log.debug(f'varname {varname} converted to register {register_name}')
+        if self.use_scope:
+            return register_name
+        else:
+            return varname
 
     def visit_Return(self,node):
         log.info(type(node).__name__)
@@ -137,7 +156,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def visit_Name(self, node):
         log.info("visit_Name %s" % node.id)
         self.var_names.append(node.id)
-        self.scope_stack.add_mapping(node.id, str(node.id).upper())  # TODO map to number registered not named?
 
     def visit_Num(self, node):
         log.info(f'Num {node.n}')

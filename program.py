@@ -43,7 +43,6 @@ class Program(object):
 
     def assign(self, var_name, val, val_is_var=False, aug_assign=''):
         if val_is_var:
-            print('val', val)
             self.insert('RCL 00')  # TODO need to look up the register associated with 'val'
         else:
             self.insert(val)
