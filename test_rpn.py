@@ -109,7 +109,7 @@ class RpnCodeGen(unittest.TestCase):
             GTO 00
             RTN
             """)
-        self.compare(expected, lines, trace=True, dump=True)
+        self.compare(expected, lines, trace=False, dump=False)
 
     def test_def_range_with_body_assign(self):
         lines = self.parse(dedent("""
@@ -131,6 +131,36 @@ class RpnCodeGen(unittest.TestCase):
             RDN
             ISG 00
             GTO 00
+            RTN
+            """)
+        self.compare(expected, lines, trace=True, dump=True)
+
+    def test_def_range_with_body_incr_i(self):
+        lines = self.parse(dedent("""
+            def simple():
+                x = 0
+                for i in range(2, 4):
+                    x += i
+                return x
+            """))
+        expected = dedent("""
+            LBL "SIMPLE"
+            0
+            STO "X"
+            RDN
+            2
+            4
+            1000
+            /
+            +
+            STO 00
+            LBL 00
+            RCL 00
+            STO+ "X"
+            RDN
+            ISG 00
+            GTO 00
+            RCL "X"
             RTN
             """)
         self.compare(expected, lines, trace=True, dump=True)
