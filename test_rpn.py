@@ -3,8 +3,33 @@ import ast
 import astunparse
 from textwrap import dedent
 from rpn import RecursiveRpnVisitor
+import logging
+from logger import config_log
+import maya
+
+log = logging.getLogger(__name__)
+config_log(log)
 
 class RpnCodeGen(unittest.TestCase):
+    LOG_BLANK_LINES = 10
+
+    @staticmethod
+    def space():
+        for i in range(RpnCodeGen.LOG_BLANK_LINES):
+            log.info('')
+
+    @classmethod
+    def setUpClass(cls):
+        RpnCodeGen.space()
+        log.info(f'RUN {maya.now()}')
+        RpnCodeGen.space()
+
+    def setUp(self):
+        RpnCodeGen.space()
+        log.info(f'{"BEGIN"*15} {self._testMethodName}')
+
+    def tearDown(self):
+        log.info(f'{"END"*15} {self._testMethodName}')
 
     def parse(self, text=''):
         if not text:
@@ -17,7 +42,7 @@ class RpnCodeGen(unittest.TestCase):
                     return x
                 """)
         self.tree = ast.parse(text)
-        # self.dump_ast()
+        self.dump_ast()
         self.visitor = RecursiveRpnVisitor()
         self.visitor.visit(self.tree)
         self.visitor.program.finish()
@@ -26,9 +51,9 @@ class RpnCodeGen(unittest.TestCase):
 
     def dump_ast(self):
         """Pretty dump AST"""
-        print('-'*100)
-        print(astunparse.dump(self.tree))  # nice and compact
-        print('-'*100)
+        log.debug('-'*10)
+        log.debug(astunparse.dump(self.tree))  # nice and compact
+        log.debug('-'*10)
 
     def compare(self, expected, lines, trace=False, dump=False):
         """
@@ -45,7 +70,7 @@ class RpnCodeGen(unittest.TestCase):
         expected = expected.strip().split('\n')
         for i, line in enumerate(lines):
             if trace:
-                print(f'expected={expected[i]}, got {line.text}')
+                log.info(f'expected={expected[i]}, got {line.text}')
             self.assertEqual(expected[i], line.text)
 
     # TESTS
