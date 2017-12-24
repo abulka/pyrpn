@@ -15,7 +15,7 @@ The stack can be empty.
 @attrs
 class ScopeStack(object):
     stack = attrib(default=Factory(list))
-    _allow_mappings = attrib(default=False)
+    allow_mappings = attrib(default=False)
 
     @property
     def next_reg(self):
@@ -36,7 +36,7 @@ class ScopeStack(object):
         self.stack.pop()
 
     def add_mapping(self, var, register=None):
-        if not self._allow_mappings:
+        if not self.allow_mappings:
             log.debug(f'scope mapping "{var}" to register "{register}" NOT allowed!!')
         else:
             if register == None:
@@ -51,13 +51,6 @@ class ScopeStack(object):
         scope = self.stack[-1]
         return scope.var_to_registers[var]
 
-    @property
-    def allow_mappings(self):
-        return self._allow_mappings
-
-    @allow_mappings.setter
-    def allow_mappings(self, flag):
-        self._allow_mappings = flag
 
 @attrs
 class Scope(object):
