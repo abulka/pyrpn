@@ -9,7 +9,7 @@ class Line(object):
 
 @attrs
 class Program(object):
-    lines = attrib(default=[])
+    lines = attrib(default=Factory(list))  # cannot just have [] because same [] gets re-used in new instances of 'Program'
     next_lineno = attrib(default=0)
     assign_pending = attrib(default='')
 
@@ -34,13 +34,19 @@ class Program(object):
         self.add_line(line)
 
     def add_rpn_rdn(self):
-        line = Line(text=f'RDN')
+        self.add_generic('RDN')
+
+    def add_generic(self, text):
+        line = Line(text=text)
         self.add_line(line)
 
     def add_rpn_assign(self, val):
         self.add_rpn_val(val)
         self.add_rpn_STO(self.assign_pending)
         self.add_rpn_rdn()
+
+    def finish(self):
+        self.add_generic('RTN')
 
     def dump(self):
         for line in self.lines:
