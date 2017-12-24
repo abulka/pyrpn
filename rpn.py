@@ -56,10 +56,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def visit_Assign(self,node):
         """ visit a Assign node and visits it recursively"""
         log.info(type(node).__name__)
+        self.scope_stack.allow_mappings = True
         for child in ast.iter_child_nodes(node):
             self.visit(child)
         self.log_state('END ASSIGN')
         self._assign()
+        self.scope_stack.allow_mappings = False
 
     def visit_AugAssign(self,node):
         """ visit a AugAssign e.g. += node and visits it recursively"""

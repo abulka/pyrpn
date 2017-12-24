@@ -10,6 +10,8 @@ class ScopeTests(BaseTest):
 
     def test_scope_easy(self):
         stack = ScopeStack()
+        stack.allow_mappings = True
+
         stack.push()
         stack.add_mapping('a', '00')
 
@@ -17,6 +19,8 @@ class ScopeTests(BaseTest):
 
     def test_scope_double(self):
         stack = ScopeStack()
+        stack.allow_mappings = True
+
         stack.push()
         stack.add_mapping('a', '00')
         stack.push()
@@ -25,3 +29,11 @@ class ScopeTests(BaseTest):
         self.assertEqual('01', stack.get_register('a'))
         stack.pop()
         self.assertEqual('00', stack.get_register('a'))
+
+    def test_scope_mappings_off(self):
+        stack = ScopeStack()
+        stack.allow_mappings = False
+
+        stack.push()
+        stack.add_mapping('a', '00')
+        self.assertRaises(KeyError, stack.get_register, 'a')
