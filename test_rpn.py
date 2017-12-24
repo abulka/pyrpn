@@ -30,7 +30,7 @@ class RpnCodeGen(unittest.TestCase):
         print(astunparse.dump(self.tree))  # nice and compact
         print('-'*100)
 
-    def compare(self, expected, lines, trace=False):
+    def compare(self, expected, lines, trace=False, dump=False):
         """
         Compares a multiline string of code with an array of rpn lines
 
@@ -39,6 +39,9 @@ class RpnCodeGen(unittest.TestCase):
         :param trace: boolean, whether to print progress as we loop
         :return: -
         """
+        if dump:
+            self.visitor.program.dump()
+
         expected = expected.strip().split('\n')
         for i, line in enumerate(lines):
             if trace:
@@ -85,7 +88,28 @@ class RpnCodeGen(unittest.TestCase):
             RDN
             RTN
             """)
-        self.compare(expected, lines)
+        self.compare(expected, lines, trace=False, dump=False)
+
+    def test_def_range(self):
+        lines = self.parse(dedent("""
+            def simple():
+                for i in range(1, 200):
+                    pass
+            """))
+        expected = dedent("""
+            LBL "SIMPLE"
+            1
+            200
+            1000
+            /
+            +
+            STO 00
+            LBL 00
+            ISG 00
+            GTO 00
+            RTN
+            """)
+        self.compare(expected, lines, trace=True, dump=True)
 
     @unittest.skip("offline")
     def test_complex(self):
@@ -93,12 +117,12 @@ class RpnCodeGen(unittest.TestCase):
         Expected RPN is:
 
         00 LBL "LOOPER"  // param n
+        00 1
         01 100
         02 STO "X"
         00 RDN
         00 1000  // for i in range....
         00 /
-        00 1
         00 +
         00 STO 00  // counter
         00 LBL 00
@@ -122,12 +146,12 @@ class RpnCodeGen(unittest.TestCase):
             """))
         expected = dedent("""
             LBL "LOOPER"
+            1
             100
             STO "X"
             RDN
             1000
             /
-            1
             +
             STO 00
             LBL 00

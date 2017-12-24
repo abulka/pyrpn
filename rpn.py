@@ -37,7 +37,7 @@ class Program(object):
         self.add_generic('RDN')
 
     def add_generic(self, text):
-        line = Line(text=text)
+        line = Line(text=str(text))
         self.add_line(line)
 
     def add_rpn_assign(self, val):
@@ -60,9 +60,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def __init__(self):
         self.program = Program()
         self.assign_pending = None
-        self.for_loop = False
         self.next_label = 0
         self.next_variable = 0
+        self.params = []
 
     def recursive(func):
         """ decorator to make visitor work recursive """
@@ -72,22 +72,38 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 self.visit(child)
         return wrapper
 
-    @recursive
     def visit_Assign(self,node):
         """ visit a Assign node and visits it recursively"""
         print(type(node).__name__)
+        for child in ast.iter_child_nodes(node):
+            self.visit(child)
+        print('END ASSIGN', self.program.assign_pending, self.params)
+        self.program.add_rpn_assign(self.params[0])
+        self.params = []
 
     @recursive
     def visit_BinOp(self, node):
         """ visit a BinOp node and visits it recursively"""
         print(type(node).__name__)
 
-    @recursive
     def visit_Call(self,node):
-        """ visit a Call node and visits it recursively"""
-        print('call...', end=' ')
+        """
+        Function call. The child nodes include the function name and the args.  do not use recursive decorator because
+        we want more control, and we need to know the end of the calls so that we can generate rpn and clear params
+
+        On the call
+            self.visit(node.func)  # will emit the function name
+        If we were using the decorator no need to visit explicitly as the recursive decorator will do it for us.
+        if no decorator then don't do this call either !!, because visiting the children will do it for us.
+        """
         print(type(node).__name__)
-        # self.visit(node.func)  # no need to visit explicitly as the recursive decorator will do it for us
+        for child in ast.iter_child_nodes(node):
+            self.visit(child)
+        print('END CALL', self.program.assign_pending, self.params)
+        if self.program.assign_pending == 'range':
+            self.program.add_generic(self.params[0])
+            self.program.add_generic(self.params[1])
+        self.params = []
 
     @recursive
     def visit_Lambda(self,node):
@@ -112,39 +128,35 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def visit_Name(self, node):
         print("visit_Name %s" % node.id)
-        # if self.for_loop and node.id == 'range':
-        #     """
-        #     00 1000  // for i in range....
-        #     00 /
-        #     00 1
-        #     00 +
-        #     00 STO 00  // counter
-        #     00 LBL 00
-        #     """
-        #     self.out.append(f'{self.lineno:02d} {node.id}')
-        #     self.increment_lineno()
-        # else:
-        #     self.assign_pending = node.id
         self.program.assign_pending = node.id
 
     def visit_Num(self, node):
-        print(f'num {node.n}')
-        self.program.add_rpn_assign(node.n)
+        print(f'Num {node.n}')
+        self.push_param(str(node.n))  # always a string
+
+    def push_param(self, val):
+        self.params.append(val)
 
     def write(self, s):
         print(s)
 
     def visit_For(self, node):
         # self.newline(node)
-        self.for_loop = True
         self.write('for ')
         self.visit(node.target)
         self.write(' in ')
         self.visit(node.iter)
         self.write(':')
+        self.program.add_generic(1000)
+        self.program.add_generic('/')
+        self.program.add_generic('+')
+        self.program.add_generic('STO 00')
+        self.program.add_generic('LBL 00')
         self.body_or_else(node)
-        self.for_loop = False
+        self.write('END FOR body or else')
         self.write('END FOR ')
+        self.program.add_generic('ISG 00')
+        self.program.add_generic('GTO 00')
 
     def body(self, statements):
         # self.new_line = True
