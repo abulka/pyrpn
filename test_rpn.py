@@ -69,6 +69,24 @@ class RpnCodeGen(unittest.TestCase):
             """)
         self.compare(expected, lines)
 
+    def test_def_two_assignments(self):
+        lines = self.parse(dedent("""
+            def simple():
+                x = 100
+                y = 200
+            """))
+        expected = dedent("""
+            LBL "SIMPLE"
+            100
+            STO "X"
+            RDN
+            200
+            STO "Y"
+            RDN
+            RTN
+            """)
+        self.compare(expected, lines)
+
     @unittest.skip("offline")
     def test_complex(self):
         """
