@@ -30,6 +30,21 @@ class RpnCodeGen(unittest.TestCase):
         print(astunparse.dump(self.tree))  # nice and compact
         print('-'*100)
 
+    def compare(self, expected, lines, trace=False):
+        """
+        Compares a multiline string of code with an array of rpn lines
+
+        :param expected: string of rpn code with newlnes
+        :param lines: Lines object
+        :param trace: boolean, whether to print progress as we loop
+        :return: -
+        """
+        expected = expected.strip().split('\n')
+        for i, line in enumerate(lines):
+            if trace:
+                print(f'expected={expected[i]}, got {line.text}')
+            self.assertEqual(expected[i], line.text)
+
     # TESTS
 
     def test_def_empty(self):
@@ -39,6 +54,20 @@ class RpnCodeGen(unittest.TestCase):
             """))
         self.assertEqual(lines[0].text, 'LBL "SIMPLE"')
         self.assertEqual(lines[1].text, 'RTN')
+
+    def test_def_assignment(self):
+        lines = self.parse(dedent("""
+            def simple():
+                x = 100
+            """))
+        expected = dedent("""
+            LBL "SIMPLE"
+            100
+            STO "X"
+            RDN
+            RTN
+            """)
+        self.compare(expected, lines)
 
     @unittest.skip("offline")
     def test_complex(self):
@@ -92,9 +121,8 @@ class RpnCodeGen(unittest.TestCase):
             GTO 00
             RCL "X"
             RTN
-            """).strip().split('\n')
-        for i, line in enumerate(lines):
-            # print(f'expected={expected[i]}, got {line.text}')
-            self.assertEqual(expected[i], line.text)
+            """)
+        self.compare(expected, lines)
+
 
 
