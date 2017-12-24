@@ -1,9 +1,8 @@
 import unittest
 import ast
 import astunparse
-import astpretty
 from textwrap import dedent
-from rpn1 import RecursiveRpnVisitor, Line
+from rpn import RecursiveRpnVisitor
 
 class RpnCodeGen(unittest.TestCase):
 

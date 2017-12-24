@@ -160,21 +160,3 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.write('else:')
             self.body(node.orelse)
 
-# ANDY
-
-s1 = """
-def looper(n):
-    x = 100
-    for i in range(1, n):
-        print(i)
-        x += n
-    return x
-"""
-
-
-# visitor = RecursiveRpnVisitor()
-# tree = ast.parse(s1)
-# print(astunparse.dump(tree))
-# visitor.visit(tree)
-# print(visitor.out)
-
