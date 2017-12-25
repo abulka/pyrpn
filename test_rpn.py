@@ -276,7 +276,7 @@ class RpnCodeGenTests(BaseTest):
                     total += x
                 return total
             """))
-        # local var mappings hint x:0, total:1, i:2
+        # local var mappings are x:0, total:1, i:2
         expected = dedent("""
             LBL "SIMPLE"
             0
@@ -313,58 +313,35 @@ class RpnCodeGenTests(BaseTest):
 
     @unittest.skip("offline")
     def test_complex(self):
-        """
-        Expected RPN is:
-
-        00 LBL "LOOPER"  // param n
-        00 1
-        01 100
-        02 STO "X"
-        00 RDN
-        00 1000  // for i in range....
-        00 /
-        00 +
-        00 STO 00  // counter
-        00 LBL 00
-        00 VIEW 00  // print(i)
-        00 RCL 00  // x += n
-        00 IP  // integer part
-        00 STO+ "X"
-        00 ISG 00
-        00 GTO 00
-        00 RCL "X"
-        00 RTN
-
-        """
         lines = self.parse(dedent("""
             def looper(n):
                 x = 100
-                for i in range(1, n):
+                for i in range(10, n):
                     print(i)
                     x += n
                 return x
             """))
         expected = dedent("""
-            LBL "LOOPER"
-            1
+            LBL "LOOPER"  // param n is on the stack, so that's up to the user
             100
-            STO "X"
+            STO 00  // x
             RDN
-            1000
+            1000    // stack.x gets consumed
             /
+            10      // range start 
             +
-            STO 00
+            STO 01  // i our counter
             LBL 00
-            VIEW 00
-            RCL 00
+            VIEW 01 // print i
+            RCL 01  // i
             IP
-            STO+ "X"
-            ISG 00
+            STO+ 00 // x
+            ISG 01  // i
             GTO 00
-            RCL "X"
+            RCL 00  // leave x on stack
             RTN
             """)
-        self.compare(expected, lines)
+        self.compare(de_comment(expected), lines)
 
     def test_comment_stripper(self):
         commented = dedent("""
