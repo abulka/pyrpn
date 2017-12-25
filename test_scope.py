@@ -8,95 +8,75 @@ config_log(log)
 
 class ScopeTests(BaseTest):
 
-    def test_scope_easy(self):
-        stack = ScopeStack()
-        stack.allow_mappings = True
+    def test_scope_default(self):
+        scopes = ScopeStack()
+        self.assertEqual(1, len(scopes.stack))
+        
+    def test_scope_cannot_pop_default(self):
+        scopes = ScopeStack()
+        scopes.pop()
+        self.assertEqual(1, len(scopes.stack))
+        
+    def test_scope_default(self):
+        scopes = ScopeStack()
+        scopes.add_mapping('a', '"A"')
+        self.assertEqual('"A"', scopes.get_register('a'))
+        scopes.pop()
+        self.assertEqual('"A"', scopes.get_register('a'))
 
-        stack.push()
-        stack.add_mapping('a', '00')
-
-        self.assertEqual('00', stack.get_register('a'))
-
-    def test_scope_double(self):
-        stack = ScopeStack()
-        stack.allow_mappings = True
-
-        stack.push()
-        stack.add_mapping('a', '00')
-        stack.push()
-        stack.add_mapping('a', '01')
-
-        self.assertEqual('01', stack.get_register('a'))
-        stack.pop()
-        self.assertEqual('00', stack.get_register('a'))
-
-    def test_scope_mappings_off(self):
-        stack = ScopeStack()
-        stack.allow_mappings = False
-
-        stack.push()
-        self.assertRaises(RuntimeError, stack.add_mapping, 'a', '00')
-        # self.assertRaises(KeyError, stack.get_register, 'a')
+    def test_register_allocation_explicit(self):
+        scopes = ScopeStack()
+        scopes.push()
+        scopes.add_mapping('X', '"X"')
+        self.assertEqual('"X"', scopes.get_register('X'))
+        scopes.pop()
+        self.assertRaises(KeyError, scopes.get_register, 'X')
 
     def test_register_allocation_auto(self):
-        stack = ScopeStack()
-        stack.push()
-        stack.allow_mappings = True
+        scopes = ScopeStack()
+        scopes.push()
+        scopes.add_mapping('a')
+        self.assertEqual('00', scopes.get_register('a'))
 
-        stack.add_mapping('a')
-        self.assertEqual('00', stack.get_register('a'))
+    def test_scope_double(self):
+        scopes = ScopeStack()
+        scopes.push()
+        scopes.add_mapping('a', '00')
+        scopes.push()
+        scopes.add_mapping('a', '01')
+        self.assertEqual('01', scopes.get_register('a'))
+        scopes.pop()
+        self.assertEqual('00', scopes.get_register('a'))
 
-    def test_register_allocation_override(self):
-        stack = ScopeStack()
-        stack.push()
-        stack.allow_mappings = True
-
-        stack.add_mapping('a', 'X')
-        self.assertEqual('X', stack.get_register('a'))
-
-    def test_register_allocation_multiple(self):
-        stack = ScopeStack()
-        stack.push()
-        stack.allow_mappings = True
-
-        stack.add_mapping('a', 'X')
-        stack.add_mapping('b')
-        stack.add_mapping('c')
-        self.assertEqual('X', stack.get_register('a'))
-        self.assertEqual('00', stack.get_register('b'))
-        self.assertEqual('01', stack.get_register('c'))
+    def test_register_allocation_mixed(self):
+        scopes = ScopeStack()
+        scopes.add_mapping('a', 'X')
+        scopes.add_mapping('b')
+        scopes.add_mapping('c')
+        self.assertEqual('X', scopes.get_register('a'))
+        self.assertEqual('00', scopes.get_register('b'))
+        self.assertEqual('01', scopes.get_register('c'))
 
     def test_register_allocation_multiple_scopes(self):
-        stack = ScopeStack()
-        stack.push()
-        stack.allow_mappings = True
-
-        stack.add_mapping('a')
-        stack.add_mapping('b')
-        self.assertEqual('00', stack.get_register('a'))
-        self.assertEqual('01', stack.get_register('b'))
-
-        stack.push()
-        stack.add_mapping('a')
-        stack.add_mapping('zz')
-        self.assertEqual('02', stack.get_register('a'))
-        self.assertEqual('03', stack.get_register('zz'))
+        scopes = ScopeStack()
+        scopes.add_mapping('a')
+        scopes.add_mapping('b')
+        self.assertEqual('00', scopes.get_register('a'))
+        self.assertEqual('01', scopes.get_register('b'))
+        scopes.push()
+        scopes.add_mapping('a')
+        scopes.add_mapping('zz')
+        self.assertEqual('02', scopes.get_register('a'))
+        self.assertEqual('03', scopes.get_register('zz'))
 
     def test_register_allocation_multiple_scope_pop(self):
-        stack = ScopeStack()
-        stack.push()
-        stack.allow_mappings = True
-
-        stack.add_mapping('a')
-        self.assertEqual('00', stack.get_register('a'))
-
-        stack.push()
-        stack.add_mapping('a')
-        self.assertEqual('01', stack.get_register('a'))
-
-        stack.pop()
-        self.assertEqual('00', stack.get_register('a'))
-
-        stack.add_mapping('b')
-        self.assertEqual('01', stack.get_register('b'))
-
+        scopes = ScopeStack()
+        scopes.add_mapping('a')
+        self.assertEqual('00', scopes.get_register('a'))
+        scopes.push()
+        scopes.add_mapping('a')
+        self.assertEqual('01', scopes.get_register('a'))
+        scopes.pop()
+        self.assertEqual('00', scopes.get_register('a'))
+        scopes.add_mapping('b')
+        self.assertEqual('01', scopes.get_register('b'))

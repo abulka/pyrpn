@@ -13,10 +13,10 @@ config_log(log)
 
 class RpnCodeGenTests(BaseTest):
 
-    def parse(self, text, use_scope=False):
+    def parse(self, text):
         self.tree = ast.parse(text)
         self.dump_ast()
-        self.visitor = RecursiveRpnVisitor(use_scope)
+        self.visitor = RecursiveRpnVisitor()
         self.visitor.visit(self.tree)
         self.visitor.program.finish()
         # self.visitor.program.dump()
@@ -29,7 +29,7 @@ class RpnCodeGenTests(BaseTest):
 
     def compare(self, expected, lines, trace=False, dump=False):
         """
-        Compares a multiline string of code with an array of rpn lines
+        Compares a multi-line string of code with an array of rpn lines
 
         :param expected: string of rpn code with newlnes
         :param lines: Lines object
@@ -55,10 +55,10 @@ class RpnCodeGenTests(BaseTest):
         self.assertEqual(lines[0].text, 'LBL "SIMPLE"')
         self.assertEqual(lines[1].text, 'RTN')
 
-    def test_def_assignment(self):
+    def test_def_assignment_global(self):
         lines = self.parse(dedent("""
             def simple():
-                x = 100
+                X = 100
             """))
         expected = dedent("""
             LBL "SIMPLE"
@@ -69,11 +69,11 @@ class RpnCodeGenTests(BaseTest):
             """)
         self.compare(expected, lines)
 
-    def test_def_assignment_00(self):
+    def test_def_assignment_scoped(self):
         lines = self.parse(dedent("""
             def simple():
                 x = 100
-            """), use_scope=True)
+            """))
         expected = dedent("""
             LBL "SIMPLE"
             100
@@ -83,11 +83,11 @@ class RpnCodeGenTests(BaseTest):
             """)
         self.compare(expected, lines)
 
-    def test_def_two_assignments(self):
+    def test_def_two_assignments_global(self):
         lines = self.parse(dedent("""
             def simple():
-                x = 100
-                y = 200
+                X = 100
+                Y = 200
             """))
         expected = dedent("""
             LBL "SIMPLE"
@@ -96,6 +96,42 @@ class RpnCodeGenTests(BaseTest):
             RDN
             200
             STO "Y"
+            RDN
+            RTN
+            """)
+        self.compare(expected, lines, trace=False, dump=False)
+
+    def test_def_two_assignments_scoped(self):
+        lines = self.parse(dedent("""
+            def simple():
+                x = 100
+                y = 200
+            """))
+        expected = dedent("""
+            LBL "SIMPLE"
+            100
+            STO 00
+            RDN
+            200
+            STO 01
+            RDN
+            RTN
+            """)
+        self.compare(expected, lines, trace=False, dump=False)
+
+    def test_def_two_assignments_mixed(self):
+        lines = self.parse(dedent("""
+            def simple():
+                X = 100
+                y = 200
+            """))
+        expected = dedent("""
+            LBL "SIMPLE"
+            100
+            STO "X"
+            RDN
+            200
+            STO 00
             RDN
             RTN
             """)
@@ -122,11 +158,11 @@ class RpnCodeGenTests(BaseTest):
             """)
         self.compare(expected, lines, trace=False, dump=False)
 
-    def test_def_range_with_body_assign(self):
+    def test_def_range_with_body_assign_global(self):
         lines = self.parse(dedent("""
             def simple():
                 for i in range(5, 60):
-                    x = 10
+                    X = 10
             """))
         expected = dedent("""
             LBL "SIMPLE"
@@ -146,13 +182,38 @@ class RpnCodeGenTests(BaseTest):
             """)
         self.compare(expected, lines, trace=True, dump=True)
 
+    def test_def_range_with_body_assign_scoped(self):
+        lines = self.parse(dedent("""
+            def simple():
+                for i in range(5, 60):
+                    x = 10
+            """))
+        expected = dedent("""
+            LBL "SIMPLE"
+            5
+            60
+            1000
+            /
+            +
+            STO 00
+            LBL 00
+            10
+            STO 01
+            RDN
+            ISG 00
+            GTO 00
+            RTN
+            """)
+        self.compare(expected, lines, trace=True, dump=True)
+
+    @unittest.skip('working on it')
     def test_def_range_with_body_incr_i(self):
         lines = self.parse(dedent("""
             def simple():
-                x = 0
+                X = 0
                 for i in range(2, 4):
-                    x += i
-                return x
+                    X += i
+                return X
             """))
         expected = dedent("""
             LBL "SIMPLE"

@@ -15,41 +15,31 @@ The stack can be empty.
 @attrs
 class ScopeStack(object):
     stack = attrib(default=Factory(list))
-    allow_mappings = attrib(default=False)
 
     def __attrs_post_init__(self):
-        print('to do - set up default initial scope on the stack -', self)
+        self.stack.append(Scope(next_reg=0))  # permanent initial scope
 
     @property
     def next_reg(self):
-        if len(self.stack) == 0:
-            return 0
-        else:
-            return self.stack[-1].next_reg
+        return self.stack[-1].next_reg
 
     @next_reg.setter
     def next_reg(self, val):
-        if len(self.stack):
-            self.stack[-1].next_reg = val
+        self.stack[-1].next_reg = val
 
     def push(self):
         self.stack.append(Scope(next_reg=self.next_reg))
 
     def pop(self):
-        self.stack.pop()
+        if len(self.stack) > 1:  # always leave first permanent scope
+            self.stack.pop()
 
     def add_mapping(self, var, register=None):
-        if not self.allow_mappings:
-            log.debug(f'scope mapping "{var}" to register "{register}" NOT allowed!!')
-            raise RuntimeError('mappings not enabled')
-        else:
-            if register == None:
-                register = f'{self.next_reg:02d}'
-                self.next_reg += 1
-            # log.debug(f'scope mapping "{var}" to register "{register}" allowed')
-
-            scope = self.stack[-1]
-            scope.data[var] = register
+        if register == None:
+            register = f'{self.next_reg:02d}'
+            self.next_reg += 1
+        scope = self.stack[-1]
+        scope.data[var] = register
 
     def has_mapping(self, var):
         if len(self.stack) == 0:
