@@ -10,13 +10,34 @@ class ScopeTests(BaseTest):
 
     def test_scope_default(self):
         scopes = Scopes()
-        self.assertEqual(1, len(scopes.stack))
-        
+        self.assertEqual(1, scopes.length)
+        self.assertTrue(scopes.current_empty)
+
+    def test_scopes_push(self):
+        scopes = Scopes()
+        self.assertEqual(1, scopes.length)
+        scopes.push()
+        self.assertEqual(2, scopes.length)
+        scopes.pop()
+        self.assertEqual(1, scopes.length)
+
+    def test_scopes_push_pop(self):
+        scopes = Scopes()
+        self.assertEqual(1, scopes.length)
+        self.assertTrue(scopes.current_empty)
+        scopes.push()
+        self.assertEqual(2, scopes.length)
+        self.assertTrue(scopes.current_empty)
+        scopes.add_mapping('a', 'blah')
+        self.assertFalse(scopes.current_empty)
+        scopes.pop()
+        self.assertEqual(1, scopes.length)
+        self.assertTrue(scopes.current_empty)
+
     def test_scope_cannot_pop_default(self):
         scopes = Scopes()
         scopes.pop()
         self.assertEqual(1, scopes.length)
-        self.assertTrue(scopes.current_empty)
 
     def test_scope_empty(self):
         scopes = Scopes()
