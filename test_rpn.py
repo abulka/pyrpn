@@ -280,36 +280,36 @@ class RpnCodeGenTests(BaseTest):
         expected = dedent("""
             LBL "SIMPLE"
             0
-            STO "X"
+            STO "X" // X
             RDN
             0
-            STO 00
+            STO 00  // x
             RDN
             0
-            STO 01
+            STO 01  // total
             RDN
             2
             4
             1000
             /
             +
-            STO 02
+            STO 02  // i
             LBL 00
-            RCL 02
+            RCL 02  // i
             STO "X"
             RDN
-            RCL 02
-            STO+ 00
+            RCL 02  // i
+            STO+ 00 // x
             RDN
-            RCL 00
-            STO+ 01
+            RCL 00  // x
+            STO+ 01 // total
             RDN
-            ISG 02
+            ISG 02  // i
             GTO 00
-            RCL 01
+            RCL 01  // total
             RTN
             """)
-        self.compare(expected, lines, trace=True, dump=True)
+        self.compare(de_comment(expected), lines, trace=True, dump=True)
 
     @unittest.skip("offline")
     def test_complex(self):
@@ -366,5 +366,56 @@ class RpnCodeGenTests(BaseTest):
             """)
         self.compare(expected, lines)
 
+    def test_comment_stripper(self):
+        commented = dedent("""
+            LBL "LOOPER"  // name of function
+            1
+            100
+            STO "X"       // use global
+            RDN           // do we need a RDN here?
+            1000
+            /
+            +
+            STO 00        // i, the looping variable
+            LBL 00
+            VIEW 00
+            RCL 00
+            IP            // integer part
+            STO+ "X"
+            ISG 00
+            GTO 00
+            RCL "X"
+            RTN           // returns the global, X
+            """)
+        expected = dedent("""
+            LBL "LOOPER"
+            1
+            100
+            STO "X"
+            RDN
+            1000
+            /
+            +
+            STO 00
+            LBL 00
+            VIEW 00
+            RCL 00
+            IP
+            STO+ "X"
+            ISG 00
+            GTO 00
+            RCL "X"
+            RTN
+            """)
+        self.assertEqual(expected, de_comment(commented))
 
-
+def de_comment(s):
+    result = []
+    for line in s.split('\n'):
+        comment_pos = line.find('//')
+        if comment_pos != -1:
+            clean_line = line[0:comment_pos].strip()
+            result.append(clean_line)
+        else:
+            result.append(line)
+    return '\n'.join(result)
