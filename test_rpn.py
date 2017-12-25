@@ -1,12 +1,12 @@
 import unittest
 from test_base import BaseTest
+from de_comment import de_comment
 import ast
 import astunparse
 from textwrap import dedent
 from rpn import RecursiveRpnVisitor
 import logging
 from logger import config_log
-import maya
 
 log = logging.getLogger(__name__)
 config_log(log)
@@ -342,57 +342,3 @@ class RpnCodeGenTests(BaseTest):
             RTN
             """)
         self.compare(de_comment(expected), lines)
-
-    def test_comment_stripper(self):
-        commented = dedent("""
-            LBL "LOOPER"  // name of function
-            1
-            100
-            STO "X"       // use global
-            RDN           // do we need a RDN here?
-            1000
-            /
-            +
-            STO 00        // i, the looping variable
-            LBL 00
-            VIEW 00
-            RCL 00
-            IP            // integer part
-            STO+ "X"
-            ISG 00
-            GTO 00
-            RCL "X"
-            RTN           // returns the global, X
-            """)
-        expected = dedent("""
-            LBL "LOOPER"
-            1
-            100
-            STO "X"
-            RDN
-            1000
-            /
-            +
-            STO 00
-            LBL 00
-            VIEW 00
-            RCL 00
-            IP
-            STO+ "X"
-            ISG 00
-            GTO 00
-            RCL "X"
-            RTN
-            """)
-        self.assertEqual(expected, de_comment(commented))
-
-def de_comment(s):
-    result = []
-    for line in s.split('\n'):
-        comment_pos = line.find('//')
-        if comment_pos != -1:
-            clean_line = line[0:comment_pos].strip()
-            result.append(clean_line)
-        else:
-            result.append(line)
-    return '\n'.join(result)
