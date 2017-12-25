@@ -145,32 +145,22 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def visit_Assign(self,node):
         """ visit a Assign node and visits it recursively"""
-        self.scope_stack.allow_mappings = True
         self.begin(node)
-
         self.visit_children(node)
-
         self._assign()
-
-        self.scope_stack.allow_mappings = False
         self.end(node)
 
     def visit_AugAssign(self,node):
         """ visit a AugAssign e.g. += node and visits it recursively"""
-        self.scope_stack.allow_mappings = True
         self.begin(node)
-
         self.visit_children(node)
-
         self._assign()
-
-        self.scope_stack.allow_mappings = False
         self.end(node)
 
     def visit_Return(self,node):
         self.begin(node)
         self.visit_children(node)
-        self.program.RCL(self.var_names[0])
+        self.program.RCL(self.var_name_to_register(self.var_names[0]))
         self.end(node)
 
     @recursive

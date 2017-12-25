@@ -234,8 +234,7 @@ class RpnCodeGenTests(BaseTest):
             """)
         self.compare(expected, lines, trace=True, dump=True)
 
-    @unittest.skip('working on it')
-    def test_def_range_with_body_incr_i(self):
+    def test_def_range_with_body_accessing_i(self):
         lines = self.parse(dedent("""
             def simple():
                 X = 0
@@ -261,6 +260,53 @@ class RpnCodeGenTests(BaseTest):
             ISG 00
             GTO 00
             RCL "X"
+            RTN
+            """)
+        self.compare(expected, lines, trace=True, dump=True)
+
+    def test_def_range_complex(self):
+        lines = self.parse(dedent("""
+            def simple():
+                X = 0
+                x = 0
+                total = 0
+                for i in range(2, 4):
+                    X = i
+                    x += i
+                    total += x
+                return total
+            """))
+        # local var mappings hint x:0, total:1, i:2
+        expected = dedent("""
+            LBL "SIMPLE"
+            0
+            STO "X"
+            RDN
+            0
+            STO 00
+            RDN
+            0
+            STO 01
+            RDN
+            2
+            4
+            1000
+            /
+            +
+            STO 02
+            LBL 00
+            RCL 02
+            STO "X"
+            RDN
+            RCL 02
+            STO+ 00
+            RDN
+            RCL 00
+            STO+ 01
+            RDN
+            ISG 02
+            GTO 00
+            RCL 01
             RTN
             """)
         self.compare(expected, lines, trace=True, dump=True)

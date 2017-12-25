@@ -29,12 +29,12 @@ class Program(object):
         line = Line(text=f'LBL "{node.name.upper()[-7:]}"')
         self._add_line(line)
 
-    def STO(self, where, aug_assign=''):
-        line = Line(text=f'STO{aug_assign} {where}')
+    def STO(self, to_register, aug_assign=''):
+        line = Line(text=f'STO{aug_assign} {to_register}')
         self._add_line(line)
 
-    def RCL(self, var_name):
-        line = Line(text=f'RCL "{var_name.upper()[-7:]}"')
+    def RCL(self, from_register, aug_assign=''):
+        line = Line(text=f'RCL{aug_assign} {from_register}')
         self._add_line(line)
 
     def insert(self, text):
