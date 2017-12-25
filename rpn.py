@@ -45,13 +45,13 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def end(self, node):
         self.log_state(f'END {type(node).__name__}')
 
-    def penultimate(self, node):
-        self.log_state(f'PENULTIMATE {type(node).__name__}')
+    def children_complete(self, node):
+        self.log_state(f'{type(node).__name__} children complete')
 
     def visit_children(self, node):
         for child in ast.iter_child_nodes(node):
             self.visit(child)
-        self.penultimate(node)
+        self.children_complete(node)
 
     # Visit functions
 

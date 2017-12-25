@@ -22,7 +22,7 @@ class BaseTest(unittest.TestCase):
 
     def setUp(self):
         BaseTest.space()
-        log.info(f'{"BEGIN"*9}      {self._testMethodName}')
+        log.info(f'/{"-"*20} {self._testMethodName} {"-"*20}\\')
 
     def tearDown(self):
-        log.info(f'{"END"*15}      {self._testMethodName}')
+        log.info(f'\\{"_"*20} {self._testMethodName} {"_"*20}/')

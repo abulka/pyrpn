@@ -35,8 +35,8 @@ class ScopeTests(BaseTest):
         stack.allow_mappings = False
 
         stack.push()
-        stack.add_mapping('a', '00')
-        self.assertRaises(KeyError, stack.get_register, 'a')
+        self.assertRaises(RuntimeError, stack.add_mapping, 'a', '00')
+        # self.assertRaises(KeyError, stack.get_register, 'a')
 
     def test_register_allocation_auto(self):
         stack = ScopeStack()

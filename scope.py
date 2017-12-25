@@ -38,27 +38,28 @@ class ScopeStack(object):
     def add_mapping(self, var, register=None):
         if not self.allow_mappings:
             log.debug(f'scope mapping "{var}" to register "{register}" NOT allowed!!')
+            raise RuntimeError('mappings not enabled')
         else:
             if register == None:
                 register = f'{self.next_reg:02d}'
                 self.next_reg += 1
-            log.debug(f'scope mapping "{var}" to register "{register}" allowed')
+            # log.debug(f'scope mapping "{var}" to register "{register}" allowed')
 
             scope = self.stack[-1]
-            scope.var_to_registers[var] = register
+            scope.data[var] = register
 
     def has_mapping(self, var):
         if len(self.stack) == 0:
             return False
         scope = self.stack[-1]
-        return var in scope.var_to_registers
+        return var in scope.data
 
     def get_register(self, var):
         scope = self.stack[-1]
-        return scope.var_to_registers[var]
+        return scope.data[var]
 
 
 @attrs
 class Scope(object):
-    var_to_registers = attrib(default=Factory(dict))
+    data = attrib(default=Factory(dict))  # var name to register name
     next_reg = attrib(default=0)

@@ -24,9 +24,8 @@ class RpnCodeGenTests(BaseTest):
 
     def dump_ast(self):
         """Pretty dump AST"""
-        log.debug('-'*10)
         log.debug(astunparse.dump(self.tree))  # nice and compact
-        log.debug('-'*10)
+        log.debug(f"{'~'*25}")
 
     def compare(self, expected, lines, trace=False, dump=False):
         """
