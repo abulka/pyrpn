@@ -206,6 +206,34 @@ class RpnCodeGenTests(BaseTest):
             """)
         self.compare(expected, lines, trace=True, dump=True)
 
+    def test_def_range_three_scoped_vars(self):
+        lines = self.parse(dedent("""
+            def simple():
+                x = 10
+                for i in range(5, 60):
+                    y = 100
+            """))
+        expected = dedent("""
+            LBL "SIMPLE"
+            10
+            STO 00
+            RDN
+            5
+            60
+            1000
+            /
+            +
+            STO 01
+            LBL 00
+            100
+            STO 02
+            RDN
+            ISG 01
+            GTO 00
+            RTN
+            """)
+        self.compare(expected, lines, trace=True, dump=True)
+
     @unittest.skip('working on it')
     def test_def_range_with_body_incr_i(self):
         lines = self.parse(dedent("""

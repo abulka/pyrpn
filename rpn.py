@@ -18,6 +18,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.params = []
         self.aug_assign_symbol = ''
         self.scope_stack = ScopeStack()
+        self.for_loop_info = []
+        self.next_local_label = 0
 
     # Recursion support
 
@@ -50,8 +52,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         scope_descr = 'scope' if num_scopes == 1 else 'scopes'
         last_scope = scopes.stack[-1]
         last_is_empty = len(last_scope.data) == 0
-        last_info = 'empty' if last_is_empty else str(last_scope)
-        scope_info = f'{num_scopes} {scope_descr} {last_info}'
+        last_info = '' if last_is_empty else str(last_scope)
+        scope_info = f'({num_scopes} {scope_descr}) {last_info}'
         log.info(f'{msg}, {self.var_names}, {self.params}, {self.aug_assign_symbol} {scope_info}')
 
     def begin(self, node):
@@ -193,9 +195,15 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         """
         self.begin(node)
         self.visit_children(node)
-        if 'range' in self.var_names:
+        if self.in_for_loop_in and 'range' in self.var_names:
             self.program.insert(self.params[0])
             self.program.insert(self.params[1])
+            self.program.insert(1000)
+            self.program.insert('/')
+            self.program.insert('+')
+
+            self.program.insert(f'STO {self.for_loop_info[-1].register}')
+            self.program.insert(f'LBL {self.for_loop_info[-1].label:02d}')
         self.reset()
         self.end(node)
 
@@ -225,23 +233,31 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.end(node)
 
     def visit_For(self, node):
-        self.scope_stack.push()
         self.begin(node)
 
         log.info('for ')
         self.visit(node.target)
+        self.for_loop_info.append(
+            ForLoopItem(register=self.var_name_to_register(self.var_names[0]),
+                        label=self.next_local_label))
+        self.next_local_label += 1
+
         log.info(' in ')
+        self.in_for_loop_in = True
         self.visit(node.iter)
+        self.in_for_loop_in = False
         log.info(':')
-        self.program.insert(1000)
-        self.program.insert('/')
-        self.program.insert('+')
-        self.program.insert('STO 00')  # need to look up scope
-        self.program.insert('LBL 00')
+
         self.body_or_else(node)
 
-        self.program.insert('ISG 00')
-        self.program.insert('GTO 00')
-
-        self.scope_stack.pop()
+        self.program.insert(f'ISG {self.for_loop_info[-1].register}')
+        self.program.insert(f'GTO {self.for_loop_info[-1].label:02d}')
+        self.for_loop_info.pop()
         self.end(node)
+
+from attr import attrs, attrib, Factory
+
+@attrs
+class ForLoopItem(object):
+    register = attrib(default=0)
+    label = attrib(default=0)
