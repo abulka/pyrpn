@@ -98,13 +98,15 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             if its uppercase - assign to named register e.g. "X"
             otherwise map to a numbered register e.g. 00
         """
-        register = self.var_to_register(self.var_names[0])
+        to_register = self.var_to_register(self.var_names[0])
         if self.params:
-            # we are assigning a parameter literal
-            self.program.assign(register, self.params[0], aug_assign=self.aug_assign_symbol)
+            # we are assigning a parameter literal to a register
+            val = self.params[0]
+            self.program.assign(to_register, val, val_type='literal', aug_assign=self.aug_assign_symbol)
         elif len(self.var_names) >= 2:
-            # we are assigning a variable to another variable
-            self.program.assign(register, self.var_names[1], val_is_var=True, aug_assign=self.aug_assign_symbol)
+            # we are assigning another variable to a register
+            from_register = self.var_to_register(self.var_names[1])
+            self.program.assign(to_register, from_register, val_type='var', aug_assign=self.aug_assign_symbol)
         else:
             raise RuntimeError("yeah dunno what assignment to make")
         self.reset()

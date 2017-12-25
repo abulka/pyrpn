@@ -41,15 +41,15 @@ class Program(object):
         line = Line(text=str(text))
         self._add_line(line)
 
-    def assign(self, var_name, val, val_is_var=False, aug_assign=''):
-        if val_is_var:
-            self.insert('RCL 00')  # TODO need to look up the register associated with 'val'
-        else:
+    def assign(self, to_register, val, val_type, aug_assign=''):
+        if val_type == 'literal':
             self.insert(val)
-        if aug_assign:
-            self.STO(var_name, aug_assign=aug_assign)
         else:
-            self.STO(var_name)
+            self.insert(f'RCL {val}')  # val might be "X" or 00
+        if aug_assign:
+            self.STO(to_register, aug_assign=aug_assign)
+        else:
+            self.STO(to_register)
         self.insert('RDN')
 
     def finish(self):

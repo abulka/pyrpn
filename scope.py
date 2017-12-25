@@ -17,6 +17,9 @@ class ScopeStack(object):
     stack = attrib(default=Factory(list))
     allow_mappings = attrib(default=False)
 
+    def __attrs_post_init__(self):
+        print('to do - set up default initial scope on the stack -', self)
+
     @property
     def next_reg(self):
         if len(self.stack) == 0:

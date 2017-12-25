@@ -29,3 +29,11 @@ python rpn1.py
 
 * Repo owner abulka@gmail.com
 * Other community or team contact
+
+### To do ###
+
+* Simplify scope and remove "allow_mappings"
+* Create a default scope
+* uppercase and lowercase variable rules
+
+
