@@ -2,7 +2,7 @@ import ast
 import logging
 from logger import config_log
 from program import Program
-from scope import ScopeStack
+from scope import Scopes
 import settings
 
 log = logging.getLogger(__name__)
@@ -17,7 +17,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.var_names = []
         self.params = []
         self.aug_assign_symbol = ''
-        self.scope_stack = ScopeStack()
+        self.scopes = Scopes()
         self.for_loop_info = []
         self.next_local_label = 0
 
@@ -47,13 +47,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def log_state(self, msg):
         # log.info(f'{msg}, {self.var_names}, {self.params}, {self.aug_assign_symbol} {self.scope_stack}')
-        scopes = self.scope_stack
-        num_scopes = len(scopes.stack)
-        scope_descr = 'scope' if num_scopes == 1 else 'scopes'
-        last_scope = scopes.stack[-1]
-        last_is_empty = len(last_scope.data) == 0
-        last_info = '' if last_is_empty else str(last_scope)
-        scope_info = f'({num_scopes} {scope_descr}) {last_info}'
+        descr = 'scope' if self.scopes.length == 1 else 'scopes'
+        last_info = '' if self.scopes.current_empty else str(self.scopes.current)
+        scope_info = f'({self.scopes.length} {descr}) {last_info}'
         log.info(f'{msg}, {self.var_names}, {self.params}, {self.aug_assign_symbol} {scope_info}')
 
     def begin(self, node):
@@ -102,13 +98,13 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         """
         if var_name.isupper():
             register = f'"{var_name.upper()[-7:]}"'  # TODO still have to cater for clash of uppercase in multiple scopes - or do we?  maybe treat as global?
-            if not self.scope_stack.has_mapping(var_name):
-                self.scope_stack.add_mapping(var_name, register=register)
+            if not self.scopes.has_mapping(var_name):
+                self.scopes.add_mapping(var_name, register=register)
         else:
-            if not self.scope_stack.has_mapping(var_name):
-                self.scope_stack.add_mapping(var_name)
+            if not self.scopes.has_mapping(var_name):
+                self.scopes.add_mapping(var_name)
             # look up what register was allocated e.g. "00"
-            register = self.scope_stack.get_register(var_name)
+            register = self.scopes.get_register(var_name)
         log.debug(f'var_name {var_name} mapped to register {register}')
         return register
 
@@ -133,14 +129,14 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def visit_FunctionDef(self,node):
         """ visit a Function node and visits it recursively"""
-        self.scope_stack.push()
+        self.scopes.push()
         self.begin(node)
 
         self.program.LBL(node)
 
         self.visit_children(node)
 
-        self.scope_stack.pop()
+        self.scopes.pop()
         self.end(node)
 
     def visit_Assign(self,node):

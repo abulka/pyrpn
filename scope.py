@@ -13,11 +13,23 @@ The stack can be empty.
 """
 
 @attrs
-class ScopeStack(object):
+class Scopes(object):
     stack = attrib(default=Factory(list))
 
     def __attrs_post_init__(self):
         self.stack.append(Scope(next_reg=0))  # permanent initial scope
+
+    @property
+    def length(self):
+        return len(self.stack)
+
+    @property
+    def current(self):
+        return self.stack[-1]
+
+    @property
+    def current_empty(self):
+        return len(self.current.data) == 0
 
     @property
     def next_reg(self):

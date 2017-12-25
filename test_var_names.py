@@ -1,5 +1,5 @@
 from test_base import BaseTest
-from scope import ScopeStack, Scope
+from scope import Scopes, Scope
 from rpn import RecursiveRpnVisitor
 import logging
 from logger import config_log
@@ -32,16 +32,16 @@ class VarnameLowerTests(BaseTest):
         v = RecursiveRpnVisitor()
         register_x = v.var_name_to_register('x')
         self.assertEqual('00', register_x)
-        v.scope_stack.push()
+        v.scopes.push()
         register_x = v.var_name_to_register('x')
         self.assertEqual('01', register_x)
 
     def test_lowercase_varname_two_x_two_scopes_pop(self):
         v = RecursiveRpnVisitor()
         v.var_name_to_register('x')
-        v.scope_stack.push()
+        v.scopes.push()
         v.var_name_to_register('x')
-        v.scope_stack.pop()
+        v.scopes.pop()
         register_x = v.var_name_to_register('x')
         self.assertEqual('00', register_x)
 
@@ -67,14 +67,14 @@ class VarnameUpperTests(BaseTest):
         """
         v = RecursiveRpnVisitor()
         v.var_name_to_register('X')
-        v.scope_stack.push()
+        v.scopes.push()
         self.assertEqual('"X"', v.var_name_to_register('X'))
 
     def test_uppercase_three_scopes(self):
         v = RecursiveRpnVisitor()
         v.var_name_to_register('X')
-        v.scope_stack.push()
+        v.scopes.push()
         v.var_name_to_register('X')
-        v.scope_stack.push()
+        v.scopes.push()
         self.assertEqual('"X"', v.var_name_to_register('X'))
 
