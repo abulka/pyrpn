@@ -2,7 +2,10 @@ import logging
 import settings
 import os
 
-os.remove(settings.LOG_FILENAME)
+try:
+    os.remove(settings.LOG_FILENAME)
+except:
+    pass
 
 def config_log(log):
     log.setLevel(logging.DEBUG)
