@@ -37,70 +37,91 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.aug_assign_symbol = ''
 
     def log_state(self, msg):
-        log.info(f'{msg}, {self.var_names}, {self.params}, {self.aug_assign_symbol}')
+        log.info(f'{msg}, {self.var_names}, {self.params}, {self.aug_assign_symbol} {self.scope_stack}')
+
+    def begin(self, node):
+        self.log_state(f'BEGIN {type(node).__name__}')
+
+    def end(self, node):
+        self.log_state(f'END {type(node).__name__}')
+
+    def penultimate(self, node):
+        self.log_state(f'PENULTIMATE {type(node).__name__}')
+
+    def visit_children(self, node):
+        for child in ast.iter_child_nodes(node):
+            self.visit(child)
+        self.penultimate(node)
 
     # Visit functions
 
     def visit_FunctionDef(self,node):
         """ visit a Function node and visits it recursively"""
-        log.info(type(node).__name__)
-        self.program.LBL(node)
         self.scope_stack.push()
-        log.debug(self.scope_stack)
-        for child in ast.iter_child_nodes(node):
-            self.visit(child)
-        log.info('END DEF')
-        log.debug(self.scope_stack)
+        self.begin(node)
+
+        self.program.LBL(node)
+
+        self.visit_children(node)
+
         self.scope_stack.pop()
-        log.debug(self.scope_stack)
+        self.end(node)
 
     def visit_Assign(self,node):
         """ visit a Assign node and visits it recursively"""
-        log.info(type(node).__name__)
         self.scope_stack.allow_mappings = True
-        log.debug(self.scope_stack)
-        for child in ast.iter_child_nodes(node):
-            self.visit(child)
-        self.log_state('END ASSIGN')
+        self.begin(node)
+
+        self.visit_children(node)
+
         self._assign()
+
         self.scope_stack.allow_mappings = False
-        log.debug(self.scope_stack)
+        self.end(node)
 
     def visit_AugAssign(self,node):
         """ visit a AugAssign e.g. += node and visits it recursively"""
-        log.info(type(node).__name__)
-        for child in ast.iter_child_nodes(node):
-            self.visit(child)
-        self.log_state('END AUG ASSIGN')
+        self.scope_stack.allow_mappings = True
+        self.begin(node)
+
+        self.visit_children(node)
+
         self._assign()
+
+        self.scope_stack.allow_mappings = False
+        self.end(node)
 
     def _assign(self):
         """
         var_name might be "x" and we need to map that to a register via our scope system
+        possibly use rule that
+            if its uppercase - assign to named register e.g. "X"
+            otherwise map to a numbered register e.g. 00
         """
-        varname = self.convert_var(self.var_names[0])
+        register = self.var_to_register(self.var_names[0])
         if self.params:
-            # we are assigning a literal
-            self.program.assign(varname, self.params[0], aug_assign=self.aug_assign_symbol)
+            # we are assigning a parameter literal
+            self.program.assign(register, self.params[0], aug_assign=self.aug_assign_symbol)
         elif len(self.var_names) >= 2:
             # we are assigning a variable to another variable
-            self.program.assign(varname, self.var_names[1], val_is_var=True,
-                                aug_assign=self.aug_assign_symbol)
+            self.program.assign(register, self.var_names[1], val_is_var=True, aug_assign=self.aug_assign_symbol)
         else:
             raise RuntimeError("yeah dunno what assignment to make")
         self.reset()
 
-    def convert_var(self, varname):
+    def var_to_register(self, var_name):
         if not self.scope_stack.allow_mappings:
             raise RuntimeError('mappings not enabled')
-        if not self.scope_stack.has_mapping(varname):
-            self.scope_stack.add_mapping(varname)
-        register_name = self.scope_stack.get_register(varname)  # convert name to a register name e.g. "00"
-        log.debug(f'varname {varname} converted to register {register_name}')
+
+        if not self.scope_stack.has_mapping(var_name):
+            self.scope_stack.add_mapping(var_name)
+        register_name = self.scope_stack.get_register(var_name)  # convert name to a register name e.g. "00"
+        log.debug(f'var_name {var_name} converted to register {register_name}')
+
         if self.use_scope:
             return register_name
         else:
-            return varname
+            return f'"{var_name.upper()[-7:]}"'
 
     def visit_Return(self,node):
         log.info(type(node).__name__)

@@ -30,7 +30,7 @@ class Program(object):
         self._add_line(line)
 
     def STO(self, where, aug_assign=''):
-        line = Line(text=f'STO{aug_assign} "{where.upper()[-7:]}"')
+        line = Line(text=f'STO{aug_assign} {where}')
         self._add_line(line)
 
     def RCL(self, var_name):
