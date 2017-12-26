@@ -401,26 +401,30 @@ class RpnCodeGenTests(BaseTest):
             """)
         self.compare(de_comment(expected), lines)
 
-    # def test_stack_wrecked_by_rcls(self):
-    #     lines = self.parse(dedent("""
-    #         def func(a, b):
-    #             c = 1
-    #             return b + c + a
-    #         """))
-    #     expected = dedent("""
-    #         LBL "func"
-    #         1
-    #         STO 00  // c
-    #         RDN
-    #         // now for the return
-    #         RCL ST Y // b
-    #         RCL 00   // c
-    #         +
-    #         // how to get to a which is our st x ?
-    #         +
-    #         RTN
-    #         """)
-    #     self.compare(de_comment(expected), lines, dump=True)
+    def test_stack_complex1(self):
+        lines = self.parse(dedent("""
+            def func(a, b):
+                c = 1
+                return b + c + a
+            """))
+        expected = dedent("""
+            LBL "func"
+            STO 00  // a
+            RDN
+            STO 01  // b
+            RDN
+            1
+            STO 02  // c
+            RDN
+            // return
+            RCL 01  // b
+            RCL 02  // c
+            +
+            RCL 00  // a
+            +
+            RTN
+            """)
+        self.compare(de_comment(expected), lines, dump=True)
 
     # @unittest.skip('offline')
     # def test_stack_wrecked_by_rcls2(self):
@@ -501,14 +505,3 @@ class RpnCodeGenTests(BaseTest):
             """)
         self.compare(de_comment(expected), lines, dump=True)
 
-    # def test_stack_x_y_as_param_return_y(self):
-    #     lines = self.parse(dedent("""
-    #         def func(x, y):
-    #             return y
-    #         """))
-    #     expected = dedent("""
-    #         LBL "func"
-    #         RCL ST Y
-    #         RTN
-    #         """)
-    #     self.compare(de_comment(expected), lines, dump=True)
