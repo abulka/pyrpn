@@ -345,6 +345,19 @@ class RpnCodeGenTests(BaseTest):
 
     # Stack param tests
 
+    """
+    So the new plan is that parameters are passed via the stack, thus a max of 4 parameters.
+    And similarly, values are returned on the stack.
+    
+    And now the insight - we don't rely on those parameters staying in those positions - its just
+    impossible to manage unless everything is hand crafted and thought about deeply.  So lets just
+    store function parameters in local registers and from then on forget about the stack.
+      
+    The stack then just becomes a workplace to create literals and rcl values into, before operating 
+    on them and storing the results back into other registers.  Though we can even avoid using most
+    of the stack by using STO+ NN and RCL+ NN style operations which mean NN += x and x += NN respectively.    
+    """
+
     def test_stack_x_as_param(self):
         lines = self.parse(dedent("""
             def func(n):
@@ -352,6 +365,8 @@ class RpnCodeGenTests(BaseTest):
             """))
         expected = dedent("""
             LBL "func"  // param n is on the stack, so that's up to the user
+            STO 00
+            RDN
             RTN
             """)
         self.compare(de_comment(expected), lines)
@@ -363,10 +378,74 @@ class RpnCodeGenTests(BaseTest):
             """))
         expected = dedent("""
             LBL "func"
-            // RCL ST X would be redundant
+            STO 00  // n
+            RDN
+            RCL 00  // n
             RTN
             """)
         self.compare(de_comment(expected), lines)
+
+    def test_stack_y_returned(self):
+        lines = self.parse(dedent("""
+            def func(a, b):
+                return b
+            """))
+        expected = dedent("""
+            LBL "func"
+            STO 00  // a
+            RDN
+            STO 01  // b
+            RDN
+            RCL 01  // b
+            RTN
+            """)
+        self.compare(de_comment(expected), lines)
+
+    # def test_stack_wrecked_by_rcls(self):
+    #     lines = self.parse(dedent("""
+    #         def func(a, b):
+    #             c = 1
+    #             return b + c + a
+    #         """))
+    #     expected = dedent("""
+    #         LBL "func"
+    #         1
+    #         STO 00  // c
+    #         RDN
+    #         // now for the return
+    #         RCL ST Y // b
+    #         RCL 00   // c
+    #         +
+    #         // how to get to a which is our st x ?
+    #         +
+    #         RTN
+    #         """)
+    #     self.compare(de_comment(expected), lines, dump=True)
+
+    # @unittest.skip('offline')
+    # def test_stack_wrecked_by_rcls2(self):
+    #     lines = self.parse(dedent("""
+    #         def func(a, b):
+    #             c = 1
+    #             d = c
+    #             return b + c + d
+    #         """))
+    #     expected = dedent("""
+    #         LBL "func"
+    #         1
+    #         STO 00  // c
+    #         RDN
+    #         RCL 00 // c
+    #         STO 01 // d
+    #         // now for the return
+    #         RCL ST Y
+    #         RCL 00
+    #         +
+    #         RCL 01
+    #         +
+    #         RTN
+    #         """)
+    #     self.compare(de_comment(expected), lines)
 
     def test_stack_x_add1(self):
         lines = self.parse(dedent("""
@@ -375,46 +454,49 @@ class RpnCodeGenTests(BaseTest):
             """))
         expected = dedent("""
             LBL "func"
+            STO 00
+            RDN
+            RCL 00
             1
             +
             RTN
             """)
-        self.compare(de_comment(expected), lines)
-
-    def test_stack_x_y_add(self):
-        lines = self.parse(dedent("""
-            def func(a, b):
-                return a + b
-            """))
-        expected = dedent("""
-            LBL "func"
-            +
-            RTN
-            """)
-        self.compare(de_comment(expected), lines)
-
-    def test_stack_x_y_add_plus_literal(self):
-        lines = self.parse(dedent("""
-            def func(a, b):
-                return a + b + 10
-            """))
-        expected = dedent("""
-            LBL "func"
-            +
-            10
-            +
-            RTN
-            """)
         self.compare(de_comment(expected), lines, dump=True)
 
-    def test_stack_x_y_as_param_return_y(self):
-        lines = self.parse(dedent("""
-            def func(x, y):
-                return y    
-            """))
-        expected = dedent("""
-            LBL "func"
-            RCL ST Y
-            RTN
-            """)
-        self.compare(de_comment(expected), lines, dump=True)
+    # def test_stack_x_y_add(self):
+    #     lines = self.parse(dedent("""
+    #         def func(a, b):
+    #             return a + b
+    #         """))
+    #     expected = dedent("""
+    #         LBL "func"
+    #         +
+    #         RTN
+    #         """)
+    #     self.compare(de_comment(expected), lines)
+    #
+    # def test_stack_x_y_add_plus_literal(self):
+    #     lines = self.parse(dedent("""
+    #         def func(a, b):
+    #             return a + b + 10
+    #         """))
+    #     expected = dedent("""
+    #         LBL "func"
+    #         +
+    #         10
+    #         +
+    #         RTN
+    #         """)
+    #     self.compare(de_comment(expected), lines, dump=True)
+    #
+    # def test_stack_x_y_as_param_return_y(self):
+    #     lines = self.parse(dedent("""
+    #         def func(x, y):
+    #             return y
+    #         """))
+    #     expected = dedent("""
+    #         LBL "func"
+    #         RCL ST Y
+    #         RTN
+    #         """)
+    #     self.compare(de_comment(expected), lines, dump=True)

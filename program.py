@@ -43,44 +43,17 @@ class Program(object):
         self._add_line(line)
 
     def assign(self, to_register, val, val_type, aug_assign=''):
-        # handling special stack register operations is a nightmare
-
-        def is_stack_x_or_y(register):
-            return register in ['ST X', 'ST Y']
-
+        assert val_type in ('literal', 'var')
         if val_type == 'literal':
             self.insert(val)
         else:
             from_register = val
-            if is_stack_x_or_y(to_register) and is_stack_x_or_y(to_register):
-                pass  # redundant to recall either x and y because they are there already
-            else:
-                self.insert(f'RCL {from_register}')  # val might be "X" or 00
-
+            self.insert(f'RCL {from_register}')  # val might be "X" or 00
         if aug_assign:
-            if to_register == 'ST X':
-                log.info('X SITUATION (aug)')
-                self.insert(aug_assign)
-            elif to_register == 'ST Y':
-                log.info('Y SITUATION (aug)')
-                self.insert('SWAP')
-                self.insert(aug_assign)
-            else:
-                self.STO(to_register, aug_assign=aug_assign)
+            self.STO(to_register, aug_assign=aug_assign)
         else:
-            # not sure how to handle these cos
-            # pushing values onto the stack affects the stack positions!
-            if to_register == 'ST X':
-                log.info('X SITUATION - yikes')
-                pass
-            elif to_register == 'ST Y':
-                log.info('Y SITUATION - yikes')
-                pass
-            else:
-                self.STO(to_register)
-
-        if 'ST' not in to_register:
-            self.insert('RDN')
+            self.STO(to_register)
+        self.insert('RDN')
 
     def finish(self):
         self.insert('RTN')

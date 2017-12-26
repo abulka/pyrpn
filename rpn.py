@@ -99,7 +99,23 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         if reset:
             self.reset()
 
-    def var_name_to_register(self, var_name, use_stack_register=None):
+    def perform_op(self, reset=True):
+        if len(self.var_names) >= 2:
+            # op between two registers
+            register1 = self.var_name_to_register(self.var_names[0])
+            register2 = self.var_name_to_register(self.var_names[1])
+            self.program.insert(f'RCL {register1}')
+            self.program.insert(f'RCL {register2}')
+        else:
+            # op between a register and a literal
+            register1 = self.var_name_to_register(self.var_names[0])
+            self.program.insert(f'RCL {register1}')
+            self.program.insert(f'{self.params[0]}')
+        self.program.insert(f'{self.aug_assign_symbol}')
+        if reset:
+            self.reset()
+
+    def var_name_to_register(self, var_name):
         """
         Figure out the register to use to store/recall 'var_name' e.g. "x" via our scope system
         Rules:
@@ -115,11 +131,11 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             if not self.scopes.has_mapping(var_name):
                 self.scopes.add_mapping(var_name, register=register)
 
-        if use_stack_register != None:
-            stack_register = ['X', 'Y', 'Z', 'T'][use_stack_register]
-            register = f'ST {stack_register}'
-            map_it(var_name, register)
-        elif var_name.isupper():
+        # if use_stack_register != None:
+        #     stack_register = ['X', 'Y', 'Z', 'T'][use_stack_register]
+        #     register = f'ST {stack_register}'
+        #     map_it(var_name, register)
+        if var_name.isupper():
             register = f'"{var_name.upper()[-7:]}"'
             map_it(var_name, register)
         else:
@@ -163,9 +179,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         """ visit arguments to a function"""
         self.begin(node)
         self.visit_children(node)
-        for i, arg_name in enumerate(self.var_names):
-            # log.debug(f'def arg mapping {i} {arg_name}')
-            to_register = self.var_name_to_register(arg_name, use_stack_register=i)
+        for arg_name in self.var_names:
+            to_register = self.var_name_to_register(arg_name)
+            self.program.STO(to_register)
+            self.program.insert('RDN')
             assert not self.scopes.current_empty
         self.reset()
         self.end(node)
@@ -194,14 +211,29 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def visit_Return(self,node):
         self.begin(node)
         self.visit_children(node)
-        register = self.var_name_to_register(self.var_names[0])
-        if register != 'ST X':  # optimisation: avoid redundant stack recall
+
+        # # if there is a pending operation, perform it and leave result on the stack ready to return
+        # # otherwise just recall the register being returned
+        # if self.aug_assign_symbol:
+        #     self.perform_op()
+        # else:
+        #     register = self.var_name_to_register(self.var_names[0])
+        #     self.program.RCL(register)
+
+        # Another approach
+        if self.var_names:
+            register = self.var_name_to_register(self.var_names[0])
             self.program.RCL(register)
+        elif self.params:
+            self.program.insert(self.params[0])
+        else:
+            pass  # you get what's on the stack?
+
         self.end(node)
 
     def visit_Add(self,node):
         self.begin(node)
-        self.aug_assign_symbol = '+'
+        self.aug_assign_symbol = '+'  # TODO rename 'aug_assign_symbol' to 'pending_op'
         self.visit_children(node)
         self.end(node)
 
@@ -209,7 +241,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         """ visit a BinOp node and visits it recursively"""
         self.begin(node)
         self.visit_children(node)
-        self._assign(reset=False)  # keep info around... hmmm
+
+        self.perform_op()
+        # self._assign(reset=False)  # keep info around... hmmm
+
         self.end(node)
 
     def visit_Call(self,node):
