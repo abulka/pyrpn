@@ -43,12 +43,19 @@ class Program(object):
         self._add_line(line)
 
     def assign(self, to_register, val, val_type, aug_assign=''):
+        # handling special stack register operations is a nightmare
+
+        def is_stack_x_or_y(register):
+            return register in ['ST X', 'ST Y']
+
         if val_type == 'literal':
             self.insert(val)
         else:
-            self.insert(f'RCL {val}')  # val might be "X" or 00
-
-        # handle special stack register operations
+            from_register = val
+            if is_stack_x_or_y(to_register) and is_stack_x_or_y(to_register):
+                pass  # redundant to recall either x and y because they are there already
+            else:
+                self.insert(f'RCL {from_register}')  # val might be "X" or 00
 
         if aug_assign:
             if to_register == 'ST X':
