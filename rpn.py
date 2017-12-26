@@ -84,7 +84,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     # Assign support
 
-    def _assign(self):
+    def _assign(self, reset=True):
         to_register = self.var_name_to_register(self.var_names[0])
         if self.params:
             # we are assigning a parameter literal to a register
@@ -96,7 +96,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.program.assign(to_register, from_register, val_type='var', aug_assign=self.aug_assign_symbol)
         else:
             raise RuntimeError("yeah dunno what assignment to make")
-        self.reset()
+        if reset:
+            self.reset()
 
     def var_name_to_register(self, var_name, use_stack_register=None):
         """
@@ -198,15 +199,18 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.program.RCL(register)
         self.end(node)
 
-    @recursive
     def visit_Add(self,node):
         self.begin(node)
         self.aug_assign_symbol = '+'
+        self.visit_children(node)
+        self.end(node)
 
-    @recursive
     def visit_BinOp(self, node):
         """ visit a BinOp node and visits it recursively"""
         self.begin(node)
+        self.visit_children(node)
+        self._assign(reset=False)  # keep info around... hmmm
+        self.end(node)
 
     def visit_Call(self,node):
         """

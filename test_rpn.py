@@ -366,9 +366,8 @@ class RpnCodeGenTests(BaseTest):
             // RCL ST X would be redundant
             RTN
             """)
-        self.compare(de_comment(expected), lines, dump=True)
+        self.compare(de_comment(expected), lines)
 
-    @unittest.skip("offline")
     def test_stack_x_as_param_returned_add1(self):
         lines = self.parse(dedent("""
             def func(n):
@@ -380,7 +379,7 @@ class RpnCodeGenTests(BaseTest):
             +
             RTN
             """)
-        self.compare(de_comment(expected), lines)
+        self.compare(de_comment(expected), lines, dump=True)
 
     @unittest.skip("offline")
     def test_stack_x_y_as_param_return_add(self):

@@ -47,11 +47,33 @@ class Program(object):
             self.insert(val)
         else:
             self.insert(f'RCL {val}')  # val might be "X" or 00
+
+        # handle special stack register operations
+
         if aug_assign:
-            self.STO(to_register, aug_assign=aug_assign)
+            if to_register == 'ST X':
+                log.info('X SITUATION (aug)')
+                self.insert(aug_assign)
+            elif to_register == 'ST Y':
+                log.info('Y SITUATION (aug)')
+                self.insert('SWAP')
+                self.insert(aug_assign)
+            else:
+                self.STO(to_register, aug_assign=aug_assign)
         else:
-            self.STO(to_register)
-        self.insert('RDN')
+            # not sure how to handle these cos
+            # pushing values onto the stack affects the stack positions!
+            if to_register == 'ST X':
+                log.info('X SITUATION - yikes')
+                pass
+            elif to_register == 'ST Y':
+                log.info('Y SITUATION - yikes')
+                pass
+            else:
+                self.STO(to_register)
+
+        if 'ST' not in to_register:
+            self.insert('RDN')
 
     def finish(self):
         self.insert('RTN')
