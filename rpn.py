@@ -107,9 +107,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.program.insert(f'RCL {register1}')
             self.program.insert(f'RCL {register2}')
         else:
-            # op between a register and a literal
-            register1 = self.var_name_to_register(self.var_names[0])
-            self.program.insert(f'RCL {register1}')
+            # op between a register and a literal, or just the literal to the previous result
+            if self.var_names:
+                register1 = self.var_name_to_register(self.var_names[0])
+                self.program.insert(f'RCL {register1}')
             self.program.insert(f'{self.params[0]}')
         self.program.insert(f'{self.aug_assign_symbol}')
         if reset:

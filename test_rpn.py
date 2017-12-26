@@ -463,32 +463,44 @@ class RpnCodeGenTests(BaseTest):
             """)
         self.compare(de_comment(expected), lines, dump=True)
 
-    # def test_stack_x_y_add(self):
-    #     lines = self.parse(dedent("""
-    #         def func(a, b):
-    #             return a + b
-    #         """))
-    #     expected = dedent("""
-    #         LBL "func"
-    #         +
-    #         RTN
-    #         """)
-    #     self.compare(de_comment(expected), lines)
-    #
-    # def test_stack_x_y_add_plus_literal(self):
-    #     lines = self.parse(dedent("""
-    #         def func(a, b):
-    #             return a + b + 10
-    #         """))
-    #     expected = dedent("""
-    #         LBL "func"
-    #         +
-    #         10
-    #         +
-    #         RTN
-    #         """)
-    #     self.compare(de_comment(expected), lines, dump=True)
-    #
+    def test_stack_x_y_add(self):
+        lines = self.parse(dedent("""
+            def func(a, b):
+                return a + b
+            """))
+        expected = dedent("""
+            LBL "func"
+            STO 00
+            RDN
+            STO 01
+            RDN
+            RCL 00
+            RCL 01
+            +
+            RTN
+            """)
+        self.compare(de_comment(expected), lines)
+
+    def test_stack_x_y_add_plus_literal(self):
+        lines = self.parse(dedent("""
+            def func(a, b):
+                return a + b + 10
+            """))
+        expected = dedent("""
+            LBL "func"
+            STO 00
+            RDN
+            STO 01
+            RDN
+            RCL 00
+            RCL 01
+            +
+            10
+            +
+            RTN
+            """)
+        self.compare(de_comment(expected), lines, dump=True)
+
     # def test_stack_x_y_as_param_return_y(self):
     #     lines = self.parse(dedent("""
     #         def func(x, y):
