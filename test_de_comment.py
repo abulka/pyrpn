@@ -53,3 +53,16 @@ class UtilCommentTests(BaseTest):
             """)
         self.assertEqual(expected, de_comment(commented))
 
+    def test_entire_line_is_comment(self):
+        commented = dedent("""
+            LBL "LOOPER"
+            // 1
+            // 100
+            RTN
+            """)
+        expected = dedent("""
+            LBL "LOOPER"
+            RTN
+            """)
+        self.assertEqual(expected, de_comment(commented))
+

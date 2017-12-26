@@ -193,7 +193,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def visit_Return(self,node):
         self.begin(node)
         self.visit_children(node)
-        self.program.RCL(self.var_name_to_register(self.var_names[0]))
+        register = self.var_name_to_register(self.var_names[0])
+        if register != 'ST X':  # optimisation: avoid redundant stack recall
+            self.program.RCL(register)
         self.end(node)
 
     @recursive

@@ -7,7 +7,7 @@ log = logging.getLogger(__name__)
 config_log(log)
 
 class BaseTest(unittest.TestCase):
-    LOG_BLANK_LINES = 5
+    LOG_BLANK_LINES = 2
 
     @staticmethod
     def space():
