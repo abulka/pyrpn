@@ -37,7 +37,7 @@ class RpnCodeGenTests(BaseTest):
         :return: -
         """
         if dump:
-            self.visitor.program.dump()
+            self.visitor.program.dump(comments=True)
 
         expected = expected.strip().split('\n')
         for i, line in enumerate(lines):

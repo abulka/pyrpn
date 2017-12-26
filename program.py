@@ -10,6 +10,7 @@ config_log(log)
 class Line(object):
     text = attrib(default='')
     lineno = attrib(default=0)
+    comment = attrib(default='')
 
 
 @attrs
@@ -37,8 +38,8 @@ class Program(object):
         line = Line(text=f'RCL{aug_assign} {from_register}')
         self._add_line(line)
 
-    def insert(self, text):
-        line = Line(text=str(text))
+    def insert(self, text, comment=''):
+        line = Line(text=str(text), comment=comment)
         self._add_line(line)
 
     def assign(self, to_register, val, val_type, aug_assign=''):
@@ -55,8 +56,9 @@ class Program(object):
     def finish(self):
         self.insert('RTN')
 
-    def dump(self):
+    def dump(self, comments=False):
         log.debug(f"{'='*20} | (Program lines dump)")
         for line in self.lines:
-            log.debug(f'{line.lineno:02d} {line.text}')
+            comment = f'  // {line.comment}' if comments and line.comment else ''
+            log.debug(f'{line.lineno:02d} {line.text}{comment}')
         log.debug(f"{'='*20} |")

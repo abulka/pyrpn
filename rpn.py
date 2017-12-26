@@ -182,13 +182,13 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.begin(node)
         self.visit_children(node)
         if self.in_for_loop_in and 'range' in self.var_names:
-            self.program.insert(self.params[0])
+            self.program.insert(self.params[0], comment=f'range {self.var_names}')
             self.program.insert(self.params[1])
             self.program.insert(1000)
             self.program.insert('/')
             self.program.insert('+')
 
-            self.program.insert(f'STO {self.for_loop_info[-1].register}')
+            self.program.insert(f'STO {self.for_loop_info[-1].register}', comment=f'range {self.var_names}')
             self.program.insert(f'LBL {self.for_loop_info[-1].label:02d}')
         self.reset()
         self.end(node)
@@ -236,7 +236,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         self.body_or_else(node)
 
-        self.program.insert(f'ISG {self.for_loop_info[-1].register}')
+        self.program.insert(f'ISG {self.for_loop_info[-1].register}', comment=f'{self.for_loop_info[-1]}')
         self.program.insert(f'GTO {self.for_loop_info[-1].label:02d}')
         self.for_loop_info.pop()
         self.end(node)
