@@ -52,7 +52,7 @@ class RpnCodeGenTests(BaseTest):
             def simple():
                 pass
             """))
-        self.assertEqual(lines[0].text, 'LBL "SIMPLE"')
+        self.assertEqual(lines[0].text, 'LBL "simple"')
         self.assertEqual(lines[1].text, 'RTN')
 
     def test_def_assignment_global(self):
@@ -61,7 +61,7 @@ class RpnCodeGenTests(BaseTest):
                 X = 100
             """))
         expected = dedent("""
-            LBL "SIMPLE"
+            LBL "simple"
             100
             STO "X"
             RDN
@@ -71,7 +71,7 @@ class RpnCodeGenTests(BaseTest):
 
     def test_def_assignment_scoped(self):
         lines = self.parse(dedent("""
-            def simple():
+            def SIMPLE():
                 x = 100
             """))
         expected = dedent("""
@@ -90,7 +90,7 @@ class RpnCodeGenTests(BaseTest):
                 Y = 200
             """))
         expected = dedent("""
-            LBL "SIMPLE"
+            LBL "simple"
             100
             STO "X"
             RDN
@@ -108,7 +108,7 @@ class RpnCodeGenTests(BaseTest):
                 y = 200
             """))
         expected = dedent("""
-            LBL "SIMPLE"
+            LBL "simple"
             100
             STO 00
             RDN
@@ -126,7 +126,7 @@ class RpnCodeGenTests(BaseTest):
                 y = 200
             """))
         expected = dedent("""
-            LBL "SIMPLE"
+            LBL "simple"
             100
             STO "X"
             RDN
@@ -139,12 +139,12 @@ class RpnCodeGenTests(BaseTest):
 
     def test_def_range(self):
         lines = self.parse(dedent("""
-            def simple():
+            def for_loop():
                 for i in range(1, 200):
                     pass
             """))
         expected = dedent("""
-            LBL "SIMPLE"
+            LBL "for_loo"
             1
             200
             1000
@@ -160,12 +160,12 @@ class RpnCodeGenTests(BaseTest):
 
     def test_def_range_with_body_assign_global(self):
         lines = self.parse(dedent("""
-            def simple():
+            def another_for_loop():
                 for i in range(5, 60):
                     X = 10
             """))
         expected = dedent("""
-            LBL "SIMPLE"
+            LBL "another"
             5
             60
             1000
@@ -184,12 +184,12 @@ class RpnCodeGenTests(BaseTest):
 
     def test_def_range_with_body_assign_scoped(self):
         lines = self.parse(dedent("""
-            def simple():
+            def range_with_body():
                 for i in range(5, 60):
                     x = 10
             """))
         expected = dedent("""
-            LBL "SIMPLE"
+            LBL "range_w"
             5
             60
             1000
@@ -208,13 +208,13 @@ class RpnCodeGenTests(BaseTest):
 
     def test_def_range_three_scoped_vars(self):
         lines = self.parse(dedent("""
-            def simple():
+            def three_scoped():
                 x = 10
                 for i in range(5, 60):
                     y = 100
             """))
         expected = dedent("""
-            LBL "SIMPLE"
+            LBL "three_s"
             10
             STO 00
             RDN
@@ -236,14 +236,14 @@ class RpnCodeGenTests(BaseTest):
 
     def test_def_range_with_body_accessing_i(self):
         lines = self.parse(dedent("""
-            def simple():
+            def range_i():
                 X = 0
                 for i in range(2, 4):
                     X += i
                 return X
             """))
         expected = dedent("""
-            LBL "SIMPLE"
+            LBL "range_i"
             0
             STO "X"
             RDN
@@ -266,7 +266,7 @@ class RpnCodeGenTests(BaseTest):
 
     def test_def_range_complex(self):
         lines = self.parse(dedent("""
-            def simple():
+            def range_complex():
                 X = 0
                 x = 0
                 total = 0
@@ -278,7 +278,7 @@ class RpnCodeGenTests(BaseTest):
             """))
         # local var mappings are x:0, total:1, i:2
         expected = dedent("""
-            LBL "SIMPLE"
+            LBL "range_c"
             0
             STO "X" // X
             RDN
@@ -322,7 +322,7 @@ class RpnCodeGenTests(BaseTest):
                 return x
             """))
         expected = dedent("""
-            LBL "LOOPER"  // param n is on the stack, so that's up to the user
+            LBL "looper"  // param n is on the stack, so that's up to the user
             100
             STO 00  // x
             RDN
@@ -339,6 +339,87 @@ class RpnCodeGenTests(BaseTest):
             ISG 01  // i
             GTO 00
             RCL 00  // leave x on stack
+            RTN
+            """)
+        self.compare(de_comment(expected), lines)
+
+    # Stack param tests
+
+    @unittest.skip("offline")
+    def test_stack_x_as_param(self):
+        lines = self.parse(dedent("""
+            def function(n):
+                pass
+            """))
+        expected = dedent("""
+            LBL "function"  // param n is on the stack, so that's up to the user
+            RTN
+            """)
+        self.compare(de_comment(expected), lines)
+
+    @unittest.skip("offline")
+    def test_stack_x_as_param_returned(self):
+        lines = self.parse(dedent("""
+            def function(n):
+                return n
+            """))
+        expected = dedent("""
+            LBL "function"
+            RTN
+            """)
+        self.compare(de_comment(expected), lines)
+
+    @unittest.skip("offline")
+    def test_stack_x_as_param_returned_add1(self):
+        lines = self.parse(dedent("""
+            def function(n):
+                return n + 1
+            """))
+        expected = dedent("""
+            LBL "function"
+            1
+            +
+            RTN
+            """)
+        self.compare(de_comment(expected), lines)
+
+    @unittest.skip("offline")
+    def test_stack_x_y_as_param_return_add(self):
+        lines = self.parse(dedent("""
+            def function(a, b):
+                return a + b
+            """))
+        expected = dedent("""
+            LBL "function"
+            +
+            RTN
+            """)
+        self.compare(de_comment(expected), lines)
+
+    @unittest.skip("offline")
+    def test_stack_x_y_as_param_return_add_plus_literal(self):
+        lines = self.parse(dedent("""
+            def function(a, b):
+                return a + b + 10
+            """))
+        expected = dedent("""
+            LBL "function"
+            +
+            10
+            +
+            RTN
+            """)
+        self.compare(de_comment(expected), lines)
+
+    @unittest.skip("offline")
+    def test_stack_x_y_as_param_return_y(self):
+        lines = self.parse(dedent("""
+            def function(x, y):
+                return y
+            """))
+        expected = dedent("""
+            LBL "function"
+            RCL ST Y
             RTN
             """)
         self.compare(de_comment(expected), lines)

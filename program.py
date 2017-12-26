@@ -27,7 +27,7 @@ class Program(object):
         self.next_lineno += 1
 
     def LBL(self, node):
-        line = Line(text=f'LBL "{node.name.upper()[-7:]}"')
+        line = Line(text=f'LBL "{node.name[:7]}"')
         self._add_line(line)
 
     def STO(self, to_register, aug_assign=''):
