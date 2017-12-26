@@ -20,6 +20,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.scopes = Scopes()
         self.for_loop_info = []
         self.next_local_label = 0
+        self.log_indent = 0
 
     # Recursion support
 
@@ -48,14 +49,26 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def log_state(self, msg):
         # log.info(f'{msg}, {self.var_names}, {self.params}, {self.aug_assign_symbol} {self.scope_stack}')
         descr = 'scope' if self.scopes.length == 1 else 'scopes'
-        last_info = '' if self.scopes.current_empty else str(self.scopes.current)
-        scope_info = f'({self.scopes.length} {descr}) {last_info}'
-        log.info(f'{msg}, {self.var_names}, {self.params}, {self.aug_assign_symbol} {scope_info}')
+        last_info = '' if self.scopes.current_empty else str(self.scopes.current.data)
+        # scope_info = f'({self.scopes.length} {descr}) {last_info}'
+        scope_info = f'scope {last_info}'
 
-    def begin(self, node):
-        self.log_state(f'BEGIN {type(node).__name__}')
+        if len(self.var_names) == 0 and len(self.params) == 0 and self.aug_assign_symbol == '':
+            state_info = ''
+        else:
+            state_info = f'{self.var_names}, {self.params}, {self.aug_assign_symbol}'
+
+        if self.scopes.current_empty:
+            scope_info = ''
+
+        log.info(f'{" "*4*self.log_indent}{msg} {state_info} {scope_info}')
+
+    def begin(self, node, msg=''):
+        self.log_state(f'BEGIN {type(node).__name__} {msg}')
+        self.log_indent += 1
 
     def end(self, node):
+        self.log_indent -= 1
         self.log_state(f'END {type(node).__name__}')
 
     def children_complete(self, node):
@@ -111,7 +124,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         else:
             map_it(var_name)
             register = self.scopes.get_register(var_name)  # look up what register was allocated e.g. "00"
-        log.debug(f'var_name {var_name} mapped to register {register}')
+        # log.debug(f'var_name {var_name} mapped to register {register}')
         return register
 
     # For support
@@ -150,7 +163,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.begin(node)
         self.visit_children(node)
         for i, arg_name in enumerate(self.var_names):
-            log.debug(f'def arg mapping {i} {arg_name}')
+            # log.debug(f'def arg mapping {i} {arg_name}')
             to_register = self.var_name_to_register(arg_name, use_stack_register=i)
             assert not self.scopes.current_empty
         self.reset()
@@ -233,12 +246,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             log.warning(f'name {node.name}')
 
     def visit_Name(self, node):
-        log.info(f'visit_Name {node.id}')
+        self.begin(node, msg=node.id)
         self.push_name(node.id)
         self.end(node)
 
     def visit_Num(self, node):
-        log.info(f'visit_Num {node.n}')
+        self.begin(node, msg=node.n)
         self.push_param(str(node.n))  # always a string
         self.end(node)
 
