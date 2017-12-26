@@ -391,10 +391,9 @@ class RpnCodeGenTests(BaseTest):
             +
             RTN
             """)
-        self.compare(de_comment(expected), lines, dump=True)
+        self.compare(de_comment(expected), lines)
 
-    @unittest.skip("offline")
-    def test_stack_x_y_as_param_return_add_plus_literal(self):
+    def test_stack_x_y_add_plus_literal(self):
         lines = self.parse(dedent("""
             def func(a, b):
                 return a + b + 10
@@ -406,7 +405,7 @@ class RpnCodeGenTests(BaseTest):
             +
             RTN
             """)
-        self.compare(de_comment(expected), lines)
+        self.compare(de_comment(expected), lines, dump=True)
 
     def test_stack_x_y_as_param_return_y(self):
         lines = self.parse(dedent("""
