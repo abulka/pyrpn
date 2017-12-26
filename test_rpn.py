@@ -348,11 +348,11 @@ class RpnCodeGenTests(BaseTest):
     @unittest.skip("offline")
     def test_stack_x_as_param(self):
         lines = self.parse(dedent("""
-            def function(n):
+            def func(n):
                 pass
             """))
         expected = dedent("""
-            LBL "function"  // param n is on the stack, so that's up to the user
+            LBL "func"  // param n is on the stack, so that's up to the user
             RTN
             """)
         self.compare(de_comment(expected), lines)
@@ -360,11 +360,11 @@ class RpnCodeGenTests(BaseTest):
     @unittest.skip("offline")
     def test_stack_x_as_param_returned(self):
         lines = self.parse(dedent("""
-            def function(n):
+            def func(n):
                 return n
             """))
         expected = dedent("""
-            LBL "function"
+            LBL "func"
             RTN
             """)
         self.compare(de_comment(expected), lines)
@@ -372,11 +372,11 @@ class RpnCodeGenTests(BaseTest):
     @unittest.skip("offline")
     def test_stack_x_as_param_returned_add1(self):
         lines = self.parse(dedent("""
-            def function(n):
+            def func(n):
                 return n + 1
             """))
         expected = dedent("""
-            LBL "function"
+            LBL "func"
             1
             +
             RTN
@@ -386,11 +386,11 @@ class RpnCodeGenTests(BaseTest):
     @unittest.skip("offline")
     def test_stack_x_y_as_param_return_add(self):
         lines = self.parse(dedent("""
-            def function(a, b):
+            def func(a, b):
                 return a + b
             """))
         expected = dedent("""
-            LBL "function"
+            LBL "func"
             +
             RTN
             """)
@@ -399,11 +399,11 @@ class RpnCodeGenTests(BaseTest):
     @unittest.skip("offline")
     def test_stack_x_y_as_param_return_add_plus_literal(self):
         lines = self.parse(dedent("""
-            def function(a, b):
+            def func(a, b):
                 return a + b + 10
             """))
         expected = dedent("""
-            LBL "function"
+            LBL "func"
             +
             10
             +
@@ -411,15 +411,14 @@ class RpnCodeGenTests(BaseTest):
             """)
         self.compare(de_comment(expected), lines)
 
-    @unittest.skip("offline")
     def test_stack_x_y_as_param_return_y(self):
         lines = self.parse(dedent("""
-            def function(x, y):
-                return y
+            def func(x, y):
+                return y    
             """))
         expected = dedent("""
-            LBL "function"
+            LBL "func"
             RCL ST Y
             RTN
             """)
-        self.compare(de_comment(expected), lines)
+        self.compare(de_comment(expected), lines, dump=True)

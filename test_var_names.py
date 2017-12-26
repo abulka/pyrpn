@@ -45,6 +45,18 @@ class VarnameLowerTests(BaseTest):
         register_x = v.var_name_to_register('x')
         self.assertEqual('00', register_x)
 
+class VarnameStackTests(BaseTest):
+
+    def test_X(self):
+        v = RecursiveRpnVisitor()
+        register = v.var_name_to_register('a', use_stack_register=0)
+        self.assertEqual('ST X', register)
+
+    def test_Y(self):
+        v = RecursiveRpnVisitor()
+        register = v.var_name_to_register('a', use_stack_register=1)
+        self.assertEqual('ST Y', register)
+
 class VarnameUpperTests(BaseTest):
 
     def test_uppercase_varname(self):

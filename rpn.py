@@ -85,7 +85,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             raise RuntimeError("yeah dunno what assignment to make")
         self.reset()
 
-    def var_name_to_register(self, var_name):
+    def var_name_to_register(self, var_name, use_stack_register=None):
         """
         Figure out the register to use to store/recall 'var_name' e.g. "x" via our scope system
         Rules:
@@ -94,17 +94,23 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             Otherwise if its a lowercase var name, map to a numbered register e.g. 00
 
         :param var_name: python identifier e.g. 'x'
+        :param use_stack_register: don't use named registers, use the stack. 1 means map to ST X, 2 means map to ST Y etc.
         :return: register name as a string e.g. "X" or 00 - depending on rules
         """
-        if var_name.isupper():
-            register = f'"{var_name.upper()[-7:]}"'  # TODO still have to cater for clash of uppercase in multiple scopes - or do we?  maybe treat as global?
+        def map_it(var_name, register=None):
             if not self.scopes.has_mapping(var_name):
                 self.scopes.add_mapping(var_name, register=register)
+
+        if use_stack_register != None:
+            stack_register = ['X', 'Y', 'Z', 'T'][use_stack_register]
+            register = f'ST {stack_register}'
+            map_it(var_name, register)
+        elif var_name.isupper():
+            register = f'"{var_name.upper()[-7:]}"'
+            map_it(var_name, register)
         else:
-            if not self.scopes.has_mapping(var_name):
-                self.scopes.add_mapping(var_name)
-            # look up what register was allocated e.g. "00"
-            register = self.scopes.get_register(var_name)
+            map_it(var_name)
+            register = self.scopes.get_register(var_name)  # look up what register was allocated e.g. "00"
         log.debug(f'var_name {var_name} mapped to register {register}')
         return register
 
@@ -137,6 +143,24 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.visit_children(node)
 
         self.scopes.pop()
+        self.end(node)
+
+    def visit_arguments(self,node):
+        """ visit arguments to a function"""
+        self.begin(node)
+        self.visit_children(node)
+        for i, arg_name in enumerate(self.var_names):
+            log.debug(f'def arg mapping {i} {arg_name}')
+            to_register = self.var_name_to_register(arg_name, use_stack_register=i)
+            assert not self.scopes.current_empty
+        self.reset()
+        self.end(node)
+
+    def visit_arg(self,node):
+        """ visit each argument """
+        self.begin(node)
+        self.push_name(node.arg)
+        self.visit_children(node)
         self.end(node)
 
     def visit_Assign(self,node):
