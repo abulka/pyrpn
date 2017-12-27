@@ -68,3 +68,5 @@ class Scopes(object):
 class Scope(object):
     data = attrib(default=Factory(dict))  # var name to register name
     next_reg = attrib(default=0)
+    # label_data = attrib(default=Factory(dict))  # function name to label name
+    # next_lbl = attrib(default='A')

@@ -299,7 +299,7 @@ class RpnCodeGenTests(BaseTest):
             def looper(n):
                 x = 100
                 for i in range(10, n):
-                    print(i)
+                    #print(i)
                     x += n
                     x += i
                 return x
@@ -317,7 +317,7 @@ class RpnCodeGenTests(BaseTest):
             +
             STO 02    // i our counter
             LBL 00
-            //VIEW 02 // print i  TODO when doing function calls
+            //VIEW 02 // print i  TODO 
             RCL 00    // n
             STO+ 01   // x +=
             RCL 02    // i
@@ -522,6 +522,21 @@ class RpnCodeGenTests(BaseTest):
             +
             9
             +
+            RTN
+            """)
+        self.compare(de_comment(expected), lines, dump=True)
+
+    # Function calls
+
+    def test_xeq_simple(self):
+        lines = self.parse(dedent("""
+            def main():
+                f(1)
+            """))
+        expected = dedent("""
+            LBL "main"
+            1
+            XEQ A
             RTN
             """)
         self.compare(de_comment(expected), lines, dump=True)
