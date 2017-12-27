@@ -291,7 +291,7 @@ class RpnCodeGenTests(BaseTest):
             """)
         self.compare(de_comment(expected), lines, trace=True, dump=True)
 
-    @unittest.skip("offline")
+    # @unittest.skip("offline")
     def test_complex(self):
         lines = self.parse(dedent("""
             def looper(n):
@@ -303,24 +303,27 @@ class RpnCodeGenTests(BaseTest):
             """))
         expected = dedent("""
             LBL "looper"  // param n is on the stack, so that's up to the user
+            STO 00
+            RDN
             100
-            STO 00  // x
-            1000    // stack.x gets consumed
+            STO 01  // x
+            10      // range start, 10
+            RCL 00  // range end, n
+            1000
             /
-            10      // range start 
             +
-            STO 01  // i our counter
+            STO 02  // i our counter
             LBL 00
-            VIEW 01 // print i
-            RCL 01  // i
-            IP
-            STO+ 00 // x
-            ISG 01  // i
+            //VIEW 02 // print i  TODO
+            RCL 00  // n
+            //IP  TODO - when using a loop counter elsewhere, IP it first
+            STO+ 01 // x
+            ISG 02  // i
             GTO 00
-            RCL 00  // leave x on stack
+            RCL 01  // leave x on stack
             RTN
             """)
-        self.compare(de_comment(expected), lines)
+        self.compare(de_comment(expected), lines, dump=True, trace=True)
 
     # Stack param tests
 
@@ -458,7 +461,6 @@ class RpnCodeGenTests(BaseTest):
             """)
         self.compare(de_comment(expected), lines, dump=True)
 
-    # @unittest.skip("offline need to figure our binop etc")
     def test_stack_complex2(self):
         lines = self.parse(dedent("""
             def func(a):
