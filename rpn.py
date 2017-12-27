@@ -185,15 +185,15 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                                 # cos it must come out last cos its RPN :-) - see later in this method below...
         self.visit_children(node)
 
-        if self.in_for_loop_in:  # and 'range' in self.var_names:
+        # if self.for_loop_info and node.func.id == 'range':
+        if self.in_for_loop_in and node.func.id == 'range':
             self.program.insert(1000)
             self.program.insert('/')
             self.program.insert('+')
             self.program.insert(f'STO {self.for_loop_info[-1].register}', comment='range')
-            self.program.insert(f'LBL {self.for_loop_info[-1].label:02d}')
         # AA2
         else:
-            self.program.insert(f'XEQ {self.func_name_to_lbl(node.func.id)}')  # TODO need to map to proper label
+            self.program.insert(f'XEQ {self.func_name_to_lbl(node.func.id)}')
 
         self.end(node)
 
@@ -233,18 +233,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.program.insert(str(node.n))
         self.end(node)
 
-    # AA4
     @recursive
     def visit_Expr(self, node):
         pass
-        # self.begin(node)
-        # self.generic_visit(node)
-        # self.begin(node, msg=node.n)
-        # self.visit_children(node)
-        # self.end(node)
-
-    # def visit_Expr(self, node):
-    #     self.generic_visit(node)
 
     def visit_For(self, node):
         self.begin(node)
@@ -261,6 +252,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.visit(node.iter)
         self.in_for_loop_in = False
         log.info(':')
+        self.program.insert(f'LBL {self.for_loop_info[-1].label:02d}')
 
         self.body_or_else(node)
 
