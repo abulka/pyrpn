@@ -218,7 +218,11 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         """ visit a AugAssign e.g. += node and visits it recursively"""
         self.begin(node)
         self.visit_children(node)
-        self._assign()
+        # self._assign()
+        if '.Add' in str(node.op):
+            op = '+'
+        self.program.insert(f'STO{op} {self.var_name_to_register(node.target.id)}')
+        assert '.Store' in str(node.target.ctx)
         self.end(node)
 
     def visit_Return(self,node):
@@ -276,9 +280,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         """
         self.begin(node)
         self.visit_children(node)
-        if self.in_for_loop_in and 'range' in self.var_names:
-            self.program.insert(self.params[0], comment=f'range {self.var_names}')
-            self.program.insert(self.params[1])
+        if self.in_for_loop_in:  # and 'range' in self.var_names:
+            # self.program.insert(self.params[0], comment=f'range {self.var_names}')
+            # self.program.insert(self.params[1])
             self.program.insert(1000)
             self.program.insert('/')
             self.program.insert('+')
@@ -305,9 +309,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def visit_Name(self, node):
         self.begin(node, msg=node.id)
-        log.debug('Name node node.ctx %s', node.ctx)
-        if '.Load' in str(node.ctx):
-            self.program.insert(f'RCL {self.var_name_to_register(node.id)}')
+        log.debug('Name node %s node.ctx %s', node.id, node.ctx)
+        if node.id == 'range':
+            pass # what to do with this situation
+        else:
+            if '.Load' in str(node.ctx):
+                self.program.insert(f'RCL {self.var_name_to_register(node.id)}')
         self.end(node)
 
     def visit_Num(self, node):
@@ -321,7 +328,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         log.info('for ')
         self.visit(node.target)
         self.for_loop_info.append(
-            ForLoopItem(register=self.var_name_to_register(self.var_names[0]),
+            ForLoopItem(register=self.var_name_to_register(node.target.id),
                         label=self.next_local_label))
         self.next_local_label += 1
 

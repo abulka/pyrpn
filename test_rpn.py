@@ -194,7 +194,7 @@ class RpnCodeGenTests(BaseTest):
             GTO 00
             RTN
             """)
-        self.compare(expected, lines, trace=True, dump=True)
+        self.compare(de_comment(expected), lines, trace=True, dump=True)
 
     def test_def_range_three_scoped_vars(self):
         lines = self.parse(dedent("""
@@ -220,7 +220,7 @@ class RpnCodeGenTests(BaseTest):
             GTO 00
             RTN
             """)
-        self.compare(expected, lines, trace=True, dump=True)
+        self.compare(de_comment(expected), lines, trace=True, dump=True)
 
     def test_def_range_with_body_accessing_i(self):
         lines = self.parse(dedent("""
@@ -248,7 +248,7 @@ class RpnCodeGenTests(BaseTest):
             RCL "X"
             RTN
             """)
-        self.compare(expected, lines, trace=True, dump=True)
+        self.compare(de_comment(expected), lines, trace=True, dump=True)
 
     def test_def_range_complex(self):
         lines = self.parse(dedent("""
@@ -277,14 +277,13 @@ class RpnCodeGenTests(BaseTest):
             /
             +
             STO 02  // i
-            LBL 00
+            LBL 00  // for
             RCL 02  // i
             STO "X"
             RCL 02  // i
-            STO+ 00 // x
+            STO+ 00 // x +=
             RCL 00  // x
-            STO+ 01 // total
-            RDN
+            STO+ 01 // total +=
             ISG 02  // i
             GTO 00
             RCL 01  // total
@@ -478,8 +477,8 @@ class RpnCodeGenTests(BaseTest):
             +
             STO 01  // c
             // return
-            RCL 01  // c
             RCL 00  // a
+            RCL 01  // c
             +
             2
             +
