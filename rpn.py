@@ -207,7 +207,11 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         """ visit a Assign node and visits it recursively"""
         self.begin(node)
         self.visit_children(node)
-        self._assign()
+        # self._assign()
+        for target in node.targets:
+            self.program.insert(f'STO {self.var_name_to_register(target.id)}')
+            assert '.Store' in str(target.ctx)
+
         self.end(node)
 
     def visit_AugAssign(self,node):
@@ -242,8 +246,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def visit_Add(self,node):
         self.begin(node)
-        self.aug_assign_symbol = '+'  # TODO rename 'aug_assign_symbol' to 'pending_op'
-        self.visit_children(node)
+        # self.program.insert('+')
+        assert len(list(ast.iter_child_nodes(node))) == 0  # should be no children
+        # self.visit_children(node)
         self.end(node)
 
     def visit_BinOp(self, node):
@@ -251,8 +256,11 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.begin(node)
         self.visit_children(node)
 
-        self.perform_op()
+        # self.perform_op()
         # self._assign(reset=False)  # keep info around... hmmm
+
+        if '.Add' in str(node.op):
+            self.program.insert('+')
 
         self.end(node)
 
@@ -297,12 +305,14 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def visit_Name(self, node):
         self.begin(node, msg=node.id)
-        self.push_name(node.id)
+        log.debug('Name node node.ctx %s', node.ctx)
+        if '.Load' in str(node.ctx):
+            self.program.insert(f'RCL {self.var_name_to_register(node.id)}')
         self.end(node)
 
     def visit_Num(self, node):
         self.begin(node, msg=node.n)
-        self.push_param(str(node.n))  # always a string
+        self.program.insert(str(node.n))
         self.end(node)
 
     def visit_For(self, node):

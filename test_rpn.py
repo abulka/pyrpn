@@ -526,14 +526,12 @@ class RpnCodeGenTests(BaseTest):
             7
             +
             STO 00  // a
-            RDN
-            RCL 00  // a
+            RCL 00  // a ... could be left out as an optimisation since its on stack already
             8
             +
             RCL 00 // a
             +
-            STO 01  // b
-            RDN
+            STO 01 // b
             // return
             RCL 00  // a
             RCL 01  // b

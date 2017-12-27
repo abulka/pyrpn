@@ -41,6 +41,7 @@ class Program(object):
     def insert(self, text, comment=''):
         line = Line(text=str(text), comment=comment)
         self._add_line(line)
+        log.debug(line.text)
 
     def assign(self, to_register, val, val_type, aug_assign=''):
         assert val_type in ('literal', 'var')
