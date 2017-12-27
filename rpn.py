@@ -14,8 +14,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def __init__(self):
         self.program = Program()
-        # self.var_names = []
-        # self.params = []
         self.pending_op = ''
         self.scopes = Scopes()
         self.for_loop_info = []
@@ -46,11 +44,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         # scope_info = f'({self.scopes.length} {descr}) {last_info}'
         scope_info = f'scope {last_info}'
 
-        # if len(self.var_names) == 0 and len(self.params) == 0 and self.pending_op == '':
-        #     state_info = ''
-        # else:
-        #     state_info = f'{self.var_names}, {self.params}, {self.aug_assign_symbol}'
-
         if self.scopes.current_empty:
             scope_info = ''
 
@@ -66,48 +59,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def children_complete(self, node):
         self.log_state(f'{type(node).__name__} children complete')
-
-    # Assign support
-
-    # def _assign(self, reset=True):
-    #     to_register = self.var_name_to_register(self.var_names[0])
-    #     if self.params:
-    #         # we are assigning a parameter literal to a register
-    #         val = self.params[0]
-    #         self.program.assign(to_register, val, val_type='literal', aug_assign=self.aug_assign_symbol)
-    #     elif len(self.var_names) >= 2:
-    #         # we are assigning another variable to a register
-    #         from_register = self.var_name_to_register(self.var_names[1])
-    #         self.program.assign(to_register, from_register, val_type='var', aug_assign=self.aug_assign_symbol)
-    #     else:
-    #         raise RuntimeError("yeah dunno what assignment to make")
-    #     if reset:
-    #         self.reset()
-
-    # def perform_op(self, reset=True):
-    #     if len(self.var_names) >= 2:
-    #         # op between two registers
-    #         register1 = self.var_name_to_register(self.var_names[0])
-    #         register2 = self.var_name_to_register(self.var_names[1])
-    #         self.program.insert(f'RCL {register1}')
-    #         self.program.insert(f'RCL {register2}')
-    #     elif self.var_names and self.params:
-    #         # op between a register and a literal
-    #         register1 = self.var_name_to_register(self.var_names[0])
-    #         self.program.insert(f'RCL {register1}')
-    #         self.program.insert(f'{self.params[0]}')
-    #     elif self.params:
-    #         # or just the literal to the previous result
-    #         self.program.insert(f'{self.params[0]}')
-    #     elif self.var_names:
-    #         # or just a register to the previous result
-    #         register = self.var_name_to_register(self.var_names[0])
-    #         self.program.insert(f'RCL {register}')
-    #     else:
-    #         raise RuntimeError('unknown op situation')
-    #     self.program.insert(f'{self.aug_assign_symbol}')
-    #     if reset:
-    #         self.reset()
 
     def var_name_to_register(self, var_name):
         """
@@ -125,10 +76,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             if not self.scopes.has_mapping(var_name):
                 self.scopes.add_mapping(var_name, register=register)
 
-        # if use_stack_register != None:
-        #     stack_register = ['X', 'Y', 'Z', 'T'][use_stack_register]
-        #     register = f'ST {stack_register}'
-        #     map_it(var_name, register)
         if var_name.isupper():
             register = f'"{var_name.upper()[-7:]}"'
             map_it(var_name, register)
@@ -144,19 +91,14 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     # For support
 
     def body(self, statements):
-        # self.new_line = True
-        # self.indentation += 1
         for stmt in statements:
             self.visit(stmt)
-        # self.indentation -= 1
 
     def body_or_else(self, node):
         self.body(node.body)
         if node.orelse:
-            # self.newline()
             log.info('else:')
             self.body(node.orelse)
-
 
     # Visit functions
 
@@ -164,13 +106,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         """ visit a Function node and visits it recursively"""
         self.scopes.push()
         self.begin(node)
-
         self.program.insert(f'LBL "{node.name[:7]}"')
-
         self.visit_children(node)
-
         self.program.insert('RTN')
-
         self.scopes.pop()
         self.end(node)
 
@@ -178,22 +116,13 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         """ visit arguments to a function"""
         self.begin(node)
         self.visit_children(node)
-        # for arg_name in self.var_names:
-        #     to_register = self.var_name_to_register(arg_name)
-        #     self.program.STO(to_register)
-        #     self.program.insert('RDN')
-        #     assert not self.scopes.current_empty
-        # self.reset()
         self.end(node)
 
     def visit_arg(self,node):
         """ visit each argument """
         self.begin(node)
-
-        # self.push_name(node.arg)
         self.program.insert(f'STO {self.var_name_to_register(node.arg)}')
         self.program.insert('RDN')
-
         self.visit_children(node)
         self.end(node)
 
@@ -201,20 +130,15 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         """ visit a Assign node and visits it recursively"""
         self.begin(node)
         self.visit_children(node)
-        # self._assign()
         for target in node.targets:
             self.program.insert(f'STO {self.var_name_to_register(target.id)}')
             assert '.Store' in str(target.ctx)
-
         self.end(node)
 
     def visit_AugAssign(self,node):
         """ visit a AugAssign e.g. += node and visits it recursively"""
         self.begin(node)
         self.visit_children(node)
-        # self._assign()
-        # if '.Add' in str(node.op):
-        #     op = '+'
         self.program.insert(f'STO{self.pending_op} {self.var_name_to_register(node.target.id)}')
         assert '.Store' in str(node.target.ctx)
         self.pending_op = ''
@@ -223,33 +147,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def visit_Return(self,node):
         self.begin(node)
         self.visit_children(node)
-
-        # # if there is a pending operation, perform it and leave result on the stack ready to return
-        # # otherwise just recall the register being returned
-        # if self.aug_assign_symbol:
-        #     self.perform_op()
-        # else:
-        #     register = self.var_name_to_register(self.var_names[0])
-        #     self.program.RCL(register)
-
-        # # Another approach
-        # if self.var_names:
-        #     register = self.var_name_to_register(self.var_names[0])
-        #     self.program.RCL(register)
-        # elif self.params:
-        #     self.program.insert(self.params[0])
-        # else:
-        #     pass  # you get what's on the stack?
-
-        # self.program.insert('RTN')
-
         self.end(node)
 
     def visit_Add(self,node):
         self.begin(node)
-        # self.program.insert('+')
-        # assert len(list(ast.iter_child_nodes(node))) == 0  # should be no children
-        # self.visit_children(node)
         self.pending_op = '+'
         self.end(node)
 
@@ -257,14 +158,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         """ visit a BinOp node and visits it recursively"""
         self.begin(node)
         self.visit_children(node)
-
-        # self.perform_op()
-        # self._assign(reset=False)  # keep info around... hmmm
-
-        # if '.Add' in str(node.op):
         assert self.pending_op
         self.program.insert(self.pending_op)
-
         self.end(node)
 
     def visit_Call(self,node):
@@ -280,15 +175,11 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.begin(node)
         self.visit_children(node)
         if self.in_for_loop_in:  # and 'range' in self.var_names:
-            # self.program.insert(self.params[0], comment=f'range {self.var_names}')
-            # self.program.insert(self.params[1])
             self.program.insert(1000)
             self.program.insert('/')
             self.program.insert('+')
-
             self.program.insert(f'STO {self.for_loop_info[-1].register}', comment='range')
             self.program.insert(f'LBL {self.for_loop_info[-1].label:02d}')
-        # self.reset()
         self.end(node)
 
     @recursive
@@ -308,7 +199,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def visit_Name(self, node):
         self.begin(node, msg=node.id)
-        log.debug('Name node %s node.ctx %s', node.id, node.ctx)
+        # log.debug('Name node "%s" node.ctx %s', node.id, node.ctx)
         if node.id == 'range':
             pass # what to do with this situation
         else:
