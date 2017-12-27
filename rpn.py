@@ -153,6 +153,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         # log.debug(f'var_name {var_name} mapped to register {register}')
         return register
 
+    def var_name_is_loop_counter(self, var_name):
+        return var_name == 'i'  # hack!  TODO - record this info in scope entry
+
     # For support
 
     def body(self, statements):
@@ -315,6 +318,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         else:
             if '.Load' in str(node.ctx):
                 self.program.insert(f'RCL {self.var_name_to_register(node.id)}')
+                if self.var_name_is_loop_counter(node.id):
+                    self.program.insert('IP')  # just get the integer portion of isg counter
         self.end(node)
 
     def visit_Num(self, node):

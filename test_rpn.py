@@ -299,6 +299,7 @@ class RpnCodeGenTests(BaseTest):
                 for i in range(10, n):
                     print(i)
                     x += n
+                    x += i
                 return x
             """))
         expected = dedent("""
@@ -306,21 +307,23 @@ class RpnCodeGenTests(BaseTest):
             STO 00
             RDN
             100
-            STO 01  // x
-            10      // range start, 10
-            RCL 00  // range end, n
+            STO 01    // x
+            10        // range start, 10
+            RCL 00    // range end, n
             1000
             /
             +
-            STO 02  // i our counter
+            STO 02    // i our counter
             LBL 00
             //VIEW 02 // print i  TODO
-            RCL 00  // n
-            //IP  TODO - when using a loop counter elsewhere, IP it first
-            STO+ 01 // x
-            ISG 02  // i
+            RCL 00    // n
+            STO+ 01   // x +=
+            RCL 02    // i
+            IP        // when using a loop counter elsewhere, IP it first
+            STO+ 01   // x +=
+            ISG 02    // i
             GTO 00
-            RCL 01  // leave x on stack
+            RCL 01    // leave x on stack
             RTN
             """)
         self.compare(de_comment(expected), lines, dump=True, trace=True)
