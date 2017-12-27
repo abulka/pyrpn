@@ -64,7 +64,6 @@ class RpnCodeGenTests(BaseTest):
             LBL "simple"
             100
             STO "X"
-            RDN
             RTN
             """)
         self.compare(expected, lines)
@@ -78,7 +77,6 @@ class RpnCodeGenTests(BaseTest):
             LBL "SIMPLE"
             100
             STO 00
-            RDN
             RTN
             """)
         self.compare(expected, lines)
@@ -93,10 +91,8 @@ class RpnCodeGenTests(BaseTest):
             LBL "simple"
             100
             STO "X"
-            RDN
             200
             STO "Y"
-            RDN
             RTN
             """)
         self.compare(expected, lines, trace=False, dump=False)
@@ -111,10 +107,8 @@ class RpnCodeGenTests(BaseTest):
             LBL "simple"
             100
             STO 00
-            RDN
             200
             STO 01
-            RDN
             RTN
             """)
         self.compare(expected, lines, trace=False, dump=False)
@@ -129,10 +123,8 @@ class RpnCodeGenTests(BaseTest):
             LBL "simple"
             100
             STO "X"
-            RDN
             200
             STO 00
-            RDN
             RTN
             """)
         self.compare(expected, lines, trace=False, dump=False)
@@ -156,7 +148,7 @@ class RpnCodeGenTests(BaseTest):
             GTO 00
             RTN
             """)
-        self.compare(expected, lines, trace=False, dump=False)
+        self.compare(expected, lines, trace=False, dump=True)
 
     def test_def_range_with_body_assign_global(self):
         lines = self.parse(dedent("""
@@ -175,7 +167,6 @@ class RpnCodeGenTests(BaseTest):
             LBL 00
             10
             STO "X"
-            RDN
             ISG 00
             GTO 00
             RTN
@@ -198,8 +189,7 @@ class RpnCodeGenTests(BaseTest):
             STO 00
             LBL 00
             10
-            STO 01
-            RDN
+            STO 01  // x
             ISG 00
             GTO 00
             RTN
@@ -217,7 +207,6 @@ class RpnCodeGenTests(BaseTest):
             LBL "three_s"
             10
             STO 00
-            RDN
             5
             60
             1000
@@ -226,8 +215,7 @@ class RpnCodeGenTests(BaseTest):
             STO 01
             LBL 00
             100
-            STO 02
-            RDN
+            STO 02  // y
             ISG 01
             GTO 00
             RTN
@@ -246,17 +234,15 @@ class RpnCodeGenTests(BaseTest):
             LBL "range_i"
             0
             STO "X"
-            RDN
             2
             4
             1000
             /
             +
-            STO 00
+            STO 00  // i
             LBL 00
-            RCL 00
+            RCL 00  // i
             STO+ "X"
-            RDN
             ISG 00
             GTO 00
             RCL "X"
@@ -281,13 +267,10 @@ class RpnCodeGenTests(BaseTest):
             LBL "range_c"
             0
             STO "X" // X
-            RDN
             0
             STO 00  // x
-            RDN
             0
             STO 01  // total
-            RDN
             2
             4
             1000
@@ -297,10 +280,8 @@ class RpnCodeGenTests(BaseTest):
             LBL 00
             RCL 02  // i
             STO "X"
-            RDN
             RCL 02  // i
             STO+ 00 // x
-            RDN
             RCL 00  // x
             STO+ 01 // total
             RDN
@@ -325,7 +306,6 @@ class RpnCodeGenTests(BaseTest):
             LBL "looper"  // param n is on the stack, so that's up to the user
             100
             STO 00  // x
-            RDN
             1000    // stack.x gets consumed
             /
             10      // range start 
@@ -369,7 +349,7 @@ class RpnCodeGenTests(BaseTest):
             RDN
             RTN
             """)
-        self.compare(de_comment(expected), lines)
+        self.compare(de_comment(expected), lines, dump=True)
 
     def test_stack_x_returned(self):
         lines = self.parse(dedent("""
@@ -400,6 +380,7 @@ class RpnCodeGenTests(BaseTest):
             RTN
             """)
         self.compare(de_comment(expected), lines)
+
     def test_stack_x_add1(self):
         lines = self.parse(dedent("""
             def func(n):
@@ -468,7 +449,6 @@ class RpnCodeGenTests(BaseTest):
             RDN
             1
             STO 02  // c
-            RDN
             // return
             RCL 01  // b
             RCL 02  // c
@@ -479,7 +459,7 @@ class RpnCodeGenTests(BaseTest):
             """)
         self.compare(de_comment(expected), lines, dump=True)
 
-    @unittest.skip("offline need to figure our binop etc")
+    # @unittest.skip("offline need to figure our binop etc")
     def test_stack_complex2(self):
         lines = self.parse(dedent("""
             def func(a):
@@ -493,12 +473,10 @@ class RpnCodeGenTests(BaseTest):
             RDN
             5
             STO+ 00
-            RDN
-            RCL 00
+            RCL 00  // a
             1
             +
             STO 01  // c
-            RDN
             // return
             RCL 01  // c
             RCL 00  // a
