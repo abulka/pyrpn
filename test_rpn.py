@@ -400,57 +400,6 @@ class RpnCodeGenTests(BaseTest):
             RTN
             """)
         self.compare(de_comment(expected), lines)
-
-    def test_stack_complex1(self):
-        lines = self.parse(dedent("""
-            def func(a, b):
-                c = 1
-                return b + c + a
-            """))
-        expected = dedent("""
-            LBL "func"
-            STO 00  // a
-            RDN
-            STO 01  // b
-            RDN
-            1
-            STO 02  // c
-            RDN
-            // return
-            RCL 01  // b
-            RCL 02  // c
-            +
-            RCL 00  // a
-            +
-            RTN
-            """)
-        self.compare(de_comment(expected), lines, dump=True)
-
-    # @unittest.skip('offline')
-    # def test_stack_wrecked_by_rcls2(self):
-    #     lines = self.parse(dedent("""
-    #         def func(a, b):
-    #             c = 1
-    #             d = c
-    #             return b + c + d
-    #         """))
-    #     expected = dedent("""
-    #         LBL "func"
-    #         1
-    #         STO 00  // c
-    #         RDN
-    #         RCL 00 // c
-    #         STO 01 // d
-    #         // now for the return
-    #         RCL ST Y
-    #         RCL 00
-    #         +
-    #         RCL 01
-    #         +
-    #         RTN
-    #         """)
-    #     self.compare(de_comment(expected), lines)
-
     def test_stack_x_add1(self):
         lines = self.parse(dedent("""
             def func(n):
@@ -505,3 +454,92 @@ class RpnCodeGenTests(BaseTest):
             """)
         self.compare(de_comment(expected), lines, dump=True)
 
+    def test_stack_complex1(self):
+        lines = self.parse(dedent("""
+            def func(a, b):
+                c = 1
+                return b + c + a
+            """))
+        expected = dedent("""
+            LBL "func"
+            STO 00  // a
+            RDN
+            STO 01  // b
+            RDN
+            1
+            STO 02  // c
+            RDN
+            // return
+            RCL 01  // b
+            RCL 02  // c
+            +
+            RCL 00  // a
+            +
+            RTN
+            """)
+        self.compare(de_comment(expected), lines, dump=True)
+
+    @unittest.skip("offline need to figure our binop etc")
+    def test_stack_complex2(self):
+        lines = self.parse(dedent("""
+            def func(a):
+                a += 5
+                c = a + 1
+                return a + c + 2
+            """))
+        expected = dedent("""
+            LBL "func"
+            STO 00  // a
+            RDN
+            5
+            STO+ 00
+            RDN
+            RCL 00
+            1
+            +
+            STO 01  // c
+            RDN
+            // return
+            RCL 01  // c
+            RCL 00  // a
+            +
+            2
+            +
+            RTN
+            """)
+        self.compare(de_comment(expected), lines, dump=True)
+
+        # Learn about binop assignments
+
+    def test_binop_1(self):
+        lines = self.parse(dedent("""
+            def func():
+                a = 5 + 6 + 7 
+                b = a + 8 + a
+                return a + b + 9
+            """))
+        expected = dedent("""
+            LBL "func"
+            5
+            6
+            +
+            7
+            +
+            STO 00  // a
+            RDN
+            RCL 00  // a
+            8
+            +
+            RCL 00 // a
+            +
+            STO 01  // b
+            RDN
+            // return
+            RCL 00  // a
+            RCL 01  // b
+            +
+            9
+            +
+            RTN
+            """)
+        self.compare(de_comment(expected), lines, dump=True)
