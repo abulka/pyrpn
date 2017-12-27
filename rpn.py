@@ -165,7 +165,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.scopes.push()
         self.begin(node)
 
-        self.program.LBL(node)
+        self.program.insert(f'LBL "{node.name[:7]}"')
 
         self.visit_children(node)
 
