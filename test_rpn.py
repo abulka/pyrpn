@@ -18,7 +18,6 @@ class RpnCodeGenTests(BaseTest):
         self.dump_ast()
         self.visitor = RecursiveRpnVisitor()
         self.visitor.visit(self.tree)
-        self.visitor.program.finish()
         # self.visitor.program.dump()
         return self.visitor.program.lines
 

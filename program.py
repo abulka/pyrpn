@@ -30,34 +30,31 @@ class Program(object):
         line = Line(text=f'LBL "{node.name[:7]}"')
         self._add_line(line)
 
-    def STO(self, to_register, aug_assign=''):
-        line = Line(text=f'STO{aug_assign} {to_register}')
-        self._add_line(line)
+    # def STO(self, to_register, aug_assign=''):
+    #     line = Line(text=f'STO{aug_assign} {to_register}')
+    #     self._add_line(line)
 
-    def RCL(self, from_register, aug_assign=''):
-        line = Line(text=f'RCL{aug_assign} {from_register}')
-        self._add_line(line)
-
+    # def RCL(self, from_register, aug_assign=''):
+    #     line = Line(text=f'RCL{aug_assign} {from_register}')
+    #     self._add_line(line)
+    #
     def insert(self, text, comment=''):
         line = Line(text=str(text), comment=comment)
         self._add_line(line)
         log.debug(line.text)
 
-    def assign(self, to_register, val, val_type, aug_assign=''):
-        assert val_type in ('literal', 'var')
-        if val_type == 'literal':
-            self.insert(val)
-        else:
-            from_register = val
-            self.insert(f'RCL {from_register}')  # val might be "X" or 00
-        if aug_assign:
-            self.STO(to_register, aug_assign=aug_assign)
-        else:
-            self.STO(to_register)
-        self.insert('RDN')
-
-    def finish(self):
-        self.insert('RTN')
+    # def assign(self, to_register, val, val_type, aug_assign=''):
+    #     assert val_type in ('literal', 'var')
+    #     if val_type == 'literal':
+    #         self.insert(val)
+    #     else:
+    #         from_register = val
+    #         self.insert(f'RCL {from_register}')  # val might be "X" or 00
+    #     if aug_assign:
+    #         self.STO(to_register, aug_assign=aug_assign)
+    #     else:
+    #         self.STO(to_register)
+    #     self.insert('RDN')
 
     def dump(self, comments=False):
         log.debug(f"{'='*20} | (Program lines dump)")

@@ -14,9 +14,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def __init__(self):
         self.program = Program()
-        self.var_names = []
-        self.params = []
-        self.aug_assign_symbol = ''
+        # self.var_names = []
+        # self.params = []
+        self.pending_op = ''
         self.scopes = Scopes()
         self.for_loop_info = []
         self.next_local_label = 0
@@ -37,13 +37,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.visit(child)
         self.children_complete(node)
 
-    # Reset info
-
-    def reset(self):
-        self.var_names = []
-        self.params = []
-        self.aug_assign_symbol = ''
-
     # Logging support
 
     def log_state(self, msg):
@@ -53,15 +46,15 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         # scope_info = f'({self.scopes.length} {descr}) {last_info}'
         scope_info = f'scope {last_info}'
 
-        if len(self.var_names) == 0 and len(self.params) == 0 and self.aug_assign_symbol == '':
-            state_info = ''
-        else:
-            state_info = f'{self.var_names}, {self.params}, {self.aug_assign_symbol}'
+        # if len(self.var_names) == 0 and len(self.params) == 0 and self.pending_op == '':
+        #     state_info = ''
+        # else:
+        #     state_info = f'{self.var_names}, {self.params}, {self.aug_assign_symbol}'
 
         if self.scopes.current_empty:
             scope_info = ''
 
-        log.info(f'{" "*4*self.log_indent}{msg} {state_info} {scope_info}')
+        log.info(f'{" "*4*self.log_indent}{msg} {self.pending_op} {scope_info}')
 
     def begin(self, node, msg=''):
         self.log_state(f'BEGIN {type(node).__name__} {msg}')
@@ -74,55 +67,47 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def children_complete(self, node):
         self.log_state(f'{type(node).__name__} children complete')
 
-    # Names and params support
-
-    def push_name(self, name):
-        self.var_names.append(name)
-
-    def push_param(self, val):
-        self.params.append(val)
-
     # Assign support
 
-    def _assign(self, reset=True):
-        to_register = self.var_name_to_register(self.var_names[0])
-        if self.params:
-            # we are assigning a parameter literal to a register
-            val = self.params[0]
-            self.program.assign(to_register, val, val_type='literal', aug_assign=self.aug_assign_symbol)
-        elif len(self.var_names) >= 2:
-            # we are assigning another variable to a register
-            from_register = self.var_name_to_register(self.var_names[1])
-            self.program.assign(to_register, from_register, val_type='var', aug_assign=self.aug_assign_symbol)
-        else:
-            raise RuntimeError("yeah dunno what assignment to make")
-        if reset:
-            self.reset()
+    # def _assign(self, reset=True):
+    #     to_register = self.var_name_to_register(self.var_names[0])
+    #     if self.params:
+    #         # we are assigning a parameter literal to a register
+    #         val = self.params[0]
+    #         self.program.assign(to_register, val, val_type='literal', aug_assign=self.aug_assign_symbol)
+    #     elif len(self.var_names) >= 2:
+    #         # we are assigning another variable to a register
+    #         from_register = self.var_name_to_register(self.var_names[1])
+    #         self.program.assign(to_register, from_register, val_type='var', aug_assign=self.aug_assign_symbol)
+    #     else:
+    #         raise RuntimeError("yeah dunno what assignment to make")
+    #     if reset:
+    #         self.reset()
 
-    def perform_op(self, reset=True):
-        if len(self.var_names) >= 2:
-            # op between two registers
-            register1 = self.var_name_to_register(self.var_names[0])
-            register2 = self.var_name_to_register(self.var_names[1])
-            self.program.insert(f'RCL {register1}')
-            self.program.insert(f'RCL {register2}')
-        elif self.var_names and self.params:
-            # op between a register and a literal
-            register1 = self.var_name_to_register(self.var_names[0])
-            self.program.insert(f'RCL {register1}')
-            self.program.insert(f'{self.params[0]}')
-        elif self.params:
-            # or just the literal to the previous result
-            self.program.insert(f'{self.params[0]}')
-        elif self.var_names:
-            # or just a register to the previous result
-            register = self.var_name_to_register(self.var_names[0])
-            self.program.insert(f'RCL {register}')
-        else:
-            raise RuntimeError('unknown op situation')
-        self.program.insert(f'{self.aug_assign_symbol}')
-        if reset:
-            self.reset()
+    # def perform_op(self, reset=True):
+    #     if len(self.var_names) >= 2:
+    #         # op between two registers
+    #         register1 = self.var_name_to_register(self.var_names[0])
+    #         register2 = self.var_name_to_register(self.var_names[1])
+    #         self.program.insert(f'RCL {register1}')
+    #         self.program.insert(f'RCL {register2}')
+    #     elif self.var_names and self.params:
+    #         # op between a register and a literal
+    #         register1 = self.var_name_to_register(self.var_names[0])
+    #         self.program.insert(f'RCL {register1}')
+    #         self.program.insert(f'{self.params[0]}')
+    #     elif self.params:
+    #         # or just the literal to the previous result
+    #         self.program.insert(f'{self.params[0]}')
+    #     elif self.var_names:
+    #         # or just a register to the previous result
+    #         register = self.var_name_to_register(self.var_names[0])
+    #         self.program.insert(f'RCL {register}')
+    #     else:
+    #         raise RuntimeError('unknown op situation')
+    #     self.program.insert(f'{self.aug_assign_symbol}')
+    #     if reset:
+    #         self.reset()
 
     def var_name_to_register(self, var_name):
         """
@@ -184,6 +169,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         self.visit_children(node)
 
+        self.program.insert('RTN')
+
         self.scopes.pop()
         self.end(node)
 
@@ -191,18 +178,22 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         """ visit arguments to a function"""
         self.begin(node)
         self.visit_children(node)
-        for arg_name in self.var_names:
-            to_register = self.var_name_to_register(arg_name)
-            self.program.STO(to_register)
-            self.program.insert('RDN')
-            assert not self.scopes.current_empty
-        self.reset()
+        # for arg_name in self.var_names:
+        #     to_register = self.var_name_to_register(arg_name)
+        #     self.program.STO(to_register)
+        #     self.program.insert('RDN')
+        #     assert not self.scopes.current_empty
+        # self.reset()
         self.end(node)
 
     def visit_arg(self,node):
         """ visit each argument """
         self.begin(node)
-        self.push_name(node.arg)
+
+        # self.push_name(node.arg)
+        self.program.insert(f'STO {self.var_name_to_register(node.arg)}')
+        self.program.insert('RDN')
+
         self.visit_children(node)
         self.end(node)
 
@@ -222,10 +213,11 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.begin(node)
         self.visit_children(node)
         # self._assign()
-        if '.Add' in str(node.op):
-            op = '+'
-        self.program.insert(f'STO{op} {self.var_name_to_register(node.target.id)}')
+        # if '.Add' in str(node.op):
+        #     op = '+'
+        self.program.insert(f'STO{self.pending_op} {self.var_name_to_register(node.target.id)}')
         assert '.Store' in str(node.target.ctx)
+        self.pending_op = ''
         self.end(node)
 
     def visit_Return(self,node):
@@ -240,22 +232,25 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         #     register = self.var_name_to_register(self.var_names[0])
         #     self.program.RCL(register)
 
-        # Another approach
-        if self.var_names:
-            register = self.var_name_to_register(self.var_names[0])
-            self.program.RCL(register)
-        elif self.params:
-            self.program.insert(self.params[0])
-        else:
-            pass  # you get what's on the stack?
+        # # Another approach
+        # if self.var_names:
+        #     register = self.var_name_to_register(self.var_names[0])
+        #     self.program.RCL(register)
+        # elif self.params:
+        #     self.program.insert(self.params[0])
+        # else:
+        #     pass  # you get what's on the stack?
+
+        # self.program.insert('RTN')
 
         self.end(node)
 
     def visit_Add(self,node):
         self.begin(node)
         # self.program.insert('+')
-        assert len(list(ast.iter_child_nodes(node))) == 0  # should be no children
+        # assert len(list(ast.iter_child_nodes(node))) == 0  # should be no children
         # self.visit_children(node)
+        self.pending_op = '+'
         self.end(node)
 
     def visit_BinOp(self, node):
@@ -266,8 +261,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         # self.perform_op()
         # self._assign(reset=False)  # keep info around... hmmm
 
-        if '.Add' in str(node.op):
-            self.program.insert('+')
+        # if '.Add' in str(node.op):
+        assert self.pending_op
+        self.program.insert(self.pending_op)
 
         self.end(node)
 
@@ -290,9 +286,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.program.insert('/')
             self.program.insert('+')
 
-            self.program.insert(f'STO {self.for_loop_info[-1].register}', comment=f'range {self.var_names}')
+            self.program.insert(f'STO {self.for_loop_info[-1].register}', comment='range')
             self.program.insert(f'LBL {self.for_loop_info[-1].label:02d}')
-        self.reset()
+        # self.reset()
         self.end(node)
 
     @recursive
