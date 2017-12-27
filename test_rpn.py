@@ -242,6 +242,7 @@ class RpnCodeGenTests(BaseTest):
             STO 00  // i
             LBL 00
             RCL 00  // i
+            IP
             STO+ "X"
             ISG 00
             GTO 00
@@ -279,8 +280,10 @@ class RpnCodeGenTests(BaseTest):
             STO 02  // i
             LBL 00  // for
             RCL 02  // i
+            IP
             STO "X"
             RCL 02  // i
+            IP
             STO+ 00 // x +=
             RCL 00  // x
             STO+ 01 // total +=
@@ -315,7 +318,7 @@ class RpnCodeGenTests(BaseTest):
             +
             STO 02    // i our counter
             LBL 00
-            //VIEW 02 // print i  TODO
+            //VIEW 02 // print i  TODO when doing function calls
             RCL 00    // n
             STO+ 01   // x +=
             RCL 02    // i
