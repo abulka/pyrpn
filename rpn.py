@@ -3,6 +3,7 @@ import logging
 from logger import config_log
 from program import Program
 from scope import Scopes
+from labels import FunctionLabels
 import settings
 
 log = logging.getLogger(__name__)
@@ -16,6 +17,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.program = Program()
         self.pending_op = ''
         self.scopes = Scopes()
+        self.labels = FunctionLabels()
         self.for_loop_info = []
         self.next_local_label = 0
         self.log_indent = 0
@@ -56,7 +58,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def log_state(self, msg=''):
         log.info(f'{self.indent}{msg}')
-        log.info(f'{self.indent}{self.scopes.dump_short()}')
+        log.info(f'{self.indent}{self.scopes.dump()}{self.labels.dump()}')
 
     def log_children(self, node):
         result = []
@@ -92,8 +94,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def func_name_to_lbl(self, func_name, called_from_def=False):
         # auto allocates if it doesn't exist - TODO should vars do this too?
-        self.scopes.add_function_mapping(func_name, called_from_def=called_from_def)
-        return self.scopes.get_label(func_name)
+        # TODO combine these into the one function
+        self.labels.add_function_mapping(func_name, called_from_def=called_from_def)
+        return self.labels.get_label(func_name)
 
     def var_to_reg(self, var_name):
         """
@@ -144,9 +147,11 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         if self.first_def:
             label = node.name[:7]
             self.program.insert(f'LBL "{label}"')
-            self.scopes.add_function_mapping(node.name, label=label, called_from_def=True)
+            # TODO consolidate this call
+            self.labels.add_function_mapping(node.name, label=label, called_from_def=True)
             self.first_def = False
         else:
+            # TODO and this call
             self.program.insert(f'LBL {self.func_name_to_lbl(node.name, called_from_def=True)}')
 
         self.scopes.push()
