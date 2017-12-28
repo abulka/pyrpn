@@ -21,7 +21,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.log_indent = 0
         # Yuk - don't like these one shot attributes - would a stack be better, containing info too?
         self.in_for_loop_in = False
-        self.f_pending = False
     # Recursion support
 
     def recursive(func):
@@ -195,28 +194,18 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def visit_Call(self,node):
         """
-        Function call. The child nodes include the function name and the args.  do not use recursive decorator because
-        we want more control, and we need to know the end of the calls so that we can generate rpn and clear params
-
-        On the call
-            self.visit(node.func)  # will emit the function name
-        If we were using the decorator no need to visit explicitly as the recursive decorator will do it for us.
-        if no decorator then don't do this call either !!, because visiting the children will do it for us.
+        Function call. The children are
+            - node.func:
+                Name node representing the function name. Usually visited first by generic iteration, which is not what
+                we want since in rpn the function call goes last.  So we manually iterate.
+                Turns out we can skip visiting this.
+            - node.args (list):
+                Manually looped through and visited.  Each visit emits a register rcl or literal onto the stack.
         """
         self.begin(node)
-
-        # AA1
-        self.f_pending = True  # this prevents function name being emitted first by the children visit_Name,
-                                # cos it must come out last cos its RPN :-) - see later in this method below...
-        # self.log_children(node)
-        # self.visit_children(node)
-        self.visit(node.func)
-        self.f_pending = False
-
-        # self.visit(node.args)  # doesn't loop through list of args!
-        # self.generic_visit(node.args)  # loops only through whole node
         for item in node.args:
             self.visit(item)
+        # self.visit(node.func)  # don't visit this name cos we emit it ourselves below, RPN style
 
         # if self.for_loop_info and node.func.id == 'range':
         if self.in_for_loop_in and node.func.id == 'range':
@@ -224,11 +213,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.program.insert('/')
             self.program.insert('+')
             self.program.insert(f'STO {self.for_loop_info[-1].register}', comment='range')
-        # AA2
         else:
             self.program.insert(f'XEQ {self.func_name_to_lbl(node.func.id)}')
-
-        # self.f_pending = False
         self.end(node)
 
     @recursive
@@ -251,12 +237,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         # log.debug('Name node "%s" node.ctx %s', node.id, node.ctx)
         if node.id == 'range':
             pass # what to do with this situation
-        # AA3
-        elif self.f_pending:
-            pass
-        # elif self.f_pending == True and not self.in_for_loop_in:
-        #     log.info('zzzzzz visit_Name %s in_for_loop_in %s %s', node.id, self.in_for_loop_in, self.for_loop_info)
-        #     self.f_pending = False
         else:
             if '.Load' in str(node.ctx):
                 self.program.insert(f'RCL {self.var_name_to_register(node.id)}')
