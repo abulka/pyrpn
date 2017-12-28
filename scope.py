@@ -47,7 +47,30 @@ class Scopes(object):
         if len(self.stack) > 1:  # always leave first permanent scope
             self.stack.pop()
 
-    # Variables
+    def var_to_reg(self, var_name):
+        """
+        Figure out the register to use to store/recall 'var_name' e.g. "x" via our scope system
+        Rules:
+            if its uppercase - assign to named uppercase register of the same name e.g. "X"
+                (if that name is already used in a previous scope, append __n to the register name e.g. X__2, starting at n=2)
+            Otherwise if its a lowercase var name, map to a numbered register e.g. 00
+
+        :param var_name: python identifier e.g. 'x'
+        :param use_stack_register: don't use named registers, use the stack. 1 means map to ST X, 2 means map to ST Y etc.
+        :return: register name as a string e.g. "X" or 00 - depending on rules
+        """
+        def map_it(var_name, register=None):
+            if not self.has_mapping(var_name):
+                self.add_mapping(var_name, register=register)
+
+        if var_name.isupper():
+            register = f'"{var_name.upper()[-7:]}"'
+            map_it(var_name, register)
+        else:
+            map_it(var_name)
+            register = self.get_register(var_name)  # look up what register was allocated e.g. "00"
+        # log.debug(f'var_name {var_name} mapped to register {register}')
+        return register
 
     def add_mapping(self, var, register=None):
         if register == None:

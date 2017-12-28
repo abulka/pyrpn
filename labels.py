@@ -23,7 +23,7 @@ class FunctionLabels(object):
         :param func_name: function name e.f. 'main' or 'add'
         :param label: force use this label name
         :param called_from_def: If 'called_from_def' is true then the second (or greater) time a mapping
-                is made for a function name, the label is incremented to avoid clashes.
+                is made for a function name, the label is deleted and incremented to avoid clashes.
         :return: label e.g. 'A'
         """
         if self.has_function_mapping(func_name) and called_from_def and func_name in self.labels_created_by_def:
