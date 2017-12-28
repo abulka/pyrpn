@@ -543,3 +543,23 @@ class RpnCodeGenTests(BaseTest):
             RTN
             """)
         self.compare(de_comment(expected), lines, dump=True)
+
+    def test_xeq_real(self):
+        lines = self.parse(dedent("""
+            def main():
+                f(1)
+                
+            def f(n):
+                pass
+            """))
+        expected = dedent("""
+            LBL "main"
+            1
+            XEQ A
+            RTN
+            LBL A
+            STO 00
+            RDN
+            RTN
+            """)
+        self.compare(de_comment(expected), lines, dump=True)

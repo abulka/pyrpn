@@ -19,6 +19,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.for_loop_info = []
         self.next_local_label = 0
         self.log_indent = 0
+        self.first_def = True
 
     # Recursion support
 
@@ -87,7 +88,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         pass
 
     def func_name_to_lbl(self, func_name):
-        return 'A'  # Hack - TODO map this properly
+        # auto allocates if it doesn't exist - TODO should vars do this too?
+        if not self.scopes.has_function_mapping(func_name):
+            self.scopes.add_function_mapping(func_name)
+        return self.scopes.get_label(func_name)
 
     def var_to_reg(self, var_name):
         """
@@ -135,7 +139,13 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         """ visit a Function node and visits it recursively"""
         self.scopes.push()
         self.begin(node)
-        self.program.insert(f'LBL "{node.name[:7]}"')
+
+        if self.first_def:
+            self.program.insert(f'LBL "{node.name[:7]}"')
+            self.first_def = False
+        else:
+            self.program.insert(f'LBL {self.func_name_to_lbl(node.name)}')
+
         self.visit_children(node)
         self.program.insert('RTN')
         self.scopes.pop()

@@ -108,3 +108,26 @@ class ScopeTests(BaseTest):
         self.assertEqual('00', scopes.get_register('a'))
         scopes.add_mapping('b')
         self.assertEqual('01', scopes.get_register('b'))
+
+    # Allocation of function labels A through J and a through e
+
+    def test_function_label_allocation_1(self):
+        scopes = Scopes()
+        scopes.add_function_mapping('func')
+        self.assertEqual('A', scopes.get_label('func'))
+
+    def test_function_label_allocation_multiple(self):
+        scopes = Scopes()
+        scopes.add_function_mapping('func')
+        scopes.add_function_mapping('func2')
+        self.assertEqual('A', scopes.get_label('func'))
+        self.assertEqual('B', scopes.get_label('func2'))
+
+    # def test_function_label_push_pop(self):
+    #     scopes = Scopes()
+    #     scopes.add_function_mapping('func')
+    #     scopes.push()
+    #     # scopes.add_function_mapping('func')
+    #     # self.assertEqual('C', scopes.get_label('func'))
+    #     # scopes.pop()
+
