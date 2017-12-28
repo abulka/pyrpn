@@ -643,19 +643,19 @@ class RpnCodeGenTests(BaseTest):
         if you redefine a def, no matter the scope, it gets a new label mapping.
         """
         lines = self.parse(dedent("""
-            def main():
+            def mvadd():
                 MVAR("length")
                 MVAR("width")
-                VARMENU("main")
+                VARMENU("mvadd")
                 STOP()
                 EXITALL()
                 return length * width 
             """))
         expected = dedent("""
-            LBL "main"
+            LBL "mvadd"
             MVAR "length"
             MVAR "width"
-            VARMENU "main"
+            VARMENU "mvadd"
             STOP
             EXITALL
             RCL "length"
