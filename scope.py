@@ -32,16 +32,8 @@ class Scopes(object):
     def current_empty(self):
         return len(self.current.data) == 0
 
-    @property
-    def next_reg(self):
-        return self.stack[-1].next_reg
-
-    @next_reg.setter
-    def next_reg(self, val):
-        self.stack[-1].next_reg = val
-
     def push(self):
-        self.stack.append(Scope(next_reg=self.next_reg))
+        self.stack.append(Scope(next_reg=self.current.next_reg))
 
     def pop(self):
         if len(self.stack) > 1:  # always leave first permanent scope
@@ -60,8 +52,8 @@ class Scopes(object):
         :return: register name as a string e.g. "X" or 00 - depending on rules
         """
         def map_it(var_name, register=None):
-            if not self.has_mapping(var_name):
-                self.add_mapping(var_name, register=register)
+            if not self._has_mapping(var_name):
+                self._add_mapping(var_name, register=register)
 
         if var_name.isupper():
             register = f'"{var_name.upper()[-7:]}"'
@@ -72,22 +64,19 @@ class Scopes(object):
         # log.debug(f'var_name {var_name} mapped to register {register}')
         return register
 
-    def add_mapping(self, var, register=None):
+    def _add_mapping(self, var, register=None):
         if register == None:
-            register = f'{self.next_reg:02d}'
-            self.next_reg += 1
-        scope = self.stack[-1]
-        scope.data[var] = register
+            register = f'{self.current.next_reg:02d}'
+            self.current.next_reg += 1
+        self.current.data[var] = register
 
-    def has_mapping(self, var):
+    def _has_mapping(self, var):
         if len(self.stack) == 0:
             return False
-        scope = self.stack[-1]
-        return var in scope.data
+        return var in self.current.data
 
     def get_register(self, var):
-        scope = self.stack[-1]
-        return scope.data[var]
+        return self.current.data[var]
 
     # Util
 
