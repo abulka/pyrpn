@@ -37,3 +37,12 @@ class Program(object):
             comment = f'  // {line.comment}' if comments and line.comment else ''
             log.debug(f'{line.lineno:02d} {line.text}{comment}')
         log.debug(f"{'='*20} |")
+
+    @staticmethod
+    def lines_to_str(lines):
+        # TODO support line numbers and comments
+        result = []
+        for line in lines:
+            result.append(line.text)
+        return '\n'.join(result)
+

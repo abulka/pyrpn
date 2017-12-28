@@ -38,11 +38,14 @@ class RpnCodeGenTests(BaseTest):
         if dump:
             self.visitor.program.dump(comments=True)
 
-        expected = expected.strip().split('\n')
-        for i, line in enumerate(lines):
-            if trace:
+        # All in one comparison
+        self.assertEqual(expected.strip(), self.visitor.program.lines_to_str(lines).strip())
+
+        if trace:
+            expected = expected.strip().split('\n')
+            for i, line in enumerate(lines):
                 log.info(f'expected={expected[i]}, got {line.text}')
-            self.assertEqual(expected[i], line.text)
+                self.assertEqual(expected[i], line.text)
 
     # TESTS
 
