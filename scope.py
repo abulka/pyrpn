@@ -29,7 +29,7 @@ class Scopes(object):
 
     @property
     def current_empty(self):
-        return len(self.current.data) == 0
+        return len(self.current.data) == 0 and len(self.current.label_data) == 0
 
     @property
     def next_reg(self):
@@ -40,7 +40,7 @@ class Scopes(object):
         self.stack[-1].next_reg = val
 
     def push(self):
-        self.stack.append(Scope(next_reg=self.next_reg))
+        self.stack.append(Scope(next_reg=self.next_reg, next_lbl=self.next_lbl))
 
     def pop(self):
         if len(self.stack) > 1:  # always leave first permanent scope
@@ -69,15 +69,16 @@ class Scopes(object):
 
     @property
     def next_lbl(self):
-        return self.stack[-1].next_lbl
+        return self.stack[0].next_lbl
 
     @next_lbl.setter
     def next_lbl(self, val):
-        self.stack[-1].next_lbl = val
+        self.stack[0].next_lbl = val
 
-    def add_function_mapping(self, func_name):
-        label = list('ABCDEFGHIJabcdefghij')[self.next_lbl]
-        self.next_lbl += 1
+    def add_function_mapping(self, func_name, label=None):
+        if label == None:
+            label = list('ABCDEFGHIJabcdefghij')[self.next_lbl]
+            self.next_lbl += 1
         scope = self.stack[-1]
         scope.label_data[func_name] = label
 
@@ -91,6 +92,9 @@ class Scopes(object):
         scope = self.stack[-1]
         return scope.label_data[func_name]
 
+    def dump_short(self):
+        result = ['-' if scope.empty else f'{scope.data}{scope.label_data}' for scope in self.stack]
+        return '[' + ', '.join(result) + ']'
 
 @attrs
 class Scope(object):
@@ -98,3 +102,8 @@ class Scope(object):
     next_reg = attrib(default=0)
     label_data = attrib(default=Factory(dict))  # function name to label name
     next_lbl = attrib(default=0)  # indexes into A-J, a-e
+
+    @property
+    def empty(self):
+        return len(self.data) == 0 and len(self.label_data) == 0
+

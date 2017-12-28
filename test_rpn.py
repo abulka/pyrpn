@@ -589,3 +589,40 @@ class RpnCodeGenTests(BaseTest):
             RTN
             """)
         self.compare(de_comment(expected), lines, dump=True)
+
+    def test_nested_defs(self):
+        lines = self.parse(dedent("""
+            def main():
+            
+                def add(a,b):
+                    # print('inner')
+                    return a + b
+                    
+                add(1,2)  # will call the inner add()
+            
+            def add(a,b):
+                pass
+            """))
+        expected = dedent("""
+            LBL "main"
+            LBL A  // inner def add()
+            STO 00
+            RDN
+            STO 01
+            RDN
+            RCL 00 // could be optimised not to use 01 and 02
+            RCL 01
+            +
+            RTN
+            1
+            2
+            XEQ A  // will call inner add, viz A
+            RTN
+            LBL B  // outer def add()
+            STO 00
+            RDN
+            STO 01
+            RDN
+            RTN
+            """)
+        self.compare(de_comment(expected), lines, dump=True)

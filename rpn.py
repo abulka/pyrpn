@@ -49,38 +49,41 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             return child.id
         elif hasattr(child, 'n'):
             return child.n
+        elif hasattr(child, 'arg'):
+            return child.arg
         else:
-            return''
+            return ''
 
-    def log_state(self, msg):
-        # log.info(f'{msg}, {self.var_names}, {self.params}, {self.aug_assign_symbol} {self.scope_stack}')
-        descr = 'scope' if self.scopes.length == 1 else 'scopes'
-        last_info = '' if self.scopes.current_empty else str(self.scopes.current.data)
-        # scope_info = f'({self.scopes.length} {descr}) {last_info}'
-        scope_info = f'scope {last_info}'
-
-        if self.scopes.current_empty:
-            scope_info = ''
-
-        scope_info = ''  # Enable/Disable scope info
-        log.info(f'{self.indent}{msg} {self.pending_op} {scope_info}')
+    def log_state(self, msg=''):
+        log.info(f'{self.indent}{msg}')
+        log.info(f'{self.indent}{self.scopes.dump_short()}')
 
     def log_children(self, node):
+        result = []
         for child in ast.iter_child_nodes(node):
             s = self.get_node_name_id_or_n(child)
-            log.debug(f'{self.indent}({type(child).__name__} {s})')
+            s = f" '{s}'" if s else ""
+            result.append(f'({type(child).__name__}{s})')
+        s = ', '.join(result)
+        if s:
+            log.debug(f'{self.indent}{s}')
 
     def begin(self, node):
-        s = self.get_node_name_id_or_n(node)
-        s = f"'{s}'" if s else ''
-        self.log_state(f'BEGIN {type(node).__name__} {s}')
+        log.info('')
         self.log_indent += 1
+        s = self.get_node_name_id_or_n(node)
+        s = f"'{s}'" if s else ""
+        s += f" op = '{self.pending_op}'" if self.pending_op else ""
+        self.log_state(f'BEGIN {type(node).__name__} {s}')
         self.log_children(node)
 
     def end(self, node):
-        self.log_indent -= 1
         # self.log_state(f'END {type(node).__name__}')
-        log.info(f'{self.indent}END {type(node).__name__}')
+        s = f'END {type(node).__name__}'
+        log.info(f'{self.indent}{s}')
+        # log.info(f'{self.indent}{"-"*len(s)}')
+        # log.info('')
+        self.log_indent -= 1
 
     def children_complete(self, node):
         # self.log_state(f'{type(node).__name__} children complete')
@@ -137,18 +140,27 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def visit_FunctionDef(self,node):
         """ visit a Function node and visits it recursively"""
-        self.scopes.push()
         self.begin(node)
 
         if self.first_def:
-            self.program.insert(f'LBL "{node.name[:7]}"')
+            label = node.name[:7]
+            self.program.insert(f'LBL "{label}"')
+
+            # just a formality, to consistently track all defs in scopes
+            if not self.scopes.has_function_mapping(node.name):
+                self.scopes.add_function_mapping(node.name, label=label)
+
             self.first_def = False
         else:
             self.program.insert(f'LBL {self.func_name_to_lbl(node.name)}')
 
+        self.scopes.push()
+        self.log_state('scope just pushed')
         self.visit_children(node)
         self.program.insert('RTN')
+        self.log_state('scope pre pop')
         self.scopes.pop()
+        self.log_state('scope just popped')
         self.end(node)
 
     def visit_arguments(self,node):
@@ -199,6 +211,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.visit_children(node)
         assert self.pending_op
         self.program.insert(self.pending_op)
+        self.pending_op = ''
         self.end(node)
 
     def visit_Call(self,node):
@@ -223,6 +236,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.program.insert(f'STO {self.for_loop_info[-1].register}', comment='range')
         else:
             self.program.insert(f'XEQ {self.func_name_to_lbl(node.func.id)}')
+            self.log_state('scope after XEQ')
         self.end(node)
 
     @recursive

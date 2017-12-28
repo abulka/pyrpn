@@ -123,11 +123,12 @@ class ScopeTests(BaseTest):
         self.assertEqual('A', scopes.get_label('func'))
         self.assertEqual('B', scopes.get_label('func2'))
 
-    # def test_function_label_push_pop(self):
-    #     scopes = Scopes()
-    #     scopes.add_function_mapping('func')
-    #     scopes.push()
-    #     # scopes.add_function_mapping('func')
-    #     # self.assertEqual('C', scopes.get_label('func'))
-    #     # scopes.pop()
+    def test_function_label_push_pop(self):
+        scopes = Scopes()
+        scopes.add_function_mapping('func')
+        scopes.push()
+        scopes.add_function_mapping('func')
+        self.assertEqual('B', scopes.get_label('func'))
+        scopes.pop()
+        self.assertEqual('A', scopes.get_label('func'))
 
