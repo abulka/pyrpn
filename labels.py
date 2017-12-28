@@ -14,11 +14,24 @@ class FunctionLabels(object):
     next_lbl = attrib(default=0)  # indexes into A-J, a-e
     labels_created_by_def = attrib(default=Factory(list))
 
-    def add_function_mapping(self, func_name, label=None, called_from_def=False):
+    def func_to_lbl(self, func_name, label=None, called_from_def=False):
+        """
+        Maps a function name to a label.  If the mapping already exists, the label is
+        returned. This method can be called from either a function call/reference or
+        a function creation situation.
+
+        :param func_name: function name e.f. 'main' or 'add'
+        :param label: force use this label name
+        :param called_from_def: If 'called_from_def' is true then the second (or greater) time a mapping
+                is made for a function name, the label is incremented to avoid clashes.
+        :return: label e.g. 'A'
+        """
         if self.has_function_mapping(func_name) and called_from_def and func_name in self.labels_created_by_def:
             del self.label_data[func_name]
         if self.has_function_mapping(func_name):
-            return
+            if called_from_def:
+                self.labels_created_by_def.append(func_name)
+            return self.get_label(func_name)
 
         if label == None:
             label = list('ABCDEFGHIJabcdefghij')[self.next_lbl]
@@ -26,6 +39,7 @@ class FunctionLabels(object):
         self.label_data[func_name] = label
         if called_from_def and func_name not in self.labels_created_by_def:
             self.labels_created_by_def.append(func_name)
+        return label
 
     def has_function_mapping(self, func_name):
         return func_name in self.label_data

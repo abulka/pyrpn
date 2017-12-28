@@ -92,12 +92,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         # log.info(f'{self.indent}{type(node).__name__} children complete')
         pass
 
-    def func_name_to_lbl(self, func_name, called_from_def=False):
-        # auto allocates if it doesn't exist - TODO should vars do this too?
-        # TODO combine these into the one function
-        self.labels.add_function_mapping(func_name, called_from_def=called_from_def)
-        return self.labels.get_label(func_name)
-
     def var_to_reg(self, var_name):
         """
         Figure out the register to use to store/recall 'var_name' e.g. "x" via our scope system
@@ -147,12 +141,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         if self.first_def:
             label = node.name[:7]
             self.program.insert(f'LBL "{label}"')
-            # TODO consolidate this call
-            self.labels.add_function_mapping(node.name, label=label, called_from_def=True)
+            self.labels.func_to_lbl(node.name, label=label, called_from_def=True)
             self.first_def = False
         else:
-            # TODO and this call
-            self.program.insert(f'LBL {self.func_name_to_lbl(node.name, called_from_def=True)}')
+            self.program.insert(f'LBL {self.labels.func_to_lbl(node.name, called_from_def=True)}')
 
         self.scopes.push()
         self.log_state('scope just pushed')
@@ -235,7 +227,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.program.insert('+')
             self.program.insert(f'STO {self.for_loop_info[-1].register}', comment='range')
         else:
-            self.program.insert(f'XEQ {self.func_name_to_lbl(node.func.id)}')
+            self.program.insert(f'XEQ {self.labels.func_to_lbl(node.func.id)}')
             self.log_state('scope after XEQ')
         self.end(node)
 
