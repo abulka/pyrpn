@@ -20,8 +20,7 @@ class Scopes(object):
     def __attrs_post_init__(self):
         self.stack.append(Scope(next_reg=0))  # permanent initial scope
 
-    @property
-    def length(self):
+    def __len__(self):
         return len(self.stack)
 
     @property
