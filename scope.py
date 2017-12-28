@@ -41,6 +41,7 @@ class Scopes(object):
     def var_to_reg(self, var_name):
         """
         Figure out the register to use to store/recall 'var_name' e.g. "x" via our scope system
+
         Rules:
             if its uppercase - assign to named uppercase register of the same name e.g. "X"
                 (if that name is already used in a previous scope, append __n to the register name e.g. X__2, starting at n=2)

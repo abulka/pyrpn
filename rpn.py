@@ -4,6 +4,7 @@ from logger import config_log
 from program import Program
 from scope import Scopes
 from labels import FunctionLabels
+from attr import attrs, attrib, Factory
 import settings
 
 log = logging.getLogger(__name__)
@@ -18,8 +19,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.pending_op = ''
         self.scopes = Scopes()
         self.labels = FunctionLabels()
+        self.local_labels = LocalLabels()
         self.for_loop_info = []
-        self.next_local_label = 0
         self.log_indent = 0
         self.first_def = True
 
@@ -245,8 +246,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.visit(node.target)
         self.for_loop_info.append(
             ForLoopItem(register=self.scopes.var_to_reg(node.target.id),
-                        label=self.next_local_label))
-        self.next_local_label += 1
+                        label=self.local_labels.next_local_label))
 
         log.info(f'{self.indent} in')
         self.visit(node.iter)
@@ -261,9 +261,17 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.for_loop_info.pop()
         self.end(node)
 
-from attr import attrs, attrib, Factory
 
 @attrs
 class ForLoopItem(object):
     register = attrib(default=0)
     label = attrib(default=0)
+
+@attrs
+class LocalLabels(object):
+    label_num = attrib(default=0)
+
+    @property
+    def next_local_label(self):
+        return self.label_num
+        self.label_num += 1
