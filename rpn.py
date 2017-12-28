@@ -54,6 +54,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             return child.n
         elif hasattr(child, 'arg'):
             return child.arg
+        elif hasattr(child, 's'):
+            return child.s
         else:
             return ''
 
@@ -169,6 +171,11 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.pending_op = '+'
         self.end(node)
 
+    def visit_Mult(self,node):
+        self.begin(node)
+        self.pending_op = '*'
+        self.end(node)
+
     def visit_BinOp(self, node):
         """ visit a BinOp node and visits it recursively"""
         self.begin(node)
@@ -189,6 +196,17 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 Manually looped through and visited.  Each visit emits a register rcl or literal onto the stack.
         """
         self.begin(node)
+
+        if node.func.id in ('MVAR', 'VARMENU', 'STOP', 'EXITALL'):
+            arg = f' "{node.args[0].s}"' if node.args else ''
+            self.program.insert(f'{node.func.id}{arg}')
+
+            if node.func.id in ('MVAR',):
+                arg = node.args[0].s
+                self.scopes.var_to_reg(arg, force_reg_name=f'"{arg}"')
+            self.end(node)
+            return
+
         for item in node.args:
             self.visit(item)
         # self.visit(node.func)  # don't visit this name cos we emit it ourselves below, RPN style

@@ -38,7 +38,7 @@ class Scopes(object):
         if len(self.stack) > 1:  # always leave first permanent scope
             self.stack.pop()
 
-    def var_to_reg(self, var_name):
+    def var_to_reg(self, var_name, force_reg_name=None):
         """
         Figure out the register to use to store/recall 'var_name' e.g. "x" via our scope system
 
@@ -55,7 +55,10 @@ class Scopes(object):
             if not self._has_mapping(var_name):
                 self._add_mapping(var_name, register=register)
 
-        if var_name.isupper():
+        if force_reg_name:
+            register = force_reg_name
+            map_it(var_name, register)
+        elif var_name.isupper():
             register = f'"{var_name.upper()[-7:]}"'
             map_it(var_name, register)
         else:
