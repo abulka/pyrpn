@@ -81,22 +81,18 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.log_children(node)
 
     def end(self, node):
-        # self.log_state(f'END {type(node).__name__}')
         s = f'END {type(node).__name__}'
         log.info(f'{self.indent}{s}')
-        # log.info(f'{self.indent}{"-"*len(s)}')
-        # log.info('')
         self.log_indent -= 1
 
     def children_complete(self, node):
-        # self.log_state(f'{type(node).__name__} children complete')
-        # log.info(f'{self.indent}{type(node).__name__} children complete')
-        pass
+        if settings.LOG_AST_CHILDREN_COMPLETE:
+            self.log_state(f'{type(node).__name__} children complete')
 
     def var_name_is_loop_counter(self, var_name):
         return var_name == 'i'  # hack!  TODO - record this info in scope entry
 
-    # For support
+    # For visit support
 
     def body(self, statements):
         for stmt in statements:
