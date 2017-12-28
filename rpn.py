@@ -93,10 +93,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def func_name_to_lbl(self, func_name, called_from_def=False):
         # auto allocates if it doesn't exist - TODO should vars do this too?
         self.scopes.add_function_mapping(func_name, called_from_def=called_from_def)
-        # if self.scopes.has_function_mapping(func_name) and redefine:
-        #     self.scopes.replace_function_mapping(func_name)
-        # elif not self.scopes.has_function_mapping(func_name):
-        #     self.scopes.add_function_mapping(func_name)
         return self.scopes.get_label(func_name)
 
     def var_to_reg(self, var_name):
