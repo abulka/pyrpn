@@ -19,8 +19,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.for_loop_info = []
         self.next_local_label = 0
         self.log_indent = 0
-        # Yuk - don't like these one shot attributes - would a stack be better, containing info too?
-        self.in_for_loop_in = False
+
     # Recursion support
 
     def recursive(func):
@@ -207,8 +206,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.visit(item)
         # self.visit(node.func)  # don't visit this name cos we emit it ourselves below, RPN style
 
-        # if self.for_loop_info and node.func.id == 'range':
-        if self.in_for_loop_in and node.func.id == 'range':
+        if self.for_loop_info and node.func.id == 'range':
             self.program.insert(1000)
             self.program.insert('/')
             self.program.insert('+')
@@ -260,9 +258,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.next_local_label += 1
 
         log.info(f'{self.indent} in')
-        self.in_for_loop_in = True
         self.visit(node.iter)
-        self.in_for_loop_in = False
+
         log.info(f'{self.indent} :')
         self.program.insert(f'LBL {self.for_loop_info[-1].label:02d}')
 
