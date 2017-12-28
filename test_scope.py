@@ -124,11 +124,44 @@ class ScopeTests(BaseTest):
         self.assertEqual('B', scopes.get_label('func2'))
 
     def test_function_label_push_pop(self):
+        # labels are global so scope push pop does not affect anything
         scopes = Scopes()
         scopes.add_function_mapping('func')
         scopes.push()
-        scopes.add_function_mapping('func')
-        self.assertEqual('B', scopes.get_label('func'))
+        if not scopes.has_function_mapping('func'):
+            scopes.add_function_mapping('func')
+        self.assertEqual('A', scopes.get_label('func'))
         scopes.pop()
         self.assertEqual('A', scopes.get_label('func'))
 
+    def test_function_multiple_mappings_refs_not_defs(self):
+        scopes = Scopes()
+        scopes.add_function_mapping('func')
+        self.assertEqual('A', scopes.get_label('func'))
+        scopes.add_function_mapping('func')
+        self.assertEqual('A', scopes.get_label('func'))
+
+    def test_function_multiple_mappings_refs_and_single_def(self):
+        scopes = Scopes()
+        scopes.add_function_mapping('func')
+        self.assertEqual('A', scopes.get_label('func'))
+        scopes.add_function_mapping('func')
+        self.assertEqual('A', scopes.get_label('func'))
+        scopes.add_function_mapping('func', called_from_def=True)
+        self.assertEqual('A', scopes.get_label('func'))
+
+    def test_function_replace_mapping_cos_two_defs(self):
+        scopes = Scopes()
+        scopes.add_function_mapping('func', called_from_def=True)
+        self.assertEqual('A', scopes.get_label('func'))
+        scopes.add_function_mapping('func', called_from_def=True)
+        self.assertEqual('B', scopes.get_label('func'))
+
+    def test_function_replace_function_mapping_then_ref(self):
+        scopes = Scopes()
+        scopes.add_function_mapping('func', called_from_def=True)
+        self.assertEqual('A', scopes.get_label('func'))
+        scopes.add_function_mapping('func', called_from_def=True)
+        self.assertEqual('B', scopes.get_label('func'))
+        scopes.add_function_mapping('func')
+        self.assertEqual('B', scopes.get_label('func'))

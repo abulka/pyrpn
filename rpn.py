@@ -90,10 +90,13 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         # log.info(f'{self.indent}{type(node).__name__} children complete')
         pass
 
-    def func_name_to_lbl(self, func_name):
+    def func_name_to_lbl(self, func_name, called_from_def=False):
         # auto allocates if it doesn't exist - TODO should vars do this too?
-        if not self.scopes.has_function_mapping(func_name):
-            self.scopes.add_function_mapping(func_name)
+        self.scopes.add_function_mapping(func_name, called_from_def=called_from_def)
+        # if self.scopes.has_function_mapping(func_name) and redefine:
+        #     self.scopes.replace_function_mapping(func_name)
+        # elif not self.scopes.has_function_mapping(func_name):
+        #     self.scopes.add_function_mapping(func_name)
         return self.scopes.get_label(func_name)
 
     def var_to_reg(self, var_name):
@@ -145,14 +148,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         if self.first_def:
             label = node.name[:7]
             self.program.insert(f'LBL "{label}"')
-
-            # just a formality, to consistently track all defs in scopes
-            if not self.scopes.has_function_mapping(node.name):
-                self.scopes.add_function_mapping(node.name, label=label)
-
+            self.scopes.add_function_mapping(node.name, label=label, called_from_def=True)
             self.first_def = False
         else:
-            self.program.insert(f'LBL {self.func_name_to_lbl(node.name)}')
+            self.program.insert(f'LBL {self.func_name_to_lbl(node.name, called_from_def=True)}')
 
         self.scopes.push()
         self.log_state('scope just pushed')

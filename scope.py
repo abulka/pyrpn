@@ -16,6 +16,11 @@ The stack can be empty.
 class Scopes(object):
     stack = attrib(default=Factory(list))
 
+    # this should be a separate class
+    label_data = attrib(default=Factory(dict))  # function name to label name
+    next_lbl = attrib(default=0)  # indexes into A-J, a-e
+    labels_created_by_proper_def = attrib(default=Factory(list))
+
     def __attrs_post_init__(self):
         self.stack.append(Scope(next_reg=0))  # permanent initial scope
 
@@ -29,7 +34,7 @@ class Scopes(object):
 
     @property
     def current_empty(self):
-        return len(self.current.data) == 0 and len(self.current.label_data) == 0
+        return len(self.current.data) == 0
 
     @property
     def next_reg(self):
@@ -40,7 +45,7 @@ class Scopes(object):
         self.stack[-1].next_reg = val
 
     def push(self):
-        self.stack.append(Scope(next_reg=self.next_reg, next_lbl=self.next_lbl))
+        self.stack.append(Scope(next_reg=self.next_reg))
 
     def pop(self):
         if len(self.stack) > 1:  # always leave first permanent scope
@@ -65,45 +70,43 @@ class Scopes(object):
         scope = self.stack[-1]
         return scope.data[var]
 
-    # Function labels - I don't think these should be in each scope - should be global
+    # Function label support - not scoped
 
-    @property
-    def next_lbl(self):
-        return self.stack[0].next_lbl
+    def add_function_mapping(self, func_name, label=None, called_from_def=False):
+        if self.has_function_mapping(func_name) and called_from_def and func_name in self.labels_created_by_proper_def:
+            del self.label_data[func_name]
+        if self.has_function_mapping(func_name):
+            return
 
-    @next_lbl.setter
-    def next_lbl(self, val):
-        self.stack[0].next_lbl = val
-
-    def add_function_mapping(self, func_name, label=None):
         if label == None:
             label = list('ABCDEFGHIJabcdefghij')[self.next_lbl]
             self.next_lbl += 1
-        scope = self.stack[-1]
-        scope.label_data[func_name] = label
+        self.label_data[func_name] = label
+        if called_from_def and func_name not in self.labels_created_by_proper_def:
+            self.labels_created_by_proper_def.append(func_name)
 
     def has_function_mapping(self, func_name):
-        if len(self.stack) == 0:
-            return False
-        scope = self.stack[-1]
-        return func_name in scope.label_data
+        return func_name in self.label_data
 
     def get_label(self, func_name):
-        scope = self.stack[-1]
-        return scope.label_data[func_name]
+        return self.label_data[func_name]
+
+    @property
+    def label_data_empty(self):
+        return len(self.label_data) == 0
+
+    # Util
 
     def dump_short(self):
-        result = ['-' if scope.empty else f'{scope.data}{scope.label_data}' for scope in self.stack]
-        return '[' + ', '.join(result) + ']'
+        result_scopes_list = ['-' if scope.empty else str(scope.data) for scope in self.stack]
+        result_labels = '-' if self.label_data_empty else str(self.label_data)
+        return '[' + ', '.join(result_scopes_list) + ']' + ' [' + result_labels + ']'
 
 @attrs
 class Scope(object):
     data = attrib(default=Factory(dict))  # var name to register name
     next_reg = attrib(default=0)
-    label_data = attrib(default=Factory(dict))  # function name to label name
-    next_lbl = attrib(default=0)  # indexes into A-J, a-e
 
     @property
     def empty(self):
-        return len(self.data) == 0 and len(self.label_data) == 0
-
+        return len(self.data) == 0

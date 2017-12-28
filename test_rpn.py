@@ -591,6 +591,12 @@ class RpnCodeGenTests(BaseTest):
         self.compare(de_comment(expected), lines, dump=True)
 
     def test_nested_defs(self):
+        """
+        Nested defs are ok but they aren't really private
+        and use up a label within the program, so future functions with the
+        same name would refer to the same label!  Workaround is that
+        if you redefine a def, no matter the scope, it gets a new label mapping.
+        """
         lines = self.parse(dedent("""
             def main():
             
