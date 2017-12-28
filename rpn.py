@@ -234,14 +234,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def visit_Name(self, node):
         self.begin(node)
-        # log.debug('Name node "%s" node.ctx %s', node.id, node.ctx)
-        if node.id == 'range':
-            pass # what to do with this situation
-        else:
-            if '.Load' in str(node.ctx):
-                self.program.insert(f'RCL {self.var_to_reg(node.id)}')
-                if self.var_name_is_loop_counter(node.id):
-                    self.program.insert('IP')  # just get the integer portion of isg counter
+        if '.Load' in str(node.ctx):
+            self.program.insert(f'RCL {self.var_to_reg(node.id)}')
+            if self.var_name_is_loop_counter(node.id):
+                self.program.insert('IP')  # just get the integer portion of isg counter
         self.end(node)
 
     def visit_Num(self, node):
