@@ -563,3 +563,29 @@ class RpnCodeGenTests(BaseTest):
             RTN
             """)
         self.compare(de_comment(expected), lines, dump=True)
+
+    def test_xeq_add_subroutine(self):
+        lines = self.parse(dedent("""
+            def main():
+                add(1,2)
+
+            def add(a,b):
+                return a + b
+            """))
+        expected = dedent("""
+            LBL "main"
+            1
+            2
+            XEQ A
+            RTN
+            LBL A  // def add()
+            STO 00
+            RDN
+            STO 01
+            RDN
+            RCL 00 // could be optimised not to use 01 and 02
+            RCL 01
+            +
+            RTN
+            """)
+        self.compare(de_comment(expected), lines, dump=True)
