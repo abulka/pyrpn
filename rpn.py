@@ -90,7 +90,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def func_name_to_lbl(self, func_name):
         return 'A'  # Hack - TODO map this properly
 
-    def var_name_to_register(self, var_name):
+    def var_to_reg(self, var_name):
         """
         Figure out the register to use to store/recall 'var_name' e.g. "x" via our scope system
         Rules:
@@ -151,7 +151,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def visit_arg(self,node):
         """ visit each argument """
         self.begin(node)
-        self.program.insert(f'STO {self.var_name_to_register(node.arg)}')
+        self.program.insert(f'STO {self.var_to_reg(node.arg)}')
         self.program.insert('RDN')
         self.visit_children(node)
         self.end(node)
@@ -161,7 +161,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.begin(node)
         self.visit_children(node)
         for target in node.targets:
-            self.program.insert(f'STO {self.var_name_to_register(target.id)}')
+            self.program.insert(f'STO {self.var_to_reg(target.id)}')
             assert '.Store' in str(target.ctx)
         self.end(node)
 
@@ -169,7 +169,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         """ visit a AugAssign e.g. += node and visits it recursively"""
         self.begin(node)
         self.visit_children(node)
-        self.program.insert(f'STO{self.pending_op} {self.var_name_to_register(node.target.id)}')
+        self.program.insert(f'STO{self.pending_op} {self.var_to_reg(node.target.id)}')
         assert '.Store' in str(node.target.ctx)
         self.pending_op = ''
         self.end(node)
@@ -239,7 +239,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             pass # what to do with this situation
         else:
             if '.Load' in str(node.ctx):
-                self.program.insert(f'RCL {self.var_name_to_register(node.id)}')
+                self.program.insert(f'RCL {self.var_to_reg(node.id)}')
                 if self.var_name_is_loop_counter(node.id):
                     self.program.insert('IP')  # just get the integer portion of isg counter
         self.end(node)
@@ -259,7 +259,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         log.info(f'{self.indent} for')
         self.visit(node.target)
         self.for_loop_info.append(
-            ForLoopItem(register=self.var_name_to_register(node.target.id),
+            ForLoopItem(register=self.var_to_reg(node.target.id),
                         label=self.next_local_label))
         self.next_local_label += 1
 
