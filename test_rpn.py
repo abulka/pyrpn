@@ -681,3 +681,23 @@ class RpnCodeGenTests(BaseTest):
             RTN
             """)
         self.compare(de_comment(expected), lines, dump=True)
+
+    # play with default scope
+
+    def test_no_def(self):
+        """
+        no def - so you don't get a label - still pastable into free42
+        """
+        lines = self.parse(dedent("""
+            val = 10
+            res = val * 10
+            """))
+        expected = dedent("""
+            10
+            STO 00
+            RCL 00
+            10
+            *
+            STO 01
+        """)
+        self.compare(de_comment(expected), lines, dump=True)
