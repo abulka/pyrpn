@@ -23,6 +23,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.for_loop_info = []
         self.log_indent = 0
         self.first_def = True
+        self.first_def_name = None
 
     # Recursion support
 
@@ -117,6 +118,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.program.insert(f'LBL "{label}"')
             self.labels.func_to_lbl(node.name, label=label, called_from_def=True)
             self.first_def = False
+            self.first_def_name = label
         else:
             self.program.insert(f'LBL {self.labels.func_to_lbl(node.name, called_from_def=True)}')
 
@@ -201,7 +203,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             for arg in node.args:
                 self.program.insert(f'MVAR "{arg.s}"')
                 self.scopes.var_to_reg(arg.s, force_reg_name=f'"{arg.s}"')
-            self.program.insert('VARMENU "myvmnu"')
+            self.program.insert(f'VARMENU "{self.first_def_name}"')
             self.program.insert('STOP')
             self.program.insert('EXITALL')
             for arg in node.args:
