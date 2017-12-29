@@ -15,15 +15,15 @@ with open('cmd_list.csv', newline='') as csvfile:
         description = row[1]
 
         if 'Parameter:' in description:
-            num_parameters = 1
+            num_arg_fragments = 1
         elif 'Parameter 2:' in description:
-            num_parameters = 2
+            num_arg_fragments = 2
         else:
-            num_parameters = 0
+            num_arg_fragments = 0
 
         entry = {
             'description': description,
-            'num_parameters': num_parameters,
+            'num_arg_fragments': num_arg_fragments,
             'indirect_allowed': '(indirect allowed)' in description,
         }
         data[cmd] = entry

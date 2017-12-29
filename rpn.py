@@ -224,7 +224,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.end(node)
             return
 
-        elif node.func.id in cmd_list and cmd_list[node.func.id]['num_parameters'] > 0:
+        elif node.func.id in cmd_list and cmd_list[node.func.id]['num_arg_fragments'] > 0:
 
             """
             something wrong here
@@ -241,7 +241,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             """
             cmd_info = cmd_list[node.func.id]
             args = ''
-            for i in range(cmd_info['num_parameters']):
+            for i in range(cmd_info['num_arg_fragments']):
                 arg = node.args[i]
                 arg_val = self.get_node_name_id_or_n(arg)
                 if 'Name' in str(arg):
