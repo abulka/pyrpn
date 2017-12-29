@@ -750,3 +750,53 @@ class RpnCodeGenTests(BaseTest):
             AGRAPH
         """)
         self.compare(de_comment(expected), lines, dump=True)
+
+    def test_multi_cmd_one_arg_frag(self):
+        """
+        multi-part commands that require an arg fragment "parameter" as part of the single rpn command
+        """
+        lines = self.parse(dedent("""
+            INDEX("matrix1")
+            INPUT("length")
+            INTEG("somevar")
+            """))
+        expected = dedent("""
+            INDEX "matrix1"
+            INPUT "length"
+            INTEG "somevar"
+        """)
+        self.compare(de_comment(expected), lines, dump=True)
+
+
+    def test_multi_cmd_two_arg_frag(self):
+        """
+        multi-part commands that require two arg fragments "parameters" as part of the single rpn command
+        """
+        lines = self.parse(dedent("""
+            KEYG(1, "doblah")
+            ASSIGN("someprog", 18)
+            """))
+        expected = dedent("""
+            KEYG 01 "doblah"
+            ASSIGN "someprog" 18
+        """)
+        self.compare(de_comment(expected), lines, dump=True)
+
+
+    @unittest.skip("not implemented")
+    def test_if(self):
+        lines = self.parse(dedent("""
+            if FS?(01):
+                FIX(2)
+            """))
+        expected = dedent("""
+            FS? 01
+            GOTO 00  // true, flag is set
+            GOTO 01  // false
+            LBL 00   // true
+            RTN
+            LBL 01   // false
+            RTN
+        """)
+        self.compare(de_comment(expected), lines, dump=True)
+

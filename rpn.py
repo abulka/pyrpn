@@ -225,26 +225,14 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             return
 
         elif node.func.id in cmd_list and cmd_list[node.func.id]['num_arg_fragments'] > 0:
-
-            """
-            something wrong here
-            we are missing out on
-                        
-            for item in node.args:
-                self.visit(item)
-            
-            which is needed for proper unary op parsing of -1
-            
-            perhaps we are being too smart and pulling out args
-            when they should be visited properly?
-                        
-            """
+            # The built-in command has arg fragment "parameter" parts which must be emitted immediately as part of the
+            # command, thus we cannot rely on normal visit parsing but must look ahead and extract needed info.
             cmd_info = cmd_list[node.func.id]
             args = ''
             for i in range(cmd_info['num_arg_fragments']):
                 arg = node.args[i]
                 arg_val = self.get_node_name_id_or_n(arg)
-                if 'Name' in str(arg):
+                if 'Str' in str(arg):
                     arg_val = f'"{arg_val}"'
                 elif 'Num' in str(arg):
                     arg_val = f'{arg_val:02d}'  # TODO probably need more formats e.g. nnnn
@@ -264,8 +252,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.program.insert('+')
             self.program.insert(f'STO {self.for_loop_info[-1].register}', comment='range')
         elif node.func.id in cmd_list:
-            # Command is a simple one without command fragment "parameter" parts - yes it may take actual
-            # parameters which are available on the stack as normal
+            # The built-in command is a simple one without command arg fragment "parameter" parts - yes it may take
+            # actual parameters but these are generated through normal visit parsing and available on the stack.
             self.program.insert(f'{node.func.id}', comment=cmd_list[node.func.id]['description'])
         else:
             self.program.insert(f'XEQ {self.labels.func_to_lbl(node.func.id)}')
