@@ -20,6 +20,9 @@ cmd_list = \
  '10↑X': {'description': 'Common exponential. Returns 10x.',
           'indirect_allowed': False,
           'num_parameters': 0},
+ 'ABS': {'description': 'Absolute value. Returns |x|.',
+         'indirect_allowed': False,
+         'num_parameters': 0},
  'ACOS': {'description': 'Arc cosine. Returns cos–1 x.',
           'indirect_allowed': False,
           'num_parameters': 0},
@@ -856,7 +859,7 @@ cmd_list = \
                          'from growing.',
           'indirect_allowed': False,
           'num_parameters': 0},
- 'X< >': {'description': ' Swaps the contents of the x-register with another '
+ 'X< >': {'description': 'Swaps the contents of the x-register with another '
                          'register or variable. Parameter: register or '
                          'variable (indirect allowed)',
           'indirect_allowed': True,
@@ -1022,7 +1025,4 @@ cmd_list = \
  '◄': {'description': 'Backspace or clear x-register. In Program entry mode, '
                       'deletes the current program line.',
        'indirect_allowed': False,
-       'num_parameters': 0},
- '\ufeffABS': {'description': 'Absolute value. Returns |x|.',
-               'indirect_allowed': False,
-               'num_parameters': 0}}
+       'num_parameters': 0}}

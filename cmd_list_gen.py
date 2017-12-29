@@ -1,10 +1,11 @@
+#coding:utf8
 import csv
 import pprint
 
 data = {}
 with open('cmd_list.csv', newline='') as csvfile:
-    spamreader = csv.reader(csvfile, delimiter=',', quotechar='"')
-    for row in spamreader:
+    myreader = csv.reader(csvfile)
+    for row in myreader:
         # print(', '.join(row))
         # print(row[0])
         # print(row[1])
