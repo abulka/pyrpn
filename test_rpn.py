@@ -725,16 +725,17 @@ class RpnCodeGenTests(BaseTest):
         """)
         self.compare(de_comment(expected), lines, dump=True)
 
-    def test_generic_cmds_2(self):
+    def test_generic_cmds_non_multi_part(self):
         """
-        looks up more generic list of 41S commands
+        These commands might take parameters, but are themselves not
+        multi-part commands that require a parameter on the same line.
         """
         lines = self.parse(dedent("""
-            ABSoooo(-1)
+            ABS(-1)
             ACOS(2)
             ACOSH(3)
             ADV()
-            # AGRAPH(4,5)
+            AGRAPH(4,5)
             """))
         expected = dedent("""
             -1
@@ -744,8 +745,8 @@ class RpnCodeGenTests(BaseTest):
             3
             ACOSH
             ADV
-            //4
-            //5
-            //AGRAPH
+            4
+            5
+            AGRAPH
         """)
         self.compare(de_comment(expected), lines, dump=True)

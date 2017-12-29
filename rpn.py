@@ -224,7 +224,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.end(node)
             return
 
-        elif node.func.id in cmd_list:
+        elif node.func.id in cmd_list and cmd_list[node.func.id]['num_parameters'] > 0:
 
             """
             something wrong here
@@ -263,6 +263,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.program.insert('/')
             self.program.insert('+')
             self.program.insert(f'STO {self.for_loop_info[-1].register}', comment='range')
+        elif node.func.id in cmd_list:
+            # Command is a simple one without command fragment "parameter" parts - yes it may take actual
+            # parameters which are available on the stack as normal
+            self.program.insert(f'{node.func.id}', comment=cmd_list[node.func.id]['description'])
         else:
             self.program.insert(f'XEQ {self.labels.func_to_lbl(node.func.id)}')
             self.log_state('scope after XEQ')
@@ -308,11 +312,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         operand=Num(n=1))],
         """
         pass
-        print('88'*88)
 
     @recursive
     def visit_USub(self, node):
-        print('88'*88)
         self.pending_unary_op = '-'
 
     def visit_For(self, node):
