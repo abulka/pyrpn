@@ -6,6 +6,7 @@ from scope import Scopes
 from labels import FunctionLabels
 from attr import attrs, attrib, Factory
 import settings
+from cmd_list import cmd_list
 
 log = logging.getLogger(__name__)
 config_log(log)
@@ -217,6 +218,22 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             if node.func.id in ('MVAR',):
                 arg = node.args[0].s
                 self.scopes.var_to_reg(arg, force_reg_name=f'"{arg}"')
+            self.end(node)
+            return
+
+        elif node.func.id in cmd_list:
+            cmd_info = cmd_list[node.func.id]
+            args = ''
+            for i in range(cmd_info['num_parameters']):
+                arg = node.args[i]
+                arg_val = self.get_node_name_id_or_n(arg)
+                if 'Name' in str(arg):
+                    arg_val = f'"{arg_val}"'
+                elif 'Num' in str(arg):
+                    arg_val = f'{arg_val:02d}'  # TODO probably need more formats e.g. nnnn
+                args += ' ' if arg_val else ''
+                args += arg_val
+            self.program.insert(f'{node.func.id}{args}', comment=cmd_info['description'])
             self.end(node)
             return
 

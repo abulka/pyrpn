@@ -701,3 +701,26 @@ class RpnCodeGenTests(BaseTest):
             STO 01
         """)
         self.compare(de_comment(expected), lines, dump=True)
+
+    # generic handling of any 41S command
+
+    def test_generic_cmds_1(self):
+        """
+        looks up generic list of 41S commands
+        """
+        lines = self.parse(dedent("""
+            fred = 1
+            FIX(2)
+            FP()
+            IP()
+            GRAD()
+            """))
+        expected = dedent("""
+            1
+            STO 00
+            FIX 02
+            FP
+            IP
+            GRAD
+        """)
+        self.compare(de_comment(expected), lines, dump=True)
