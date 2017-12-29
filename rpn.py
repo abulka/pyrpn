@@ -18,6 +18,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def __init__(self):
         self.program = Program()
         self.pending_op = ''
+        self.pending_unary_op = ''
         self.scopes = Scopes()
         self.labels = FunctionLabels()
         self.local_labels = LocalLabels()
@@ -199,6 +200,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 Manually looped through and visited.  Each visit emits a register rcl or literal onto the stack.
         """
         self.begin(node)
+        # log.info(list(cmd_list.keys()))
+        # log.info(node.func.id in cmd_list)
 
         if node.func.id == 'varmenu':
             for arg in node.args:
@@ -222,6 +225,20 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             return
 
         elif node.func.id in cmd_list:
+
+            """
+            something wrong here
+            we are missing out on
+                        
+            for item in node.args:
+                self.visit(item)
+            
+            which is needed for proper unary op parsing of -1
+            
+            perhaps we are being too smart and pulling out args
+            when they should be visited properly?
+                        
+            """
             cmd_info = cmd_list[node.func.id]
             args = ''
             for i in range(cmd_info['num_parameters']):
@@ -276,12 +293,27 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def visit_Num(self, node):
         self.begin(node)
-        self.program.insert(str(node.n))
+        self.program.insert(f'{self.pending_unary_op}{node.n}')
+        self.pending_unary_op = ''
         self.end(node)
 
     @recursive
     def visit_Expr(self, node):
         pass
+
+    @recursive
+    def visit_UnaryOp(self, node):
+        """
+        op=USub(),
+        operand=Num(n=1))],
+        """
+        pass
+        print('88'*88)
+
+    @recursive
+    def visit_USub(self, node):
+        print('88'*88)
+        self.pending_unary_op = '-'
 
     def visit_For(self, node):
         self.begin(node)

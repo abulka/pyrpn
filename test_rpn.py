@@ -724,3 +724,28 @@ class RpnCodeGenTests(BaseTest):
             GRAD
         """)
         self.compare(de_comment(expected), lines, dump=True)
+
+    def test_generic_cmds_2(self):
+        """
+        looks up more generic list of 41S commands
+        """
+        lines = self.parse(dedent("""
+            ABSoooo(-1)
+            ACOS(2)
+            ACOSH(3)
+            ADV()
+            # AGRAPH(4,5)
+            """))
+        expected = dedent("""
+            -1
+            ABS
+            2
+            ACOS
+            3
+            ACOSH
+            ADV
+            //4
+            //5
+            //AGRAPH
+        """)
+        self.compare(de_comment(expected), lines, dump=True)
