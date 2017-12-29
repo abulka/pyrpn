@@ -197,7 +197,17 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         """
         self.begin(node)
 
-        if node.func.id in ('MVAR', 'VARMENU', 'STOP', 'EXITALL'):
+        if node.func.id == 'varmenu':
+            self.program.insert('MVAR "length"')  # TODO loop through variable args
+            self.program.insert('MVAR "width"')
+            self.program.insert('VARMENU "myvmnu"')
+            self.program.insert('STOP')
+            self.program.insert('EXITALL')
+            for arg in node.args:
+                self.scopes.var_to_reg(arg.s, force_reg_name=f'"{arg.s}"')
+            self.end(node)
+            return
+        elif node.func.id in ('MVAR', 'VARMENU', 'STOP', 'EXITALL'):
             arg = f' "{node.args[0].s}"' if node.args else ''
             self.program.insert(f'{node.func.id}{arg}')
 

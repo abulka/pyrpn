@@ -636,12 +636,6 @@ class RpnCodeGenTests(BaseTest):
     # Calls to HP42s methods
 
     def test_mvar(self):
-        """
-        Nested defs are ok but they aren't really private
-        and use up a label within the program, so future functions with the
-        same name would refer to the same label!  Workaround is that
-        if you redefine a def, no matter the scope, it gets a new label mapping.
-        """
         lines = self.parse(dedent("""
             def mvadd():
                 MVAR("length")
@@ -656,6 +650,29 @@ class RpnCodeGenTests(BaseTest):
             MVAR "length"
             MVAR "width"
             VARMENU "mvadd"
+            STOP
+            EXITALL
+            RCL "length"
+            RCL "width"
+            *
+            RTN
+            """)
+        self.compare(de_comment(expected), lines, dump=True)
+
+    def test_varmenu(self):
+        """
+        new construct - to save time
+        """
+        lines = self.parse(dedent("""
+            def myvmnu():
+                varmenu("length", "width")
+                return length * width 
+            """))
+        expected = dedent("""
+            LBL "myvmnu"
+            MVAR "length"
+            MVAR "width"
+            VARMENU "myvmnu"
             STOP
             EXITALL
             RCL "length"
