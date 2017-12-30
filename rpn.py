@@ -282,24 +282,29 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         # Actually should embed descriptions in lbl line comments
         if self.debug_gen_descriptive_labels:
-            label_true = 'if body'
+            label_if_body = 'if body'
             label_resume = 'resume'
             label_else = 'else' if len(node.orelse) > 0 else None
             label_elif = 'elif' if len(node.orelse) == 1 and isinstance(node.orelse[0], ast.If) else None
         else:
-            label_true = self.local_labels.next_local_label
+            label_if_body = self.local_labels.next_local_label
             label_resume = self.local_labels.next_local_label
             label_else = self.local_labels.next_local_label if len(node.orelse) > 0 else None
             label_elif = self.local_labels.next_local_label if len(node.orelse) == 1 and isinstance(node.orelse[0], ast.If) else None
 
-        self.program.insert(f'GTO {label_true}')
+        # log.info('label_if_body %s', label_if_body)
+        # log.info('label_resume %s', label_resume)
+        # log.info('label_else %s', label_else)
+        # log.info('label_elif %s', label_elif)
+
+        self.program.insert(f'GTO {label_if_body}')
         if label_elif:
             self.program.insert(f'GTO {label_elif}')
         elif label_else:
             self.program.insert(f'GTO {label_else}')
         else:
             self.program.insert(f'GTO {label_resume}')
-        self.program.insert(f'LBL {label_true}')
+        self.program.insert(f'LBL {label_if_body}')
 
         self.body(node.body)
 
@@ -316,7 +321,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 self.visit(node.test)
                 log.info(f'{self.indent} :')
 
-                label_elif_body = 'elif body'
+                label_elif_body = 'elif body' if self.debug_gen_descriptive_labels else self.local_labels.next_local_label
+                # log.info('label_elif_body %s', label_elif_body)
+
                 self.program.insert(f'GTO {label_elif_body}')
                 self.program.insert(f'GTO {label_else}')
                 self.program.insert(f'LBL {label_elif_body}')

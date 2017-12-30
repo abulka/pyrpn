@@ -862,34 +862,43 @@ class RpnCodeGenTests(BaseTest):
             LBL resume
             FIX 02
         """)
+
+        """
+        Label allocation:
+            label_if_body   00
+            label_resume    01
+            label_else      02
+            label_elif      03
+            label_elif_body 04
+        """
         expected = dedent("""
             FS? 20
             GTO 00  // if body
-            GTO 01  // elif
+            GTO 03  // elif
 
             LBL 00  // if body
             CF 05
-            GTO 02  // resume
+            GTO 01  // resume
 
-            LBL 01  // elif
+            LBL 03  // elif
             FS? 21
-            GTO 03  // elif body
-            GTO 04  // else
+            GTO 04  // elif body
+            GTO 02  // else
 
-            LBL 03  // elif body
+            LBL 04  // elif body
             CF 06
-            GTO 02  // resume
+            GTO 01  // resume
 
-            LBL 04  // else
+            LBL 02  // else
             CF 07
 
-            LBL 02  // resume
+            LBL 01  // resume
             FIX 02
         """)
 
         lines = self.parse(dedent(src), debug_gen_descriptive_labels=True)
         self.compare(de_comment(expected_descriptive), lines, dump=True)
 
-        # lines = self.parse(dedent(src))
-        # self.compare(de_comment(expected), lines, dump=True)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines, dump=True)
 
