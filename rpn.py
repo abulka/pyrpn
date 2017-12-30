@@ -203,7 +203,11 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         # log.info(list(cmd_list.keys()))
         # log.info(node.func.id in cmd_list)
 
-        if node.func.id == 'varmenu':
+        func_name = node.func.id
+        if func_name == 'FS':
+            func_name = 'FS?'  # Hack to allow question marks
+
+        if func_name == 'varmenu':
             for arg in node.args:
                 self.program.insert(f'MVAR "{arg.s}"')
                 self.scopes.var_to_reg(arg.s, force_reg_name=f'"{arg.s}"')
@@ -214,20 +218,20 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 self.scopes.var_to_reg(arg.s, force_reg_name=f'"{arg.s}"')
             self.end(node)
             return
-        elif node.func.id in ('MVAR', 'VARMENU', 'STOP', 'EXITALL'):
+        elif func_name in ('MVAR', 'VARMENU', 'STOP', 'EXITALL'):
             arg = f' "{node.args[0].s}"' if node.args else ''
-            self.program.insert(f'{node.func.id}{arg}')
+            self.program.insert(f'{func_name}{arg}')
 
-            if node.func.id in ('MVAR',):
+            if func_name in ('MVAR',):
                 arg = node.args[0].s
                 self.scopes.var_to_reg(arg, force_reg_name=f'"{arg}"')
             self.end(node)
             return
 
-        elif node.func.id in cmd_list and cmd_list[node.func.id]['num_arg_fragments'] > 0:
+        elif func_name in cmd_list and cmd_list[func_name]['num_arg_fragments'] > 0:
             # The built-in command has arg fragment "parameter" parts which must be emitted immediately as part of the
             # command, thus we cannot rely on normal visit parsing but must look ahead and extract needed info.
-            cmd_info = cmd_list[node.func.id]
+            cmd_info = cmd_list[func_name]
             args = ''
             for i in range(cmd_info['num_arg_fragments']):
                 arg = node.args[i]
@@ -238,7 +242,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                     arg_val = f'{arg_val:02d}'  # TODO probably need more formats e.g. nnnn
                 args += ' ' if arg_val else ''
                 args += arg_val
-            self.program.insert(f'{node.func.id}{args}', comment=cmd_info['description'])
+            self.program.insert(f'{func_name}{args}', comment=cmd_info['description'])
             self.end(node)
             return
 
@@ -246,18 +250,55 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.visit(item)
         # self.visit(node.func)  # don't visit this name cos we emit it ourselves below, RPN style
 
-        if self.for_loop_info and node.func.id == 'range':
+        if self.for_loop_info and func_name == 'range':
             self.program.insert(1000)
             self.program.insert('/')
             self.program.insert('+')
             self.program.insert(f'STO {self.for_loop_info[-1].register}', comment='range')
-        elif node.func.id in cmd_list:
+        elif func_name in cmd_list:
             # The built-in command is a simple one without command arg fragment "parameter" parts - yes it may take
             # actual parameters but these are generated through normal visit parsing and available on the stack.
-            self.program.insert(f'{node.func.id}', comment=cmd_list[node.func.id]['description'])
+            self.program.insert(f'{func_name}', comment=cmd_list[func_name]['description'])
         else:
-            self.program.insert(f'XEQ {self.labels.func_to_lbl(node.func.id)}')
+            self.program.insert(f'XEQ {self.labels.func_to_lbl(func_name)}')
             self.log_state('scope after XEQ')
+        self.end(node)
+
+    def visit_If(self, node):
+        """
+        If's subnodes are:
+            - test
+            - body
+            - orelse
+        """
+        self.begin(node)
+        log.info(f'{self.indent} if')
+
+        self.visit(node.test)
+        log.info(f'{self.indent} :')
+        self.program.insert('GOTO 00')
+        self.program.insert('GOTO 01')
+        self.program.insert('LBL 00')
+
+        self.body(node.body)
+
+        # handle the else
+        # while True:
+        #     else_ = node.orelse
+        #     if len(else_) == 1 and isinstance(else_[0], If):
+        #         node = else_[0]
+        #         self.newline()
+        #         self.write('elif ')
+        #         self.visit(node.test)
+        #         self.write(':')
+        #         self.body(node.body)
+        #     else:
+        #         if len(else_) > 0:
+        #             self.newline()
+        #             self.write('else:')
+        #             self.body(else_)
+        #         break
+        self.program.insert('LBL 01')
         self.end(node)
 
     @recursive

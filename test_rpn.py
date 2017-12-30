@@ -783,20 +783,21 @@ class RpnCodeGenTests(BaseTest):
         self.compare(de_comment(expected), lines, dump=True)
 
 
-    @unittest.skip("not implemented")
+    # @unittest.skip("not implemented")
     def test_if(self):
         lines = self.parse(dedent("""
-            if FS?(01):
-                FIX(2)
+            if FS(1):
+                CF(1)
+            FIX(2)
             """))
         expected = dedent("""
             FS? 01
             GOTO 00  // true, flag is set
-            GOTO 01  // false
+            GOTO 01  // false, flag is not set - jump to code block after the if
             LBL 00   // true
-            RTN
-            LBL 01   // false
-            RTN
+            CF 01
+            LBL 01   // code block after the if
+            FIX 02
         """)
         self.compare(de_comment(expected), lines, dump=True)
 
