@@ -66,3 +66,15 @@ class UtilCommentTests(BaseTest):
             """)
         self.assertEqual(expected, de_comment(commented))
 
+    def test_remove_blank_lines(self):
+        commented = dedent("""
+            LBL "LOOPER"
+
+            RTN
+            """)
+        expected = dedent("""
+            LBL "LOOPER"
+            RTN
+            """)
+        self.assertEqual(expected, de_comment(commented))
+
