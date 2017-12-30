@@ -13,10 +13,11 @@ config_log(log)
 
 class RpnCodeGenTests(BaseTest):
 
-    def parse(self, text):
+    def parse(self, text, debug_gen_descriptive_labels=False):
         self.tree = ast.parse(text)
         self.dump_ast()
         self.visitor = RecursiveRpnVisitor()
+        self.visitor.debug_gen_descriptive_labels=debug_gen_descriptive_labels
         self.visitor.visit(self.tree)
         # self.visitor.program.dump()
         return self.visitor.program.lines
@@ -801,7 +802,6 @@ class RpnCodeGenTests(BaseTest):
         """)
         self.compare(de_comment(expected), lines, dump=True)
 
-    # @unittest.skip("not implemented")
     def test_if_else(self):
         lines = self.parse(dedent("""
             if FS(1):
@@ -826,4 +826,70 @@ class RpnCodeGenTests(BaseTest):
             FIX 02
         """)
         self.compare(de_comment(expected), lines, dump=True)
+
+    # @unittest.skip("not implemented")
+    def test_if_elif(self):
+        src = """
+            if FS(20):
+                CF(5)
+            elif FS(21):
+                CF(6)
+            else:
+                CF(7)
+            FIX(2)  
+        """
+        expected_descriptive = dedent("""
+            FS? 20
+            GTO if body
+            GTO elif
+
+            LBL if body
+            CF 05
+            GTO resume
+
+            LBL elif
+            FS? 21
+            GTO elif body
+            GTO else
+
+            LBL elif body
+            CF 06
+            GTO resume
+
+            LBL else
+            CF 07
+
+            LBL resume
+            FIX 02
+        """)
+        expected = dedent("""
+            FS? 20
+            GTO 00  // if body
+            GTO 01  // elif
+
+            LBL 00  // if body
+            CF 05
+            GTO 02  // resume
+
+            LBL 01  // elif
+            FS? 21
+            GTO 03  // elif body
+            GTO 04  // else
+
+            LBL 03  // elif body
+            CF 06
+            GTO 02  // resume
+
+            LBL 04  // else
+            CF 07
+
+            LBL 02  // resume
+            FIX 02
+        """)
+
+        lines = self.parse(dedent(src), debug_gen_descriptive_labels=True)
+        self.compare(de_comment(expected_descriptive), lines, dump=True)
+
+        # lines = self.parse(dedent(src))
+        # self.compare(de_comment(expected), lines, dump=True)
 

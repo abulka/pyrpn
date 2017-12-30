@@ -26,6 +26,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.log_indent = 0
         self.first_def = True
         self.first_def_name = None
+        self.debug_gen_descriptive_labels = False
 
     # Recursion support
 
@@ -279,21 +280,31 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.visit(node.test)
         log.info(f'{self.indent} :')
 
-        label_true = self.local_labels.next_local_label
-        label_resume = self.local_labels.next_local_label
-        label_else = self.local_labels.next_local_label if len(node.orelse) > 0 else None
-
-        self.program.insert(f'GTO {label_true:02d}')
-        if label_else:
-            self.program.insert(f'GTO {label_else:02d}')  # this is different if there is an else - yikes!
+        # Actually should embed descriptions in lbl line comments
+        if self.debug_gen_descriptive_labels:
+            label_true = 'if body'
+            label_resume = 'resume'
+            label_else = 'else' if len(node.orelse) > 0 else None
+            label_elif = 'elif' if len(node.orelse) == 1 and isinstance(node.orelse[0], ast.If) else None
         else:
-            self.program.insert(f'GTO {label_resume:02d}')  # this is different if there is an else - yikes!
+            label_true = self.local_labels.next_local_label
+            label_resume = self.local_labels.next_local_label
+            label_else = self.local_labels.next_local_label if len(node.orelse) > 0 else None
+            label_elif = self.local_labels.next_local_label if len(node.orelse) == 1 and isinstance(node.orelse[0], ast.If) else None
 
-        self.program.insert(f'LBL {label_true:02d}')
+        self.program.insert(f'GTO {label_true}')
+        if label_elif:
+            self.program.insert(f'GTO {label_elif}')
+        elif label_else:
+            self.program.insert(f'GTO {label_else}')
+        else:
+            self.program.insert(f'GTO {label_resume}')
+        self.program.insert(f'LBL {label_true}')
+
         self.body(node.body)
 
         if label_else:
-            self.program.insert(f'GTO {label_resume:02d}')  # this needs to be inserted if there is an else - yikes!
+            self.program.insert(f'GTO {label_resume}')  # this needs to be inserted if there is an else - yikes!
 
         # handle the else
         while True:
@@ -301,17 +312,25 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             if len(else_) == 1 and isinstance(else_[0], ast.If):
                 node = else_[0]
                 log.info(f'{self.indent} elif')
+                self.program.insert(f'LBL {label_elif}')
                 self.visit(node.test)
                 log.info(f'{self.indent} :')
+
+                label_elif_body = 'elif body'
+                self.program.insert(f'GTO {label_elif_body}')
+                self.program.insert(f'GTO {label_else}')
+                self.program.insert(f'LBL {label_elif_body}')
+
                 self.body(node.body)
+                self.program.insert(f'GTO {label_resume}')
             else:
                 if len(else_) > 0:
                     log.info(f'{self.indent} else')
-                    self.program.insert(f'LBL {label_else:02d}')
+                    self.program.insert(f'LBL {label_else}')
                     self.body(else_)
                 break
 
-        self.program.insert(f'LBL {label_resume:02d}')
+        self.program.insert(f'LBL {label_resume}')
         self.end(node)
 
     @recursive
@@ -373,12 +392,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.visit(node.iter)
 
         log.info(f'{self.indent} :')
-        self.program.insert(f'LBL {self.for_loop_info[-1].label:02d}')
+        self.program.insert(f'LBL {self.for_loop_info[-1].label}')
 
         self.body_or_else(node)
 
         self.program.insert(f'ISG {self.for_loop_info[-1].register}', comment=f'{self.for_loop_info[-1]}')
-        self.program.insert(f'GTO {self.for_loop_info[-1].label:02d}')
+        self.program.insert(f'GTO {self.for_loop_info[-1].label}')
         self.for_loop_info.pop()
         self.end(node)
 
@@ -396,4 +415,4 @@ class LocalLabels(object):
     def next_local_label(self):
         result = self.label_num
         self.label_num += 1
-        return result
+        return f'{result:02d}'
