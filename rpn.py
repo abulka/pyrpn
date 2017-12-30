@@ -154,6 +154,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         for target in node.targets:
             self.program.insert(f'STO {self.scopes.var_to_reg(target.id)}')
             assert '.Store' in str(target.ctx)
+            assert isinstance(target.ctx, ast.Store)
         self.end(node)
 
     def visit_AugAssign(self,node):
@@ -162,6 +163,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.visit_children(node)
         self.program.insert(f'STO{self.pending_op} {self.scopes.var_to_reg(node.target.id)}')
         assert '.Store' in str(node.target.ctx)
+        assert isinstance(node.target.ctx, ast.Store)
         self.pending_op = ''
         self.end(node)
 
@@ -236,9 +238,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             for i in range(cmd_info['num_arg_fragments']):
                 arg = node.args[i]
                 arg_val = self.get_node_name_id_or_n(arg)
-                if 'Str' in str(arg):
+                if isinstance(arg, ast.Str):
                     arg_val = f'"{arg_val}"'
-                elif 'Num' in str(arg):
+                elif isinstance(arg, ast.Num):
                     arg_val = f'{arg_val:02d}'  # TODO probably need more formats e.g. nnnn
                 args += ' ' if arg_val else ''
                 args += arg_val
@@ -278,31 +280,38 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         log.info(f'{self.indent} :')
 
         label_true = self.local_labels.next_local_label
-        label_false = self.local_labels.next_local_label
-        self.program.insert(f'GTO {label_true:02d}')
-        self.program.insert(f'GTO {label_false:02d}')
-        self.program.insert(f'LBL {label_true:02d}')
+        label_resume = self.local_labels.next_local_label
+        label_else = self.local_labels.next_local_label if len(node.orelse) > 0 else None
 
+        self.program.insert(f'GTO {label_true:02d}')
+        if label_else:
+            self.program.insert(f'GTO {label_else:02d}')  # this is different if there is an else - yikes!
+        else:
+            self.program.insert(f'GTO {label_resume:02d}')  # this is different if there is an else - yikes!
+
+        self.program.insert(f'LBL {label_true:02d}')
         self.body(node.body)
 
-        # handle the else
-        # while True:
-        #     else_ = node.orelse
-        #     if len(else_) == 1 and isinstance(else_[0], If):
-        #         node = else_[0]
-        #         self.newline()
-        #         self.write('elif ')
-        #         self.visit(node.test)
-        #         self.write(':')
-        #         self.body(node.body)
-        #     else:
-        #         if len(else_) > 0:
-        #             self.newline()
-        #             self.write('else:')
-        #             self.body(else_)
-        #         break
+        if label_else:
+            self.program.insert(f'GTO {label_resume:02d}')  # this needs to be inserted if there is an else - yikes!
 
-        self.program.insert(f'LBL {label_false:02d}')
+        # handle the else
+        while True:
+            else_ = node.orelse
+            if len(else_) == 1 and isinstance(else_[0], ast.If):
+                node = else_[0]
+                log.info(f'{self.indent} elif')
+                self.visit(node.test)
+                log.info(f'{self.indent} :')
+                self.body(node.body)
+            else:
+                if len(else_) > 0:
+                    log.info(f'{self.indent} else')
+                    self.program.insert(f'LBL {label_else:02d}')
+                    self.body(else_)
+                break
+
+        self.program.insert(f'LBL {label_resume:02d}')
         self.end(node)
 
     @recursive
@@ -323,6 +332,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def visit_Name(self, node):
         self.begin(node)
         if '.Load' in str(node.ctx):
+            assert isinstance(node.ctx, ast.Load)
             self.program.insert(f'RCL {self.scopes.var_to_reg(node.id)}')
             if self.var_name_is_loop_counter(node.id):
                 self.program.insert('IP')  # just get the integer portion of isg counter

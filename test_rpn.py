@@ -782,8 +782,6 @@ class RpnCodeGenTests(BaseTest):
         """)
         self.compare(de_comment(expected), lines, dump=True)
 
-
-    # @unittest.skip("not implemented")
     def test_if(self):
         lines = self.parse(dedent("""
             if FS(1):
@@ -793,10 +791,38 @@ class RpnCodeGenTests(BaseTest):
         expected = dedent("""
             FS? 01
             GTO 00  // true, flag is set
-            GTO 01  // false, flag is not set - jump to code block after the if
-            LBL 00   // true
+            GTO 01  // jump to resume
+            
+            LBL 00  // true
             CF 01
-            LBL 01   // code block after the if
+            
+            LBL 01  // resume (code block after the if)
+            FIX 02
+        """)
+        self.compare(de_comment(expected), lines, dump=True)
+
+    # @unittest.skip("not implemented")
+    def test_if_else(self):
+        lines = self.parse(dedent("""
+            if FS(1):
+                CF(5)
+            else:
+                CF(6)
+            FIX(2)  
+            """))
+        expected = dedent("""
+            FS? 01
+            GTO 00  // true, flag is set
+            GTO 02  // else (false), jump to else
+
+            LBL 00  // true
+            CF 05
+            GTO 01  // jump to resume
+
+            LBL 02  // else (false)
+            CF 06
+
+            LBL 01  // resume
             FIX 02
         """)
         self.compare(de_comment(expected), lines, dump=True)
