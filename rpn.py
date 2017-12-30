@@ -276,9 +276,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         self.visit(node.test)
         log.info(f'{self.indent} :')
-        self.program.insert('GOTO 00')
-        self.program.insert('GOTO 01')
-        self.program.insert('LBL 00')
+
+        label_true = self.local_labels.next_local_label
+        label_false = self.local_labels.next_local_label
+        self.program.insert(f'GTO {label_true:02d}')
+        self.program.insert(f'GTO {label_false:02d}')
+        self.program.insert(f'LBL {label_true:02d}')
 
         self.body(node.body)
 
@@ -298,7 +301,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         #             self.write('else:')
         #             self.body(else_)
         #         break
-        self.program.insert('LBL 01')
+
+        self.program.insert(f'LBL {label_false:02d}')
         self.end(node)
 
     @recursive
@@ -380,5 +384,6 @@ class LocalLabels(object):
 
     @property
     def next_local_label(self):
-        return self.label_num
+        result = self.label_num
         self.label_num += 1
+        return result

@@ -792,8 +792,8 @@ class RpnCodeGenTests(BaseTest):
             """))
         expected = dedent("""
             FS? 01
-            GOTO 00  // true, flag is set
-            GOTO 01  // false, flag is not set - jump to code block after the if
+            GTO 00  // true, flag is set
+            GTO 01  // false, flag is not set - jump to code block after the if
             LBL 00   // true
             CF 01
             LBL 01   // code block after the if
