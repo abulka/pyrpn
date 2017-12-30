@@ -297,19 +297,19 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         # log.info('label_else %s', label_else)
         # log.info('label_elif %s', label_elif)
 
-        self.program.insert(f'GTO {label_if_body}')
+        self.program.insert(f'GTO {label_if_body}', comment='if_body')
         if label_elif:
-            self.program.insert(f'GTO {label_elif}')
+            self.program.insert(f'GTO {label_elif}', comment='elif')
         elif label_else:
-            self.program.insert(f'GTO {label_else}')
+            self.program.insert(f'GTO {label_else}', comment='else')
         else:
-            self.program.insert(f'GTO {label_resume}')
-        self.program.insert(f'LBL {label_if_body}')
+            self.program.insert(f'GTO {label_resume}', comment='resume')
+        self.program.insert(f'LBL {label_if_body}', comment='if_body')
 
         self.body(node.body)
 
         if label_else:
-            self.program.insert(f'GTO {label_resume}')  # this needs to be inserted if there is an else - yikes!
+            self.program.insert(f'GTO {label_resume}', comment='resume')
 
         # handle the else
         while True:
@@ -317,27 +317,27 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             if len(else_) == 1 and isinstance(else_[0], ast.If):
                 node = else_[0]
                 log.info(f'{self.indent} elif')
-                self.program.insert(f'LBL {label_elif}')
+                self.program.insert(f'LBL {label_elif}', comment='elif')
                 self.visit(node.test)
                 log.info(f'{self.indent} :')
 
                 label_elif_body = 'elif body' if self.debug_gen_descriptive_labels else self.local_labels.next_local_label
                 # log.info('label_elif_body %s', label_elif_body)
 
-                self.program.insert(f'GTO {label_elif_body}')
-                self.program.insert(f'GTO {label_else}')
-                self.program.insert(f'LBL {label_elif_body}')
+                self.program.insert(f'GTO {label_elif_body}', comment='elif_body')
+                self.program.insert(f'GTO {label_else}', comment='else')
+                self.program.insert(f'LBL {label_elif_body}', comment='elif_body')
 
                 self.body(node.body)
-                self.program.insert(f'GTO {label_resume}')
+                self.program.insert(f'GTO {label_resume}', comment='resume')
             else:
                 if len(else_) > 0:
                     log.info(f'{self.indent} else')
-                    self.program.insert(f'LBL {label_else}')
+                    self.program.insert(f'LBL {label_else}', comment='else')
                     self.body(else_)
                 break
 
-        self.program.insert(f'LBL {label_resume}')
+        self.program.insert(f'LBL {label_resume}', comment='resume')
         self.end(node)
 
     @recursive
