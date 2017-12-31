@@ -841,18 +841,18 @@ class RpnCodeGenTests(BaseTest):
         expected_descriptive = dedent("""
             FS? 20
             GTO if body
-            GTO elif
+            GTO elif 1
 
             LBL if body
             CF 05
             GTO resume
 
-            LBL elif
+            LBL elif 1
             FS? 21
-            GTO elif body
+            GTO elif body 1
             GTO else
 
-            LBL elif body
+            LBL elif body 1
             CF 06
             GTO resume
 
@@ -901,4 +901,98 @@ class RpnCodeGenTests(BaseTest):
 
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines, dump=True)
+
+    # @unittest.skip("not implemented")
+    def test_if_elif_elif(self):
+        src = """
+            if FS(20):
+                pass
+            elif FS(21):
+                pass
+            elif FS(22):
+                pass
+            else:
+                pass
+            FIX(2)  
+        """
+        expected_descriptive = dedent("""
+            FS? 20
+            GTO if body
+            GTO elif 1
+
+            LBL if body
+            GTO resume
+
+            LBL elif 1
+            FS? 21
+            GTO elif body 1   // new
+            GTO elif 2  // 2nd
+
+            LBL elif body 1
+            GTO resume
+
+            // ---- new ------ \.
+            
+            LBL elif 2 // 2nd
+            FS? 22
+            GTO elif body 2
+            GTO else
+
+            LBL elif body 2
+            GTO resume
+
+            // ---- new end -- /.
+
+            LBL else
+
+            LBL resume
+            FIX 02
+        """)
+
+        """
+        Label allocation:
+            label_if_body   00
+            label_resume    01
+            label_else      02
+            label_elif      03
+            label_elif_body 04
+        """
+        expected = dedent("""
+            FS? 20
+            GTO 00  // if body
+            GTO 03  // elif
+
+            LBL 00  // if body
+            GTO 01  // resume
+
+            LBL 03  // elif
+            FS? 21
+            GTO 04  // elif body
+            GTO 06  // elif (2nd)
+
+            LBL 04  // elif body
+            GTO 01  // resume
+
+
+            // This is the second elif
+            LBL 06  // elif (2nd)
+            FS? 22
+            GTO 05  // elif body (2nd)
+            GTO 02  // else
+            // This is the second elif body
+            LBL 05  // elif body (2nd)
+            GTO 01  // resume
+
+
+            LBL 02  // else
+
+            LBL 01  // resume
+            FIX 02
+        """)
+
+        lines = self.parse(dedent(src), debug_gen_descriptive_labels=True)
+        self.compare(de_comment(expected_descriptive), lines, dump=True)
+
+        # lines = self.parse(dedent(src))
+        # self.compare(de_comment(expected), lines, dump=True)
 

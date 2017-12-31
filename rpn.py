@@ -285,7 +285,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             label_if_body = 'if body'
             label_resume = 'resume'
             label_else = 'else' if len(node.orelse) > 0 else None
-            label_elif = 'elif' if len(node.orelse) == 1 and isinstance(node.orelse[0], ast.If) else None
+            label_elif = 'elif 1' if len(node.orelse) == 1 and isinstance(node.orelse[0], ast.If) else None
         else:
             label_if_body = self.local_labels.next_local_label
             label_resume = self.local_labels.next_local_label
@@ -311,23 +311,43 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         if label_else:
             self.program.insert(f'GTO {label_resume}', comment='resume')
 
-        # handle the else
+        elif_num = 2
+        elif_body_num = 1
+        def node_desc(node):
+            # if not node:
+            #     return 'None'
+            s = str(node)
+            return s[6:9].strip() + '_' + s[-4:-1].strip()
+        more_elifs_coming = lambda node : len(node.orelse) == 1 and isinstance(node.orelse[0], ast.If)
+        # handle any number of nested elif and the else
+        log.info(f'...while loop begins... node= {node_desc(node)}')
         while True:
+            log.info(f'  ...in while loop... node= {node_desc(node)} orelse[0]= {node_desc(node.orelse[0]) if len(node.orelse) == 1 else None}')
             else_ = node.orelse
             if len(else_) == 1 and isinstance(else_[0], ast.If):
                 node = else_[0]
+                log.info(f'  ...node= {node_desc(node)} orelse[0]= {node_desc(node.orelse[0])}')
                 log.info(f'{self.indent} elif')
                 self.program.insert(f'LBL {label_elif}', comment='elif')
                 self.visit(node.test)
                 log.info(f'{self.indent} :')
 
-                label_elif_body = 'elif body' if self.debug_gen_descriptive_labels else self.local_labels.next_local_label
+                label_elif_body = f'elif body {elif_body_num}' if self.debug_gen_descriptive_labels else self.local_labels.next_local_label
+                elif_body_num += 1
                 # log.info('label_elif_body %s', label_elif_body)
 
                 self.program.insert(f'GTO {label_elif_body}', comment='elif_body')
-                self.program.insert(f'GTO {label_else}', comment='else')
-                self.program.insert(f'LBL {label_elif_body}', comment='elif_body')
 
+                # this should go to yet another elif, if there is one, otherwise simply jump to the else
+                log.info(f'  ...decision point situation: node= {node_desc(node)} orelse[0]= {node_desc(node.orelse[0])}, test={more_elifs_coming(node)}')
+                if more_elifs_coming(node):
+                    label_elif = f'elif {elif_num}' if self.debug_gen_descriptive_labels else self.local_labels.next_local_label
+                    elif_num += 1
+                    self.program.insert(f'GTO {label_elif}', comment='elif 2nd')
+                else:
+                    self.program.insert(f'GTO {label_else}', comment='else')
+
+                self.program.insert(f'LBL {label_elif_body}', comment='elif_body')
                 self.body(node.body)
                 self.program.insert(f'GTO {label_resume}', comment='resume')
             else:
@@ -335,7 +355,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                     log.info(f'{self.indent} else')
                     self.program.insert(f'LBL {label_else}', comment='else')
                     self.body(else_)
+                log.info(f'  ..break while on node={node_desc(node)}')
                 break
+        log.info(f'...FINISH while node={node_desc(node)}')
 
         self.program.insert(f'LBL {label_resume}', comment='resume')
         self.end(node)
@@ -380,6 +402,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         op=USub(),
         operand=Num(n=1))],
         """
+        pass
+
+    @recursive
+    def visit_Pass(self, node):
         pass
 
     @recursive
