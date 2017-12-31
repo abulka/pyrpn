@@ -827,7 +827,6 @@ class RpnCodeGenTests(BaseTest):
         """)
         self.compare(de_comment(expected), lines, dump=True)
 
-    # @unittest.skip("not implemented")
     def test_if_elif(self):
         src = """
             if FS(20):
@@ -902,7 +901,6 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines, dump=True)
 
-    # @unittest.skip("not implemented")
     def test_if_elif_elif(self):
         src = """
             if FS(20):
@@ -951,11 +949,13 @@ class RpnCodeGenTests(BaseTest):
 
         """
         Label allocation:
-            label_if_body   00
-            label_resume    01
-            label_else      02
-            label_elif      03
-            label_elif_body 04
+            label_if_body     00
+            label_resume      01
+            label_else        02
+            label_elif        03
+            label_elif_body   04
+            label_elif 2      05  // new
+            label_elif_body 2 06  // new
         """
         expected = dedent("""
             FS? 20
@@ -968,19 +968,19 @@ class RpnCodeGenTests(BaseTest):
             LBL 03  // elif
             FS? 21
             GTO 04  // elif body
-            GTO 06  // elif (2nd)
+            GTO 05  // elif (2nd)
 
             LBL 04  // elif body
             GTO 01  // resume
 
 
             // This is the second elif
-            LBL 06  // elif (2nd)
+            LBL 05  // elif (2nd)
             FS? 22
-            GTO 05  // elif body (2nd)
+            GTO 06  // elif body (2nd)
             GTO 02  // else
             // This is the second elif body
-            LBL 05  // elif body (2nd)
+            LBL 06  // elif body (2nd)
             GTO 01  // resume
 
 
@@ -993,6 +993,6 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src), debug_gen_descriptive_labels=True)
         self.compare(de_comment(expected_descriptive), lines, dump=True)
 
-        # lines = self.parse(dedent(src))
-        # self.compare(de_comment(expected), lines, dump=True)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines, dump=True)
 

@@ -333,7 +333,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 log.info(f'{self.indent} :')
 
                 label_elif_body = f'elif body {elif_body_num}' if self.debug_gen_descriptive_labels else self.local_labels.next_local_label
-                elif_body_num += 1
                 # log.info('label_elif_body %s', label_elif_body)
 
                 self.program.insert(f'GTO {label_elif_body}', comment='elif_body')
@@ -342,12 +341,11 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 log.info(f'  ...decision point situation: node= {node_desc(node)} orelse[0]= {node_desc(node.orelse[0])}, test={more_elifs_coming(node)}')
                 if more_elifs_coming(node):
                     label_elif = f'elif {elif_num}' if self.debug_gen_descriptive_labels else self.local_labels.next_local_label
-                    elif_num += 1
-                    self.program.insert(f'GTO {label_elif}', comment='elif 2nd')
+                    self.program.insert(f'GTO {label_elif}', comment=f'elif {elif_num}')
                 else:
                     self.program.insert(f'GTO {label_else}', comment='else')
 
-                self.program.insert(f'LBL {label_elif_body}', comment='elif_body')
+                self.program.insert(f'LBL {label_elif_body}', comment=f'elif_body {elif_body_num}')
                 self.body(node.body)
                 self.program.insert(f'GTO {label_resume}', comment='resume')
             else:
@@ -357,6 +355,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                     self.body(else_)
                 log.info(f'  ..break while on node={node_desc(node)}')
                 break
+            elif_num += 1
+            elif_body_num += 1
         log.info(f'...FINISH while node={node_desc(node)}')
 
         self.program.insert(f'LBL {label_resume}', comment='resume')
