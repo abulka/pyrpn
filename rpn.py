@@ -269,16 +269,45 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def visit_If(self, node):
         """
-        If's subnodes are:
+        If's sub-nodes are:
             - test
             - body
             - orelse
+        where orelse[0] might be another if node (elif situation) otherwise might be a body (else situation)
+        or the orelse list might be empty (no else situation).
         """
         self.begin(node)
         log.info(f'{self.indent} if')
 
         self.visit(node.test)
         log.info(f'{self.indent} :')
+
+        @attrs
+        class LabelFactory(object):
+            local_label_allocator = attrib(default=self.local_labels)
+            next_elif_num = attrib(default=2)
+            next_elif_body_num = attrib(default=1)
+            generate_descriptive = attrib(default=self.debug_gen_descriptive_labels)
+
+            def new(self, description):
+                if description == 'elif':
+                    description = f'{description} {self.next_elif_num}'
+                    self.next_elif_num += 1
+                elif description == 'elif body':
+                    description = f'{description} {self.next_elif_body_num}'
+                    self.next_elif_body_num += 1
+                return Label(text=self.local_label_allocator.next_local_label, description=description)
+
+        @attrs
+        class Label(object):
+            text = attrib(default='')
+            description = attrib(default='')
+
+        factory = LabelFactory()
+        # label1 = factory.new(description='if body')
+        # label2 = factory.new(description='elif')
+        # label3 = factory.new(description='elif body')
+        # print(label1, label2, label3)
 
         # Actually should embed descriptions in lbl line comments
         if self.debug_gen_descriptive_labels:
