@@ -996,3 +996,17 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines, dump=True)
 
+
+    def test_view_variable(self):
+        src = """
+            a = 100
+            VIEW(a)
+        """
+        expected = dedent("""
+            100
+            STO 00
+            VIEW 00
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines, dump=True)
+

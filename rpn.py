@@ -241,6 +241,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 arg_val = self.get_node_name_id_or_n(arg)
                 if isinstance(arg, ast.Str):
                     arg_val = f'"{arg_val}"'
+                if isinstance(arg, ast.Name):  # reference to a variable, thus pull out a register name
+                    arg_val = self.scopes.var_to_reg(arg_val)
                 elif isinstance(arg, ast.Num):
                     arg_val = f'{arg_val:02d}'  # TODO probably need more formats e.g. nnnn
                 args += ' ' if arg_val else ''
