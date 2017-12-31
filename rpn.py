@@ -282,29 +282,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.visit(node.test)
         log.info(f'{self.indent} :')
 
-        @attrs
-        class LabelFactory(object):
-            local_label_allocator = attrib(default=self.local_labels)
-            next_elif_num = attrib(default=1)
-            next_elif_body_num = attrib(default=1)
-            generate_descriptive = attrib(default=self.debug_gen_descriptive_labels)
-
-            def new(self, description):
-                if description == 'elif':
-                    description = f'{description} {self.next_elif_num}'
-                    self.next_elif_num += 1
-                elif description == 'elif body':
-                    description = f'{description} {self.next_elif_body_num}'
-                    self.next_elif_body_num += 1
-                label_text = description if self.generate_descriptive else self.local_label_allocator.next_local_label
-                return Label(text=label_text, description=description)
-
-        @attrs
-        class Label(object):
-            text = attrib(default='')
-            description = attrib(default='')
-
-        f = LabelFactory()
+        f = LabelFactory(local_label_allocator=self.local_labels, descriptive=self.debug_gen_descriptive_labels)
         node_desc_short = lambda node : str(node)[6:9].strip() + '_' + str(node)[-4:-1].strip()
         insert = lambda cmd, label : self.program.insert(f'{cmd} {label.text}', comment=label.description)
 
@@ -435,6 +413,7 @@ class ForLoopItem(object):
     register = attrib(default=0)
     label = attrib(default=0)
 
+
 @attrs
 class LocalLabels(object):
     label_num = attrib(default=0)
@@ -444,3 +423,27 @@ class LocalLabels(object):
         result = self.label_num
         self.label_num += 1
         return f'{result:02d}'
+
+
+@attrs
+class LabelFactory(object):
+    local_label_allocator = attrib()
+    descriptive = attrib(default=False)
+    next_elif_num = attrib(default=1)
+    next_elif_body_num = attrib(default=1)
+
+    def new(self, description):
+        # Creates a new label via the smart label factory
+        if description == 'elif':
+            description = f'{description} {self.next_elif_num}'
+            self.next_elif_num += 1
+        elif description == 'elif body':
+            description = f'{description} {self.next_elif_body_num}'
+            self.next_elif_body_num += 1
+        label_text = description if self.descriptive else self.local_label_allocator.next_local_label
+        return Label(text=label_text, description=description)
+
+@attrs
+class Label(object):
+    text = attrib(default='')
+    description = attrib(default='')
