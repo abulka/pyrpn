@@ -285,7 +285,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         @attrs
         class LabelFactory(object):
             local_label_allocator = attrib(default=self.local_labels)
-            next_elif_num = attrib(default=2)
+            next_elif_num = attrib(default=1)
             next_elif_body_num = attrib(default=1)
             generate_descriptive = attrib(default=self.debug_gen_descriptive_labels)
 
@@ -296,49 +296,60 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 elif description == 'elif body':
                     description = f'{description} {self.next_elif_body_num}'
                     self.next_elif_body_num += 1
-                return Label(text=self.local_label_allocator.next_local_label, description=description)
+                label_text = description if self.generate_descriptive else self.local_label_allocator.next_local_label
+                return Label(text=label_text, description=description)
 
         @attrs
         class Label(object):
             text = attrib(default='')
             description = attrib(default='')
 
-        factory = LabelFactory()
+
+        f = factory = LabelFactory()
+        # label1 = factory.new('zzzzz')
+        # print(label1)
         # label1 = factory.new(description='if body')
         # label2 = factory.new(description='elif')
         # label3 = factory.new(description='elif body')
         # print(label1, label2, label3)
 
-        # Actually should embed descriptions in lbl line comments
-        if self.debug_gen_descriptive_labels:
-            label_if_body = 'if body'
-            label_resume = 'resume'
-            label_else = 'else' if len(node.orelse) > 0 else None
-            label_elif = 'elif 1' if len(node.orelse) == 1 and isinstance(node.orelse[0], ast.If) else None
-        else:
-            label_if_body = self.local_labels.next_local_label
-            label_resume = self.local_labels.next_local_label
-            label_else = self.local_labels.next_local_label if len(node.orelse) > 0 else None
-            label_elif = self.local_labels.next_local_label if len(node.orelse) == 1 and isinstance(node.orelse[0], ast.If) else None
+        insert = lambda cmd, label : self.program.insert(f'{cmd} {label.text}', comment=label.description)
+
+        label_if_body = f.new('if body')
+        label_resume = f.new('resume')
+        label_else = f.new('else') if len(node.orelse) > 0 else None
+        label_elif = f.new('elif') if len(node.orelse) == 1 and isinstance(node.orelse[0], ast.If) else None
+
+        # # Actually should embed descriptions in lbl line comments
+        # if self.debug_gen_descriptive_labels:
+        #     label_if_body = 'if body'
+        #     label_resume = 'resume'
+        #     label_else = 'else' if len(node.orelse) > 0 else None
+        #     label_elif = 'elif 1' if len(node.orelse) == 1 and isinstance(node.orelse[0], ast.If) else None
+        # else:
+        #     label_if_body = self.local_labels.next_local_label
+        #     label_resume = self.local_labels.next_local_label
+        #     label_else = self.local_labels.next_local_label if len(node.orelse) > 0 else None
+        #     label_elif = self.local_labels.next_local_label if len(node.orelse) == 1 and isinstance(node.orelse[0], ast.If) else None
 
         # log.info('label_if_body %s', label_if_body)
         # log.info('label_resume %s', label_resume)
         # log.info('label_else %s', label_else)
         # log.info('label_elif %s', label_elif)
 
-        self.program.insert(f'GTO {label_if_body}', comment='if_body')
+        insert('GTO', label_if_body)
         if label_elif:
-            self.program.insert(f'GTO {label_elif}', comment='elif')
+            insert('GTO', label_elif)
         elif label_else:
-            self.program.insert(f'GTO {label_else}', comment='else')
+            insert('GTO', label_else)
         else:
-            self.program.insert(f'GTO {label_resume}', comment='resume')
-        self.program.insert(f'LBL {label_if_body}', comment='if_body')
+            insert('GTO', label_resume)
+        insert('LBL', label_if_body)
 
         self.body(node.body)
 
         if label_else:
-            self.program.insert(f'GTO {label_resume}', comment='resume')
+            insert('GTO', label_resume)
 
         elif_num = 2
         elif_body_num = 1
@@ -357,30 +368,32 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 node = else_[0]
                 log.info(f'  ...node= {node_desc(node)} orelse[0]= {node_desc(node.orelse[0])}')
                 log.info(f'{self.indent} elif')
-                self.program.insert(f'LBL {label_elif}', comment='elif')
+                insert('LBL', label_elif)
                 self.visit(node.test)
                 log.info(f'{self.indent} :')
 
-                label_elif_body = f'elif body {elif_body_num}' if self.debug_gen_descriptive_labels else self.local_labels.next_local_label
+                # label_elif_body = f'elif body {elif_body_num}' if self.debug_gen_descriptive_labels else self.local_labels.next_local_label
                 # log.info('label_elif_body %s', label_elif_body)
+                label_elif_body = f.new('elif body')
 
-                self.program.insert(f'GTO {label_elif_body}', comment='elif_body')
+                insert('GTO', label_elif_body)
 
                 # this should go to yet another elif, if there is one, otherwise simply jump to the else
                 log.info(f'  ...decision point situation: node= {node_desc(node)} orelse[0]= {node_desc(node.orelse[0])}, test={more_elifs_coming(node)}')
                 if more_elifs_coming(node):
-                    label_elif = f'elif {elif_num}' if self.debug_gen_descriptive_labels else self.local_labels.next_local_label
-                    self.program.insert(f'GTO {label_elif}', comment=f'elif {elif_num}')
+                    # label_elif = f'elif {elif_num}' if self.debug_gen_descriptive_labels else self.local_labels.next_local_label
+                    label_elif = f.new('elif')
+                    insert('GTO', label_elif)
                 else:
-                    self.program.insert(f'GTO {label_else}', comment='else')
+                    insert('GTO', label_else)
 
-                self.program.insert(f'LBL {label_elif_body}', comment=f'elif_body {elif_body_num}')
+                insert('LBL', label_elif_body)
                 self.body(node.body)
-                self.program.insert(f'GTO {label_resume}', comment='resume')
+                insert('GTO', label_resume)
             else:
                 if len(else_) > 0:
                     log.info(f'{self.indent} else')
-                    self.program.insert(f'LBL {label_else}', comment='else')
+                    insert('LBL', label_else)
                     self.body(else_)
                 log.info(f'  ..break while on node={node_desc(node)}')
                 break
@@ -388,7 +401,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             elif_body_num += 1
         log.info(f'...FINISH while node={node_desc(node)}')
 
-        self.program.insert(f'LBL {label_resume}', comment='resume')
+        insert('LBL', label_resume)
         self.end(node)
 
     @recursive
