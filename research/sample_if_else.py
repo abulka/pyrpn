@@ -9,3 +9,6 @@ elif FS(22):
 else:
     pass
 FIX(2) 
+
+x = 1
+x == 200
