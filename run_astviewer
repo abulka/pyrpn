@@ -1,0 +1,5 @@
+# pip install PyQt5
+# pip install astviewer
+# See https://github.com/titusjan/astviewer
+
+pyastviewer research/sample_if_else.py
