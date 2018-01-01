@@ -31,14 +31,6 @@ class Program(object):
         self._add_line(line)
         log.debug(line.text)
 
-    def dump(self, comments=False, linenos=False):
-        log.debug(f"{'='*20} | (Program lines dump)")
-        for line in self.lines:
-            comment = f'  // {line.comment}' if comments and line.comment else ''
-            lineno = f'{line.lineno:02d} ' if linenos else ''
-            log.debug(f'{lineno}{line.text}{comment}')
-        log.debug(f"{'='*20} |")
-
     def lines_to_str(self, comments=False, linenos=False):
         result = []
         for line in self.lines:
@@ -46,4 +38,11 @@ class Program(object):
             lineno = f'{line.lineno:02d} ' if linenos else ''
             result.append(f'{lineno}{line.text}{comment}')
         return '\n'.join(result)
+
+    # logging
+
+    def dump(self, comments=False, linenos=False):
+        log.debug(f"{'='*20} | (Program lines dump)")
+        log.debug(self.lines_to_str(comments, linenos))
+        log.debug(f"{'='*20} |")
 
