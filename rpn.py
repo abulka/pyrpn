@@ -123,15 +123,15 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.first_def = False
             self.first_def_name = label
         else:
-            self.program.insert(f'LBL {self.labels.func_to_lbl(node.name, called_from_def=True)}')
+            self.program.insert(f'LBL {self.labels.func_to_lbl(node.name, called_from_def=True)}', comment=f'def {node.name}')
 
         self.scopes.push()
-        self.log_state('scope just pushed')
+
         self.visit_children(node)
-        self.program.insert('RTN')
-        self.log_state('scope pre pop')
+
+        self.program.insert('RTN', comment=f'end def {node.name}')
+
         self.scopes.pop()
-        self.log_state('scope just popped')
         self.end(node)
 
     def visit_arguments(self,node):
@@ -143,9 +143,19 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def visit_arg(self,node):
         """ visit each argument """
         self.begin(node)
-        self.program.insert(f'STO {self.scopes.var_to_reg(node.arg)}')
+        self.program.insert(f'STO {self.scopes.var_to_reg(node.arg)}', comment=f'param: {node.arg}')
         self.program.insert('RDN')
         self.visit_children(node)
+        self.end(node)
+
+    def visit_Return(self,node):
+        """
+        Child nodes are:
+            - node.value
+        """
+        self.begin(node)
+        self.visit_children(node)
+        # self.program.insert(f'RTN', comment='return')
         self.end(node)
 
     def visit_Assign(self,node):
@@ -265,7 +275,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             # actual parameters but these are generated through normal visit parsing and available on the stack.
             self.program.insert(f'{func_name}', comment=cmd_list[func_name]['description'])
         else:
-            self.program.insert(f'XEQ {self.labels.func_to_lbl(func_name)}')
+            self.program.insert(f'XEQ {self.labels.func_to_lbl(func_name)}', comment=f'{func_name}()')
             self.log_state('scope after XEQ')
         self.end(node)
 
@@ -356,7 +366,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.begin(node)
         if '.Load' in str(node.ctx):
             assert isinstance(node.ctx, ast.Load)
-            self.program.insert(f'RCL {self.scopes.var_to_reg(node.id)}')
+            self.program.insert(f'RCL {self.scopes.var_to_reg(node.id)}', comment=node.id)
             if self.var_name_is_loop_counter(node.id):
                 self.program.insert('IP')  # just get the integer portion of isg counter
         self.end(node)
