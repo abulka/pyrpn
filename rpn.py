@@ -98,6 +98,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def var_name_is_loop_counter(self, var_name):
         return var_name == 'i'  # hack!  TODO - record this info in scope entry
 
+    def find_comment(self, node):
+        # Finds comment in the original python source code associated with this token
+        line = node.first_token.line
+        comment_i = line.find('#')
+        return line[comment_i:] if comment_i != -1 else ''
+
     # For visit support
 
     def body(self, statements):
@@ -112,6 +118,13 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     # Visit functions
 
+    def check_rpn_def_directives(self, node):
+        # Adds an additional string label to the rpn code
+        comment = self.find_comment(node)
+        if 'rpn: export' in comment:
+            label = node.name[:7]
+            self.program.insert(f'LBL "{label}"', comment=f'def {node.name} (rpn: export)')
+
     def visit_FunctionDef(self,node):
         """ visit a Function node and visits it recursively"""
         self.begin(node)
@@ -124,6 +137,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.first_def_name = label
         else:
             self.program.insert(f'LBL {self.labels.func_to_lbl(node.name, called_from_def=True)}', comment=f'def {node.name}')
+            self.check_rpn_def_directives(node)
 
         self.scopes.push()
 
@@ -164,22 +178,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.begin(node)
         self.visit_children(node)
         for target in node.targets:
-
-            # import tokenize
-            # print(target.first_token, target.last_token)
-            # start, end = target.last_token.startpos, target.last_token.endpos
-            # print(self.atok.text[:start] + 'RUN' + self.atok.text[end:])
-            # print(self.atok.get_text(target))
-            # print(self.atok.text)
-            # print(self.atok.get_text_range(target))
-            # print(target.first_token.line)
-            # print(self.atok.find_token(target.last_token, tokenize.COMMENT))
-            # print(self.atok.find_token(target.first_token, tokenize.COMMENT))  # https://github.com/gristlabs/asttokens/issues/10
-            # print(self.atok.find_token(target.first_token, tokenize.EQUAL))
-            # print(self.atok.find_token(target.first_token, tokenize.OP))
-            comment_i = target.last_token.line.find('#')
-            comment = target.last_token.line[comment_i:] if comment_i != -1 else ''
-
+            comment = self.find_comment(target)
             self.program.insert(f'STO {self.scopes.var_to_reg(target.id)}', comment=f'{target.id} = {comment}')
             assert '.Store' in str(target.ctx)
             assert isinstance(target.ctx, ast.Store)
