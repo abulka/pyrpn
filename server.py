@@ -1,5 +1,4 @@
-from flask import Flask
-import argparse
+from flask import Flask, render_template
 from parse import parse
 import logging
 from logger import config_log
@@ -10,9 +9,17 @@ config_log(log)
 app = Flask(__name__)
 
 
+# @app.route('/')
+# def hello_world():
+#     return 'Hello World!'
+
 @app.route('/')
-def hello_world():
-    return 'Hello World!'
+def index():
+    with open('research/sample_if_else.py') as fp:
+        source = fp.read()
+    program = parse(source)
+    rpn = program.lines_to_str(comments=True, linenos=True)
+    return render_template('index.html', name='andy', rpn=rpn)
 
 @app.route('/aa')
 def aa():
