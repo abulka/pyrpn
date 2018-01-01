@@ -31,11 +31,12 @@ class Program(object):
         self._add_line(line)
         log.debug(line.text)
 
-    def dump(self, comments=False):
+    def dump(self, comments=False, linenos=False):
         log.debug(f"{'='*20} | (Program lines dump)")
         for line in self.lines:
             comment = f'  // {line.comment}' if comments and line.comment else ''
-            log.debug(f'{line.lineno:02d} {line.text}{comment}')
+            lineno = f'{line.lineno:02d} ' if linenos else ''
+            log.debug(f'{lineno}{line.text}{comment}')
         log.debug(f"{'='*20} |")
 
     @staticmethod
