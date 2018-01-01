@@ -36,6 +36,12 @@
               font-size: larger;
             }
 
+            .submit_button {
+                margin-top: 1em;
+                background-color: chartreuse;
+                font-size: x-large;
+                float: right;
+            }
         </style>
 
     </head>
@@ -49,28 +55,34 @@
 
                     <form method="POST" action="/">
                         {{ form.source(class_='python') }}
+                        <input class="submit_button" type="submit" value="Convert">
                         <br>
                         {{ form.comments.label }} {{ form.comments() }}
                         <br>
                         {{ form.line_numbers.label }} {{ form.line_numbers() }}
                         <br>
                         {{ form.csrf_token }}
-                        <input type="submit" value="Convert">
                     </form>
 
               </article>
           </div>
           <div class="right-half">
             <article>
-               <h1>RPN</h1>
-
+               <!--<h1>RPN</h1>-->
+                <img src="static/calc_icon1.png" style="float: right;">
                <pre>
 {{ rpn }}
                </pre>
 
             </article>
           </div>
-        </secion>
+        </section>
+
+        <br>
+        <br>
+        <br>
+        <h1>Nostalgic images...</h1>
+        <img src="https://i.ytimg.com/vi/-A7HB6YD12o/maxresdefault.jpg">
 
    </body>
 </html>
