@@ -1,12 +1,74 @@
 <!doctype html>
 <html>
+    <head>
+
+        <style>
+
+            /* Pen-specific styles */
+            /*html, body, section, div {*/
+              /*height: 100vh;*/
+            /*}*/
+
+            /*body {*/
+              /*color: #fff;*/
+              /*font-family: sans-serif;*/
+              /*font-size: 1.25rem;*/
+              /*line-height: 150%;*/
+              /*text-shadow: 0 2px 2px #b6701e;*/
+            /*}*/
+
+            article {
+              /*position: relative;*/
+              /*top: 50%;*/
+              /*text-align: center;*/
+              /*transform: translate(0, -50%);*/
+              padding: 1rem;
+            }
+
+            h1 {
+              font-size: 1.75rem;
+              margin: 0 0 0.75rem 0;
+            }
+
+            /* Pattern styles */
+            .container {
+              display: grid;
+            }
+
+            .left-half {
+              background: #ff9e2c;
+              grid-column: 1;
+            }
+
+            .right-half {
+              /*background: #b6701e;*/
+              grid-column: 2;
+            }
+
+        </style>
+
+    </head>
    <body>
 
-   <h1>Hello {{ name }}!</h1>
+        <section class="container">
+          <div class="left-half">
+            <article>
+              <h1>Left Half</h1>
+              <p>Weekends don't count unless you spend them doing something completely pointless.</p>
+            </article>
+          </div>
+          <div class="right-half">
+            <article>
+               <h1>RPN</h1>
 
-   <pre>
+               <pre>
 {{ rpn }}
-   </pre>
+               </pre>
+
+            </article>
+          </div>
+        </secion>
 
    </body>
 </html>
+

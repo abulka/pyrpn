@@ -21,8 +21,12 @@ def index():
     rpn = program.lines_to_str(comments=True, linenos=True)
     return render_template('index.html', name='andy', rpn=rpn)
 
-@app.route('/aa')
-def aa():
+@app.route('/hello')
+def hello():
+    return render_template('hello.html', name='andy')
+
+@app.route('/test')
+def test():
     with open('research/sample_if_else.py') as fp:
         source = fp.read()
     program = parse(source)
