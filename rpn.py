@@ -164,7 +164,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.begin(node)
         self.visit_children(node)
         for target in node.targets:
-            self.program.insert(f'STO {self.scopes.var_to_reg(target.id)}')
+            self.program.insert(f'STO {self.scopes.var_to_reg(target.id)}', comment=f'{target.id} = ')
             assert '.Store' in str(target.ctx)
             assert isinstance(target.ctx, ast.Store)
         self.end(node)
@@ -242,18 +242,20 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             # command, thus we cannot rely on normal visit parsing but must look ahead and extract needed info.
             cmd_info = cmd_list[func_name]
             args = ''
+            comment = cmd_info['description']
             for i in range(cmd_info['num_arg_fragments']):
                 arg = node.args[i]
                 arg_val = self.get_node_name_id_or_n(arg)
                 if isinstance(arg, ast.Str):
                     arg_val = f'"{arg_val}"'
                 if isinstance(arg, ast.Name):  # reference to a variable, thus pull out a register name
+                    comment = arg_val
                     arg_val = self.scopes.var_to_reg(arg_val)
                 elif isinstance(arg, ast.Num):
                     arg_val = f'{arg_val:02d}'  # TODO probably need more formats e.g. nnnn
                 args += ' ' if arg_val else ''
                 args += arg_val
-            self.program.insert(f'{func_name}{args}', comment=cmd_info['description'])
+            self.program.insert(f'{func_name}{args}', comment=comment)
             self.end(node)
             return
 
@@ -375,16 +377,18 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def visit_Str(self, node):
         self.begin(node)
-        self.program.insert(f'{self.pending_unary_op}"{node.s}"')
-        self.pending_unary_op = ''
+        # self.program.insert(f'{self.pending_unary_op}"{node.s}"')
+        # self.pending_unary_op = ''
+        self.program.insert(f'"{node.s}"')
+        self.program.insert('ASTO ST X')
         self.end(node)
 
     @recursive
     def visit_Expr(self, node):
         pass
 
-    cmpops = {"Eq":"==", "NotEq":"!=", "Lt":"<", "LtE":"<=", "Gt":"X<Y?", "GtE":">=",
-                        "Is":"is", "IsNot":"is not", "In":"in", "NotIn":"not in"}
+    cmpops = {"Eq":"X=Y?", "NotEq":"//!=", "Lt":"X<Y?", "LtE":"//<=", "Gt":"X<Y?", "GtE":"//>=",
+                        "Is":"//is", "IsNot":"//is not", "In":"//in", "NotIn":"//not in"}
     def visit_Compare(self, node):
         """
         A comparison of two or more values. left is the first value in the comparison, ops the list of operators,

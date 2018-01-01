@@ -1055,10 +1055,9 @@ class RpnCodeGenTests(BaseTest):
             PSE
             LBL 01  // resume
         """)
-        lines = self.parse(dedent(src), debug_gen_descriptive_labels=False)
+        lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines, dump=True)
 
-    @unittest.skip('hard')
     def test_elif_view(self):
         src = """
             def selectr(n):
@@ -1078,7 +1077,58 @@ class RpnCodeGenTests(BaseTest):
                     return "dunno"
         """
         expected = dedent("""
+            LBL "selectr"
+            STO 00  // param: n
+            RDN
+            RCL 00  // n
+            XEQ A  // num_to_txt()
+            STO 01  // msg = 
+            VIEW 00  // n
+            PSE
+            VIEW 01  // msg
+            RTN  // end def selectr
+            LBL A  // def num_to_txt
+            STO 00  // param: n
+            RDN
+            RCL 00  // n
+            0
+            X=Y?
+            GTO 00  // if body
+            GTO 03  // elif 1
+            LBL 00  // if body
+            999
+            RTN  // return
+            GTO 01  // resume
+            LBL 03  // elif 1
+            RCL 00  // n
+            1
+            X=Y?
+            GTO 04  // elif body 1
+            GTO 05  // elif 2
+            LBL 04  // elif body 1
+            "one"
+            ASTO ST X
+            RTN  // return
+            GTO 01  // resume
+            LBL 05  // elif 2
+            RCL 00  // n
+            2
+            X=Y?
+            GTO 06  // elif body 2
+            GTO 02  // else
+            LBL 06  // elif body 2
+            "two"
+            ASTO ST X
+            RTN  // return
+            GTO 01  // resume
+            LBL 02  // else
+            "dunno"
+            ASTO ST X
+            RTN  // return
+            LBL 01  // resume
+            RTN  // end def num_to_txt        
         """)
-        lines = self.parse(dedent(src), debug_gen_descriptive_labels=False)
+        lines = self.parse(dedent(src))
+        # print(self.visitor.program.dump(linenos=True, comments=False))  # for pasting into free42
         self.compare(de_comment(expected), lines, dump=True)
 
