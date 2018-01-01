@@ -7,6 +7,7 @@ from textwrap import dedent
 from rpn import RecursiveRpnVisitor
 import logging
 from logger import config_log
+import asttokens
 
 log = logging.getLogger(__name__)
 config_log(log)
@@ -14,10 +15,15 @@ config_log(log)
 class RpnCodeGenTests(BaseTest):
 
     def parse(self, text, debug_gen_descriptive_labels=False):
-        self.tree = ast.parse(text)
+        # self.tree = ast.parse(text)
+
+        self.atok = asttokens.ASTTokens(text, parse=True)  # this keeps source code in the AST tree
+        self.tree = self.atok.tree
+
         self.dump_ast()
         self.visitor = RecursiveRpnVisitor()
         self.visitor.debug_gen_descriptive_labels=debug_gen_descriptive_labels
+        self.visitor.atok = self.atok
         self.visitor.visit(self.tree)
         # self.visitor.program.dump()
         return self.visitor.program.lines
@@ -27,20 +33,22 @@ class RpnCodeGenTests(BaseTest):
         log.debug(astunparse.dump(self.tree))  # nice and compact
         log.debug(f"{'~'*25}")
 
-    def compare(self, expected, lines, trace=False, dump=False):
+    def compare(self, expected, lines, trace=False, dump=False, keep_comments=False):
         """
         Compares a multi-line string of code with an array of rpn lines
 
         :param expected: string of rpn code with newlnes
         :param lines: Lines object
         :param trace: boolean, whether to print progress as we loop
+        :param dump: boolean, whether to dump to log the lines of entire program
+        :param comments: boolean, whether to compare comments too
         :return: -
         """
         if dump:
             self.visitor.program.dump(comments=True)
 
         # All in one comparison
-        self.assertEqual(expected.strip(), self.visitor.program.lines_to_str(lines).strip())
+        self.assertEqual(expected.strip(), self.visitor.program.lines_to_str(lines, comments=keep_comments).strip())
 
         if trace:
             expected = expected.strip().split('\n')
@@ -1131,4 +1139,17 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         # print(self.visitor.program.dump(linenos=True, comments=False))  # for pasting into free42
         self.compare(de_comment(expected), lines, dump=True)
+
+    def test_comment(self):
+        src = """
+            # nothing here
+            x = 1  # my comment
+            # or here
+        """
+        expected = dedent("""
+            1
+            STO 00  // x = # my comment
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(expected, lines, dump=True, keep_comments=True)
 

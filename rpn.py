@@ -164,7 +164,23 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.begin(node)
         self.visit_children(node)
         for target in node.targets:
-            self.program.insert(f'STO {self.scopes.var_to_reg(target.id)}', comment=f'{target.id} = ')
+
+            # import tokenize
+            # print(target.first_token, target.last_token)
+            # start, end = target.last_token.startpos, target.last_token.endpos
+            # print(self.atok.text[:start] + 'RUN' + self.atok.text[end:])
+            # print(self.atok.get_text(target))
+            # print(self.atok.text)
+            # print(self.atok.get_text_range(target))
+            # print(target.first_token.line)
+            # print(self.atok.find_token(target.last_token, tokenize.COMMENT))
+            # print(self.atok.find_token(target.first_token, tokenize.COMMENT))  # https://github.com/gristlabs/asttokens/issues/10
+            # print(self.atok.find_token(target.first_token, tokenize.EQUAL))
+            # print(self.atok.find_token(target.first_token, tokenize.OP))
+            comment_i = target.last_token.line.find('#')
+            comment = target.last_token.line[comment_i:] if comment_i != -1 else ''
+
+            self.program.insert(f'STO {self.scopes.var_to_reg(target.id)}', comment=f'{target.id} = {comment}')
             assert '.Store' in str(target.ctx)
             assert isinstance(target.ctx, ast.Store)
         self.end(node)
