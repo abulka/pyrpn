@@ -383,7 +383,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def visit_Expr(self, node):
         pass
 
-    @recursive
+    cmpops = {"Eq":"==", "NotEq":"!=", "Lt":"<", "LtE":"<=", "Gt":"X<Y?", "GtE":">=",
+                        "Is":"is", "IsNot":"is not", "In":"in", "NotIn":"not in"}
     def visit_Compare(self, node):
         """
         A comparison of two or more values. left is the first value in the comparison, ops the list of operators,
@@ -393,7 +394,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             - comparators
         """
         self.begin(node)
-        self.visit_children(node)
+
+        self.visit(node.left)
+        for o, e in zip(node.ops, node.comparators):
+            self.visit(e)
+            self.program.insert(self.cmpops[o.__class__.__name__])
+
         self.end(node)
 
     @recursive
