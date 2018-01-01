@@ -1010,6 +1010,20 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines, dump=True)
 
+    # returns and strings and compares
+
+    def test_return(self):
+        src = """
+            def main():
+                return
+        """
+        expected = dedent("""
+            LBL "main"
+            RTN
+        """)
+        lines = self.parse(dedent(src), debug_gen_descriptive_labels=False)
+        self.compare(de_comment(expected), lines, dump=True)
+
     @unittest.skip('hard')
     def test_compare(self):
         src = """

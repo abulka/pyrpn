@@ -129,7 +129,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         self.visit_children(node)
 
-        self.program.insert('RTN', comment=f'end def {node.name}')
+        if self.program.lines[-1].text != 'RTN':
+            self.program.insert('RTN', comment=f'end def {node.name}')
 
         self.scopes.pop()
         self.end(node)
@@ -155,7 +156,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         """
         self.begin(node)
         self.visit_children(node)
-        # self.program.insert(f'RTN', comment='return')
+        self.program.insert(f'RTN', comment='return')
         self.end(node)
 
     def visit_Assign(self,node):
