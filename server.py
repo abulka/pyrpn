@@ -1,25 +1,31 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect, url_for
 from parse import parse
 import logging
 from logger import config_log
+from server_forms import MyForm
 
 log = logging.getLogger(__name__)
 config_log(log)
 
 app = Flask(__name__)
 
-
-# @app.route('/')
-# def hello_world():
-#     return 'Hello World!'
-
-@app.route('/')
+@app.route('/', methods=["GET", "POST"])
 def index():
-    with open('research/sample_if_else.py') as fp:
-        source = fp.read()
+    rpn = ''
+    form = MyForm()
+    if form.validate_on_submit():
+        rpn = do(form.source.data, comments=form.comments.data, linenos=form.line_numbers.data)
+    else:
+        rpn = 'validate BAD?'
+
+    return render_template('index.html', form=form, rpn=rpn)
+
+
+def do(source, comments=True, linenos=True):
     program = parse(source)
-    rpn = program.lines_to_str(comments=True, linenos=True)
-    return render_template('index.html', name='andy', rpn=rpn)
+    rpn = program.lines_to_str(comments=comments, linenos=linenos)
+    return rpn
+
 
 @app.route('/hello')
 def hello():
@@ -27,18 +33,16 @@ def hello():
 
 @app.route('/test')
 def test():
-    with open('research/sample_if_else.py') as fp:
-        source = fp.read()
-    program = parse(source)
-    rpn = program.lines_to_str(comments=True, linenos=True)
+    rpn = do()
     return f'<html><body><pre>{rpn}</pre></body></html>'
 
 
-
-# if __name__ == '__main__':
-#     app.run()
-
 if __name__ == '__main__':
     app.jinja_env.auto_reload = True
-    # app.run(debug=True, host='0.0.0.0')
+
+    app.config.update(dict(
+        SECRET_KEY="powerful secretkey",
+        WTF_CSRF_SECRET_KEY="a csrf secret key"
+    ))
+
     app.run(debug=True)
