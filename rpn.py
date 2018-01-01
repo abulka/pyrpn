@@ -24,8 +24,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.local_labels = LocalLabels()
         self.for_loop_info = []
         self.log_indent = 0
-        self.first_def = True
-        self.first_def_name = None
+        self.first_def_label = None
         self.debug_gen_descriptive_labels = False
 
     # Recursion support
@@ -116,8 +115,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             log.info('else:')
             self.body(node.orelse)
 
-    # Visit functions
-
     def has_rpn_def_directive(self, node):
         return 'rpn: export' in self.find_comment(node)
 
@@ -128,26 +125,31 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             label = node.name[:7]
             self.program.insert(f'LBL "{label}"', comment=f'def {node.name} (rpn: export)')
 
+    def make_global_label(self, node):
+        label = f'"{node.name[:7]}"'
+        self.program.insert(f'LBL {label}')
+        self.labels.func_to_lbl(node.name, label=label, called_from_def=True)
+        return label
+
+    def make_local_label(self, node):
+        self.program.insert(f'LBL {self.labels.func_to_lbl(node.name, called_from_def=True)}', comment=f'def {node.name}')
+
+    # Visit functions
+
     def visit_FunctionDef(self,node):
         """ visit a Function node and visits it recursively"""
         self.begin(node)
 
-        if self.first_def:
-            label = f'"{node.name[:7]}"'
-            self.program.insert(f'LBL {label}')
-            self.labels.func_to_lbl(node.name, label=label, called_from_def=True)
-            self.first_def = False
-            self.first_def_name = label
+        if not self.first_def_label:
+            self.first_def_label = self.make_global_label(node)  # main entry point to rpn program
         else:
             if not self.has_rpn_def_directive(node):
-                self.program.insert(f'LBL {self.labels.func_to_lbl(node.name, called_from_def=True)}', comment=f'def {node.name}')
+                self.make_local_label(node)
             elif self.labels.has_function_mapping(node.name):
-                self.program.insert(f'LBL {self.labels.func_to_lbl(node.name, called_from_def=True)}', comment=f'def {node.name}')
+                self.make_local_label(node)
                 self.check_rpn_def_directives(node)
             else:
-                label = f'"{node.name[:7]}"'
-                self.program.insert(f'LBL {label}')
-                self.labels.func_to_lbl(node.name, label=label, called_from_def=True)
+                self.make_global_label(node)
 
         self.scopes.push()
 
@@ -245,7 +247,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             for arg in node.args:
                 self.program.insert(f'MVAR "{arg.s}"')
                 self.scopes.var_to_reg(arg.s, force_reg_name=f'"{arg.s}"')
-            self.program.insert(f'VARMENU {self.first_def_name}')
+            self.program.insert(f'VARMENU {self.first_def_label}')
             self.program.insert('STOP')
             self.program.insert('EXITALL')
             for arg in node.args:
@@ -415,7 +417,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         pass
 
     cmpops = {"Eq":"X=Y?", "NotEq":"//!=", "Lt":"X<Y?", "LtE":"//<=", "Gt":"X<Y?", "GtE":"//>=",
-                        "Is":"//is", "IsNot":"//is not", "In":"//in", "NotIn":"//not in"}
+              "Is":"//is", "IsNot":"//is not", "In":"//in", "NotIn":"//not in"}
     def visit_Compare(self, node):
         """
         A comparison of two or more values. left is the first value in the comparison, ops the list of operators,
