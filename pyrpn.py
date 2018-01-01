@@ -1,19 +1,10 @@
 import argparse
-import pprint
-import unittest
-from test_base import BaseTest
-from de_comment import de_comment
-import ast
-import astunparse
-from textwrap import dedent
-from rpn import RecursiveRpnVisitor
+from parse import parse
 import logging
 from logger import config_log
-import asttokens
 
 log = logging.getLogger(__name__)
 config_log(log)
-
 
 parser = argparse.ArgumentParser(description="Convert python to rpn for hp41s/free42/dm42")
 group = parser.add_mutually_exclusive_group()
@@ -25,17 +16,6 @@ parser.add_argument("-c", "--comments", action='store_true', help="generate comm
 args = parser.parse_args()
 
 # pprint.pprint(args, indent=4)
-
-
-def parse(text):
-    atok = asttokens.ASTTokens(text, parse=True)
-    tree = atok.tree
-    # self.dump_ast()
-    visitor = RecursiveRpnVisitor()
-    visitor.atok = atok
-    visitor.visit(tree)
-    # visitor.program.dump()
-    return visitor.program
 
 def run():
     with open(args.filename) as fp:
