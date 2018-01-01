@@ -118,6 +118,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     # Visit functions
 
+    def has_rpn_def_directive(self, node):
+        return 'rpn: export' in self.find_comment(node)
+
     def check_rpn_def_directives(self, node):
         # Adds an additional string label to the rpn code
         comment = self.find_comment(node)
@@ -130,14 +133,21 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.begin(node)
 
         if self.first_def:
-            label = node.name[:7]
-            self.program.insert(f'LBL "{label}"')
+            label = f'"{node.name[:7]}"'
+            self.program.insert(f'LBL {label}')
             self.labels.func_to_lbl(node.name, label=label, called_from_def=True)
             self.first_def = False
             self.first_def_name = label
         else:
-            self.program.insert(f'LBL {self.labels.func_to_lbl(node.name, called_from_def=True)}', comment=f'def {node.name}')
-            self.check_rpn_def_directives(node)
+            if not self.has_rpn_def_directive(node):
+                self.program.insert(f'LBL {self.labels.func_to_lbl(node.name, called_from_def=True)}', comment=f'def {node.name}')
+            elif self.labels.has_function_mapping(node.name):
+                self.program.insert(f'LBL {self.labels.func_to_lbl(node.name, called_from_def=True)}', comment=f'def {node.name}')
+                self.check_rpn_def_directives(node)
+            else:
+                label = f'"{node.name[:7]}"'
+                self.program.insert(f'LBL {label}')
+                self.labels.func_to_lbl(node.name, label=label, called_from_def=True)
 
         self.scopes.push()
 
@@ -235,7 +245,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             for arg in node.args:
                 self.program.insert(f'MVAR "{arg.s}"')
                 self.scopes.var_to_reg(arg.s, force_reg_name=f'"{arg.s}"')
-            self.program.insert(f'VARMENU "{self.first_def_name}"')
+            self.program.insert(f'VARMENU {self.first_def_name}')
             self.program.insert('STOP')
             self.program.insert('EXITALL')
             for arg in node.args:

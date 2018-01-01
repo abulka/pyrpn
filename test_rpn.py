@@ -1172,3 +1172,26 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(expected, lines, dump=True, keep_comments=False)
 
+    def test_def_double_export_no_calls_till_later(self):
+        # two clean definitions, no calls till later
+        src = """
+            def main():
+                pass
+                
+            def useful():  # rpn: export
+                pass
+                
+            main()
+            useful()
+        """
+        expected = dedent("""
+            LBL "main"
+            RTN
+            LBL "useful"
+            RTN
+            XEQ "main"
+            XEQ "useful"
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(expected, lines, dump=True, keep_comments=False)
+
