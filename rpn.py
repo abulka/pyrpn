@@ -178,11 +178,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.pending_op = ''
         self.end(node)
 
-    def visit_Return(self,node):
-        self.begin(node)
-        self.visit_children(node)
-        self.end(node)
-
     def visit_Add(self,node):
         self.begin(node)
         self.pending_op = '+'
@@ -377,9 +372,28 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.pending_unary_op = ''
         self.end(node)
 
+    def visit_Str(self, node):
+        self.begin(node)
+        self.program.insert(f'{self.pending_unary_op}"{node.s}"')
+        self.pending_unary_op = ''
+        self.end(node)
+
     @recursive
     def visit_Expr(self, node):
         pass
+
+    @recursive
+    def visit_Compare(self, node):
+        """
+        A comparison of two or more values. left is the first value in the comparison, ops the list of operators,
+        and comparators the list of values after the first. If that sounds awkward, that’s because it is:
+            - left
+            - ops
+            - comparators
+        """
+        self.begin(node)
+        self.visit_children(node)
+        self.end(node)
 
     @recursive
     def visit_UnaryOp(self, node):
