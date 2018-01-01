@@ -51,6 +51,9 @@ class FunctionLabels(object):
     def label_data_empty(self):
         return len(self.label_data) == 0
 
+    def is_global_def(self, func_name):
+        return '"' in self.get_label(func_name)  # if its got a " around the label
+
     # Util
 
     def dump(self):

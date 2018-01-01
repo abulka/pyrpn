@@ -298,7 +298,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             # actual parameters but these are generated through normal visit parsing and available on the stack.
             self.program.insert(f'{func_name}', comment=cmd_list[func_name]['description'])
         else:
-            self.program.insert(f'XEQ {self.labels.func_to_lbl(func_name)}', comment=f'{func_name}()')
+            label = self.labels.func_to_lbl(func_name)
+            comment = f'{func_name}()' if not self.labels.is_global_def(func_name) else ''  # only emit comment if local label
+            self.program.insert(f'XEQ {label}', comment=comment)
             self.log_state('scope after XEQ')
         self.end(node)
 
