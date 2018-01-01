@@ -1010,3 +1010,46 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines, dump=True)
 
+    @unittest.skip('hard')
+    def test_compare(self):
+        src = """
+            if 2 > 1:
+                PSE()
+        """
+        expected = dedent("""
+            2
+            1
+            X<Y?
+            GTO 00  // if body
+            GTO 01  // resume
+            LBL 00  // if body
+            PSE
+            LBL 01  // resume
+        """)
+        lines = self.parse(dedent(src), debug_gen_descriptive_labels=False)
+        self.compare(de_comment(expected), lines, dump=True)
+
+    @unittest.skip('hard')
+    def test_elif_view(self):
+        src = """
+            def selectr(n):
+                msg = num_to_txt(n)
+                VIEW(n)
+                PSE()
+                VIEW(msg)
+                
+            def num_to_txt(n):
+                if n == 0:
+                    return 999 # "zero"
+                elif n == 1:
+                    return "one"
+                elif n == 2:
+                    return "two"
+                else:
+                    return "dunno"
+        """
+        expected = dedent("""
+        """)
+        lines = self.parse(dedent(src), debug_gen_descriptive_labels=False)
+        self.compare(de_comment(expected), lines, dump=True)
+
