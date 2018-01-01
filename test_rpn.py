@@ -48,7 +48,7 @@ class RpnCodeGenTests(BaseTest):
             self.visitor.program.dump(comments=True)
 
         # All in one comparison
-        self.assertEqual(expected.strip(), self.visitor.program.lines_to_str(lines, comments=keep_comments).strip())
+        self.assertEqual(expected.strip(), self.visitor.program.lines_to_str(comments=keep_comments).strip())
 
         if trace:
             expected = expected.strip().split('\n')
