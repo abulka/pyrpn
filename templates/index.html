@@ -2,16 +2,26 @@
 <html>
     <head>
 
+        <script src="../static/js/lib/jquery-3.2.1.min.js"></script>
+        <script src="../static/js/lib/codemirror-5.33.0/codemirror.js"></script>
+        <link rel="stylesheet" href="../static/js/lib/codemirror-5.33.0/codemirror.css">
+        <script src="../static/js/lib/codemirror-5.33.0/python.js"></script>
+
         <style>
             .python {
                 width: 100%;
-                height: 30em;
+                /*height: 30em;*/
+                /*height: 100%;*/
+                /*flex: 1; !* consume available width *!*/
                 font-family: monospace;
                 font-size: large;
             }
 
             article {
               padding: 1rem;
+              height: 100%;
+              border-color: #aa1111;
+                border-bottom-width: thick;
             }
 
             h1 {
@@ -30,7 +40,7 @@
             }
 
             .right-half {
-              background: #f9ff17;
+              background: #f4ffd7;
               grid-column: 2;
               font-family: "Monotype Corsiva", "Apple Chancery", "URW Chancery L", cursive;
               font-size: larger;
@@ -42,7 +52,20 @@
                 font-size: x-large;
                 float: right;
             }
+
+            .CodeMirror {
+                font-family: monospace;
+                font-size: 16px;
+            }
         </style>
+
+        <script>
+            $(document).ready(function () {
+                var options1 = {lineNumbers: true, mode: "python"}
+                console.log($('#id_python_text').get(0))
+                var myCodeMirror1 = CodeMirror.fromTextArea($('#id_python_text').get(0), options1);
+            })
+        </script>
 
     </head>
    <body>
@@ -54,7 +77,7 @@
                   <h1>Enter Python Source Code:</h1>
 
                     <form method="POST" action="/">
-                        {{ form.source(class_='python') }}
+                        {{ form.source(class_='python', id='id_python_text') }}
                         <input class="submit_button" type="submit" value="Convert">
                         <br>
                         {{ form.comments.label }} {{ form.comments() }}
