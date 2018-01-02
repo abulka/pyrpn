@@ -15,6 +15,7 @@
                 /*flex: 1; !* consume available width *!*/
                 font-family: monospace;
                 font-size: large;
+                display: none;
             }
 
             article {
@@ -48,6 +49,7 @@
 
             .submit_button {
                 margin-top: 1em;
+                margin-bottom: 1em;
                 background-color: chartreuse;
                 font-size: x-large;
                 float: right;
@@ -56,16 +58,11 @@
             .CodeMirror {
                 font-family: monospace;
                 font-size: 16px;
+                  border: 1px solid #eee;
+                  height: auto;
             }
-        </style>
 
-        <script>
-            $(document).ready(function () {
-                var options1 = {lineNumbers: true, mode: "python"}
-                console.log($('#id_python_text').get(0))
-                var myCodeMirror1 = CodeMirror.fromTextArea($('#id_python_text').get(0), options1);
-            })
-        </script>
+        </style>
 
     </head>
    <body>
@@ -76,15 +73,15 @@
 
                   <h1>Enter Python Source Code:</h1>
 
-                    <form method="POST" action="/">
+                    <form id="mainform" method="POST" action="/">
                         {{ form.source(class_='python', id='id_python_text') }}
-                        <input class="submit_button" type="submit" value="Convert">
+                        <input class="submit_button" title='Ctrl-ENTER' type="submit" value="Convert">
                         <br>
                         {{ form.comments.label }} {{ form.comments() }}
                         <br>
                         {{ form.line_numbers.label }} {{ form.line_numbers() }}
-                        <br>
                         {{ form.csrf_token }}
+                        <br>
                     </form>
 
               </article>
@@ -101,12 +98,32 @@
           </div>
         </section>
 
-        <br>
-        <br>
-        <br>
-        <h1>Nostalgic images...</h1>
-        <img src="https://i.ytimg.com/vi/-A7HB6YD12o/maxresdefault.jpg">
+        <!--<br>-->
+        <!--<br>-->
+        <!--<br>-->
+        <!--<h1>Nostalgic images...</h1>-->
+        <!--<img src="https://i.ytimg.com/vi/-A7HB6YD12o/maxresdefault.jpg">-->
 
    </body>
+
+    <script>
+        var options1 = {lineNumbers: true, mode: "python"}
+        var myCodeMirror1 = CodeMirror.fromTextArea($('#id_python_text').get(0), options1);
+
+        $(document).keydown(function(e) {
+              // console.log('key code is: ' + e.which + ' ' + (e.ctrlKey ? 'Ctrl' : '') + ' ' +
+              //       (e.shiftKey ? 'Shift' : '') + ' ' + (e.altKey ? 'Alt' : ''));
+
+              if (e.ctrlKey && e.which == 13)
+                  $('#mainform').submit()
+        });
+
+         $(document).ready(function () {
+             myCodeMirror1.focus()
+             myCodeMirror1.setCursor(myCodeMirror1.lineCount(), 0)
+         })
+    </script>
+
+
 </html>
 
