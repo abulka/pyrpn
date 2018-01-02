@@ -16,7 +16,7 @@ def index():
     if form.validate_on_submit():
         rpn = do(form.source.data, comments=form.comments.data, linenos=form.line_numbers.data)
     else:
-        rpn = 'validate BAD?'
+        rpn = 'Press Convert'
 
     return render_template('index.html', form=form, rpn=rpn)
 
