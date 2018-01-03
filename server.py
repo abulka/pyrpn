@@ -43,5 +43,6 @@ def test():
 
 
 if __name__ == '__main__':
+    # This code does not run if running via gunicorn on heroku
     app.jinja_env.auto_reload = True
     app.run(debug=True)
