@@ -1275,3 +1275,26 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(expected, lines, dump=True, keep_comments=False)
 
+    # More control structures
+
+    # @unittest.skip('offline')
+    def test_while(self):
+        src = """
+            while 1 < 2:
+                pass
+        """
+        expected = dedent("""
+            LBL 00  // while
+            1
+            2
+            // X>Y?
+            X<Y?  // TODO this is WRONG
+            GTO 01  // while body
+            GTO 02  // resume
+            LBL 01  // while body
+            GTO 00  // while (loop again)
+            LBL 02  // resume
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
+

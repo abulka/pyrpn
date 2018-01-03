@@ -28,6 +28,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.log_indent = 0
         self.first_def_label = None
         self.debug_gen_descriptive_labels = False
+        self.node_desc_short = lambda node : str(node)[6:9].strip() + '_' + str(node)[-4:-1].strip()
+        self.insert = lambda cmd, label : self.program.insert(f'{cmd} {label.text}', comment=label.description)
+
 
     # Recursion support
 
@@ -356,8 +359,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         log.info(f'{self.indent} :')
 
         f = LabelFactory(local_label_allocator=self.local_labels, descriptive=self.debug_gen_descriptive_labels)
-        node_desc_short = lambda node : str(node)[6:9].strip() + '_' + str(node)[-4:-1].strip()
-        insert = lambda cmd, label : self.program.insert(f'{cmd} {label.text}', comment=label.description)
+        insert = self.insert
 
         label_if_body = f.new('if body')
         label_resume = f.new('resume')
@@ -404,6 +406,42 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                     insert('LBL', label_else)
                     self.body(else_)
                 break
+
+        insert('LBL', label_resume)
+        self.end(node)
+
+    def visit_While(self,node):
+        """
+        visit a While node.  Children nodes are:
+            - test
+            - body
+            - orelse (list)
+        """
+        self.begin(node)
+
+        f = LabelFactory(local_label_allocator=self.local_labels, descriptive=self.debug_gen_descriptive_labels)
+        insert = self.insert
+
+        label_while = f.new('while')
+        insert('LBL', label_while)
+        log.info(f'{self.indent} while')
+        self.visit(node.test)
+        log.info(f'{self.indent} :')
+
+        label_while_body = f.new('while body')
+        label_resume = f.new('resume')
+        label_else = f.new('else') if len(node.orelse) > 0 else None
+
+        insert('GTO', label_while_body)
+        if label_else: insert('GTO', label_else)
+        else: insert('GTO', label_resume)
+
+        insert('LBL', label_while_body)
+        self.body(node.body)
+        insert('GTO', label_while)
+
+        if label_else:
+            insert('GTO', label_resume)
 
         insert('LBL', label_resume)
         self.end(node)
