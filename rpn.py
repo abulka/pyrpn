@@ -435,6 +435,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         label_else = f.new('else') if len(node.orelse) > 0 else None
 
         self.resume_labels.append(label_resume)  # just in case we hit a break
+        self.continue_labels.append(label_while)  # just in case we hit a continue
 
         insert('GTO', label_while_body)
         if label_else: insert('GTO', label_else)
@@ -456,6 +457,13 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         """ visit a Break node """
         if self.resume_labels:
             label = self.resume_labels.pop()
+            self.insert('GTO', label)
+
+    @recursive
+    def visit_Continue(self,node):
+        """ visit a Continue node """
+        if self.continue_labels:
+            label = self.continue_labels.pop()
             self.insert('GTO', label)
 
     @recursive
