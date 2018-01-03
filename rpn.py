@@ -316,7 +316,18 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                     arg_val = f'"{arg_val}"'
                 if isinstance(arg, ast.Name):  # reference to a variable, thus pull out a register name
                     comment = arg_val
-                    arg_val = self.scopes.var_to_reg(arg_val)
+
+                    # hack if trying to access i
+                    if self.var_name_is_loop_counter(arg_val):
+                        comment = arg_val + ' (loop var)'
+                        register = arg_val = self.scopes.var_to_reg(arg_val)
+                        self.program.insert(f'RCL {register}', comment=comment)
+                        self.program.insert('IP')  # just get the integer portion of isg counter
+                        arg_val = 'ST X'  # access the value in stack x rather than in the register
+                        assert cmd_info['indirect_allowed']
+                    else:
+                        arg_val = self.scopes.var_to_reg(arg_val)
+
                 elif isinstance(arg, ast.Num):
                     arg_val = f'{arg_val:02d}'  # TODO probably need more formats e.g. nnnn
                 args += ' ' if arg_val else ''

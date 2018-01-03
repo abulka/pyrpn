@@ -196,6 +196,33 @@ class RpnCodeGenTests(BaseTest):
             """)
         self.compare(de_comment(expected), lines, trace=False, dump=True)
 
+    def test_for_range_loop_view_i(self):
+        lines = self.parse(dedent("""
+            for i in range(1,20):
+                VIEW(i)
+        """))
+        expected = dedent("""
+            // setup
+            0
+            19
+            1000
+            /
+            +
+            STO 00
+            
+            LBL 00  // for
+            ISG 00  // test
+            GTO 01  // for body
+            GTO 02  // resume
+            LBL 01  // for body
+            RCL 00
+            IP
+            VIEW ST X
+            GTO 00  // for
+            LBL 02  // resume
+            """)
+        self.compare(de_comment(expected), lines, trace=False, dump=True)
+
     def test_for_range_with_body_assign_global(self):
         lines = self.parse(dedent("""
             def another_for_loop():
@@ -350,7 +377,7 @@ class RpnCodeGenTests(BaseTest):
         src = """
             for i in range(1,3):
                 continue
-                VIEW(i)
+                PSE()
         """
         expected = dedent("""
             0
@@ -367,7 +394,7 @@ class RpnCodeGenTests(BaseTest):
 
             LBL 01  // for body
             GTO 00  // (continue)
-            VIEW 00 // i
+            PSE
             GTO 00  // for
             
             LBL 02  // resume
@@ -380,7 +407,7 @@ class RpnCodeGenTests(BaseTest):
         src = """
             for i in range(1,3):
                 break
-                VIEW(i)
+                PSE()
         """
         expected = dedent("""
             0
@@ -397,7 +424,7 @@ class RpnCodeGenTests(BaseTest):
 
             LBL 01  // for body
             GTO 02  // resume (break)
-            VIEW 00 // i
+            PSE
             GTO 00  // for
             
             LBL 02  // resume
