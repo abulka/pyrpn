@@ -333,7 +333,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.program.insert(1000)
             self.program.insert('/')
             self.program.insert('+')
-            self.program.insert(f'STO {self.for_loop_info[-1].register}', comment='range')
+            register = self.for_loop_info[-1].register
+            var_name = self.for_loop_info[-1].var_name
+            self.program.insert(f'STO {register}', comment=f'range {var_name}')
         elif func_name in cmd_list:
             # The built-in command is a simple one without command arg fragment "parameter" parts - yes it may take
             # actual parameters but these are generated through normal visit parsing and available on the stack.
@@ -551,27 +553,33 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         insert = self.insert
 
         label_for = f.new('for')
+        label_for_body = f.new('for body')
         label_resume = f.new('resume')
 
         log.info(f'{self.indent} for')
         self.visit(node.target)
         self.for_loop_info.append(
-            ForLoopItem(register=self.scopes.var_to_reg(node.target.id),
-                        label=label_for.text))  # TODO change for loop and forloopitem to use Label objects
+            ForLoopItem(var_name=node.target.id,
+                        register=self.scopes.var_to_reg(node.target.id),
+                        label=label_for))
 
         log.info(f'{self.indent} in')
         self.visit(node.iter)
 
         log.info(f'{self.indent} :')
-        self.program.insert(f'LBL {self.for_loop_info[-1].label}')
 
         self.resume_labels.append(label_resume)  # just in case we hit a break
         self.continue_labels.append(label_for)  # just in case we hit a continue
 
+        self.insert('LBL', label_for)
+        self.program.insert(f'ISG {self.for_loop_info[-1].register}', comment=f'{self.for_loop_info[-1]}')
+        self.insert('GTO', label_for_body)
+        self.insert('GTO', label_resume)
+
+        self.insert('LBL', label_for_body)
         self.body_or_else(node)
 
-        self.program.insert(f'ISG {self.for_loop_info[-1].register}', comment=f'{self.for_loop_info[-1]}')
-        self.program.insert(f'GTO {self.for_loop_info[-1].label}')
+        self.insert('GTO', label_for)
         self.for_loop_info.pop()
         insert('LBL', label_resume)
         self.end(node)
@@ -579,6 +587,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
 @attrs
 class ForLoopItem(object):
+    var_name = attrib(default='')
     register = attrib(default=0)
     label = attrib(default=0)
 

@@ -141,7 +141,9 @@ class RpnCodeGenTests(BaseTest):
             """)
         self.compare(expected, lines, trace=False, dump=False)
 
-    def test_def_range(self):
+    # For
+
+    def test_for_range(self):
         lines = self.parse(dedent("""
             def for_loop():
                 for i in range(1, 200):
@@ -149,21 +151,28 @@ class RpnCodeGenTests(BaseTest):
             """))
         expected = dedent("""
             LBL "for_loo"
+            
+            // setup
             1
             200
             1000
             /
             +
             STO 00
-            LBL 00
-            ISG 00
-            GTO 00
-            LBL 01  // resume
+            
+            LBL 00  // for
+            ISG 00  // test
+            GTO 01  // for body
+            GTO 02  // resume
+            LBL 01  // for body
+            GTO 00  // for
+            LBL 02  // resume
+            
             RTN
             """)
         self.compare(de_comment(expected), lines, trace=False, dump=True)
 
-    def test_def_range_with_body_assign_global(self):
+    def test_for_range_with_body_assign_global(self):
         lines = self.parse(dedent("""
             def another_for_loop():
                 for i in range(5, 60):
@@ -177,68 +186,53 @@ class RpnCodeGenTests(BaseTest):
             /
             +
             STO 00
-            LBL 00
+
+            LBL 00  // for
+            ISG 00  // test
+            GTO 01  // for body
+            GTO 02  // resume
+            LBL 01  // for body
             10
             STO "X"
-            ISG 00
-            GTO 00
-            LBL 01  // resume
+            GTO 00  // for
+            LBL 02  // resume
+            
             RTN
             """)
         self.compare(de_comment(expected), lines, trace=True, dump=True)
 
-    def test_def_range_with_body_assign_scoped(self):
+    def test_for_range_x_y_vars(self):
         lines = self.parse(dedent("""
-            def range_with_body():
-                for i in range(5, 60):
-                    x = 10
+            x = 10
+            for i in range(5, 60):
+                y = 100
             """))
         expected = dedent("""
-            LBL "range_w"
-            5
-            60
-            1000
-            /
-            +
-            STO 00
-            LBL 00
-            10
-            STO 01  // x
-            ISG 00
-            GTO 00
-            LBL 01  // resume
-            RTN
-            """)
-        self.compare(de_comment(expected), lines, trace=True, dump=True)
-
-    def test_def_range_three_scoped_vars(self):
-        lines = self.parse(dedent("""
-            def three_scoped():
-                x = 10
-                for i in range(5, 60):
-                    y = 100
-            """))
-        expected = dedent("""
-            LBL "three_s"
             10
             STO 00
+            
             5
             60
             1000
             /
             +
             STO 01
-            LBL 00
+            
+            LBL 00  // for
+            ISG 01  // test
+            GTO 01  // for body
+            GTO 02  // resume
+            
+            LBL 01  // for body
             100
-            STO 02  // y
-            ISG 01
-            GTO 00
-            LBL 01  // resume
-            RTN
+            STO 02  // y = 
+            GTO 00  // for
+            
+            LBL 02  // resume
             """)
         self.compare(de_comment(expected), lines, trace=True, dump=True)
 
-    def test_def_range_with_body_accessing_i(self):
+    def test_for_range_with_body_accessing_i(self):
         lines = self.parse(dedent("""
             def range_i():
                 X = 0
@@ -248,27 +242,35 @@ class RpnCodeGenTests(BaseTest):
             """))
         expected = dedent("""
             LBL "range_i"
+            
             0
             STO "X"
+            
             2
             4
             1000
             /
             +
-            STO 00  // i
-            LBL 00
+            STO 00  // i =
+                        
+            LBL 00  // for
+            ISG 00  // test
+            GTO 01  // for body
+            GTO 02  // resume
+            
+            LBL 01  // for body
             RCL 00  // i
             IP
             STO+ "X"
-            ISG 00
-            GTO 00
-            LBL 01  // resume
+            GTO 00  // for
+                        
+            LBL 02  // resume
             RCL "X"
             RTN
             """)
         self.compare(de_comment(expected), lines, trace=True, dump=True)
 
-    def test_def_range_complex(self):
+    def test_for_range_complex(self):
         lines = self.parse(dedent("""
             def range_complex():
                 X = 0
@@ -283,19 +285,27 @@ class RpnCodeGenTests(BaseTest):
         # local var mappings are x:0, total:1, i:2
         expected = dedent("""
             LBL "range_c"
+            
             0
             STO "X" // X
             0
             STO 00  // x
             0
             STO 01  // total
+            
             2
             4
             1000
             /
             +
-            STO 02  // i
+            STO 02  // i =
+
             LBL 00  // for
+            ISG 02  // test
+            GTO 01  // for body
+            GTO 02  // resume
+            
+            LBL 01  // for body
             RCL 02  // i
             IP
             STO "X"
@@ -304,16 +314,74 @@ class RpnCodeGenTests(BaseTest):
             STO+ 00 // x +=
             RCL 00  // x
             STO+ 01 // total +=
-            ISG 02  // i
-            GTO 00
-            LBL 01  // resume
+            GTO 00  // for
+
+            LBL 02  // resume
             RCL 01  // total
             RTN
             """)
         self.compare(de_comment(expected), lines, trace=True, dump=True)
 
-    # @unittest.skip("offline")
-    def test_complex(self):
+    def test_for_continue(self):
+        src = """
+            for i in range(1,3):
+                continue
+                VIEW(i)
+        """
+        expected = dedent("""
+            1
+            3
+            1000
+            /
+            +
+            STO 00
+            
+            LBL 00  // for
+            ISG 00  // test
+            GTO 01  // for body
+            GTO 02  // resume
+
+            LBL 01  // for body
+            GTO 00  // (continue)
+            VIEW 00 // i
+            GTO 00  // for
+            
+            LBL 02  // resume
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
+
+    # @unittest.skip('offline')
+    def test_for_break(self):
+        src = """
+            for i in range(1,3):
+                break
+                VIEW(i)
+        """
+        expected = dedent("""
+            1
+            3
+            1000
+            /
+            +
+            STO 00
+            
+            LBL 00  // for
+            ISG 00  // test
+            GTO 01  // for body
+            GTO 02  // resume
+
+            LBL 01  // for body
+            GTO 02  // resume (break)
+            VIEW 00 // i
+            GTO 00  // for
+            
+            LBL 02  // resume
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
+
+    def test_for_complex(self):
         lines = self.parse(dedent("""
             def looper(n):
                 x = 100
@@ -325,26 +393,34 @@ class RpnCodeGenTests(BaseTest):
             """))
         expected = dedent("""
             LBL "looper"  // param n is on the stack, so that's up to the user
-            STO 00
+            STO 00    // param n
             RDN
+            
             100
             STO 01    // x
+            
             10        // range start, 10
             RCL 00    // range end, n
             1000
             /
             +
             STO 02    // i our counter
-            LBL 00
-            //VIEW 02 // print i  TODO 
+                        
+            LBL 00  // for
+            ISG 02  // test
+            GTO 01  // for body
+            GTO 02  // resume
+
+            LBL 01  // for body
+            //PRV 02 // print i  TODO 
             RCL 00    // n
             STO+ 01   // x +=
             RCL 02    // i
             IP        // when using a loop counter elsewhere, IP it first
             STO+ 01   // x +=
-            ISG 02    // i
-            GTO 00
-            LBL 01  // resume
+            GTO 00  // for
+            
+            LBL 02  // resume
             RCL 01    // leave x on stack
             RTN
             """)
@@ -1375,55 +1451,6 @@ class RpnCodeGenTests(BaseTest):
             GTO 00  // continue (loop again)
             GTO 00  // while (loop again)
             LBL 02  // resume
-        """)
-        lines = self.parse(dedent(src))
-        self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
-
-    # @unittest.skip('offline')
-    def test_for_continue(self):
-        src = """
-            for i in range(1,3):
-                continue
-                VIEW(i)
-        """
-        expected = dedent("""
-            1
-            3
-            1000
-            /
-            +
-            STO 00
-            LBL 00  // TODO this may be wrong because test is not tested before body
-            GTO 00  // (continue)
-            //GTO 01  // resume (break)
-            VIEW 00 // i
-            ISG 00
-            GTO 00  // for
-            LBL 01  // resume
-        """)
-        lines = self.parse(dedent(src))
-        self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
-
-    # @unittest.skip('offline')
-    def test_for_break(self):
-        src = """
-            for i in range(1,3):
-                break
-                VIEW(i)
-        """
-        expected = dedent("""
-            1
-            3
-            1000
-            /
-            +
-            STO 00
-            LBL 00  // TODO this may be wrong because test is not tested before body
-            GTO 01  // resume (break)
-            VIEW 00 // i
-            ISG 00
-            GTO 00  // for
-            LBL 01  // resume
         """)
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
