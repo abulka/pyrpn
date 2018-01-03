@@ -9,6 +9,11 @@ config_log(log)
 
 app = Flask(__name__)
 
+app.config.update(dict(
+    SECRET_KEY="powerful secretkey",
+    WTF_CSRF_SECRET_KEY="a csrf secret key"
+))
+
 @app.route('/', methods=["GET", "POST"])
 def index():
     rpn = ''
@@ -39,10 +44,4 @@ def test():
 
 if __name__ == '__main__':
     app.jinja_env.auto_reload = True
-
-    app.config.update(dict(
-        SECRET_KEY="powerful secretkey",
-        WTF_CSRF_SECRET_KEY="a csrf secret key"
-    ))
-
     app.run(debug=True)
