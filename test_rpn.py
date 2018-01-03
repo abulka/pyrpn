@@ -1428,7 +1428,7 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
 
-    @unittest.skip('offline')
+    # @unittest.skip('offline')
     def test_while_else_break(self):
         """
         The else clause is only executed when your while condition becomes false. If you break out of the loop,
@@ -1442,19 +1442,23 @@ class RpnCodeGenTests(BaseTest):
                 VIEW(n)
         """
         expected = dedent("""
-            10
+            2
             STO 00  // n
             LBL 00  // while
             RCL 00
             2
             X=Y?
             GTO 01  // while body
-            GTO 02  // else
+            GTO 03  // else
+            
             LBL 01  // while body
-            GTO 03  // resume (break, skip else)
-            LBL 02  // else
+            GTO 02  // resume (break, thus skip else)
+            GTO 00  // while
+            
+            LBL 03  // else
             VIEW 00 // n
-            LBL 03  // resume
+            
+            LBL 02  // resume
         """)
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
