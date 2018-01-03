@@ -211,16 +211,43 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.pending_ops.append('+')
         self.end(node)
 
+    def visit_Sub(self,node):
+        self.begin(node)
+        self.pending_ops.append('-')
+        self.end(node)
+
     def visit_Mult(self,node):
         self.begin(node)
         self.pending_ops.append('*')
         self.end(node)
 
-    def visit_BinOp(self, node):
-        """ visit a BinOp node and visits it recursively"""
+    def visit_Div(self,node):
         self.begin(node)
-        self.visit_children(node)
+        self.pending_ops.append('/')
+        self.end(node)
+
+    def visit_BinOp(self, node):
+        """
+        visit a BinOp node and visits it recursively,
+        Child nodes are:
+            - node.left
+            - node.op
+            - node.right
+
+        Operator precedence has already taken care of in the building of the AST.
+
+        We visit in a certain order left, right, op because this suits our rpn output.
+        The default visit order when using `self.visit_children(node)` is op, left, right - no good.
+        """
+        self.begin(node)
+
+        self.visit(node.left)
+        self.visit(node.op)
+        self.visit(node.right)
+
+        log.info(self.pending_ops)
         assert self.pending_ops
+        # assert len(self.pending_ops) == 1  # TODO if this is true, then we don't need a op list
         self.program.insert(self.pending_ops[-1])
         self.pending_ops.pop()
         self.end(node)
