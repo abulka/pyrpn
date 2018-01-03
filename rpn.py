@@ -17,7 +17,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def __init__(self):
         self.program = Program()
-        self.pending_op = ''
+        self.pending_ops = []
         self.pending_unary_op = ''
         self.scopes = Scopes()
         self.labels = FunctionLabels()
@@ -81,7 +81,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.log_indent += 1
         s = self.get_node_name_id_or_n(node)
         s = f"'{s}'" if s else ""
-        s += f" op = '{self.pending_op}'" if self.pending_op else ""
+        s += f" op = '{self.pending_ops}'" if self.pending_ops else ""
         self.log_state(f'BEGIN {type(node).__name__} {s}')
         self.log_children(node)
 
@@ -200,29 +200,29 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         """ visit a AugAssign e.g. += node and visits it recursively"""
         self.begin(node)
         self.visit_children(node)
-        self.program.insert(f'STO{self.pending_op} {self.scopes.var_to_reg(node.target.id)}')
+        self.program.insert(f'STO{self.pending_ops[-1]} {self.scopes.var_to_reg(node.target.id)}')
         assert '.Store' in str(node.target.ctx)
         assert isinstance(node.target.ctx, ast.Store)
-        self.pending_op = ''
+        self.pending_ops.pop()
         self.end(node)
 
     def visit_Add(self,node):
         self.begin(node)
-        self.pending_op = '+'
+        self.pending_ops.append('+')
         self.end(node)
 
     def visit_Mult(self,node):
         self.begin(node)
-        self.pending_op = '*'
+        self.pending_ops.append('*')
         self.end(node)
 
     def visit_BinOp(self, node):
         """ visit a BinOp node and visits it recursively"""
         self.begin(node)
         self.visit_children(node)
-        assert self.pending_op
-        self.program.insert(self.pending_op)
-        self.pending_op = ''
+        assert self.pending_ops
+        self.program.insert(self.pending_ops[-1])
+        self.pending_ops.pop()
         self.end(node)
 
     def visit_Call(self,node):

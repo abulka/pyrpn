@@ -1195,3 +1195,20 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(expected, lines, dump=True, keep_comments=False)
 
+
+    @unittest.skip('hard - how about operator precendence issues?')
+    def test_expr_three(self):
+        src = """
+            x = 1 + 2 - 6        
+        """
+        expected = dedent("""
+            1 
+            2
+            +
+            6
+            -
+            STO 00
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(expected, lines, dump=True, keep_comments=False)
+
