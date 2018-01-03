@@ -24,6 +24,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.scopes = Scopes()
         self.labels = FunctionLabels()
         self.local_labels = LocalLabels()
+        self.resume_labels = []  # created by the current while or for loop so that break and continue know where to go
+        self.continue_labels = []  # created by the current while or for loop so that break and continue know where to go
         self.for_loop_info = []
         self.log_indent = 0
         self.first_def_label = None
@@ -415,7 +417,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         visit a While node.  Children nodes are:
             - test
             - body
-            - orelse (list)
+            - orelse
         """
         self.begin(node)
 
@@ -432,6 +434,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         label_resume = f.new('resume')
         label_else = f.new('else') if len(node.orelse) > 0 else None
 
+        self.resume_labels.append(label_resume)  # just in case we hit a break
+
         insert('GTO', label_while_body)
         if label_else: insert('GTO', label_else)
         else: insert('GTO', label_resume)
@@ -442,9 +446,17 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         if label_else:
             insert('LBL', label_else)
+            self.body(node.orelse)
 
         insert('LBL', label_resume)
         self.end(node)
+
+    # @recursive
+    # def visit_Break(self,node):
+    #     """ visit a Break node """
+    #     if self.resume_labels:
+    #         label = self.resume_labels.pop()
+    #         self.insert('GTO', label)
 
     @recursive
     def visit_Lambda(self,node):

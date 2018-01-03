@@ -1277,7 +1277,6 @@ class RpnCodeGenTests(BaseTest):
 
     # More control structures
 
-    # @unittest.skip('offline')
     def test_while(self):
         src = """
             while 1 < 2:
@@ -1321,13 +1320,87 @@ class RpnCodeGenTests(BaseTest):
             2
             X<Y?
             GTO 01  // while body
+            GTO 03  // else
+            LBL 01  // while body
+            1
+            STO- 00
+            GTO 00  // while (loop again)
+            LBL 03  // else
+            VIEW 00 // n
+            LBL 02  // resume
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
+
+    @unittest.skip('offline')
+    def test_while_break(self):
+        src = """
+            while 1 < 2:
+                break
+        """
+        expected = dedent("""
+            LBL 00  // while
+            1
+            2
+            X>Y?
+            GTO 01  // while body
+            GTO 02  // resume
+            LBL 01  // while body
+            GTO 02  // resume (break)
+            GTO 00  // while (loop again)
+            LBL 02  // resume
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
+
+    @unittest.skip('offline')
+    def test_while_continue(self):
+        src = """
+            while 1 < 2:
+                continue
+        """
+        expected = dedent("""
+            LBL 00  // while
+            1
+            2
+            X>Y?
+            GTO 01  // while body
+            GTO 02  // resume
+            LBL 01  // while body
+            GTO 00  // continue (loop again)
+            GTO 00  // while (loop again)
+            LBL 02  // resume
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
+
+    @unittest.skip('offline')
+    def test_while_else_break(self):
+        """
+        The else clause is only executed when your while condition becomes false. If you break out of the loop,
+        or if an exception is raised, it won't be executed.
+        """
+        src = """
+            n = 2
+            while n == 2:
+                break
+            else:
+                VIEW(n)
+        """
+        expected = dedent("""
+            10
+            STO 00  // n
+            LBL 00  // while
+            RCL 00
+            2
+            X=Y?
+            GTO 01  // while body
             GTO 02  // else
             LBL 01  // while body
-            GTO 00  // while (loop again)
+            GTO 03  // resume (break, skip else)
             LBL 02  // else
             VIEW 00 // n
             LBL 03  // resume
         """)
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
-
