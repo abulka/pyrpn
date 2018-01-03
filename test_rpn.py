@@ -1196,8 +1196,7 @@ class RpnCodeGenTests(BaseTest):
         self.compare(expected, lines, dump=True, keep_comments=False)
 
 
-    # @unittest.skip('hard - how about operator precendence issues?')
-    def test_expr__two_ops(self):
+    def test_expr_two_ops(self):
         src = """
             x = 1 + 2 - 6        
         """
@@ -1212,7 +1211,7 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(expected, lines, dump=True, keep_comments=False)
 
-    def test_expr__two_ops_mult_precedence(self):
+    def test_expr_two_ops_multiplication_precedence(self):
         src = """
             x = 1 + 2 * 6        
         """
@@ -1234,4 +1233,20 @@ class RpnCodeGenTests(BaseTest):
         """)
         lines = self.parse(dedent(src))
         self.compare(expected, lines, dump=True, keep_comments=False)
+
+    @unittest.skip('hard to actually blow the stack')
+    def test_expr_blow_stack(self):
+        src = """
+            x = 1 + 2 * 6 + 1 * 9 / 100 + 1 + 2 * 6       
+        """
+        expected = dedent("""
+            1
+            2
+            6
+            *
+            +
+            STO 00
+        """)
+        from rpn import RpnError
+        self.assertRaises(RpnError, self.parse, dedent(src))
 

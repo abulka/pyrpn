@@ -11,6 +11,8 @@ from cmd_list import cmd_list
 log = logging.getLogger(__name__)
 config_log(log)
 
+class RpnError(Exception):
+    pass
 
 class RecursiveRpnVisitor(ast.NodeVisitor):
     """ recursive visitor with RPN generating capability :-) """
@@ -238,15 +240,20 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         We visit in a certain order left, right, op because this suits our rpn output.
         The default visit order when using `self.visit_children(node)` is op, left, right - no good.
+
+        It doesn't matter if we do left, right or right, left - operators will stack up
+        before being resolved, so we do need a stack of operators, and we risk blowing the rpn stack.
         """
         self.begin(node)
 
         self.visit(node.left)
-        self.visit(node.op)
         self.visit(node.right)
+        self.visit(node.op)
 
         log.info(self.pending_ops)
         assert self.pending_ops
+        if len(self.pending_ops) > 4:
+            raise RpnError("We blew our expression stack %s" % self.pending_ops)
         # assert len(self.pending_ops) == 1  # TODO if this is true, then we don't need a op list
         self.program.insert(self.pending_ops[-1])
         self.pending_ops.pop()
