@@ -547,11 +547,17 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def visit_For(self, node):
         self.begin(node)
 
+        f = LabelFactory(local_label_allocator=self.local_labels, descriptive=self.debug_gen_descriptive_labels)
+        insert = self.insert
+
+        label_for = f.new('for')
+        label_resume = f.new('resume')
+
         log.info(f'{self.indent} for')
         self.visit(node.target)
         self.for_loop_info.append(
             ForLoopItem(register=self.scopes.var_to_reg(node.target.id),
-                        label=self.local_labels.next_local_label))
+                        label=label_for.text))  # TODO change for loop and forloopitem to use Label objects
 
         log.info(f'{self.indent} in')
         self.visit(node.iter)
@@ -559,11 +565,15 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         log.info(f'{self.indent} :')
         self.program.insert(f'LBL {self.for_loop_info[-1].label}')
 
+        self.resume_labels.append(label_resume)  # just in case we hit a break
+        self.continue_labels.append(label_for)  # just in case we hit a continue
+
         self.body_or_else(node)
 
         self.program.insert(f'ISG {self.for_loop_info[-1].register}', comment=f'{self.for_loop_info[-1]}')
         self.program.insert(f'GTO {self.for_loop_info[-1].label}')
         self.for_loop_info.pop()
+        insert('LBL', label_resume)
         self.end(node)
 
 

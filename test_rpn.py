@@ -158,9 +158,10 @@ class RpnCodeGenTests(BaseTest):
             LBL 00
             ISG 00
             GTO 00
+            LBL 01  // resume
             RTN
             """)
-        self.compare(expected, lines, trace=False, dump=True)
+        self.compare(de_comment(expected), lines, trace=False, dump=True)
 
     def test_def_range_with_body_assign_global(self):
         lines = self.parse(dedent("""
@@ -181,9 +182,10 @@ class RpnCodeGenTests(BaseTest):
             STO "X"
             ISG 00
             GTO 00
+            LBL 01  // resume
             RTN
             """)
-        self.compare(expected, lines, trace=True, dump=True)
+        self.compare(de_comment(expected), lines, trace=True, dump=True)
 
     def test_def_range_with_body_assign_scoped(self):
         lines = self.parse(dedent("""
@@ -204,6 +206,7 @@ class RpnCodeGenTests(BaseTest):
             STO 01  // x
             ISG 00
             GTO 00
+            LBL 01  // resume
             RTN
             """)
         self.compare(de_comment(expected), lines, trace=True, dump=True)
@@ -230,6 +233,7 @@ class RpnCodeGenTests(BaseTest):
             STO 02  // y
             ISG 01
             GTO 00
+            LBL 01  // resume
             RTN
             """)
         self.compare(de_comment(expected), lines, trace=True, dump=True)
@@ -258,6 +262,7 @@ class RpnCodeGenTests(BaseTest):
             STO+ "X"
             ISG 00
             GTO 00
+            LBL 01  // resume
             RCL "X"
             RTN
             """)
@@ -301,6 +306,7 @@ class RpnCodeGenTests(BaseTest):
             STO+ 01 // total +=
             ISG 02  // i
             GTO 00
+            LBL 01  // resume
             RCL 01  // total
             RTN
             """)
@@ -338,6 +344,7 @@ class RpnCodeGenTests(BaseTest):
             STO+ 01   // x +=
             ISG 02    // i
             GTO 00
+            LBL 01  // resume
             RCL 01    // leave x on stack
             RTN
             """)
@@ -1368,6 +1375,31 @@ class RpnCodeGenTests(BaseTest):
             GTO 00  // continue (loop again)
             GTO 00  // while (loop again)
             LBL 02  // resume
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
+
+    # @unittest.skip('offline')
+    def test_for_continue(self):
+        src = """
+            for i in range(1,3):
+                continue
+                VIEW(i)
+        """
+        expected = dedent("""
+            1
+            3
+            1000
+            /
+            +
+            STO 00
+            LBL 00  // TODO this may be wrong because test is not tested before body
+            GTO 00  // (continue)
+            //GTO 01  // resume (break)
+            VIEW 00 // i
+            ISG 00
+            GTO 00  // for
+            LBL 01  // resume
         """)
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
