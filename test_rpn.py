@@ -1404,6 +1404,30 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
 
+    # @unittest.skip('offline')
+    def test_for_break(self):
+        src = """
+            for i in range(1,3):
+                break
+                VIEW(i)
+        """
+        expected = dedent("""
+            1
+            3
+            1000
+            /
+            +
+            STO 00
+            LBL 00  // TODO this may be wrong because test is not tested before body
+            GTO 01  // resume (break)
+            VIEW 00 // i
+            ISG 00
+            GTO 00  // for
+            LBL 01  // resume
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
+
     @unittest.skip('offline')
     def test_while_else_break(self):
         """
