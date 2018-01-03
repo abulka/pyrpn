@@ -488,7 +488,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def visit_Expr(self, node):
         pass
 
-    cmpops = {"Eq":"X=Y?", "NotEq":"//!=", "Lt":"X<Y?", "LtE":"//<=", "Gt":"X<Y?", "GtE":"//>=",
+    # Most of these operators map to rpn in the opposite way, because of the stack order etc.
+    cmpops = {"Eq":"X=Y?", "NotEq":"//!=", "Lt":"X>Y?", "LtE":"//<=", "Gt":"X<Y?", "GtE":"//>=",
               "Is":"//is", "IsNot":"//is not", "In":"//in", "NotIn":"//not in"}
     def visit_Compare(self, node):
         """

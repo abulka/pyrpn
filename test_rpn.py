@@ -1287,8 +1287,7 @@ class RpnCodeGenTests(BaseTest):
             LBL 00  // while
             1
             2
-            // X>Y?
-            X<Y?  // TODO this is WRONG
+            X>Y?
             GTO 01  // while body
             GTO 02  // resume
             LBL 01  // while body
