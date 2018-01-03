@@ -441,7 +441,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         insert('GTO', label_while)
 
         if label_else:
-            insert('GTO', label_resume)
+            insert('LBL', label_else)
 
         insert('LBL', label_resume)
         self.end(node)

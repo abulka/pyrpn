@@ -1297,3 +1297,37 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
 
+    def test_while_else(self):
+        """
+        The else clause is only executed when your while condition becomes false. If you break out of the loop,
+        or if an exception is raised, it won't be executed.
+
+        The else clause is executed if you exit a block normally, by hitting the loop condition or falling off the
+        bottom of a try block. It is not executed if you break or return out of a block, or raise an exception. It
+        works for not only while and for loops, but also try blocks.
+        """
+        src = """
+            n = 10
+            while n > 2:
+                n -= 1
+            else:
+                VIEW(n)
+        """
+        expected = dedent("""
+            10
+            STO 00  // n
+            LBL 00  // while
+            RCL 00
+            2
+            X<Y?
+            GTO 01  // while body
+            GTO 02  // else
+            LBL 01  // while body
+            GTO 00  // while (loop again)
+            LBL 02  // else
+            VIEW 00 // n
+            LBL 03  // resume
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
+
