@@ -325,6 +325,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.end(node)
             return
 
+        # if only one param to range, add implicit 0, which adjusted for ISG means -1
+        if self.for_loop_info and func_name == 'range' and len(node.args) == 1:
+            self.program.insert(-1)
+
         for item in node.args:
             self.visit(item)
         # self.visit(node.func)  # don't visit this name cos we emit it ourselves below, RPN style
@@ -488,13 +492,19 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         if '.Load' in str(node.ctx):
             assert isinstance(node.ctx, ast.Load)
             self.program.insert(f'RCL {self.scopes.var_to_reg(node.id)}', comment=node.id)
+            if self.for_loop_info:
+                self.program.insert('1')  # adjust the for loop end by -1 to conform to python range
+                self.program.insert('-')
             if self.var_name_is_loop_counter(node.id):
                 self.program.insert('IP')  # just get the integer portion of isg counter
         self.end(node)
 
     def visit_Num(self, node):
         self.begin(node)
-        self.program.insert(f'{self.pending_unary_op}{node.n}')
+        n = int(node.n)
+        if self.for_loop_info:
+            n -= 1  # adjust the for loop end by -1 to conform to python range
+        self.program.insert(f'{self.pending_unary_op}{n}')
         self.pending_unary_op = ''
         self.end(node)
 
@@ -573,6 +583,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         self.insert('LBL', label_for)
         self.program.insert(f'ISG {self.for_loop_info[-1].register}', comment=f'{self.for_loop_info[-1]}')
+        self.for_loop_info.pop()
         self.insert('GTO', label_for_body)
         self.insert('GTO', label_resume)
 
@@ -580,7 +591,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.body_or_else(node)
 
         self.insert('GTO', label_for)
-        self.for_loop_info.pop()
         insert('LBL', label_resume)
         self.end(node)
 

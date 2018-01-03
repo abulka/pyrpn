@@ -153,8 +153,8 @@ class RpnCodeGenTests(BaseTest):
             LBL "for_loo"
             
             // setup
-            1
-            200
+            0
+            199
             1000
             /
             +
@@ -172,6 +172,30 @@ class RpnCodeGenTests(BaseTest):
             """)
         self.compare(de_comment(expected), lines, trace=False, dump=True)
 
+    def test_for_range_one_param(self):
+        lines = self.parse(dedent("""
+            for i in range(20):
+                pass
+            """))
+        expected = dedent("""
+            // setup
+            -1
+            19
+            1000
+            /
+            +
+            STO 00
+            
+            LBL 00  // for
+            ISG 00  // test
+            GTO 01  // for body
+            GTO 02  // resume
+            LBL 01  // for body
+            GTO 00  // for
+            LBL 02  // resume
+            """)
+        self.compare(de_comment(expected), lines, trace=False, dump=True)
+
     def test_for_range_with_body_assign_global(self):
         lines = self.parse(dedent("""
             def another_for_loop():
@@ -180,8 +204,8 @@ class RpnCodeGenTests(BaseTest):
             """))
         expected = dedent("""
             LBL "another"
-            5
-            60
+            4
+            59
             1000
             /
             +
@@ -211,8 +235,8 @@ class RpnCodeGenTests(BaseTest):
             10
             STO 00
             
-            5
-            60
+            4
+            59
             1000
             /
             +
@@ -246,8 +270,8 @@ class RpnCodeGenTests(BaseTest):
             0
             STO "X"
             
-            2
-            4
+            1
+            3
             1000
             /
             +
@@ -293,8 +317,8 @@ class RpnCodeGenTests(BaseTest):
             0
             STO 01  // total
             
-            2
-            4
+            1
+            3
             1000
             /
             +
@@ -329,8 +353,8 @@ class RpnCodeGenTests(BaseTest):
                 VIEW(i)
         """
         expected = dedent("""
-            1
-            3
+            0
+            2
             1000
             /
             +
@@ -359,8 +383,8 @@ class RpnCodeGenTests(BaseTest):
                 VIEW(i)
         """
         expected = dedent("""
-            1
-            3
+            0
+            2
             1000
             /
             +
@@ -399,8 +423,10 @@ class RpnCodeGenTests(BaseTest):
             100
             STO 01    // x
             
-            10        // range start, 10
+            9        // range start, 10
             RCL 00    // range end, n
+            1         // adjust by -1 to conform to python specs
+            -
             1000
             /
             +
