@@ -1332,7 +1332,6 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
 
-    @unittest.skip('offline')
     def test_while_break(self):
         src = """
             while 1 < 2:

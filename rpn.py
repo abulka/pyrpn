@@ -451,12 +451,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         insert('LBL', label_resume)
         self.end(node)
 
-    # @recursive
-    # def visit_Break(self,node):
-    #     """ visit a Break node """
-    #     if self.resume_labels:
-    #         label = self.resume_labels.pop()
-    #         self.insert('GTO', label)
+    @recursive
+    def visit_Break(self,node):
+        """ visit a Break node """
+        if self.resume_labels:
+            label = self.resume_labels.pop()
+            self.insert('GTO', label)
 
     @recursive
     def visit_Lambda(self,node):
