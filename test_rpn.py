@@ -8,6 +8,7 @@ from rpn import RecursiveRpnVisitor
 import logging
 from logger import config_log
 import asttokens
+from rpn import RpnError
 
 log = logging.getLogger(__name__)
 config_log(log)
@@ -1247,6 +1248,30 @@ class RpnCodeGenTests(BaseTest):
             +
             STO 00
         """)
-        from rpn import RpnError
         self.assertRaises(RpnError, self.parse, dedent(src))
+
+    def test_expr_brackets(self):
+        src = """
+            x = ((1 + 2) * (6 + 2 - 3) * (2 + 7)) / 200       
+        """
+        expected = dedent("""
+            1
+            2
+            +
+            6
+            2
+            +
+            3
+            -
+            *
+            2
+            7
+            +
+            *
+            200
+            /
+            STO 00
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(expected, lines, dump=True, keep_comments=False)
 
