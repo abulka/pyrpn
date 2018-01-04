@@ -26,9 +26,25 @@ article {
 
 /* more mundane stuff*/
 
-h1 {
+.header h1 {
+    display: inline-block;
+    color: #a11f13;
     font-size: 1.75rem;
-    margin: 0 0 0.75rem 0;
+    font-family: "Roboto", "Lucida Grande", "DejaVu Sans", "Bitstream Vera Sans", Verdana, Arial, sans-serif;
+    margin-top: 0;
+    margin-right: 0;
+    margin-left: 0;
+    margin-bottom: 0.10em;
+}
+
+.header i {
+    clear: both;
+    display: block;
+}
+
+h3 {
+    margin-top: 0.5em;
+    margin-bottom: 3px;
 }
 
 .python {

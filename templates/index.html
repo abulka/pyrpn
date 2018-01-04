@@ -9,13 +9,16 @@
         <link rel="stylesheet" href="../static/index.css">
     </head>
    <body>
-
+        <!--<h1 style="background: #00bb00; margin: 5 5 0 0">Python code to RPN code converter</h1>-->
         <section class="container">
           <div class="left-half">
               <article>
-
-                  <h1>Enter Python Source Code:</h1>
-
+                  <div class="header">
+                      <h1>Python to RPN - source code converter</h1>
+                      <a style="float: right" href="help">help</a>
+                      <i>A new way to program HP calculators like the HP42S and <a href="http://thomasokken.com/free42/" target="_blank">Free42</a></i>
+                  </div>
+                    <h3>Enter Python Source Code:</h3>
                     <form id="mainform" method="POST" action="/">
                         {{ form.source(class_='python', id='id_python_text') }}
                         <input class="submit_button" title='Ctrl-ENTER' type="submit" value="Convert">
