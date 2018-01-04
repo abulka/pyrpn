@@ -36,11 +36,12 @@
                 <pre>{{ rpn }}</pre>
 
                 <textarea id="rpn" style="display: none">{{ rpn }}</textarea>
+                <textarea id="rpn_free42" style="display: none">{{ rpn_free42 }}</textarea>
 
                 <!-- The buttons used to copy the text -->
-                <button  title="Copy RPN text as shown"  onclick="myCopyFunction()">Copy</button>
+                <button title="Copy RPN text as shown"  onclick="myCopyFunction()">Copy</button>
                 <br>
-                <button title="Copy RPN text - ready to paste into Free42 calc (no comments, line numbers)" onclick="myCopyFunction2()">Copy for Free42</button>
+                <button title="Copy RPN text - ready to paste into Free42 calc (no comments, line numbers)" onclick="myCopyFunctionFree42()">Copy for Free42</button>
 
             </article>
           </div>
@@ -75,6 +76,13 @@
 
         function myCopyFunction() {
           var copyText = $('#rpn')[0];
+          copyText.select();
+          document.execCommand("Copy");
+          // alert(copyText.value);
+        }
+
+        function myCopyFunctionFree42() {
+          var copyText = $('#rpn_free42')[0];
           copyText.select();
           document.execCommand("Copy");
           // alert(copyText.value);

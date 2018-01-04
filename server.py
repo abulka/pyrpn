@@ -17,13 +17,16 @@ app.config.update(dict(
 @app.route('/', methods=["GET", "POST"])
 def index():
     rpn = ''
+    rpn_free42 = ''
     form = MyForm()
     if form.validate_on_submit():
-        rpn = do(form.source.data, comments=form.comments.data, linenos=form.line_numbers.data)
+        program = parse(form.source.data)
+        rpn = program.lines_to_str(comments=form.comments.data, linenos=form.line_numbers.data)
+        rpn_free42 = program.lines_to_str(comments=False, linenos=True)
     else:
-        rpn = 'Press Convert'
+        rpn = rpn_free42 = 'Press Convert'
 
-    return render_template('index.html', form=form, rpn=rpn)
+    return render_template('index.html', form=form, rpn=rpn, rpn_free42=rpn_free42)
 
 
 def do(source, comments=True, linenos=True):
