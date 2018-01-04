@@ -372,7 +372,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                     self.program.insert(0)  # no longer adjusted cos isg routine will do that
                 for item in node.args:
                     self.visit(item)
-                self.program.insert('XEQ i')
+                self.program.insert('XEQ d')
                 self.needed_templates.append('isg_prepare')
             register = self.for_loop_info[-1].register
             var_name = self.for_loop_info[-1].var_name

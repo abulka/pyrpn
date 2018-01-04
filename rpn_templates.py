@@ -3,7 +3,7 @@ from textwrap import dedent
 ISG_PREPARE = dedent("""
     RTN     // prevent any code above running into below inserted functions
 
-    LBL i   // template function "calculate_ISG", takes two params
+    LBL d   // template function "calculate_ISG", takes two params
     CF 99
     1
     -
@@ -11,15 +11,15 @@ ISG_PREPARE = dedent("""
     1
     -
     X>=0?
-    GTO j
+    GTO e
     ABS
     SF 99
-    LBL j
+    LBL e
     X<>Y
     1000
     /
     +
-    FSC? 99
+    FS?C 99
     +/-
     RTN  // returns ISG number in form a.bbb
     """)

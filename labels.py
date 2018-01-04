@@ -34,7 +34,7 @@ class FunctionLabels(object):
             return self.get_label(func_name)
 
         if label == None:
-            label = list('ABCDEFGHIJabcdefghij')[self.next_lbl]
+            label = list('ABCDEFGHIJabcde')[self.next_lbl]
             self.next_lbl += 1
         self.label_data[func_name] = label
         if called_from_def and func_name not in self.labels_created_by_def:

@@ -201,7 +201,7 @@ class RpnCodeGenTests(BaseTest):
             // setup
             RCL 00
             RCL 01
-            XEQ i
+            XEQ d
             STO 02  // range i
             
             LBL 00  // for
@@ -227,7 +227,7 @@ class RpnCodeGenTests(BaseTest):
             // setup
             0
             RCL 00
-            XEQ i
+            XEQ d
             STO 01  // i
             
             LBL 00  // for
@@ -365,7 +365,7 @@ class RpnCodeGenTests(BaseTest):
 
             10        // range start, 10
             RCL 00    // range end, n
-            XEQ i
+            XEQ d
             STO 02    // i our counter
 
             LBL 00  // for
