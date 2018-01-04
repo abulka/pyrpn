@@ -7,9 +7,9 @@
         <link rel="stylesheet" href="../static/js/lib/codemirror-5.33.0/codemirror.css">
         <script src="../static/js/lib/codemirror-5.33.0/python.js"></script>
         <link rel="stylesheet" href="../static/index.css">
+        <script src="../static/js/lib/clipboard.min.js"></script>
     </head>
    <body>
-        <!--<h1 style="background: #00bb00; margin: 5 5 0 0">Python code to RPN code converter</h1>-->
         <section class="container">
           <div class="left-half">
               <article>
@@ -38,23 +38,13 @@
                 <img src="static/calc_icon1.png" style="float: right;">
                 <pre>{{ rpn }}</pre>
 
-                <textarea id="rpn" type="hidden">{{ rpn }}</textarea>
-                <textarea id="rpn_free42" type="hidden">{{ rpn_free42 }}</textarea>
-
                 <!-- The buttons used to copy the text -->
-                <button title="Copy RPN text as shown"  onclick="myCopyFunction()">Copy</button>
-                <br>
-                <button title="Copy RPN text - ready to paste into Free42 calc (no comments, line numbers)" onclick="myCopyFunctionFree42()">Copy for Free42</button>
+                <button class="btn" data-clipboard-text="{{ rpn }}" title="Copy RPN text as shown">Copy</button>
+                <button class="btn" data-clipboard-text="{{ rpn_free42 }}" title="Copy RPN text - ready to paste into Free42 calc (no comments, line numbers)">Copy for Free42</button>
 
             </article>
           </div>
         </section>
-
-        <!--<br>-->
-        <!--<br>-->
-        <!--<br>-->
-        <!--<h1>Nostalgic images...</h1>-->
-        <!--<img src="https://i.ytimg.com/vi/-A7HB6YD12o/maxresdefault.jpg">-->
 
    </body>
 
@@ -76,26 +66,16 @@
              myCodeMirror1.focus()
              myCodeMirror1.setCursor(myCodeMirror1.lineCount(), 0)
 
-             // $('#rpn').hide();
          })
 
-        function myCopyFunction() {
-          var copyText = $('#rpn');
-          copyText.show()
-          copyText[0].select();
-          document.execCommand("Copy");
-          copyText.hide()
-          // alert(copyText.value);
-        }
-
-        function myCopyFunctionFree42() {
-          var copyText = $('#rpn_free42');
-          copyText.show()
-          copyText[0].select();
-          document.execCommand("Copy");
-          copyText.hide()
-          // alert(copyText.value);
-        }
+        <!-- 3. Instantiate clipboard by passing a string selector -->
+        var clipboard = new Clipboard('.btn');
+        clipboard.on('success', function(e) {
+            // console.log(e);
+        });
+        clipboard.on('error', function(e) {
+            // console.log(e);
+        });
 
     </script>
 
