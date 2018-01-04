@@ -35,6 +35,10 @@ def do(source, comments=True, linenos=True):
     return rpn
 
 
+@app.route('/help')
+def help():
+    return render_template('help.html')
+
 @app.route('/hello')
 def hello():
     return render_template('hello.html', name='andy')
