@@ -33,9 +33,14 @@
             <article>
                <!--<h1>RPN</h1>-->
                 <img src="static/calc_icon1.png" style="float: right;">
-               <pre>
-{{ rpn }}
-               </pre>
+                <pre>{{ rpn }}</pre>
+
+                <textarea id="rpn" style="display: none">{{ rpn }}</textarea>
+
+                <!-- The buttons used to copy the text -->
+                <button  title="Copy RPN text as shown"  onclick="myCopyFunction()">Copy</button>
+                <br>
+                <button title="Copy RPN text - ready to paste into Free42 calc (no comments, line numbers)" onclick="myCopyFunction2()">Copy for Free42</button>
 
             </article>
           </div>
@@ -67,6 +72,14 @@
              myCodeMirror1.focus()
              myCodeMirror1.setCursor(myCodeMirror1.lineCount(), 0)
          })
+
+        function myCopyFunction() {
+          var copyText = $('#rpn')[0];
+          copyText.select();
+          document.execCommand("Copy");
+          // alert(copyText.value);
+        }
+
     </script>
 
 
