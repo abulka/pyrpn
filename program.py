@@ -31,6 +31,21 @@ class Program(object):
         self._add_line(line)
         log.debug(line.text)
 
+    def insert_raw_lines(self, text):
+        # inserts rpn text, removes any blank lines, preserves comments
+        for line in text.split('\n'):
+            comment_pos = line.find('//')
+            if comment_pos != -1:
+                clean_line = line[0:comment_pos].strip()
+                if clean_line == '':
+                    continue
+                comment = line[comment_pos + 2:].strip()
+                self.insert(clean_line, comment)
+            elif line.strip() == '':
+                continue
+            else:
+                self.insert(line)
+
     def lines_to_str(self, comments=False, linenos=False):
         result = []
         for line in self.lines:

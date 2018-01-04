@@ -8,5 +8,6 @@ def parse(text):
     visitor = RecursiveRpnVisitor()
     visitor.atok = atok
     visitor.visit(tree)
+    visitor.finish()
     # visitor.program.dump()
     return visitor.program

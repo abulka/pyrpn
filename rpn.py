@@ -7,6 +7,7 @@ from labels import FunctionLabels
 from attr import attrs, attrib, Factory
 import settings
 from cmd_list import cmd_list
+import rpn_templates
 
 log = logging.getLogger(__name__)
 config_log(log)
@@ -27,6 +28,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.resume_labels = []  # created by the current while or for loop so that break and continue know where to go
         self.continue_labels = []  # created by the current while or for loop so that break and continue know where to go
         self.for_loop_info = []
+        self.needed_templates = []  # extra fragments that need to be emitted at the end
         self.log_indent = 0
         self.first_def_label = None
         self.debug_gen_descriptive_labels = False
@@ -140,6 +142,13 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def make_local_label(self, node):
         self.program.insert(f'LBL {self.labels.func_to_lbl(node.name, called_from_def=True)}', comment=f'def {node.name}')
+
+    # Finishing up
+
+    def finish(self):
+        if 'isg_prepare' in self.needed_templates:
+            self.program.insert_raw_lines(rpn_templates.ISG_PREPARE)
+
 
     # Visit functions
 
@@ -336,21 +345,46 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.end(node)
             return
 
-        # if only one param to range, add implicit 0, which adjusted for ISG means -1
-        if self.for_loop_info and func_name == 'range' and len(node.args) == 1:
-            self.program.insert(-1)
-
-        for item in node.args:
-            self.visit(item)
-        # self.visit(node.func)  # don't visit this name cos we emit it ourselves below, RPN style
-
         if self.for_loop_info and func_name == 'range':
-            self.program.insert(1000)
-            self.program.insert('/')
-            self.program.insert('+')
+
+            # Look ahead optimisation for ranges with simple number literals as parameters (no expressions or vars)
+            def both_literals():
+                for arg in node.args:
+                    if not isinstance(arg, ast.Num):
+                        return False
+                return True
+
+            def num_after_point(x):
+                # returns the frac digits, excluding the .
+                s = str(x)
+                if '.' not in s: raise RpnError(f'cannot construct range ISG value based on to of {x}')
+                return s[s.index('.') + 1:]
+
+            if both_literals():
+                from_ = int(self.get_node_name_id_or_n(node.args[0])) - 1 if len(node.args) == 2 else -1
+                to_ = int(self.get_node_name_id_or_n(node.args[1])) - 1 if len(node.args) == 2 else int(self.get_node_name_id_or_n(node.args[0])) - 1
+                self.program.insert(f'{from_}.{num_after_point(to_ / 1000)}')
+            else:
+                # range call involves complexity (expressions or variables)
+                if len(node.args) == 1:
+                    # if only one param to range, add implicit 0, which adjusted for ISG means -1
+                    # self.program.insert(-1)
+                    self.program.insert(0)  # no longer adjusted cos isg routine will do that
+                for item in node.args:
+                    self.visit(item)
+                self.program.insert('XEQ i')
+                self.needed_templates.append('isg_prepare')
             register = self.for_loop_info[-1].register
             var_name = self.for_loop_info[-1].var_name
             self.program.insert(f'STO {register}', comment=f'range {var_name}')
+        else:
+            # Common arg parsing for all functions
+            for item in node.args:
+                self.visit(item)
+            # self.visit(node.func)  # don't visit this name cos we emit it ourselves below, RPN style
+
+        if self.for_loop_info and func_name == 'range':
+            pass  # already done our work, above
         elif func_name in cmd_list:
             # The built-in command is a simple one without command arg fragment "parameter" parts - yes it may take
             # actual parameters but these are generated through normal visit parsing and available on the stack.
@@ -503,9 +537,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         if '.Load' in str(node.ctx):
             assert isinstance(node.ctx, ast.Load)
             self.program.insert(f'RCL {self.scopes.var_to_reg(node.id)}', comment=node.id)
-            if self.for_loop_info:
-                self.program.insert('1')  # adjust the for loop end by -1 to conform to python range
-                self.program.insert('-')
+            # if self.for_loop_info:
+            #     self.program.insert('1')  # adjust the for loop end by -1 to conform to python range
+            #     self.program.insert('-')
             if self.var_name_is_loop_counter(node.id):
                 self.program.insert('IP')  # just get the integer portion of isg counter
         self.end(node)
@@ -513,8 +547,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def visit_Num(self, node):
         self.begin(node)
         n = int(node.n)
-        if self.for_loop_info:
-            n -= 1  # adjust the for loop end by -1 to conform to python range
+        # if self.for_loop_info:
+        #     n -= 1  # adjust the for loop end by -1 to conform to python range
         self.program.insert(f'{self.pending_unary_op}{n}')
         self.pending_unary_op = ''
         self.end(node)
