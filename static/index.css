@@ -1,6 +1,7 @@
 .container {
     display: grid;
     /*grid-template-columns: auto auto;*/
+    grid-template-columns: 60% auto;
     /*grid-gap: 10px;*/
 }
 
@@ -37,7 +38,6 @@ h1 {
     /*flex: 1; !* consume available width *!*/
     font-family: monospace;
     font-size: large;
-    display: none;
 }
 
 .submit_button {

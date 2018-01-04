@@ -50,7 +50,9 @@
    </body>
 
     <script>
-        var options1 = {lineNumbers: true, mode: "python"}
+        var options1 = {lineNumbers: true,
+                        mode: "python",
+                        lineWrapping: true}
         var myCodeMirror1 = CodeMirror.fromTextArea($('#id_python_text').get(0), options1);
 
         $(document).keydown(function(e) {
