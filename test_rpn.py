@@ -240,7 +240,6 @@ class RpnCodeGenTests(BaseTest):
             """) + ISG_PREPARE
         self.compare(de_comment(expected), lines, trace=False, dump=True)
 
-    @unittest.skip('for offline')
     def test_for_range_loop_view_i(self):
         lines = self.parse(dedent("""
             for i in range(1,20):
@@ -248,11 +247,7 @@ class RpnCodeGenTests(BaseTest):
         """))
         expected = dedent("""
             // setup
-            0
-            19
-            1000
-            /
-            +
+            0.019
             STO 00
             
             LBL 00  // for
@@ -268,7 +263,6 @@ class RpnCodeGenTests(BaseTest):
             """)
         self.compare(de_comment(expected), lines, trace=False, dump=True)
 
-    @unittest.skip('for offline')
     def test_for_range_with_body_accessing_i(self):
         lines = self.parse(dedent("""
             def range_i():
@@ -283,11 +277,7 @@ class RpnCodeGenTests(BaseTest):
             0
             STO "X"
             
-            1
-            3
-            1000
-            /
-            +
+            1.003
             STO 00  // i =
                         
             LBL 00  // for
@@ -307,7 +297,6 @@ class RpnCodeGenTests(BaseTest):
             """)
         self.compare(de_comment(expected), lines, trace=True, dump=True)
 
-    @unittest.skip('for offline')
     def test_for_complex1(self):
         lines = self.parse(dedent("""
             def range_complex():
@@ -331,11 +320,7 @@ class RpnCodeGenTests(BaseTest):
             0
             STO 01  // total
             
-            1
-            3
-            1000
-            /
-            +
+            1.003
             STO 02  // i =
 
             LBL 00  // for
@@ -360,7 +345,6 @@ class RpnCodeGenTests(BaseTest):
             """)
         self.compare(de_comment(expected), lines, trace=True, dump=True)
 
-    @unittest.skip('for offline')
     def test_for_complex2(self):
         lines = self.parse(dedent("""
             def looper(n):
@@ -379,13 +363,9 @@ class RpnCodeGenTests(BaseTest):
             100
             STO 01    // x
 
-            9        // range start, 10
+            10        // range start, 10
             RCL 00    // range end, n
-            1         // adjust by -1 to conform to python specs
-            -
-            1000
-            /
-            +
+            XEQ i
             STO 02    // i our counter
 
             LBL 00  // for
@@ -405,10 +385,9 @@ class RpnCodeGenTests(BaseTest):
             LBL 02  // resume
             RCL 01    // leave x on stack
             RTN
-            """)
+            """) + ISG_PREPARE
         self.compare(de_comment(expected), lines, dump=True, trace=True)
 
-    @unittest.skip('for offline')
     def test_for_continue(self):
         src = """
             for i in range(1,3):
@@ -416,11 +395,7 @@ class RpnCodeGenTests(BaseTest):
                 PSE()
         """
         expected = dedent("""
-            0
-            2
-            1000
-            /
-            +
+            0.002
             STO 00
             
             LBL 00  // for
@@ -438,7 +413,6 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
 
-    @unittest.skip('for offline')
     def test_for_break(self):
         src = """
             for i in range(1,3):
@@ -446,11 +420,7 @@ class RpnCodeGenTests(BaseTest):
                 PSE()
         """
         expected = dedent("""
-            0
-            2
-            1000
-            /
-            +
+            0.002
             STO 00
             
             LBL 00  // for
