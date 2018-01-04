@@ -38,8 +38,8 @@
                 <img src="static/calc_icon1.png" style="float: right;">
                 <pre>{{ rpn }}</pre>
 
-                <textarea id="rpn" style="display: none">{{ rpn }}</textarea>
-                <textarea id="rpn_free42" style="display: none">{{ rpn_free42 }}</textarea>
+                <textarea id="rpn" type="hidden">{{ rpn }}</textarea>
+                <textarea id="rpn_free42" type="hidden">{{ rpn_free42 }}</textarea>
 
                 <!-- The buttons used to copy the text -->
                 <button title="Copy RPN text as shown"  onclick="myCopyFunction()">Copy</button>
@@ -75,19 +75,25 @@
          $(document).ready(function () {
              myCodeMirror1.focus()
              myCodeMirror1.setCursor(myCodeMirror1.lineCount(), 0)
+
+             // $('#rpn').hide();
          })
 
         function myCopyFunction() {
-          var copyText = $('#rpn')[0];
-          copyText.select();
+          var copyText = $('#rpn');
+          copyText.show()
+          copyText[0].select();
           document.execCommand("Copy");
+          copyText.hide()
           // alert(copyText.value);
         }
 
         function myCopyFunctionFree42() {
-          var copyText = $('#rpn_free42')[0];
-          copyText.select();
+          var copyText = $('#rpn_free42');
+          copyText.show()
+          copyText[0].select();
           document.execCommand("Copy");
+          copyText.hide()
           // alert(copyText.value);
         }
 
