@@ -4,14 +4,16 @@ from wtforms.validators import DataRequired, Email
 from textwrap import dedent
 
 sample_source = dedent("""
-    def main():
-        pass
+    def demo():
+        total = 0
+        for i in range(10):
+            result = add(i, 5)
+            aview('Counter ', i, ' total ', total)
+        aview('Final total was: ', total)
         
-    def useful():  # rpn: export
-        pass
-        
-    main()
-    useful()
+    def add(a,b):
+        # helper function to add two numbers :-)
+        return a + b
 """)
 
 class MyForm(FlaskForm):
