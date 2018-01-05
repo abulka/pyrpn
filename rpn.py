@@ -34,7 +34,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.debug_gen_descriptive_labels = False
         self.node_desc_short = lambda node : str(node)[6:9].strip() + '_' + str(node)[-4:-1].strip()
         self.insert = lambda cmd, label : self.program.insert(f'{cmd} {label.text}', comment=label.description)
-
+        self.inside_alpha = False
 
     # Recursion support
 
@@ -322,8 +322,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             return
 
         elif func_name == 'AVIEW':
-            alpha_text = self.get_node_name_id_or_n(node.args[0])
-            self.split_alpha_text(alpha_text)
+            if len(node.args) > 0:
+                alpha_text = self.get_node_name_id_or_n(node.args[0])
+                self.split_alpha_text(alpha_text)
             self.program.insert(f'{func_name}')
             self.end(node)
             return
@@ -333,6 +334,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.split_alpha_text(alpha_text)
 
             if len(node.args) > 0:
+                self.inside_alpha = True
                 skip_first = True
                 for arg in node.args:
                     if skip_first:
@@ -342,7 +344,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                     # if isinstance(arg, ast.Num):
                     if isinstance(arg, ast.Name):  # probably a recall of a register into stack X
                         self.program.insert('AIP')
+                    elif isinstance(arg, ast.Str):  # a literal string
+                        pass  # visit_Name will insert a alpha text append for us
+                    else:
+                        raise RpnError(f'Do not know how to alpha {arg} with value {self.get_node_name_id_or_n(arg)}')
                     # TODO what about string and string concatination etc.?
+                self.inside_alpha = False
             self.end(node)
             return
 
@@ -590,10 +597,11 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def visit_Str(self, node):
         self.begin(node)
-        # self.program.insert(f'{self.pending_unary_op}"{node.s}"')
-        # self.pending_unary_op = ''
-        self.program.insert(f'"{node.s}"')
-        self.program.insert('ASTO ST X')
+        if self.inside_alpha:
+            self.program.insert(f'├"{node.s}"')
+        else:
+            self.program.insert(f'"{node.s}"')
+            self.program.insert('ASTO ST X')
         self.end(node)
 
     @recursive

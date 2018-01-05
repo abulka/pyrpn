@@ -1517,6 +1517,16 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
 
+    def test_alpha_AVIEW_n0_args(self):
+        src = """
+            AVIEW()
+        """
+        expected = dedent("""
+            AVIEW
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
+
     def test_alpha_CLA(self):
         src = """
             CLA()
@@ -1573,6 +1583,27 @@ class RpnCodeGenTests(BaseTest):
             100
             STO 00
             "Ans: "
+            RCL 00
+            AIP
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
+
+    def test_alpha_AIP_extended_two(self):
+        """
+        Nicer way to build strings
+        """
+        src = """
+            n = 100
+            alpha("Ans: ", n, " and ", n)
+        """
+        expected = dedent("""
+            100
+            STO 00
+            "Ans: "
+            RCL 00
+            AIP
+            ├" and "
             RCL 00
             AIP
         """)
