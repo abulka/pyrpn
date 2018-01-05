@@ -321,15 +321,15 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.end(node)
             return
 
-        elif func_name == 'AVIEW':
-            if len(node.args) > 0:
-                alpha_text = self.get_node_name_id_or_n(node.args[0])
-                self.split_alpha_text(alpha_text)
-            self.program.insert(f'{func_name}')
-            self.end(node)
-            return
+        # elif func_name == 'AVIEW':
+        #     if len(node.args) > 0:
+        #         alpha_text = self.get_node_name_id_or_n(node.args[0])
+        #         self.split_alpha_text(alpha_text)
+        #     self.program.insert(f'{func_name}')
+        #     self.end(node)
+        #     return
 
-        elif func_name == 'alpha':
+        elif func_name in ('alpha', 'aview', 'print'):
             alpha_text = self.get_node_name_id_or_n(node.args[0])
             self.split_alpha_text(alpha_text)
 
@@ -350,6 +350,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                         raise RpnError(f'Do not know how to alpha {arg} with value {self.get_node_name_id_or_n(arg)}')
                     # TODO what about string and string concatination etc.?
                 self.inside_alpha = False
+            if func_name in ('aview', 'print'):
+                self.program.insert('AVIEW')
             self.end(node)
             return
 
@@ -598,9 +600,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def visit_Str(self, node):
         self.begin(node)
         if self.inside_alpha:
-            self.program.insert(f'├"{node.s}"')
+            self.program.insert(f'├"{node.s[0:15]}"')
         else:
-            self.program.insert(f'"{node.s}"')
+            self.program.insert(f'"{node.s[0:15]}"')
             self.program.insert('ASTO ST X')
         self.end(node)
 

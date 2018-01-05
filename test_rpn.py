@@ -1504,9 +1504,43 @@ class RpnCodeGenTests(BaseTest):
 
     # Text and the alpha register
 
-    def test_alpha_long_string_aview(self):
+    def test_alpha_AVIEW_no_args(self):
+        src = """
+            AVIEW()
+        """
+        expected = dedent("""
+            AVIEW
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
+
+    def test_alpha_AVIEW_with_arg(self):  # TODO - probably should not be allowed to take args?
+        src = """
+            AVIEW("hello")
+        """
+        expected = dedent("""
+            "hello"
+            ASTO ST X
+            AVIEW
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
+
+    def test_alpha_AVIEW_with_arg_long(self):  # TODO - probably should not be allowed to take args ?
         src = """
             AVIEW("Hello there all is well in London!!")
+        """
+        expected = dedent("""
+            "Hello there all"
+            ASTO ST X
+            AVIEW
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
+
+    def test_alpha_aview_long_string(self):
+        src = """
+            aview("Hello there all is well in London!!")
         """
         expected = dedent("""
             "Hello there al"
@@ -1517,12 +1551,25 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
 
-    def test_alpha_AVIEW_n0_args(self):
+    def test_alpha_print(self):
         src = """
-            AVIEW()
+            print("Hello")
         """
         expected = dedent("""
+            "Hello"
             AVIEW
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
+
+    def test_alpha_long_string(self):
+        src = """
+            alpha("Hello there all is well in London!!")
+        """
+        expected = dedent("""
+            "Hello there al"
+            ├"l is well in L"
+            ├"ondon!!"
         """)
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
