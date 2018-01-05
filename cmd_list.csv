@@ -13,14 +13,14 @@ AON,Alpha on. Select the ALPHA menu.
 ARCL,"Alpha recall. Copy data into the Alpha register, appending it to the current contents. Numbers are formatted using the current display format.  Parameter: register or variable.   (indirect allowed)"
 AROT,Alpha rotate. Rotate the Alpha register by the number of characters specified in the x-register.
 ASHF,Alpha shift. Shifts the six left-most characters out of the Alpha register.
-ASlN,Arc sine. Returns sin–1 x.
-ASlNH,Arc hyperbolic sine. Returns sinh–1 x.
+ASIN,Arc sine. Returns sin–1 x.
+ASINH,Arc hyperbolic sine. Returns sinh–1 x.
 ASSIGN,"Assign a function, program, or variable to a menu key in the CUSTOM menu. Parameter 1: function name, alpha program label, or variable name. Parameter 2: key number (01–18)."
 ASTO,Alpha store. Copy the first six characters in the Alpha register into a register or variable. Parameter: register or variable (indirect allowed)
 ATAN,Arc tangent. Returns tan–1 x.
 ATANH,Arc hyperbolic tangent. Returns tanh–1 x.
 ATOX,Alpha to X. Convert the left-most character in the Alpha register to its character code (returned to the x-register) and delete the character.
-AVlEW,Alpha view. Display the Alpha register.
+AVIEW,Alpha view. Display the Alpha register.
 BASE+,Base addition. Returns the 36-bit sum of y + x.
 BASE–,Base subtraction. Returns the 36-bit difference of y – x.
 BASEx,Base multiplication. Returns the 36-bit product of y x x.
@@ -28,7 +28,7 @@ BASE÷,Base division. Returns the 36-bit quotient of y ÷ x.
 BASE+/–,Base change sign. Returns the 36-bit 2's complement of x.
 BEEP,Sound a sequence of four tones.
 BEST,Select the best curve-fitting model for the current statistical data.
-BlNM,Select Binary mode (base 2)
+BINM,Select Binary mode (base 2)
 BIT?,"Test the xth bit of y. If the bit is set (1), execute the next program line; if the bit is clear (0), skip the next program line."
 BST,Back step. Move the program pointer to the previous program line. (Not programmable.)
 CF,Clear flag nn (00 ≤  nn ≤ 35 or 81 ≤  nn ≤ 99). Parameter: flag number (indirect allowed)
@@ -63,7 +63,7 @@ DIM?,Returns the dimensions of the matrix in the x-register (rows to the y-regis
 DOT,Dot Product.  Returns the dot product of two vectors (matrices or complex numbers).
 DSE,"Decrement, Skip if (less than or) Equal. Given ccccccc.fflii in a variable or register, decrements ccccccc by ii and skips the next program line if ccccccc is now ≤  fff. Parameter: register or variable (indirect allowed)"
 EDIT,Edit a matrix in the x-register.
-EDlTN,Edit a named matrix. Parameter: variable name (indirect allowed)
+EDITN,Edit a named matrix. Parameter: variable name (indirect allowed)
 END,End of a program.
 ENG,Select Engineering display format. Parameter: number of digits (indirect allowed)
 ENTER,"Separate two numbers keyed in sequentially; copies x into the y-register, y into the z-register, and z into the t-register, and loses t."
@@ -106,7 +106,7 @@ KEYX,"On menu key, execute. Execute (as a subroutine) specified label when a par
 LASTX,Last x. Recall the last value of x used in a calculation.
 LBL,Label. Identify programs and routines for execution and branching. Parameter: local or global label.
 LCLBL,Select Local label mode for the CUSTOM menu (to use CUSTOM menu assignments to execute local labels within the current program).
-LlNF,Select the linear curve-fitting model.
+LINF,Select the linear curve-fitting model.
 LINΣ,"Select Linear statistics mode, which uses six summation coefficients."
 LIST,Print a portion of a program listing. (Not programmable.) Parameter: number of lines.
 LN,Natural logarithm. Returns ln(x).
@@ -179,7 +179,7 @@ SEED,Store a seed for the random number generator.
 SF,Set flag nn (00 ≤ nn ≤ 35; 81 ≤ nn ≤ 99). Parameter: flag number (indirect allowed)
 SIGN,"Sign. Return 1 for x ≥ 0, –1 for x < 0, and 0 for non-numbers. Returns the unit vector of a complex number."
 SIN,Sine. Returns sin(x).
-SlNH,Hyperbolic sine. Returns sinh(x).
+SINH,Hyperbolic sine. Returns sinh(x).
 SIZE,Set the number of storage registers. Parameter: number of registers.
 SLOPE,Return the slope of the linear transformation of the current curve-fitting model.
 SOLVE,Solve for an unknown variable. Parameter: variable name (indirect allowed)
@@ -191,7 +191,7 @@ STO–,Store subtraction. Subtracts x from an existing register or variable. Par
 ST0×,Store multiplication. Multiplies an existing register or variable by x. Parameter: register or variable (indirect allowed)
 ST0÷,Store division. Divides an existing register or variable by x. Parameter: register or variable (indirect allowed)
 STOEL,Store element. Stores a copy of x into the current element of the indexed matrix.
-STOlJ,Moves the row- and column-pointers to I = x and J = y in the indexed matrix.
+STOIJ,Moves the row- and column-pointers to I = x and J = y in the indexed matrix.
 STOP,Stop program execution. (R/S in program entry mode).
 STR?,"If the x-register contains an Alpha string, execute the next program line; if the x-register does not contain an Alpha string, skip the next program line."
 SUM,Returns the sums Σx and Σy into the x- and y-registers.
@@ -223,7 +223,7 @@ XEQ,Execute a function or program. Parameter: function or label (indirect allowe
 XOR,Logical XOR (exclusive OR). Returns x XOR y.
 XTOA," X to Alpha. Appends a character (specified by the code in the x-register) to the Alpha register. If the x-register contains an Alpha string, appends the entire string."
 X↑2,Square. Returns x2.
-YlNT,y-intercept. Returns the y-intercept of the curve fitted to the current statistical data.
+YINT,y-intercept. Returns the y-intercept of the curve fitted to the current statistical data.
 Y↑X,Power. Returns yx.
 1/x,Reciprocal. Returns 1/x.
 10↑X,Common exponential. Returns 10x.

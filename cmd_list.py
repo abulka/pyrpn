@@ -76,6 +76,12 @@ cmd_list = \
                          'of the Alpha register.',
           'indirect_allowed': False,
           'num_arg_fragments': 0},
+ 'ASIN': {'description': 'Arc sine. Returns sin–1 x.',
+          'indirect_allowed': False,
+          'num_arg_fragments': 0},
+ 'ASINH': {'description': 'Arc hyperbolic sine. Returns sinh–1 x.',
+           'indirect_allowed': False,
+           'num_arg_fragments': 0},
  'ASSIGN': {'description': 'Assign a function, program, or variable to a menu '
                            'key in the CUSTOM menu. Parameter 1: function '
                            'name, alpha program label, or variable name. '
@@ -87,12 +93,6 @@ cmd_list = \
                          'Parameter: register or variable (indirect allowed)',
           'indirect_allowed': True,
           'num_arg_fragments': 1},
- 'ASlN': {'description': 'Arc sine. Returns sin–1 x.',
-          'indirect_allowed': False,
-          'num_arg_fragments': 0},
- 'ASlNH': {'description': 'Arc hyperbolic sine. Returns sinh–1 x.',
-           'indirect_allowed': False,
-           'num_arg_fragments': 0},
  'ATAN': {'description': 'Arc tangent. Returns tan–1 x.',
           'indirect_allowed': False,
           'num_arg_fragments': 0},
@@ -104,7 +104,7 @@ cmd_list = \
                          'the x-register) and delete the character.',
           'indirect_allowed': False,
           'num_arg_fragments': 0},
- 'AVlEW': {'description': 'Alpha view. Display the Alpha register.',
+ 'AVIEW': {'description': 'Alpha view. Display the Alpha register.',
            'indirect_allowed': False,
            'num_arg_fragments': 0},
  'BASE+': {'description': 'Base addition. Returns the 36-bit sum of y + x.',
@@ -133,6 +133,9 @@ cmd_list = \
                          'statistical data.',
           'indirect_allowed': False,
           'num_arg_fragments': 0},
+ 'BINM': {'description': 'Select Binary mode (base 2)',
+          'indirect_allowed': False,
+          'num_arg_fragments': 0},
  'BIT?': {'description': 'Test the xth bit of y. If the bit is set (1), '
                          'execute the next program line; if the bit is clear '
                          '(0), skip the next program line.',
@@ -142,9 +145,6 @@ cmd_list = \
                         'program line. (Not programmable.)',
          'indirect_allowed': False,
          'num_arg_fragments': 0},
- 'BlNM': {'description': 'Select Binary mode (base 2)',
-          'indirect_allowed': False,
-          'num_arg_fragments': 0},
  'CF': {'description': 'Clear flag nn (00 ≤  nn ≤ 35 or 81 ≤  nn ≤ 99). '
                        'Parameter: flag number (indirect allowed)',
         'indirect_allowed': True,
@@ -276,7 +276,7 @@ cmd_list = \
  'EDIT': {'description': 'Edit a matrix in the x-register.',
           'indirect_allowed': False,
           'num_arg_fragments': 0},
- 'EDlTN': {'description': 'Edit a named matrix. Parameter: variable name '
+ 'EDITN': {'description': 'Edit a named matrix. Parameter: variable name '
                           '(indirect allowed)',
            'indirect_allowed': True,
            'num_arg_fragments': 1},
@@ -464,6 +464,9 @@ cmd_list = \
                           'within the current program).',
            'indirect_allowed': False,
            'num_arg_fragments': 0},
+ 'LINF': {'description': 'Select the linear curve-fitting model.',
+          'indirect_allowed': False,
+          'num_arg_fragments': 0},
  'LINΣ': {'description': 'Select Linear statistics mode, which uses six '
                          'summation coefficients.',
           'indirect_allowed': False,
@@ -484,9 +487,6 @@ cmd_list = \
          'indirect_allowed': False,
          'num_arg_fragments': 0},
  'LOGF': {'description': 'Select the logarithmic curve-fitting model.',
-          'indirect_allowed': False,
-          'num_arg_fragments': 0},
- 'LlNF': {'description': 'Select the linear curve-fitting model.',
           'indirect_allowed': False,
           'num_arg_fragments': 0},
  'MAN': {'description': 'Select Manual print mode.',
@@ -753,6 +753,9 @@ cmd_list = \
  'SIN': {'description': 'Sine. Returns sin(x).',
          'indirect_allowed': False,
          'num_arg_fragments': 0},
+ 'SINH': {'description': 'Hyperbolic sine. Returns sinh(x).',
+          'indirect_allowed': False,
+          'num_arg_fragments': 0},
  'SIZE': {'description': 'Set the number of storage registers. Parameter: '
                          'number of registers.',
           'indirect_allowed': False,
@@ -796,13 +799,13 @@ cmd_list = \
                           'element of the indexed matrix.',
            'indirect_allowed': False,
            'num_arg_fragments': 0},
- 'STOP': {'description': 'Stop program execution. (R/S in program entry mode).',
-          'indirect_allowed': False,
-          'num_arg_fragments': 0},
- 'STOlJ': {'description': 'Moves the row- and column-pointers to I = x and J = '
+ 'STOIJ': {'description': 'Moves the row- and column-pointers to I = x and J = '
                           'y in the indexed matrix.',
            'indirect_allowed': False,
            'num_arg_fragments': 0},
+ 'STOP': {'description': 'Stop program execution. (R/S in program entry mode).',
+          'indirect_allowed': False,
+          'num_arg_fragments': 0},
  'STO–': {'description': 'Store subtraction. Subtracts x from an existing '
                          'register or variable. Parameter: register or '
                          'variable (indirect allowed)',
@@ -817,9 +820,6 @@ cmd_list = \
                         'y-registers.',
          'indirect_allowed': False,
          'num_arg_fragments': 0},
- 'SlNH': {'description': 'Hyperbolic sine. Returns sinh(x).',
-          'indirect_allowed': False,
-          'num_arg_fragments': 0},
  'TAN': {'description': 'Tangent. Returns tan(x).',
          'indirect_allowed': False,
          'num_arg_fragments': 0},
@@ -935,7 +935,7 @@ cmd_list = \
                          'program line',
           'indirect_allowed': False,
           'num_arg_fragments': 0},
- 'YlNT': {'description': 'y-intercept. Returns the y-intercept of the curve '
+ 'YINT': {'description': 'y-intercept. Returns the y-intercept of the curve '
                          'fitted to the current statistical data.',
           'indirect_allowed': False,
           'num_arg_fragments': 0},
