@@ -1501,3 +1501,21 @@ class RpnCodeGenTests(BaseTest):
         """)
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
+
+    # Text and the alpha register
+
+    def test_alpha_long_string_aview(self):
+        src = """
+            AVIEW("Hello there all is well in London!!")
+        """
+        expected = dedent("""
+            "Hello there al"
+            ├"l is well in L"
+            ├"ondon!!"
+            AVIEW
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
+
+
+

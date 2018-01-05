@@ -143,6 +143,15 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def make_local_label(self, node):
         self.program.insert(f'LBL {self.labels.func_to_lbl(node.name, called_from_def=True)}', comment=f'def {node.name}')
 
+    def split_alpha_text(self, alpha_text):
+        first = True
+        while alpha_text:
+            fragment = alpha_text[0:14]
+            alpha_text = alpha_text[14:]
+            leading_symbol = '' if first else '├'
+            first = False
+            self.program.insert(f'{leading_symbol}"{fragment}"', comment=alpha_text)
+
     # Finishing up
 
     def finish(self):
@@ -311,6 +320,14 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 self.scopes.var_to_reg(arg, force_reg_name=f'"{arg}"')
             self.end(node)
             return
+
+        elif func_name == 'AVIEW':
+            alpha_text = self.get_node_name_id_or_n(node.args[0])
+            self.split_alpha_text(alpha_text)
+            self.program.insert(f'{func_name}')
+            self.end(node)
+            return
+
 
         elif func_name in cmd_list and cmd_list[func_name]['num_arg_fragments'] > 0:
             # The built-in command has arg fragment "parameter" parts which must be emitted immediately as part of the
