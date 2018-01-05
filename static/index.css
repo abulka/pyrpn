@@ -10,6 +10,7 @@
     margin-right: 0px;
     margin-left: 0px;
     max-width: inherit; /* was -webkit-fill-available but pycharm complained */
+    margin-top: 1em;
 }
 
 article {
@@ -45,7 +46,7 @@ article pre {
 .header h1 {
     display: inline-block;
     color: #a11f13;
-    font-size: 1.75rem;
+    font-size: 2.5em;
     font-family: "Roboto", "Lucida Grande", "DejaVu Sans", "Bitstream Vera Sans", Verdana, Arial, sans-serif;
     margin-top: 0;
     margin-right: 0;
