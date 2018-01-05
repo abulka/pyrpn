@@ -328,6 +328,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.end(node)
             return
 
+        elif func_name == 'alpha':
+            alpha_text = self.get_node_name_id_or_n(node.args[0])
+            self.split_alpha_text(alpha_text)
+            self.end(node)
+            return
+
 
         elif func_name in cmd_list and cmd_list[func_name]['num_arg_fragments'] > 0:
             # The built-in command has arg fragment "parameter" parts which must be emitted immediately as part of the

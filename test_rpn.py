@@ -1527,5 +1527,19 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
 
+    def test_alpha_ASTO(self):
+        src = """
+            alpha("Hello there all is well in London!!")
+            ASTO(s)  # Copy the first six characters into a register or variable
+        """
+        expected = dedent("""
+            "Hello there al"
+            ├"l is well in L"
+            ├"ondon!!"
+            ASTO 00
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
+
 
 
