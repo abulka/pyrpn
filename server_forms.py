@@ -17,4 +17,4 @@ sample_source = dedent("""
 class MyForm(FlaskForm):
     source = TextAreaField('source', default=sample_source, validators=[]) #, validators=[DataRequired()])
     comments = BooleanField('Generate comments', default=False)
-    line_numbers = BooleanField('Generate line numbers', default=True)
+    line_numbers = BooleanField('Generate line numbers', default=False)

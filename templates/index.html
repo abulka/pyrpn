@@ -6,22 +6,25 @@
         <script src="../static/js/lib/codemirror-5.33.0/codemirror.js"></script>
         <link rel="stylesheet" href="../static/js/lib/codemirror-5.33.0/codemirror.css">
         <script src="../static/js/lib/codemirror-5.33.0/python.js"></script>
-        <link rel="stylesheet" href="../static/index.css">
         <script src="../static/js/lib/clipboard.min.js"></script>
+        <script src="../static/js/lib/bootstrap.min.js"></script>
+        <link rel="stylesheet" href=../static/js/lib/bootstrap.min.css>
+        <link rel="stylesheet" href="../static/index.css">
+
     </head>
    <body>
-        <section class="container">
+        <section class="container custom-container">
           <div class="left-half">
               <article>
                   <div class="header">
                       <h1>Python to RPN - source code converter</h1>
                       <a style="float: right" href="help" target="_blank">help</a>
-                      <i>A new way to program HP calculators like the HP42S and <a href="http://thomasokken.com/free42/" target="_blank">Free42</a></i>
+                      <i>A new way to program HP calculators like the HP42S, DM42 and Free42</i>
                   </div>
                     <h3>Enter Python Source Code:</h3>
                     <form id="mainform" method="POST" action="/">
                         {{ form.source(class_='python', id='id_python_text') }}
-                        <input class="submit_button" title='Ctrl-ENTER' type="submit" value="Convert">
+                        <input class="submit_button" title='Ctrl-ENTER' data-toggle="tooltip" type="submit" value="Convert">
                         <br>
                         {{ form.comments.label }} {{ form.comments() }}
                         <br>
@@ -38,10 +41,11 @@
                 <img src="static/calc_icon1.png" style="float: right;">
                 <pre>{{ rpn }}</pre>
 
-                <!-- The buttons used to copy the text -->
-                <button class="btn" data-clipboard-text="{{ rpn }}" title="Copy RPN text as shown">Copy</button>
-                <button class="btn" data-clipboard-text="{{ rpn_free42 }}" title="Copy RPN text - ready to paste into Free42 calc (no comments, line numbers)">Copy for Free42</button>
-
+                <div id="result-view" style="display: none">
+                    <!-- The buttons used to copy the text -->
+                    <button class="btn btn-primary" data-clipboard-text="{{ rpn }}" title="Copy RPN text as shown">Copy</button>
+                    <button class="btn btn-primary" data-clipboard-text="{{ rpn_free42 }}" title="Copy RPN text - ready to paste into Free42 calc (no comments, line numbers)">Copy for Free42</button>
+                </div>
             </article>
           </div>
         </section>
@@ -49,6 +53,9 @@
    </body>
 
     <script>
+        var first_time = $('.right-half pre').text() == "Press Convert"
+        if (! first_time) $('#result-view').show()
+
         var options1 = {lineNumbers: true,
                         mode: "python",
                         lineWrapping: true}
@@ -68,13 +75,37 @@
 
          })
 
-        <!-- 3. Instantiate clipboard by passing a string selector -->
+        // Clipboard Copy
+        $('[data-toggle="tooltip"]').tooltip()
+        $('.btn').tooltip({
+          trigger: 'click',
+          placement: 'bottom'
+        });
+
+        function setTooltip(btn, message) {
+          btn.tooltip('hide')
+            .attr('data-original-title', message)
+            .tooltip('show');
+        }
+
+        function hideTooltip(btn) {
+          setTimeout(function() {
+            btn.tooltip('hide');
+          }, 1000);
+        }
+
+        // Clipboard Copy
         var clipboard = new Clipboard('.btn');
         clipboard.on('success', function(e) {
             // console.log(e);
+            var btn = $(e.trigger);
+            setTooltip(btn, 'Copied');
+            hideTooltip(btn);
         });
         clipboard.on('error', function(e) {
             // console.log(e);
+              setTooltip('Failed!');
+              hideTooltip();
         });
 
     </script>
