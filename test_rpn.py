@@ -1517,5 +1517,15 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
 
+    def test_alpha_CLA(self):
+        src = """
+            CLA()
+        """
+        expected = dedent("""
+            CLA
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
+
 
 
