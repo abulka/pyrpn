@@ -729,10 +729,10 @@ class RpnCodeGenTests(BaseTest):
             2
             XEQ A  // will call inner add, viz A
             RTN
-            LBL B  // outer def add()
-            STO 00
+            LBL B  // def add()
+            STO 02
             RDN
-            STO 01
+            STO 03
             RDN
             RTN
             """)
@@ -1192,9 +1192,9 @@ class RpnCodeGenTests(BaseTest):
             VIEW 01  // msg
             RTN  // end def selectr
             LBL A  // def num_to_txt
-            STO 00  // param: n
+            STO 02  // param: n
             RDN
-            RCL 00  // n
+            RCL 02  // n
             0
             X=Y?
             GTO 00  // if body
@@ -1204,7 +1204,7 @@ class RpnCodeGenTests(BaseTest):
             RTN  // return
             GTO 01  // resume
             LBL 03  // elif 1
-            RCL 00  // n
+            RCL 02  // n
             1
             X=Y?
             GTO 04  // elif body 1
@@ -1215,7 +1215,7 @@ class RpnCodeGenTests(BaseTest):
             RTN  // return
             GTO 01  // resume
             LBL 05  // elif 2
-            RCL 00  // n
+            RCL 02  // n
             2
             X=Y?
             GTO 06  // elif body 2
@@ -1658,4 +1658,35 @@ class RpnCodeGenTests(BaseTest):
         self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
 
 
+    # Scope
+
+    def test_scope_basic(self):
+        """
+        Every variable should be given a new register, unless that variable is named the same and we are in the
+        same scope.
+        """
+        lines = self.parse(dedent("""
+            def main():
+                x = 100
+                f(x)
+            
+            def f(a):
+                return a + 50
+            """))
+        expected = dedent("""
+            LBL "main"
+            100
+            STO 00
+            RCL 00
+            XEQ A
+            RTN
+            LBL A
+            STO 01
+            RDN
+            RCL 01
+            50
+            +
+            RTN
+            """)
+        self.compare(de_comment(expected), lines, dump=True)
 

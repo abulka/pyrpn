@@ -16,9 +16,10 @@ The stack can be empty.
 @attrs
 class Scopes(object):
     stack = attrib(default=Factory(list))
+    next_reg = attrib(default=0)
 
     def __attrs_post_init__(self):
-        self.stack.append(Scope(next_reg=0))  # permanent initial scope
+        self.stack.append(Scope())  # permanent initial scope
 
     def __len__(self):
         return len(self.stack)
@@ -32,7 +33,7 @@ class Scopes(object):
         return len(self.current.data) == 0
 
     def push(self):
-        self.stack.append(Scope(next_reg=self.current.next_reg))
+        self.stack.append(Scope())
 
     def pop(self):
         if len(self.stack) > 1:  # always leave first permanent scope
@@ -69,8 +70,8 @@ class Scopes(object):
 
     def _add_mapping(self, var, register=None):
         if register == None:
-            register = f'{self.current.next_reg:02d}'
-            self.current.next_reg += 1
+            register = f'{self.next_reg:02d}'
+            self.next_reg += 1
         self.current.data[var] = register
 
     def _has_mapping(self, var):
@@ -90,7 +91,6 @@ class Scopes(object):
 @attrs
 class Scope(object):
     data = attrib(default=Factory(dict))  # var name to register name
-    next_reg = attrib(default=0)
 
     @property
     def empty(self):

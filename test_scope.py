@@ -97,15 +97,36 @@ class ScopeTests(BaseTest):
         self.assertEqual('02', scopes.get_register('a'))
         self.assertEqual('03', scopes.get_register('zz'))
 
+    # New thinking - don't reuse registers and start testing var_to_reg() not _add_mapping()
+
     def test_register_allocation_multiple_scope_pop(self):
         scopes = Scopes()
-        scopes._add_mapping('a')
+        scopes.var_to_reg('a')
         self.assertEqual('00', scopes.get_register('a'))
         scopes.push()
-        scopes._add_mapping('a')
+        scopes.var_to_reg('a')
         self.assertEqual('01', scopes.get_register('a'))
         scopes.pop()
         self.assertEqual('00', scopes.get_register('a'))
-        scopes._add_mapping('b')
-        self.assertEqual('01', scopes.get_register('b'))
+        scopes.var_to_reg('b')
+        self.assertEqual('02', scopes.get_register('b'))
+
+    def test_do_not_reuse_registers(self):
+        scopes = Scopes()
+        scopes.var_to_reg('a')
+        self.assertEqual('00', scopes.get_register('a'))
+        scopes.push()
+        scopes.var_to_reg('a')
+        self.assertEqual('01', scopes.get_register('a'))
+        scopes.var_to_reg('b')
+        self.assertEqual('02', scopes.get_register('b'))
+        scopes.pop()
+        # Back at the original scope, only 'a' exists but registers 0,1,2 used
+        self.assertEqual('00', scopes.get_register('a'))
+        # new registers should be allocated for new var names
+        scopes.var_to_reg('nn')
+        self.assertEqual('03', scopes.get_register('nn'))
+        # new registers should be allocated for old var names that are now popped
+        scopes.var_to_reg('b')
+        self.assertEqual('04', scopes.get_register('b'))
 
