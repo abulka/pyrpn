@@ -331,6 +331,18 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         elif func_name == 'alpha':
             alpha_text = self.get_node_name_id_or_n(node.args[0])
             self.split_alpha_text(alpha_text)
+
+            if len(node.args) > 0:
+                skip_first = True
+                for arg in node.args:
+                    if skip_first:
+                        skip_first = False
+                        continue
+                    self.visit(arg)
+                    # if isinstance(arg, ast.Num):
+                    if isinstance(arg, ast.Name):  # probably a recall of a register into stack X
+                        self.program.insert('AIP')
+                    # TODO what about string and string concatination etc.?
             self.end(node)
             return
 

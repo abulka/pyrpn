@@ -1541,5 +1541,43 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
 
+    def test_alpha_AIP(self):
+        """
+        But what does it mean to refer to the X stack register?
+        Disallow. We append any register to alpha? Viz.
+        """
+        src = """
+            n = 100
+            alpha("Ans: ")
+            AIP(n)
+        """
+        expected = dedent("""
+            100
+            STO 00
+            "Ans: "
+            RCL 00
+            AIP
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
+
+    def test_alpha_AIP_extended(self):
+        """
+        Nicer way to build strings
+        """
+        src = """
+            n = 100
+            alpha("Ans: ", n)
+        """
+        expected = dedent("""
+            100
+            STO 00
+            "Ans: "
+            RCL 00
+            AIP
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
+
 
 
