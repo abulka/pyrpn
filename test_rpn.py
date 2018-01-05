@@ -1690,3 +1690,18 @@ class RpnCodeGenTests(BaseTest):
             """)
         self.compare(de_comment(expected), lines, dump=True)
 
+
+    def test_Pow(self):
+        """
+        Power function
+        """
+        lines = self.parse(dedent("""
+            5**2
+            """))
+        expected = dedent("""
+            5
+            2
+            Y↑X
+            """)
+        self.compare(de_comment(expected), lines, dump=True)
+

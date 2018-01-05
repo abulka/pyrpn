@@ -7,13 +7,14 @@ sample_source = dedent("""
     def demo():
         total = 0
         for i in range(10):
-            result = add(i, 5)
-            aview('Counter ', i, ' total ', total)
+            result = calc_something(i, 5)
+            aview('Counter ', i, ' result= ', total)
+            total += result
         aview('Final total was: ', total)
         
-    def add(a,b):
-        # helper function to add two numbers :-)
-        return a + b
+    def calc_something(a,b):
+        # adds two numbers then squares them
+        return (a + b)**2
 """)
 
 class MyForm(FlaskForm):

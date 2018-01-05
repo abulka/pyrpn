@@ -251,6 +251,13 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.pending_ops.append('/')
         self.end(node)
 
+    def visit_Pow(self,node):
+        """ visit a Power node """
+        self.begin(node)
+        self.pending_ops.append('Y↑X')
+        self.end(node)
+
+
     def visit_BinOp(self, node):
         """
         visit a BinOp node and visits it recursively,
