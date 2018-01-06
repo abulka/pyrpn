@@ -661,10 +661,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         log.info(f'{self.indent} for')
         self.visit(node.target)
-        self.for_loop_info.append(
-            ForLoopItem(var_name=node.target.id,
-                        register=self.scopes.var_to_reg(node.target.id),
-                        label=label_for))
+        varname = node.target.id
+        register = self.scopes.var_to_reg(varname)
+        self.for_loop_info.append(ForLoopItem(varname, register, label_for))
 
         log.info(f'{self.indent} in')
         self.visit(node.iter)
@@ -675,7 +674,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.continue_labels.append(label_for)  # just in case we hit a continue
 
         self.insert('LBL', label_for)
-        self.program.insert(f'ISG {self.for_loop_info[-1].register}', comment=f'{node.target.id}')
+        self.program.insert(f'ISG {register}', comment=f'{varname}')
         self.for_loop_info.pop()
         self.insert('GTO', label_for_body)
         self.insert('GTO', label_resume)

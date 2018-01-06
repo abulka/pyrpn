@@ -1244,7 +1244,7 @@ class RpnCodeGenTests(BaseTest):
         """
         expected = dedent("""
             1
-            STO 00  // x = # my comment
+            STO 00  // x
         """)
         lines = self.parse(dedent(src))
         self.compare(expected, lines, dump=True, keep_comments=True)
