@@ -41,27 +41,18 @@ def do(source, comments=True, linenos=True):
 
 db = redis.Redis('localhost') #connect to server
 
-# @app.route('/r/', defaults={'path': ''}, methods = ['PUT', 'GET'])
-# @app.route('/r/<path:path>', methods = ['PUT', 'GET'])
 @app.route('/examples')
 def list_examples():
-
-    # if (request.method == 'PUT'):
-    #     event = request.json
-    #     event['last_updated'] = int(time.time())
-    #     event['ttl'] = ttl
-    #     db.delete(path) #remove old keys
-    #     db.hmset(path, event)
-    #     db.expire(path, ttl)
-    #     return json.dumps(event), 201
-    #
-    # if not db.exists(path):
-    #     return "Error: thing doesn't exist"
+    """
+    In the CLI use
+        DEL pyrpn.examples
+    to delete examples
+    """
 
     example1 = {
         'title': 'initial demo',
-        'descriptions': 'this is a description',
-        'title': sample_source,
+        'description': 'this is a description',
+        'code': sample_source,
     }
     rez = 'Examples:\n'
     EXAMPLES = 'pyrpn.examples'
@@ -71,29 +62,38 @@ def list_examples():
         db.lpush(EXAMPLES, json.dumps(example1))
     else:
         len = db.llen(EXAMPLES)
-        print(f'it exists and has length {len}')
+        print(f'examples list exists and has length {len}')
 
-    examples = db.lrange(EXAMPLES, 0, -1)
-    print(type(examples))
+    examples_data = []  # python object
+    examples = db.lrange(EXAMPLES, 0, -1)  # redis object (wrapped in python)
     for example in examples:
-        print(example)
-        data = json.loads(example)
+        data = json.loads(example)  # convert record back into python object
+        examples_data.append(data)
         rez += f'{data["title"]}\n'
+    print(examples_data)
+    # return f'<html><body><pre>{rez}</pre></body></html>'
+    return render_template('examples_list.html', examples=examples_data)
 
-    # event = db.hgetall('pyrpn.examples')
-    # if event:
-    #     # for k, v in event.items():
-    #     #     rez += f'{k} = {v}'
-    #     #     rez += '\n'
-    #     for k, v in event.items():
-    #         rez += f'{k} = {v}'
-    #         rez += '\n'
-            # event["ttl"] = db.ttl(path)
-    #cast integers accordingly, nested arrays, dicts not supported for now  :(
-    # dict_with_ints = dict((k,int(v) if isInt(v) else v) for k,v in event.iteritems())
-    # return json.dumps(dict_with_ints), 200
-    return f'<html><body><pre>{rez}</pre></body></html>'
 
+"""
+    Example
+    https://www.tutorialspoint.com/flask/flask_templates.htm
+    
+    dict = {'phy':50,'che':60,'maths':700}
+    return render_template('examples_list.html', result = dict)
+
+      <table border = 1>
+         {% for key, value in result.items() %}
+
+            <tr>
+               <th> {{ key }} </th>
+               <td> {{ value }} </td>
+            </tr>
+
+         {% endfor %}
+      </table>
+
+"""
 
 @app.route('/help')
 def help():

@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+    <head>
+
+        <script src="../static/js/lib/jquery-3.2.1.min.js"></script>
+
+    </head>
+   <body>
+        <h1>Examples</h1>
+
+        <table border = 1>
+            <tr>
+               <th> title </th>
+               <th> description </th>
+               <th> code </th>
+            </tr>
+             {% for example in examples %}
+                <tr>
+                   <td> {{ example['title'] }} </td>
+                   <td> {{ example['description'] }} </td>
+                   <td> <pre>{{ example['code'] }} </pre></td>
+                </tr>
+
+             {% endfor %}
+        </table>
+
+        <hr>
+
+
+   </body>
+
+</html>
+
