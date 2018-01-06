@@ -145,12 +145,13 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def split_alpha_text(self, alpha_text):
         first = True
-        while alpha_text:
-            fragment = alpha_text[0:14]
-            alpha_text = alpha_text[14:]
+        s = alpha_text
+        while s:
+            fragment = s[0:14]
+            s = s[14:]
             leading_symbol = '' if first else '├'
             first = False
-            self.program.insert(f'{leading_symbol}"{fragment}"', comment=alpha_text)
+            self.program.insert(f'{leading_symbol}"{fragment}"')  # , comment=alpha_text
 
     # Finishing up
 
@@ -216,7 +217,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.visit_children(node)
         for target in node.targets:
             comment = self.find_comment(target)
-            self.program.insert(f'STO {self.scopes.var_to_reg(target.id)}', comment=f'{target.id} = {comment}')
+            self.program.insert(f'STO {self.scopes.var_to_reg(target.id)}', comment=f'{target.id}')
             assert '.Store' in str(target.ctx)
             assert isinstance(target.ctx, ast.Store)
         self.end(node)
@@ -588,9 +589,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         if '.Load' in str(node.ctx):
             assert isinstance(node.ctx, ast.Load)
             self.program.insert(f'RCL {self.scopes.var_to_reg(node.id)}', comment=node.id)
-            # if self.for_loop_info:
-            #     self.program.insert('1')  # adjust the for loop end by -1 to conform to python range
-            #     self.program.insert('-')
             if self.var_name_is_loop_counter(node.id):
                 self.program.insert('IP')  # just get the integer portion of isg counter
         self.end(node)
@@ -598,8 +596,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def visit_Num(self, node):
         self.begin(node)
         n = int(node.n)
-        # if self.for_loop_info:
-        #     n -= 1  # adjust the for loop end by -1 to conform to python range
         self.program.insert(f'{self.pending_unary_op}{n}')
         self.pending_unary_op = ''
         self.end(node)
@@ -679,7 +675,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.continue_labels.append(label_for)  # just in case we hit a continue
 
         self.insert('LBL', label_for)
-        self.program.insert(f'ISG {self.for_loop_info[-1].register}', comment=f'{self.for_loop_info[-1]}')
+        self.program.insert(f'ISG {self.for_loop_info[-1].register}', comment=f'{node.target.id}')
         self.for_loop_info.pop()
         self.insert('GTO', label_for_body)
         self.insert('GTO', label_resume)
