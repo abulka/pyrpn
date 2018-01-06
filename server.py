@@ -1,8 +1,11 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, request
 from parse import parse
 import logging
 from logger import config_log
-from server_forms import MyForm
+from server_forms import MyForm, sample_source
+import redis
+import json
+
 
 log = logging.getLogger(__name__)
 config_log(log)
@@ -33,6 +36,63 @@ def do(source, comments=True, linenos=True):
     program = parse(source)
     rpn = program.lines_to_str(comments=comments, linenos=linenos)
     return rpn
+
+
+
+db = redis.Redis('localhost') #connect to server
+
+# @app.route('/r/', defaults={'path': ''}, methods = ['PUT', 'GET'])
+# @app.route('/r/<path:path>', methods = ['PUT', 'GET'])
+@app.route('/examples')
+def list_examples():
+
+    # if (request.method == 'PUT'):
+    #     event = request.json
+    #     event['last_updated'] = int(time.time())
+    #     event['ttl'] = ttl
+    #     db.delete(path) #remove old keys
+    #     db.hmset(path, event)
+    #     db.expire(path, ttl)
+    #     return json.dumps(event), 201
+    #
+    # if not db.exists(path):
+    #     return "Error: thing doesn't exist"
+
+    example1 = {
+        'title': 'initial demo',
+        'descriptions': 'this is a description',
+        'title': sample_source,
+    }
+    rez = 'Examples:\n'
+    EXAMPLES = 'pyrpn.examples'
+    print("db.exists('EXAMPLES')", db.exists('EXAMPLES'))
+    if not db.exists(EXAMPLES):
+        print('creating initial....')
+        db.lpush(EXAMPLES, json.dumps(example1))
+    else:
+        len = db.llen(EXAMPLES)
+        print(f'it exists and has length {len}')
+
+    examples = db.lrange(EXAMPLES, 0, -1)
+    print(type(examples))
+    for example in examples:
+        print(example)
+        data = json.loads(example)
+        rez += f'{data["title"]}\n'
+
+    # event = db.hgetall('pyrpn.examples')
+    # if event:
+    #     # for k, v in event.items():
+    #     #     rez += f'{k} = {v}'
+    #     #     rez += '\n'
+    #     for k, v in event.items():
+    #         rez += f'{k} = {v}'
+    #         rez += '\n'
+            # event["ttl"] = db.ttl(path)
+    #cast integers accordingly, nested arrays, dicts not supported for now  :(
+    # dict_with_ints = dict((k,int(v) if isInt(v) else v) for k,v in event.iteritems())
+    # return json.dumps(dict_with_ints), 200
+    return f'<html><body><pre>{rez}</pre></body></html>'
 
 
 @app.route('/help')

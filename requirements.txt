@@ -6,4 +6,5 @@ asttokens
 Flask
 flask_wtf
 gunicorn
+redis
 
