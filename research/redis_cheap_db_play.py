@@ -1,9 +1,9 @@
 import redis
 from attr import attrs, attrib
-from lib.cheap_redis_db import CheapRecord, set_connection, register_class
+from lib.cheap_redis_db import CheapRecord, config
 
 r = redis.StrictRedis()
-set_connection(r)
+config.set_connection(r)
 
 
 @attrs
@@ -20,8 +20,8 @@ class Fred(CheapRecord):
     y = attrib(default=0)
 
 
-register_class(Eg, namespace='pyrpn')
-register_class(Fred)
+config.register_class(Eg, namespace='pyrpn')
+config.register_class(Fred)
 
 # Create some records
 

@@ -24,28 +24,34 @@ log = logging.getLogger(__name__)
 config_log(log)
 
 
+class _CheapRecordManager:
+    def __init__(self):
+        self.redis_conn = None
+        self.class_to_namespace = {}
 
-# This config and module methods could all be in a class, actually
+    def set_connection(self, r):
+        self.redis_conn = r
 
-config = {
-    'redis_db': None,
-    'class_to_namespace': {}
-}
+    def register_class(self, cls, namespace=''):
+        """
+        Registers the full namespace key prefix to store records for 'cls' under.
 
-def set_connection(r):
-    config['redis_db'] = r
+        :param cls: reference to a class, derived from CheapRecord
+        :param namespace: can be any '.' separated set of names e.g. myapp.stuff.blah or blank to live in root key system
+        :return: -
+        """
+        key = cls.__name__.lower()
+        namespace = namespace + f'.{key}' if namespace else key
+        self.class_to_namespace[cls.__name__] = namespace
 
-def register_class(cls, namespace=''):
-    """
-    Registers the full namespace key prefix to store records for 'cls' under.
+    def get_namespace(self, cls):
+        cls_name = cls.__name__
+        if cls_name not in self.class_to_namespace:
+            raise RuntimeError(f'CheapRecord detected unregistered class {cls_name}, please call register_class({cls_name}, [optional namespace])')
+        return self.class_to_namespace[cls_name]
 
-    :param cls: reference to a class, derived from CheapRecord
-    :param namespace: can be any '.' separated set of names e.g. myapp.stuff.blah or blank to live in root key system
-    :return: -
-    """
-    key = cls.__name__.lower()
-    namespace = namespace + f'.{key}' if namespace else key
-    config['class_to_namespace'][cls.__name__] = namespace
+
+config = _CheapRecordManager()
 
 
 @attrs
@@ -58,17 +64,14 @@ class CheapRecord:
 
     @property
     def namespace(self):
-        cls_name = self.__class__.__name__
-        if cls_name not in config['class_to_namespace']:
-            raise RuntimeError(f'CheapRecord detected unregistered class {cls_name}, please call register_class({cls_name}, [optional namespace])')
-        return config['class_to_namespace'][cls_name]
+        return config.get_namespace(self.__class__)
 
     @property
     def id_allocator_key(self):
         return f'{self.namespace}:id'
 
     def ensure_id_allocator(self):
-        r = config['redis_db']
+        r = config.redis_conn
         key = self.id_allocator_key
         if r.exists(self.id_allocator_key):
             id = r.get(key).decode('utf-8')
@@ -79,8 +82,8 @@ class CheapRecord:
 
     @classmethod
     def keys(cls):
-        r = config['redis_db']
-        namespace = config['class_to_namespace'][cls.__name__]
+        r = config.redis_conn
+        namespace = config.get_namespace(cls)
         return [key.decode('utf8') for key in r.keys(f'{namespace}:*')]
 
     @property
@@ -88,7 +91,7 @@ class CheapRecord:
         return asdict(self, filter=lambda attr, value: attr.name not in ('xxx',))  # filter unused, kept for future use
 
     def save(self):
-        r = config['redis_db']
+        r = config.redis_conn
         next_key = r.incr(self.id_allocator_key)
         print('id incremented to', next_key)
         key = f'{self.namespace}:{next_key}'
@@ -99,7 +102,7 @@ class CheapRecord:
     @classmethod
     def purge_all_records(cls, skip=('id', 'meta')):
         # clears entire db
-        r = config['redis_db']
+        r = config.redis_conn
         to_delete = []
         for key in cls.keys():
             id = key.split(':')[1]
@@ -113,7 +116,7 @@ class CheapRecord:
         r.delete(*to_delete)
 
         # reset the id counter
-        namespace = config['class_to_namespace'][cls.__name__]
+        namespace = config.get_namespace(cls)
         counter_key = f'{namespace}:id'
         r.set(counter_key, 0)
 
