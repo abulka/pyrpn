@@ -97,6 +97,25 @@ class CheapDb:
     def keys_scan(redis_db, key_full_path=''):
         return [key.decode('utf8') for key in redis_db.keys(f'{key_full_path}:*')]
 
+    @classmethod
+    def clear(cls, r, redis_dir):
+        # clears entire db
+        to_delete = []
+        keys = cls.keys_scan(r, redis_dir)
+        for key in keys:
+            id = key.split(':')[1]
+            if id in ('id', 'meta'):
+                continue
+            to_delete.append(key)
+        print('deleting', *to_delete)
+        r.delete(*to_delete)
+        keys = cls.keys_scan(r, redis_dir)
+        print('done, keys left', keys)
+
+        # reset the counter
+        counter_key = f'{redis_dir}:id'
+        r.set(counter_key, 0)
+
 
 """Cool techniques to auto make attr based classes"""
 
@@ -132,6 +151,10 @@ print(f1.asdict)
 
 # listing keys
 
-print(CheapDb.keys_scan(r, 'fred'))  # static use
+print(Fred.keys_scan(r, 'fred'))  # static use
 print(e1.keys()) # if you have an instance, this is easier
+
+# delete
+
+Eg.clear(r, 'pyrpn.eg')
 
