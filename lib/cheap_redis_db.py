@@ -84,7 +84,11 @@ class CheapRecord:
     def keys(cls):
         r = config.redis_conn
         namespace = config.get_namespace(cls)
-        return [key.decode('utf8') for key in r.keys(f'{namespace}:*')]
+        # return [key.decode('utf8') for key in r.keys(f'{namespace}:*')]
+        keys = r.keys(f'{namespace}:*')
+        if f'{namespace}:id' in keys:
+            keys.remove(f'{namespace}:id')
+        return keys
 
     @property
     def asdict(self):

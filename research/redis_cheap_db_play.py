@@ -2,7 +2,10 @@ import redis
 from attr import attrs, attrib
 from lib.cheap_redis_db import CheapRecord, config
 
-r = redis.StrictRedis()
+# r = redis.StrictRedis()
+r = redis.StrictRedis(charset="utf-8", decode_responses=True)
+# r = redis.StrictRedis('localhost', 6379, charset="utf-8", decode_responses=True)
+
 config.set_connection(r)
 
 

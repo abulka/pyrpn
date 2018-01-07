@@ -2,13 +2,19 @@ from flask import Flask, render_template, redirect, url_for, request
 from parse import parse
 import logging
 from logger import config_log
-from server_forms import MyForm, ExampleForm, sample_source
+from server_forms import MyForm, ExampleForm
+from examples import example_01
 import redis
 import json
-
+from attr import attrs, attrib
+from lib import cheap_redis_db
 
 log = logging.getLogger(__name__)
 config_log(log)
+
+# db = redis.StrictRedis()
+db = redis.StrictRedis('localhost', 6379, charset="utf-8", decode_responses=True)
+cheap_redis_db.config.set_connection(db)
 
 app = Flask(__name__)
 
@@ -16,6 +22,17 @@ app.config.update(dict(
     SECRET_KEY="powerful secretkey",
     WTF_CSRF_SECRET_KEY="a csrf secret key"
 ))
+
+
+@attrs
+class Example(cheap_redis_db.CheapRecord):
+    title = attrib(default='Untitled')
+    description = attrib(default='this is a title')
+    source = attrib(default='code goes here')
+    public = attrib(default=True)  # true or false I suppose - is this supported?
+
+cheap_redis_db.config.register_class(Example, namespace='pyrpn')
+
 
 @app.route('/', methods=["GET", "POST"])
 def index():
@@ -38,11 +55,6 @@ def do(source, comments=True, linenos=True):
     return rpn
 
 
-
-db = redis.Redis('localhost') #connect to server
-
-EXAMPLES = 'pyrpn.examples'
-
 @app.route('/examples')
 def list_examples():
     """
@@ -51,28 +63,21 @@ def list_examples():
     to delete examples
     """
 
-    example1 = {
-        'title': 'initial demo',
-        'description': 'this is a description',
-        'code': sample_source,
-    }
-    rez = 'Examples:\n'
-    print("db.exists('EXAMPLES')", db.exists('EXAMPLES'))
-    if not db.exists(EXAMPLES):
-        print('creating initial....')
-        db.lpush(EXAMPLES, json.dumps(example1))
-    else:
-        len = db.llen(EXAMPLES)
-        print(f'examples list exists and has length {len}')
+    if len(Example.keys()) == 0:
+        # create the first example
+        example = Example(
+            title=example_01['title'],
+            source=example_01['source'],
+            description=example_01['description'],
+            public=example_01['public'],
+        )
+        print('first example created', example.asdict)
 
-    examples_data = []  # python object
-    examples = db.lrange(EXAMPLES, 0, -1)  # redis object (wrapped in python)
-    for example in examples:
-        data = json.loads(example)  # convert record back into python object
-        examples_data.append(data)
-        rez += f'{data["title"]}\n'
-    print(examples_data)
-    # return f'<html><body><pre>{rez}</pre></body></html>'
+    examples_data = []
+    for key in Example.keys():
+        example = db.hgetall(key)
+        examples_data.append(example)
+    # return f'<html><body><pre>{example}</pre></body></html>'
     return render_template('examples_list.html', examples=examples_data)
 
 

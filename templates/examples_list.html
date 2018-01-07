@@ -23,7 +23,7 @@
              {% for example in examples %}
                 <tr>
                    <td> {{ example['title'] }} </td>
-                   <td> <div class="prism_wrapper"><pre><code class="language-python"> {{ example['code'].strip() }} </code></pre></div></td>
+                   <td> <div class="prism_wrapper"><pre><code class="language-python"> {{ example['source'].strip() }} </code></pre></div></td>
                    <td> {{ example['description'] }} </td>
                    <td> <input type="button" value="Convert..."> </td>
                 </tr>
