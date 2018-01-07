@@ -63,7 +63,7 @@ def list_examples():
     to delete examples
     """
 
-    if len(Example.keys()) == 0:
+    if len(Example.ids()) == 0:
         # create the first example
         example = Example(
             title=example_01['title'],
@@ -74,8 +74,8 @@ def list_examples():
         print('first example created', example.asdict)
 
     examples_data = []
-    for key in Example.keys():
-        example = db.hgetall(key)
+    for id in Example.ids():
+        example = Example.get(id)
         examples_data.append(example)
     # return f'<html><body><pre>{example}</pre></body></html>'
     return render_template('examples_list.html', examples=examples_data)

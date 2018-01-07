@@ -37,8 +37,17 @@ print(f1.asdict)
 
 # listing keys (static calls)
 
-print(Eg.keys())
-print(Fred.keys())
+print(Eg._keys())
+print(Fred._keys())
+
+# listing ids (static calls) - id's recommended over keys
+
+print(Eg.ids())
+print(Fred.ids())
+
+# get
+
+print(Eg.get(1))
 
 # Delete all records (static method calls)
 

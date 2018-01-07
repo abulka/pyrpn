@@ -82,7 +82,7 @@ class CheapRecord:
             print(f'key {key} created', self.id)
 
     @classmethod
-    def keys(cls):
+    def _keys(cls):
         r = config.redis_conn
         namespace = config.get_namespace(cls)
         # return [key.decode('utf8') for key in r.keys(f'{namespace}:*')]
@@ -90,6 +90,20 @@ class CheapRecord:
         if f'{namespace}:id' in keys:
             keys.remove(f'{namespace}:id')
         return keys
+
+    @classmethod
+    def ids(cls):
+        ids = [int(key.split(':')[1]) for key in cls._keys()]
+        ids.sort()
+        return ids
+
+    @classmethod
+    def get(cls, id):
+        r = config.redis_conn
+        namespace = config.get_namespace(cls)
+        key = f'{namespace}:{id}'
+        data = r.hgetall(key)  # looks like you don't need to encode a key to utf8 to use it - otherwise would need to: r.hgetall(key.encode('utf8'))
+        return data
 
     @property
     def asdict(self):
@@ -105,17 +119,12 @@ class CheapRecord:
         r.hmset(key, dic) # create the hash in redis
 
     @classmethod
-    def purge_all_records(cls, skip=('id', 'meta')):
+    def purge_all_records(cls):
         # clears entire db
         r = config.redis_conn
-        to_delete = []
-        for key in cls.keys():
-            id = key.split(':')[1]
-            if id in skip:
-                continue
-            to_delete.append(key)
+        to_delete = cls._keys()
         print(cls.__name__, 'about to delete', *to_delete)
-        # return
+        return
 
         # delete all records
         r.delete(*to_delete)
@@ -125,6 +134,6 @@ class CheapRecord:
         counter_key = f'{namespace}:id'
         r.set(counter_key, 0)
 
-        keys = cls.keys()
+        keys = cls._keys()
         print('done, keys left', keys)
 
