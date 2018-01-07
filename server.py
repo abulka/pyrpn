@@ -90,15 +90,13 @@ def edit_example():
     form = ExampleForm(request.form)
     if request.method == 'POST' and form.validate():
         print('validated OK')
-        example = {
-            'title': request.values.get('title'),
-            'description': request.values.get('description'),
-            'code': request.values.get('source'),
-            'public': request.values.get('public'),
-        }
+        example = Example(
+            title=request.values.get('title'),
+            source=request.values.get('source'),
+            description=request.values.get('description'),
+            public=request.values.get('public'),
+        )
         print(example)
-        # flash('Thanks for saving')
-        db.lpush(EXAMPLES, json.dumps(example))
     else:
         # You probably don't have args at this route with GET
         # method, but if you do, you can access them like so:

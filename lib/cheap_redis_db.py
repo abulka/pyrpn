@@ -74,7 +74,8 @@ class CheapRecord:
         r = config.redis_conn
         key = self.id_allocator_key
         if r.exists(self.id_allocator_key):
-            id = r.get(key).decode('utf-8')
+            # id = r.get(key).decode('utf-8')
+            id = r.get(key)
             print(f'redis key {key} already there has val of {id}')
         else:
             r.set(key, self.id)
