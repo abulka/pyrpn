@@ -7,6 +7,8 @@
         <link rel="stylesheet" href="../static/js/lib/prism.css">
         <script src="../static/js/lib/prism.js"></script>
 
+        <link rel="stylesheet" href="../static/index.css">
+
     </head>
    <body>
         <h1>Examples</h1>
@@ -14,22 +16,21 @@
         <table border = 1>
             <tr>
                <th> Title </th>
+               <th> <img src="https://www.python.org/static/community_logos/python-logo-master-v3-TM-flattened.png" width="40%"> </th>
                <th> Description </th>
-               <th> Python Code </th>
-               <th> RPN</th>
+               <th> <img src="static/calc_icon1.png"> </th>
             </tr>
              {% for example in examples %}
                 <tr>
                    <td> {{ example['title'] }} </td>
-                   <td> {{ example['description'] }} </td>
                    <td> <div class="prism_wrapper"><pre><code class="language-python"> {{ example['code'].strip() }} </code></pre></div></td>
+                   <td> {{ example['description'] }} </td>
                    <td> <input type="button" value="Convert..."> </td>
                 </tr>
 
              {% endfor %}
         </table>
 
-        <hr>
 
 
    </body>
