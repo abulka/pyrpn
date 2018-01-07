@@ -1,6 +1,6 @@
 import redis
 from attr import attrs, attrib
-from lib.cheap_redis_db import CheapRecord, set_connection, find_keys
+from lib.cheap_redis_db import CheapRecord, set_connection, register_class
 
 r = redis.StrictRedis()
 set_connection(r)
@@ -20,25 +20,25 @@ class Fred(CheapRecord):
     y = attrib(default=0)
 
 
+register_class(Eg, namespace='pyrpn')
+register_class(Fred)
+
 # Create some records
 
-e1 = Eg(namespace='pyrpn', code='def blah():\n    pass')  # in 'pyrpn' namespace
-e2 = Eg(namespace='pyrpn', code='x = 100')                # in 'pyrpn' namespace
-f1 = Fred(x=1, y=2)  # in root namespace
+e1 = Eg(code='def blah(): pass')
+e2 = Eg(code='x = 100')
+f1 = Fred(x=1, y=2)  # since we didn't register with any namespace, this record will be created under 'fred' in root namespace
 
 print(e1.asdict)
 print(f1.asdict)
 
+# listing keys (static calls)
 
-# listing keys
-
-print(find_keys('pyrpn.eg'))  # static use
-print(find_keys('fred'))  # static use
-print(e1.keys())  # if you have an instance, this is easier
+print(Eg.keys())
+print(Fred.keys())
 
 # Delete all records (static method calls)
 
-Eg.purge_all_records(namespace='pyrpn')  # You must supply the 'redis_dir' if you have created records in that namespace
+Eg.purge_all_records()
 Fred.purge_all_records()
-
 

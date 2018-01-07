@@ -23,40 +23,49 @@ from logger import config_log
 log = logging.getLogger(__name__)
 config_log(log)
 
+
+
+# This config and module methods could all be in a class, actually
+
 config = {
     'redis_db': None,
+    'class_to_namespace': {}
 }
 
 def set_connection(r):
     config['redis_db'] = r
 
-def find_keys(namespace=''):
-    r = config['redis_db']
-    return [key.decode('utf8') for key in r.keys(f'{namespace}:*')]
+def register_class(cls, namespace=''):
+    """
+    Registers the full namespace key prefix to store records for 'cls' under.
+
+    :param cls: reference to a class, derived from CheapRecord
+    :param namespace: can be any '.' separated set of names e.g. myapp.stuff.blah or blank to live in root key system
+    :return: -
+    """
+    key = cls.__name__.lower()
+    namespace = namespace + f'.{key}' if namespace else key
+    config['class_to_namespace'][cls.__name__] = namespace
 
 
 @attrs
 class CheapRecord:
-    namespace = attrib(default='') # this can be any '.' separated set of names e.g. myapp.stuff.blah or blank to live in root key system
     id = attrib(default=0)  # auto allocated
 
     def __attrs_post_init__(self):
-        self.adjust_dir_key()
         self.ensure_id_allocator()
         self.save()
 
-    def adjust_dir_key(self):
-        if self.namespace:
-            self.namespace += '.'
-        self.namespace += self.__class__.__name__.lower()
+    @property
+    def namespace(self):
+        cls_name = self.__class__.__name__
+        if cls_name not in config['class_to_namespace']:
+            raise RuntimeError(f'CheapRecord detected unregistered class {cls_name}, please call register_class({cls_name}, [optional namespace])')
+        return config['class_to_namespace'][cls_name]
 
     @property
     def id_allocator_key(self):
         return f'{self.namespace}:id'
-
-    @property
-    def asdict(self):
-        return asdict(self, filter=lambda attr, value: attr.name not in ('redis_db','namespace'))
 
     def ensure_id_allocator(self):
         r = config['redis_db']
@@ -68,43 +77,46 @@ class CheapRecord:
             r.set(key, self.id)
             print(f'key {key} created', self.id)
 
+    @classmethod
+    def keys(cls):
+        r = config['redis_db']
+        namespace = config['class_to_namespace'][cls.__name__]
+        return [key.decode('utf8') for key in r.keys(f'{namespace}:*')]
+
+    @property
+    def asdict(self):
+        return asdict(self, filter=lambda attr, value: attr.name not in ('xxx',))  # filter unused, kept for future use
+
     def save(self):
         r = config['redis_db']
         next_key = r.incr(self.id_allocator_key)
-        print('id incrmented to', next_key)
+        print('id incremented to', next_key)
         key = f'{self.namespace}:{next_key}'
         dic = self.asdict
         dic['id'] = key  # for reference
-        r.hmset(key, dic)
-
-    def keys(self):
-        # only works on an instance - see the global find_keys() for a more useful version of this
-        r = config['redis_db']
-        return [key.decode('utf8') for key in r.keys(f'{self.namespace}:*')]
+        r.hmset(key, dic) # create the hash in redis
 
     @classmethod
-    def purge_all_records(cls, namespace='', skip=('id', 'meta')):
+    def purge_all_records(cls, skip=('id', 'meta')):
         # clears entire db
-        if namespace:
-            namespace += f'.{cls.__name__.lower()}'
-        else:
-            namespace = cls.__name__.lower()
+        r = config['redis_db']
         to_delete = []
-        for key in find_keys(namespace):
+        for key in cls.keys():
             id = key.split(':')[1]
             if id in skip:
                 continue
             to_delete.append(key)
+        print(cls.__name__, 'about to delete', *to_delete)
+        # return
 
-        r = config['redis_db']
-        print(cls.__name__, 'deleting', *to_delete)
-        return
-
+        # delete all records
         r.delete(*to_delete)
-        keys = find_keys(namespace)
-        print('done, keys left', keys)
 
-        # reset the counter
+        # reset the id counter
+        namespace = config['class_to_namespace'][cls.__name__]
         counter_key = f'{namespace}:id'
         r.set(counter_key, 0)
+
+        keys = cls.keys()
+        print('done, keys left', keys)
 
