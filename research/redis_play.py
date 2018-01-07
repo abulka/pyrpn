@@ -89,6 +89,15 @@ class CheapDb:
         dic['id'] = key  # for reference
         r.hmset(key, dic)
 
+    def keys(self):
+        # only works from an instance
+        return [key.decode('utf8') for key in self.redis_db.keys(f'{self.redis_dir}:*')]
+
+    @staticmethod
+    def keys_scan(redis_db, key_full_path=''):
+        return [key.decode('utf8') for key in redis_db.keys(f'{key_full_path}:*')]
+
+
 """Cool techniques to auto make attr based classes"""
 
 # UserDb = make_class("UserDb", ["x", "y"], bases=(CheapDb,))
@@ -120,3 +129,9 @@ class Fred(CheapDb):
 f1 = Fred(redis_db=r, x=1, y=2)
 # print(f1, '\n', f1.asdict)
 print(f1.asdict)
+
+# listing keys
+
+print(CheapDb.keys_scan(r, 'fred'))  # static use
+print(e1.keys()) # if you have an instance, this is easier
+
