@@ -4,21 +4,26 @@
 
         <script src="../static/js/lib/jquery-3.2.1.min.js"></script>
 
+        <link rel="stylesheet" href="../static/js/lib/prism.css">
+        <script src="../static/js/lib/prism.js"></script>
+
     </head>
    <body>
         <h1>Examples</h1>
 
         <table border = 1>
             <tr>
-               <th> title </th>
-               <th> description </th>
-               <th> code </th>
+               <th> Title </th>
+               <th> Description </th>
+               <th> Python Code </th>
+               <th> RPN</th>
             </tr>
              {% for example in examples %}
                 <tr>
                    <td> {{ example['title'] }} </td>
                    <td> {{ example['description'] }} </td>
-                   <td> <pre>{{ example['code'] }} </pre></td>
+                   <td> <div class="prism_wrapper"><pre><code class="language-python"> {{ example['code'].strip() }} </code></pre></div></td>
+                   <td> <input type="button" value="Convert..."> </td>
                 </tr>
 
              {% endfor %}
