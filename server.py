@@ -2,7 +2,7 @@ from flask import Flask, render_template, redirect, url_for, request
 from parse import parse
 import logging
 from logger import config_log
-from server_forms import MyForm, sample_source
+from server_forms import MyForm, ExampleForm, sample_source
 import redis
 import json
 
@@ -41,6 +41,8 @@ def do(source, comments=True, linenos=True):
 
 db = redis.Redis('localhost') #connect to server
 
+EXAMPLES = 'pyrpn.examples'
+
 @app.route('/examples')
 def list_examples():
     """
@@ -55,7 +57,6 @@ def list_examples():
         'code': sample_source,
     }
     rez = 'Examples:\n'
-    EXAMPLES = 'pyrpn.examples'
     print("db.exists('EXAMPLES')", db.exists('EXAMPLES'))
     if not db.exists(EXAMPLES):
         print('creating initial....')
@@ -75,25 +76,43 @@ def list_examples():
     return render_template('examples_list.html', examples=examples_data)
 
 
-"""
-    Example
-    https://www.tutorialspoint.com/flask/flask_templates.htm
-    
-    dict = {'phy':50,'che':60,'maths':700}
-    return render_template('examples_list.html', result = dict)
+@app.route('/example', methods=['GET', 'POST'])
+def edit_example():
+    """
+    This should take a form to edit it.  If no param then create a new blank form and save to a new entry in redis.
+    :return:
+    """
+    form = ExampleForm(request.form)
+    if request.method == 'POST' and form.validate():
+        print('validated OK')
+        example = {
+            'title': request.values.get('title'),
+            'description': request.values.get('description'),
+            'code': request.values.get('source'),
+            'public': request.values.get('public'),
+        }
+        print(example)
+        # flash('Thanks for saving')
+        db.lpush(EXAMPLES, json.dumps(example))
+    else:
+        # You probably don't have args at this route with GET
+        # method, but if you do, you can access them like so:
+        yourarg = request.args.get('argname')
 
-      <table border = 1>
-         {% for key, value in result.items() %}
+    return render_template('example.html', form=form)
 
-            <tr>
-               <th> {{ key }} </th>
-               <td> {{ value }} </td>
-            </tr>
+# @app.route('/register', methods=['GET', 'POST'])
+# def register():
+#     if flask.request.method == 'POST':
+#         username = flask.request.values.get('user') # Your form's
+#         password = flask.request.values.get('pass') # input names
+#         your_register_routine(username, password)
+#     else:
+#         # You probably don't have args at this route with GET
+#         # method, but if you do, you can access them like so:
+#         yourarg = flask.request.args.get('argname')
+#         your_register_template_rendering(yourarg)
 
-         {% endfor %}
-      </table>
-
-"""
 
 @app.route('/help')
 def help():

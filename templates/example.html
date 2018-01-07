@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+    <head>
+
+        <script src="../static/js/lib/jquery-3.2.1.min.js"></script>
+
+        <link rel="stylesheet" href="../static/js/lib/prism.css">
+        <script src="../static/js/lib/prism.js"></script>
+
+        <link rel="stylesheet" href="../static/index.css">
+
+    </head>
+   <body>
+        <h1>Save Example</h1>
+
+        <form id="mainform" method="POST" action="/example">
+            {{ form.source(class_='python', id='id_python_text') }}
+            <input class="submit_button" title='Save this as an example' data-toggle="tooltip" type="submit" value="Save">
+            <br>
+            {{ form.title.label }} {{ form.title() }}
+            <br>
+            {{ form.description.label }} {{ form.description() }}
+            <br>
+            {{ form.public.label }} {{ form.public() }}
+            {{ form.csrf_token }}
+            <br>
+        </form>
+
+
+
+   </body>
+
+</html>
+

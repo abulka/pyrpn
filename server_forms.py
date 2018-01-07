@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import TextAreaField, BooleanField
+from wtforms import TextAreaField, BooleanField, StringField
 from wtforms.validators import DataRequired, Email
 from textwrap import dedent
 
@@ -21,3 +21,9 @@ class MyForm(FlaskForm):
     source = TextAreaField('source', default=sample_source, validators=[]) #, validators=[DataRequired()])
     comments = BooleanField('Generate comments', default=False)
     line_numbers = BooleanField('Generate line numbers', default=False)
+
+class ExampleForm(FlaskForm):
+    source = TextAreaField('source', default=sample_source, validators=[])
+    title = StringField('title', default='Untitled')
+    description = StringField('description', default='Enter a description here')
+    public = BooleanField('makepublic', default=False)
