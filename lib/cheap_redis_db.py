@@ -12,25 +12,6 @@ def find_keys(redis_dir=''):
     r = config['redis_db']
     return [key.decode('utf8') for key in r.keys(f'{redis_dir}:*')]
 
-def purge_all_records(redis_dir, skip=('id', 'meta')):
-    # clears entire db
-    to_delete = []
-    for key in find_keys(redis_dir):
-        id = key.split(':')[1]
-        if id in skip:
-            continue
-        to_delete.append(key)
-
-    r = config['redis_db']
-    print('deleting', *to_delete)
-    r.delete(*to_delete)
-    keys = find_keys(redis_dir)
-    print('done, keys left', keys)
-
-    # reset the counter
-    counter_key = f'{redis_dir}:id'
-    r.set(counter_key, 0)
-
 
 @attrs
 class CheapRecord:
@@ -78,4 +59,30 @@ class CheapRecord:
         # only works on an instance - see the global find_keys() for a more useful version of this
         r = config['redis_db']
         return [key.decode('utf8') for key in r.keys(f'{self.redis_dir}:*')]
+
+    @classmethod
+    def purge_all_records(cls, redis_dir='', skip=('id', 'meta')):
+        # clears entire db
+        if redis_dir:
+            redis_dir += f'.{cls.__name__.lower()}'
+        else:
+            redis_dir = cls.__name__.lower()
+        to_delete = []
+        for key in find_keys(redis_dir):
+            id = key.split(':')[1]
+            if id in skip:
+                continue
+            to_delete.append(key)
+
+        r = config['redis_db']
+        print(cls.__name__, 'deleting', *to_delete)
+        return
+
+        r.delete(*to_delete)
+        keys = find_keys(redis_dir)
+        print('done, keys left', keys)
+
+        # reset the counter
+        counter_key = f'{redis_dir}:id'
+        r.set(counter_key, 0)
 

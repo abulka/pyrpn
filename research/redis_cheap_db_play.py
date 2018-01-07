@@ -1,6 +1,6 @@
 import redis
 from attr import attrs, attrib
-from lib.cheap_redis_db import CheapRecord, set_connection, find_keys, purge_all_records
+from lib.cheap_redis_db import CheapRecord, set_connection, find_keys
 
 r = redis.StrictRedis()
 set_connection(r)
@@ -34,7 +34,9 @@ print(f1.asdict)
 print(find_keys('fred'))  # static use
 print(e1.keys())  # if you have an instance, this is easier
 
-# Delete all records
+# Delete all records (static method calls)
 
-purge_all_records('pyrpn.eg')
+Eg.purge_all_records(redis_dir='pyrpn')  # You must supply the 'redis_dir' if you have created records in that namespace
+Fred.purge_all_records()
+
 
