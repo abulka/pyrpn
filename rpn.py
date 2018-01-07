@@ -363,6 +363,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.end(node)
             return
 
+        elif func_name == 'list':
+            self.program.insert_raw_lines(rpn_templates.LIST_PUSH_POP)
+            return
 
         elif func_name in cmd_list and cmd_list[func_name]['num_arg_fragments'] > 0:
             # The built-in command has arg fragment "parameter" parts which must be emitted immediately as part of the
