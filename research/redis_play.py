@@ -50,21 +50,39 @@ from attr import attrs, attrib, Factory, make_class, asdict
 @attrs
 class CheapDb:
     id = attrib(default=0)
-    key_base = attrib(default='pyrpn.examplez')
+    redis_key = attrib(default='')
 
     def __attrs_post_init__(self):
-        self.key_base += ':' + self.__class__.__name__.lower()
+        if self.redis_key:
+            self.redis_key += ':'
+        self.redis_key += self.__class__.__name__.lower()
+
+
+"""Cool techniques to auto make attr based classes"""
 
 # UserDb = make_class("UserDb", ["x", "y"], bases=(CheapDb,))
-User = make_class("User",
-                    bases=(CheapDb,),
-                    attrs={
-                        "x": attrib(default=0),
-                        "y": attrib(default=0)
-                    })
+
+# User = make_class("User",
+#                     bases=(CheapDb,),
+#                     attrs={
+#                         "x": attrib(default=0),
+#                         "y": attrib(default=0)
+#                     })
+
+@attrs
+class User(CheapDb):
+    x = attrib(default=0)
+    y = attrib(default=0)
 
 
-u1 = User(x=1, y=2)
-print(u1)
-print(asdict(u1))
+u1 = User(redis_key='pyrpn.examplez', x=1, y=2)
+print(u1, '\n', asdict(u1))
 
+
+@attrs
+class Fred(CheapDb):
+    x = attrib(default=0)
+    y = attrib(default=0)
+
+f1 = Fred(x=1, y=2)
+print(f1, '\n', asdict(f1))
