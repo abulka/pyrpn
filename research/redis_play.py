@@ -49,14 +49,47 @@ from attr import attrs, attrib, Factory, make_class, asdict
 
 @attrs
 class CheapDb:
+    redis_db = attrib()  # connection
+    redis_dir = attrib(default='') # this can be any set of folders e.g. myapp.stuff.blah or blank to live in root key system
     id = attrib(default=0)
-    redis_key = attrib(default='')
 
     def __attrs_post_init__(self):
-        if self.redis_key:
-            self.redis_key += ':'
-        self.redis_key += self.__class__.__name__.lower()
+        if self.redis_dir:
+            self.redis_dir += '.'
+        self.redis_dir += self.__class__.__name__.lower()
 
+        self.make_id_allocator()
+
+    @property
+    def counter_key(self):
+        return f'{self.redis_dir}:id'
+
+    @property
+    def asdict(self):
+        return asdict(self, filter=lambda attr, value: attr.name not in ('redis_db','redis_dir'))
+
+    def make_id_allocator(self):
+        r = self.redis_db
+        key = self.counter_key
+        if r.exists(self.counter_key):
+            id = r.get(key).decode('utf-8')
+            print(f'redis key {key} already there has val of {id}')
+        else:
+            r.set(key, self.id)
+            print(f'key {key} created', self.id)
+
+    def append(self):
+        rez = r.incr('user:id')
+        print('id incrmented to', rez)
+
+        key = f'user:{rez}'
+        dic = copy.copy(example)
+        dic['id'] = key  # for reference
+        r.hmset(key, dic)
+
+
+        # self.redis_db.
+        asdict(e1)
 
 """Cool techniques to auto make attr based classes"""
 
@@ -70,13 +103,14 @@ class CheapDb:
 #                     })
 
 @attrs
-class User(CheapDb):
+class Eg(CheapDb):
     x = attrib(default=0)
     y = attrib(default=0)
 
 
-u1 = User(redis_key='pyrpn.examplez', x=1, y=2)
-print(u1, '\n', asdict(u1))
+e1 = Eg(redis_db=r, redis_dir='pyrpn', x=1, y=2)
+# print(e1, '\n', e1.asdict)
+print(e1.asdict)
 
 
 @attrs
@@ -84,5 +118,6 @@ class Fred(CheapDb):
     x = attrib(default=0)
     y = attrib(default=0)
 
-f1 = Fred(x=1, y=2)
-print(f1, '\n', asdict(f1))
+f1 = Fred(redis_db=r, x=1, y=2)
+# print(f1, '\n', f1.asdict)
+print(f1.asdict)
