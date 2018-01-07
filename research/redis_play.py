@@ -35,7 +35,7 @@ print(keys)
 
 to_delete = []
 for key in keys:
-    //key = key.decode('utf8')
+    key = key.decode('utf8')
     id = key.split(':')[1]
     if id in ('id', 'meta'):
         continue
