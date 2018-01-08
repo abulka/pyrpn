@@ -27,9 +27,9 @@ app.config.update(dict(
 @attrs
 class Example(cheap_redis_db.CheapRecord):
     title = attrib(default='Untitled')
-    description = attrib(default='this is a title')
-    source = attrib(default='code goes here')
-    public = attrib(default=True)  # true or false I suppose - is this supported?
+    description = attrib(default='Description here')
+    source = attrib(default='python source code goes here')
+    public = attrib(default='')  # true or false is not supported in redis - only strings are.  Even integers are just strings
 
 cheap_redis_db.config.register_class(Example, namespace='pyrpn')
 
@@ -65,27 +65,35 @@ def examples_list():
     return render_template('examples_list.html', examples=examples_data, title="Examples")
 
 
+def redis_bool_to_bool(redis_val):
+    # hack to convert redis bool of 'y'/'' into real bool
+    return redis_val == 'yes'
+
+def bool_to_redis_bool(val):
+    # hack to convert bool into redis bool of 'y'/''.  Returns the value to store into redis
+    return 'yes' if val else ''
+
+
 @app.route('/example', methods=['GET', 'POST'])
 def example_create():
     """
     Handle GET blank initial forms and POST creating new entries.
     """
-    form = ExampleForm(request.form)
-    if request.method == 'POST' and form.validate():
+    if request.method == 'POST':
+        log.debug(f'example_create POST public {request.values.get("public")}')
+        form = ExampleForm(request.form)
         # example = Example(**dict(request.values))  # why doesn't this work?
-        example = Example(
-            title=request.values.get('title'),
-            source=request.values.get('source'),
-            description=request.values.get('description'),
-            public=request.values.get('public'),
-        )
-        log.info('form validated ok')
-        log.info(example)
-    else:
-        # You probably don't have args at this route with GET
-        # method, but if you do, you can access them like so:
-        yourarg = request.args.get('argname')
-
+        if form.validate():
+            example = Example(
+                title=request.values.get('title'),
+                source=request.values.get('source'),
+                description=request.values.get('description'),
+                public = bool_to_redis_bool(request.values.get('public')),
+            )
+            log.info(example)
+            return redirect(url_for('example_edit', id=example.id))
+    else:  # GET
+        form = ExampleForm()
     return render_template('example.html', form=form, title='Example Edit')
 
 @app.route('/example/<int:id>', methods=['GET', 'POST'])
@@ -96,28 +104,30 @@ def example_edit(id):
     """
     delete = request.args.get('delete')  # Wish forms could send delete verb properly...
     example = Example.get(id)
-    log.info(f'example edit id {id} delete flag {delete} example is {example}')
+    log.info(f'example_edit: id {id} delete flag {delete} example is {example}')
 
     if request.method == 'GET' and delete:
         example.delete()
-        return redirect(url_for('examples_list'))  # name of def
+        return redirect(url_for('examples_list'))  # 'url_for' takes the name of view def
 
     if request.method == 'GET':
-        form = ExampleForm(**example.asdict)
+        dic = example.asdict
+        dic['public'] = redis_bool_to_bool(example.public)
+        form = ExampleForm(**dic)
         return render_template('example.html', form=form, title='Example Edit')
 
     elif request.method == 'POST':  # Wish forms could send put verb properly...
         form = ExampleForm(request.form)
         if form.validate():
-            log.info('edit form validated ok')
             example.title=request.values.get('title')
             example.source=request.values.get('source')
             example.description=request.values.get('description')
-            example.public=request.values.get('public')
+            # example.public=request.values.get('public')
+            example.public = bool_to_redis_bool(request.values.get('public'))
             example.save()
-            log.info(f'example {id} edited and saved {example}')
+            log.info(f'example_edit: {id} edited and saved {example}')
         else:
-            log.debug('form did not validate')
+            log.warning('form did not validate')
         return render_template('example.html', form=form, title='Example Edit')
 
 @app.route('/help')
