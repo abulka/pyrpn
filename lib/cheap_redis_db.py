@@ -71,18 +71,26 @@ class CheapRecord:
         self.ensure_id_allocator()
         self.save()
 
-    @property
-    def namespace(self):
-        return config.get_namespace(self.__class__)
+    @classmethod
+    def _get_namespace(cls):
+        return config.get_namespace(cls)
 
-    @property
-    def id_allocator_key(self):
-        return f'{self.namespace}:id'
+    @classmethod
+    def _get_id_allocator_key(cls):
+        return f'{cls._get_namespace()}:id'
+
+    # @property
+    # def namespace(self):
+    #     return config.get_namespace(self.__class__)
+
+    # @property
+    # def id_allocator_key(self):
+    #     return f'{self.namespace()}:id'
 
     def ensure_id_allocator(self):
         r = config.redis_conn
-        key = self.id_allocator_key
-        if r.exists(self.id_allocator_key):
+        key = self._get_id_allocator_key()
+        if r.exists(key):
             # id = r.get(key).decode('utf-8')
             id = r.get(key)
             print(f'redis key {key} already there has val of {id}')
@@ -93,7 +101,7 @@ class CheapRecord:
     @classmethod
     def _keys(cls):
         r = config.redis_conn
-        namespace = config.get_namespace(cls)
+        namespace = cls._get_namespace()
         # return [key.decode('utf8') for key in r.keys(f'{namespace}:*')]
         keys = r.keys(f'{namespace}:*')
         if f'{namespace}:id' in keys:
@@ -110,7 +118,7 @@ class CheapRecord:
     def get(cls, id):
         r = config.redis_conn
         namespace = config.get_namespace(cls)
-        key = f'{namespace}:{id}'
+        key = f'{cls._get_namespace()}:{id}'
         data = r.hgetall(key)  # looks like you don't need to encode a key to utf8 to use it - otherwise would need to: r.hgetall(key.encode('utf8'))
         return data
 
@@ -120,9 +128,9 @@ class CheapRecord:
 
     def save(self):
         r = config.redis_conn
-        next_key = r.incr(self.id_allocator_key)
+        next_key = r.incr(self._get_id_allocator_key())
         print('id incremented to', next_key)
-        key = f'{self.namespace}:{next_key}'
+        key = f'{self._get_namespace()}:{next_key}'
         dic = self.asdict
         dic['id'] = key  # for reference
         r.hmset(key, dic) # create the hash in redis
@@ -140,9 +148,7 @@ class CheapRecord:
         r.delete(*to_delete)
 
         # reset the id counter
-        namespace = config.get_namespace(cls)
-        counter_key = f'{namespace}:id'
-        r.set(counter_key, 0)
+        r.set(cls._get_id_allocator_key(), 0)
 
         keys = cls._keys()
         print('done deleting, keys left', keys)
