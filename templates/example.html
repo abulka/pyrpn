@@ -4,14 +4,20 @@
 
         <script src="../static/js/lib/jquery-3.2.1.min.js"></script>
 
-        <link rel="stylesheet" href="../static/js/lib/prism.css">
-        <script src="../static/js/lib/prism.js"></script>
+        <script src="../static/js/lib/codemirror-5.33.0/codemirror.js"></script>
+        <link rel="stylesheet" href="../static/js/lib/codemirror-5.33.0/codemirror.css">
+        <script src="../static/js/lib/codemirror-5.33.0/python.js"></script>
 
         <link rel="stylesheet" href="../static/index.css">
 
     </head>
    <body>
         <h1>Save Example</h1>
+
+        <ul>
+            <li><a href="/">Converter</a></li>
+            <li><a href="/examples">Examples</a></li>
+        </ul>
 
         <form id="mainform" method="POST" action="/example">
             {{ form.source(class_='python', id='id_python_text') }}
@@ -26,13 +32,13 @@
             <br>
         </form>
 
-        <ul>
-            <li>
-                <a href="/">Converter</a>
-                <a href="/examples">Examples</a>
-            </li>
-        </ul>
+   <script>
+        var options1 = {lineNumbers: true,
+                        mode: "python",
+                        lineWrapping: true}
+        var myCodeMirror1 = CodeMirror.fromTextArea($('#id_python_text').get(0), options1);
 
+   </script>
 
    </body>
 

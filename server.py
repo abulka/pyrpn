@@ -65,12 +65,13 @@ def list_examples():
 
     if len(Example.ids()) == 0:
         # create the first example
-        example = Example(
-            title=example_01['title'],
-            source=example_01['source'],
-            description=example_01['description'],
-            public=example_01['public'],
-        )
+        example = Example(**example_01)
+        # example = Example(
+        #     title=example_01['title'],
+        #     source=example_01['source'],
+        #     description=example_01['description'],
+        #     public=example_01['public'],
+        # )
         print('first example created', example.asdict)
 
     examples_data = []
