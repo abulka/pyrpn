@@ -75,6 +75,8 @@ class CheapRecord:
 
     def __attrs_post_init__(self):
         self._ensure_id_allocator_created()
+        if self.id:
+            self.id = int(self.id)  # just in case we get an id as string, force it to be an int always
         self.save()
 
     @classmethod
@@ -103,11 +105,19 @@ class CheapRecord:
 
     @classmethod
     def get_data(cls, id):
+        # returns dict of data only
         r = config.redis_conn
         namespace = config.get_namespace(cls)
         key = f'{cls._get_namespace()}:{id}'
         data = r.hgetall(key)  # looks like you don't need to encode a key to utf8 to use it - otherwise would need to: r.hgetall(key.encode('utf8'))
         return data
+
+    @classmethod
+    def get(cls, id):
+        # returns actual instance
+        data = cls.get_data(id)
+        instance = cls(**data)
+        return instance
 
     @classmethod
     def delete_id(cls, id):
@@ -158,7 +168,8 @@ class CheapRecord:
         if dry_run:
             log.debug(cls.__name__, 'would delete', *to_delete)
             return
-        r.delete(*to_delete)
+        if to_delete:
+            r.delete(*to_delete)
         cls._reset_id_allocator()
 
     @classmethod

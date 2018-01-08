@@ -14,7 +14,7 @@ class Eg(CheapRecord):
     title = attrib(default='Untitled')
     description = attrib(default='this is a title')
     code = attrib(default='code goes here')
-    public = attrib(default=True)  # true or false I suppose - is this supported?
+    public = attrib(default='1')  # true or false is not supported in redis - only strings are.  Even integers are just strings
 
 
 @attrs
@@ -25,6 +25,11 @@ class Fred(CheapRecord):
 
 config.register_class(Eg, namespace='pyrpn')
 config.register_class(Fred)
+
+# ensure nothing in there - needed for the asserts below to work
+
+Eg.purge_all_records()
+Fred.purge_all_records()
 
 # Create some records
 
@@ -46,9 +51,14 @@ print(f1.asdict)
 print(Eg._keys(), Eg.ids())
 print(Fred._keys(), Fred.ids())
 
-# get data, as a dict - we don't have a way of creating an actual instance yet
+# get data, as a dict
 
 print(Eg.get_data(1))
+
+# get actual instance
+
+e = Eg.get(1)
+assert e == e1
 
 # delete
 
