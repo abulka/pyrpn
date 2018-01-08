@@ -56,7 +56,7 @@ def do(source, comments=True, linenos=True):
 
 
 @app.route('/examples')
-def list_examples():
+def examples_list():
     if len(Example.ids()) == 0:
         example = Example(**example_01)  # create the first example
         log.info('first example re-created', example.asdict)
@@ -97,6 +97,10 @@ def example_edit(id):
     delete = request.args.get('delete')  # Wish forms could send delete verb properly...
     example = Example.get(id)
     log.info(f'example edit id {id} delete flag {delete} example is {example}')
+
+    if request.method == 'GET' and delete:
+        example.delete()
+        return redirect(url_for('examples_list'))  # name of def
 
     if request.method == 'GET':
         form = ExampleForm(**example.asdict)

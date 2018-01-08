@@ -139,7 +139,7 @@ class CheapRecord:
         key = cls._get_id_allocator_key()  # represents the next ID to allocate, stores last value allocated
         if r.exists(key):
             id = r.get(key)
-            log.debug(f'redis key {key} already there has val of {id}')
+            # log.debug(f'redis key {key} already there has val of {id}')
         else:
             cls._reset_id_allocator()
 
