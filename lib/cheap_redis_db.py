@@ -1,15 +1,24 @@
 """
 CheapRecord is a cheap, quick and easy redis db system.
 
-It creates an integer redis key called 'id' which allocates id numbers
-It creates a hash with that id as key
-The key insight here is that all keys are name-spaced under some name, simply by prefixing them like:
+It creates a single integer redis object with a key called 'blah:id' which allocates id numbers.
+For each record it creates a redis hash object under a key 'blah:1' or 'blah:2' etc
+Note 'blah' is the namespace.
+For our purposes id's are integers 1..n and keys are the actual redis keys (which will be the namespace : id).
+
+The key insight here is that whilst all redis keys live in the one root namespace we can simulate namespaces.
+All keys for a record are name-spaced under some name, simply by prefixing them with colon viz:
     - KEY      VAL
     - user:id  integer counter being incremented
     - user:0   hash
     - user:1   hash
-where 'user' is the namespace.  You can further namespace like this my.silly.user:id
-All the name spacing is done automatically, by pulling out the name of the class and using that as the namespace.
+where 'user' is the namespace (which by convention is the CheapRecord classname in lower case).  We then use the :id
+key as an integer id, which we increment when allocating id numbers for all 'records' in the e.g. 'user' namespace.
+In reality the keys are flat in the main root of redis, but appear as if they are in directories using redis commandser UI.
+
+All the name spacing is done automatically by CheapRecord, by pulling out the name of the class and using that as the
+namespace.  Plus you can prepend addition namespacing when you register your class with _CheapRecordManager.  So you
+can end up with keys like 'my.silly.user:id'
 
 Usage:
   See research/redis_cheap_db_play.py
@@ -119,12 +128,13 @@ class CheapRecord:
         r.hmset(key, dic) # create the hash in redis
 
     @classmethod
-    def purge_all_records(cls):
+    def purge_all_records(cls, dry_run=False):
         # clears entire db
         r = config.redis_conn
         to_delete = cls._keys()
-        print(cls.__name__, 'about to delete', *to_delete)
-        return
+        if dry_run:
+            print(cls.__name__, 'would delete', *to_delete)
+            return
 
         # delete all records
         r.delete(*to_delete)
@@ -135,5 +145,5 @@ class CheapRecord:
         r.set(counter_key, 0)
 
         keys = cls._keys()
-        print('done, keys left', keys)
+        print('done deleting, keys left', keys)
 

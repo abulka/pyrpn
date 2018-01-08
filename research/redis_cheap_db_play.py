@@ -51,6 +51,7 @@ print(Eg.get(1))
 
 # Delete all records (static method calls)
 
-Eg.purge_all_records()
-Fred.purge_all_records()
+dry_run=True
+Eg.purge_all_records(dry_run)
+Fred.purge_all_records(dry_run)
 
