@@ -48,7 +48,7 @@ h3 {
     float: right;
 }
 
-/*Example Page*/
+/*Examples Page*/
 
 table {
     border: 1px solid black;
@@ -67,6 +67,25 @@ th {
 th {
     /*background-color: rgba(88, 200, 212, 0.2);*/
     color: #fa6b0f;
+}
+
+/* Edit Example Page */
+
+table.form_table {
+    /*get rid of borders*/
+    border: none;
+}
+table.form_table th, td {
+    /*get rid of borders*/
+    border-bottom: none;
+}
+.table-expand tbody tr td:nth-child(1n) {
+    /*make left column slim down*/
+    white-space:nowrap;
+}
+.table-expand tbody tr td:nth-child(2n) {
+    /*make left column slim down*/
+    width:100%
 }
 
 /*after adding bootstrap I had to add margins*/

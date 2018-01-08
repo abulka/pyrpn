@@ -16,15 +16,23 @@
 
         <form id="mainform" method="POST" action="/example">
             {{ form.source(class_='python', id='id_python_text') }}
+
+            <table class="form_table table-expand">
+                <tr>
+                   <td> {{ form.title.label }} </td>
+                   <td> {{ form.title() }} </td>
+                </tr>
+                <tr>
+                   <td> {{ form.description.label }} </td>
+                   <td> {{ form.description(class_='description') }} </td>
+                </tr>
+                <tr>
+                   <td> {{ form.public.label }} </td>
+                   <td> {{ form.public() }} </td>
+                </tr>
+            </table>
             <input class="submit_button" title='Save this as an example' data-toggle="tooltip" type="submit" value="Save">
-            <br>
-            {{ form.title.label }} {{ form.title() }}
-            <br>
-            {{ form.description.label }} {{ form.description(class_='description') }}
-            <br>
-            {{ form.public.label }} {{ form.public() }}
             {{ form.csrf_token }}
-            <br>
         </form>
 
     </div>
