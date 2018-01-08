@@ -45,6 +45,9 @@ h3 {
     margin-bottom: 1em;
     background-color: chartreuse;
     font-size: x-large;
+}
+
+.convert_button {
     float: right;
 }
 

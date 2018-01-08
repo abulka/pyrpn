@@ -11,5 +11,5 @@ class MyForm(FlaskForm):
 class ExampleForm(FlaskForm):
     source = TextAreaField('source', default=example_01['source'], validators=[])
     title = StringField('title', default='Untitled')
-    description = StringField('description', default='Enter a description here')
+    description = TextAreaField('description', default='Enter a description here')
     public = BooleanField('makepublic', default=False)

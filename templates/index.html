@@ -19,7 +19,7 @@
                     <h3>Enter Python Source Code:</h3>
                     <form id="mainform" method="POST" action="/">
                         {{ form.source(class_='python', id='id_python_text') }}
-                        <input class="submit_button" title='Ctrl-ENTER' data-toggle="tooltip" type="submit" value="Convert">
+                        <input class="submit_button convert_button" title='Ctrl-ENTER' data-toggle="tooltip" type="submit" value="Convert">
                         <br>
                         {{ form.comments.label }} {{ form.comments() }}
                         <br>
