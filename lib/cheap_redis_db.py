@@ -102,12 +102,26 @@ class CheapRecord:
         return ids
 
     @classmethod
-    def get(cls, id):
+    def get_data(cls, id):
         r = config.redis_conn
         namespace = config.get_namespace(cls)
         key = f'{cls._get_namespace()}:{id}'
         data = r.hgetall(key)  # looks like you don't need to encode a key to utf8 to use it - otherwise would need to: r.hgetall(key.encode('utf8'))
         return data
+
+    @classmethod
+    def delete_id(cls, id):
+        """
+        """
+        r = config.redis_conn
+        key = f'{cls._get_namespace()}:{id}'
+        if r.exists(key):
+            r.delete(key)
+            log.debug(f'deleted {key}')
+            assert not r.exists(key)
+
+    def delete(self):
+        self.delete_id(self.id)
 
     @classmethod
     def _ensure_id_allocator_created(cls):

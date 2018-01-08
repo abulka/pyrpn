@@ -30,26 +30,31 @@ config.register_class(Fred)
 
 e1 = Eg(code='def blah(): pass')
 e2 = Eg(code='x = 100')
+e3 = Eg(code='y = 6100')
+assert len(Eg._keys()) == 3
+
 f1 = Fred(x=1, y=2)  # since we didn't register with any namespace, this record will be created under 'fred' in root namespace
 f1.x = 2000
 f1.save()
+assert len(Fred.ids()) == 1
 
 print(e1.asdict)
 print(f1.asdict)
 
-# listing keys (static calls)
+# listing keys and ids (static calls)
 
-print(Eg._keys())
-print(Fred._keys())
+print(Eg._keys(), Eg.ids())
+print(Fred._keys(), Fred.ids())
 
-# listing ids (static calls) - id's recommended over keys
+# get data, as a dict - we don't have a way of creating an actual instance yet
 
-print(Eg.ids())
-print(Fred.ids())
+print(Eg.get_data(1))
 
-# get
+# delete
 
-print(Eg.get(1))
+Eg.delete_id(e1.id)
+e3.delete()
+assert len(Eg.ids()) == 1
 
 # Delete all records (static method calls)
 
@@ -57,3 +62,5 @@ dry_run=False
 Eg.purge_all_records(dry_run)
 Fred.purge_all_records(dry_run)
 
+assert len(Eg.ids()) == 0
+assert len(Fred.ids()) == 0
