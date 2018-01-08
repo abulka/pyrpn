@@ -15,9 +15,9 @@ div.header h1 {
 div.header i {
     clear: both;
     display: block;
-    margin-left: 10em;
+    margin-left: 1em;
     margin-right: 0;
-    alignment: center;
+    margin-bottom: 0.5em;
 }
 
 h3 {
