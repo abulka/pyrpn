@@ -66,7 +66,7 @@ config = _CheapRecordManager()
 
 @attrs
 class CheapRecord:
-    id = attrib(default=0)  # auto allocated
+    id = attrib(default=None)  # id will be auto allocated
 
     def __attrs_post_init__(self):
         self._ensure_id_allocator_created()
@@ -107,7 +107,7 @@ class CheapRecord:
     @classmethod
     def _ensure_id_allocator_created(cls):
         r = config.redis_conn
-        key = cls._get_id_allocator_key()
+        key = cls._get_id_allocator_key()  # represents the next ID to allocate, stores last value allocated
         if r.exists(key):
             # id = r.get(key).decode('utf-8')
             id = r.get(key)
@@ -118,16 +118,20 @@ class CheapRecord:
 
     @property
     def asdict(self):
-        return asdict(self, filter=lambda attr, value: attr.name not in ('xxx',))  # filter unused, kept for future use
+        # return asdict(self, filter=lambda attr, value: attr.name not in ('xxx',))  # filter unused, kept for future use
+        return asdict(self)
 
     def save(self):
+        """
+        The first save will allocate the id and create the record, subsequent saves will update the existing record.
+        :return: -
+        """
         r = config.redis_conn
-        next_key = r.incr(self._get_id_allocator_key())
-        print('id incremented to', next_key)
-        key = f'{self._get_namespace()}:{next_key}'
+        if self.id == None:
+            self.id = r.incr(self._get_id_allocator_key())
+        key = f'{self._get_namespace()}:{self.id}'
         dic = self.asdict
-        dic['id'] = key  # for reference
-        r.hmset(key, dic) # create the hash in redis
+        r.hmset(key, dic) # set the hash in redis, creating it if it isn't there
 
     @classmethod
     def purge_all_records(cls, dry_run=False):
