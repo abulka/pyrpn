@@ -1,19 +1,11 @@
-<!doctype html>
-<html>
-    <head>
+{% extends "base.html" %}
+{% block additional_js %}
+    <script src="../static/js/lib/codemirror-5.33.0/codemirror.js"></script>
+    <link rel="stylesheet" href="../static/js/lib/codemirror-5.33.0/codemirror.css">
+    <script src="../static/js/lib/codemirror-5.33.0/python.js"></script>
+{% endblock %}
 
-        <script src="../static/js/lib/jquery-3.2.1.min.js"></script>
-
-        <script src="../static/js/lib/codemirror-5.33.0/codemirror.js"></script>
-        <link rel="stylesheet" href="../static/js/lib/codemirror-5.33.0/codemirror.css">
-        <script src="../static/js/lib/codemirror-5.33.0/python.js"></script>
-
-        <link rel="stylesheet" href="../static/index.css">
-
-    </head>
-   <body>
-        <h1>Save Example</h1>
-
+{% block content %}
         <ul>
             <li><a href="/">Converter</a></li>
             <li><a href="/examples">Examples</a></li>
@@ -39,8 +31,4 @@
         var myCodeMirror1 = CodeMirror.fromTextArea($('#id_python_text').get(0), options1);
 
    </script>
-
-   </body>
-
-</html>
-
+{% endblock %}

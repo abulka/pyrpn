@@ -74,6 +74,7 @@ def edit_example():
     form = ExampleForm(request.form)
     if request.method == 'POST' and form.validate():
         print('validated OK')
+        # example = Example(**dict(request.values))  # why doesn't this work?
         example = Example(
             title=request.values.get('title'),
             source=request.values.get('source'),
@@ -86,7 +87,7 @@ def edit_example():
         # method, but if you do, you can access them like so:
         yourarg = request.args.get('argname')
 
-    return render_template('example.html', form=form)
+    return render_template('example.html', form=form, title='Example Edit')
 
 # @app.route('/register', methods=['GET', 'POST'])
 # def register():
