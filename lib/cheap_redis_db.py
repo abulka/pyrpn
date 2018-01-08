@@ -37,6 +37,7 @@ class _CheapRecordManager:
     def __init__(self):
         self.redis_conn = None
         self.class_to_namespace = {}
+        self.initial_id = 0
 
     def set_connection(self, r):
         self.redis_conn = r
@@ -68,7 +69,7 @@ class CheapRecord:
     id = attrib(default=0)  # auto allocated
 
     def __attrs_post_init__(self):
-        self.ensure_id_allocator()
+        self._ensure_id_allocator_created()
         self.save()
 
     @classmethod
@@ -78,25 +79,6 @@ class CheapRecord:
     @classmethod
     def _get_id_allocator_key(cls):
         return f'{cls._get_namespace()}:id'
-
-    # @property
-    # def namespace(self):
-    #     return config.get_namespace(self.__class__)
-
-    # @property
-    # def id_allocator_key(self):
-    #     return f'{self.namespace()}:id'
-
-    def ensure_id_allocator(self):
-        r = config.redis_conn
-        key = self._get_id_allocator_key()
-        if r.exists(key):
-            # id = r.get(key).decode('utf-8')
-            id = r.get(key)
-            print(f'redis key {key} already there has val of {id}')
-        else:
-            r.set(key, self.id)
-            print(f'key {key} created', self.id)
 
     @classmethod
     def _keys(cls):
@@ -121,6 +103,18 @@ class CheapRecord:
         key = f'{cls._get_namespace()}:{id}'
         data = r.hgetall(key)  # looks like you don't need to encode a key to utf8 to use it - otherwise would need to: r.hgetall(key.encode('utf8'))
         return data
+
+    @classmethod
+    def _ensure_id_allocator_created(cls):
+        r = config.redis_conn
+        key = cls._get_id_allocator_key()
+        if r.exists(key):
+            # id = r.get(key).decode('utf-8')
+            id = r.get(key)
+            print(f'redis key {key} already there has val of {id}')
+        else:
+            r.set(key, config.initial_id)
+            print(f'key {key} created', config.initial_id)
 
     @property
     def asdict(self):
