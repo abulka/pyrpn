@@ -1,18 +1,10 @@
-<!doctype html>
-<html>
-    <head>
+{% extends "base.html" %}
+{% block additional_js %}
+    <link rel="stylesheet" href="../static/js/lib/prism.css">
+    <script src="../static/js/lib/prism.js"></script>
+{% endblock %}
 
-        <script src="../static/js/lib/jquery-3.2.1.min.js"></script>
-
-        <link rel="stylesheet" href="../static/js/lib/prism.css">
-        <script src="../static/js/lib/prism.js"></script>
-
-        <link rel="stylesheet" href="../static/index.css">
-
-    </head>
-   <body>
-        <h1>Examples</h1>
-
+{% block content %}
         <ul>
             <li><a href="/">Converter</a></li>
             <li><a href="/example">Add Example</a></li>
@@ -36,9 +28,4 @@
              {% endfor %}
         </table>
 
-
-
-   </body>
-
-</html>
-
+{% endblock %}

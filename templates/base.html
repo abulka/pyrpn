@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% block heading %}
+    <title>Python to RPN - {{title}}</title>
+    <h1>Python to RPN - {{title}}</h1>
+    {% endblock %}
+
+    <script src="../static/js/lib/jquery-3.2.1.min.js"></script>
+    {% block additional_js %}
+    {% endblock additional_js %}
+    <link rel="stylesheet" href="../static/index.css">
+</head>
+<body>
+    <div>
+        <!--<h2>This is part of my base template</h2>-->
+        <!--<hr>-->
+        {% block content %}
+        {% endblock %}
+
+       <br>
+       <br>
+       <br>
+       <hr>
+
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-21552030-5"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'UA-21552030-5');
+        </script>
+
+        <!--<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>-->
+        <!--&lt;!&ndash; 300x250, created 09/02/10 &ndash;&gt;-->
+        <!--<ins class="adsbygoogle"-->
+             <!--style="display:inline-block;width:300px;height:250px"-->
+             <!--data-ad-client="ca-pub-3729777633760054"-->
+             <!--data-ad-slot="0535527882"></ins>-->
+        <!--<script>-->
+        <!--(adsbygoogle = window.adsbygoogle || []).push({});-->
+        <!--</script>-->
+
+    </div>
+</body>
+</html>

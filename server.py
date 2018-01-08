@@ -57,29 +57,12 @@ def do(source, comments=True, linenos=True):
 
 @app.route('/examples')
 def list_examples():
-    """
-    In the CLI use
-        DEL pyrpn.examples
-    to delete examples
-    """
-
     if len(Example.ids()) == 0:
-        # create the first example
-        example = Example(**example_01)
-        # example = Example(
-        #     title=example_01['title'],
-        #     source=example_01['source'],
-        #     description=example_01['description'],
-        #     public=example_01['public'],
-        # )
-        print('first example created', example.asdict)
-
-    examples_data = []
-    for id in Example.ids():
-        example = Example.get(id)
-        examples_data.append(example)
-    # return f'<html><body><pre>{example}</pre></body></html>'
-    return render_template('examples_list.html', examples=examples_data)
+        example = Example(**example_01)  # create the first example
+        log.info('first example re-created', example.asdict)
+        # return f'<html><body><pre>{example}</pre></body></html>'
+    examples_data = [Example.get(id) for id in Example.ids()]
+    return render_template('examples_list.html', examples=examples_data, title="Examples")
 
 
 @app.route('/example', methods=['GET', 'POST'])
