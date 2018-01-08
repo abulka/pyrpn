@@ -6,11 +6,13 @@
 {% endblock %}
 
 {% block content %}
-        <ul>
-            <li><a href="/">Converter</a></li>
-            <li><a href="/examples">Examples</a></li>
-            <li><a href="/help">Help</a></li>
-        </ul>
+    <ul>
+        <li><a href="/">Converter</a></li>
+        <li><a href="/examples">Examples</a></li>
+        <li><a href="/help">Help</a></li>
+    </ul>
+
+    <div class="andy_content">
 
         <form id="mainform" method="POST" action="/example">
             {{ form.source(class_='python', id='id_python_text') }}
@@ -18,18 +20,20 @@
             <br>
             {{ form.title.label }} {{ form.title() }}
             <br>
-            {{ form.description.label }} {{ form.description() }}
+            {{ form.description.label }} {{ form.description(class_='description') }}
             <br>
             {{ form.public.label }} {{ form.public() }}
             {{ form.csrf_token }}
             <br>
         </form>
 
-   <script>
+    </div>
+
+    <script>
         var options1 = {lineNumbers: true,
                         mode: "python",
                         lineWrapping: true}
         var myCodeMirror1 = CodeMirror.fromTextArea($('#id_python_text').get(0), options1);
 
-   </script>
+    </script>
 {% endblock %}

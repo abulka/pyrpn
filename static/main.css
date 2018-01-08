@@ -34,6 +34,12 @@ h3 {
     font-size: large;
 }
 
+.description {
+    width: 50%;
+    height: 10em;
+    align-content: left;
+}
+
 .submit_button {
     margin-top: 1em;
     margin-bottom: 1em;
@@ -61,4 +67,11 @@ th {
 th {
     /*background-color: rgba(88, 200, 212, 0.2);*/
     color: #fa6b0f;
+}
+
+/*after adding bootstrap I had to add margins*/
+
+.andy_content {
+    margin-left: 1em;
+    margin-right: 1em;
 }
