@@ -1,26 +1,23 @@
-<!doctype html>
-<html>
-    <head>
+{% extends "base.html" %}
+{% block additional_js %}
+    <script src="../static/js/lib/codemirror-5.33.0/codemirror.js"></script>
+    <link rel="stylesheet" href="../static/js/lib/codemirror-5.33.0/codemirror.css">
+    <script src="../static/js/lib/codemirror-5.33.0/python.js"></script>
+    <script src="../static/js/lib/clipboard.min.js"></script>
+    <script src="../static/js/lib/bootstrap.min.js"></script>
+    <link rel="stylesheet" href=../static/js/lib/bootstrap.min.css>
+{% endblock %}
 
-        <script src="../static/js/lib/jquery-3.2.1.min.js"></script>
-        <script src="../static/js/lib/codemirror-5.33.0/codemirror.js"></script>
-        <link rel="stylesheet" href="../static/js/lib/codemirror-5.33.0/codemirror.css">
-        <script src="../static/js/lib/codemirror-5.33.0/python.js"></script>
-        <script src="../static/js/lib/clipboard.min.js"></script>
-        <script src="../static/js/lib/bootstrap.min.js"></script>
-        <link rel="stylesheet" href=../static/js/lib/bootstrap.min.css>
-        <link rel="stylesheet" href="../static/index.css">
+{% block content %}
+        <ul>
+            <li><a href="/examples">Examples</a></li>
+            <li><a href="/example">Add Example</a></li>
+            <li><a href="/help">Help</a></li>
+        </ul>
 
-    </head>
-   <body>
         <section class="container custom-container">
           <div class="left-half">
               <article>
-                  <div class="header">
-                      <h1>Python to RPN - source code converter</h1>
-                      <a style="float: right" href="help" target="_blank">help</a>
-                      <i>A new way to program HP calculators like the HP42S, DM42 and Free42</i>
-                  </div>
                     <h3>Enter Python Source Code:</h3>
                     <form id="mainform" method="POST" action="/">
                         {{ form.source(class_='python', id='id_python_text') }}
@@ -32,10 +29,6 @@
                         {{ form.csrf_token }}
                         <br>
                         <!--<a href="/example" id="save_to_examples">Save</a>-->
-                        <ul>
-                            <li><a href="/examples">Examples</a></li>
-                            <li><a href="/example">Add Example</a></li>
-                        </ul>
                     </form>
 
               </article>
@@ -54,33 +47,6 @@
             </article>
           </div>
         </section>
-
-   <br>
-   <br>
-   <br>
-   <hr>
-
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-21552030-5"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'UA-21552030-5');
-    </script>
-
-    <!--<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>-->
-    <!--&lt;!&ndash; 300x250, created 09/02/10 &ndash;&gt;-->
-    <!--<ins class="adsbygoogle"-->
-         <!--style="display:inline-block;width:300px;height:250px"-->
-         <!--data-ad-client="ca-pub-3729777633760054"-->
-         <!--data-ad-slot="0535527882"></ins>-->
-    <!--<script>-->
-    <!--(adsbygoogle = window.adsbygoogle || []).push({});-->
-    <!--</script>-->
-
-   </body>
 
     <script>
         var first_time = $('.right-half pre').text() == "Press Convert"
@@ -140,6 +106,4 @@
 
     </script>
 
-
-</html>
-
+{% endblock %}

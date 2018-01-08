@@ -1,15 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <link rel="stylesheet" href="../static/main.css">
     {% block heading %}
-    <title>Python to RPN - {{title}}</title>
-    <h1>Python to RPN - {{title}}</h1>
+        <title>Python to RPN - {{title}}</title>
+
+        <div class="header">
+            <h1 class="header">Python to RPN - {{title}}</h1>
+            <i class="header">A new way to program HP calculators like the HP42S, DM42 and Free42</i>
+        </div>
     {% endblock %}
 
     <script src="../static/js/lib/jquery-3.2.1.min.js"></script>
     {% block additional_js %}
     {% endblock additional_js %}
-    <link rel="stylesheet" href="../static/index.css">
+    <link rel="stylesheet" href="../static/main_last.css">
+
 </head>
 <body>
     <div>

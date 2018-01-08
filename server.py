@@ -46,7 +46,7 @@ def index():
     else:
         rpn = rpn_free42 = 'Press Convert'
 
-    return render_template('index.html', form=form, rpn=rpn, rpn_free42=rpn_free42)
+    return render_template('index.html', form=form, rpn=rpn, rpn_free42=rpn_free42, title='source code converter')
 
 
 def do(source, comments=True, linenos=True):
@@ -62,7 +62,7 @@ def list_examples():
         log.info('first example re-created', example.asdict)
         # return f'<html><body><pre>{example}</pre></body></html>'
     examples_data = [Example.get(id) for id in Example.ids()]
-    return render_template('examples_list.html', examples=examples_data, title="Examples")
+    return render_template('examples_list.html', examples=examples_data, title="examples")
 
 
 @app.route('/example', methods=['GET', 'POST'])
@@ -87,7 +87,7 @@ def edit_example():
         # method, but if you do, you can access them like so:
         yourarg = request.args.get('argname')
 
-    return render_template('example.html', form=form, title='Example Edit')
+    return render_template('example.html', form=form, title='example Edit')
 
 # @app.route('/register', methods=['GET', 'POST'])
 # def register():
