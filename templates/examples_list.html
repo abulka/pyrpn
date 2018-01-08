@@ -22,9 +22,14 @@
              {% for example in examples %}
                 <tr>
                    <td> {{ example.title }} </td>
-                   <td> <pre><code class="language-python"> {{ example.source.strip() }} </code></pre></td>
+                   <td> <pre><code class="language-python">{{ example.source.strip() }}</code></pre></td>
                    <td> {{ example.description.strip()|safe }}</td>
-                   <td> <input type="button" value="Convert..."> </td>
+                   <td>
+                       <!--<input type="button" value="RPN...">-->
+                       <p><a href="/example/{{ example.id }}">Convert to RPN</a></p>
+                       <p><a href="/example/{{ example.id }}">Edit</a></p>
+                       <p><a href="/example/{{ example.id }}">Delete</a></p>
+                   </td>
                 </tr>
 
              {% endfor %}

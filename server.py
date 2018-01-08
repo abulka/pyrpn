@@ -66,14 +66,12 @@ def list_examples():
 
 
 @app.route('/example', methods=['GET', 'POST'])
-def edit_example():
+def example_create():
     """
-    This should take a form to edit it.  If no param then create a new blank form and save to a new entry in redis.
-    :return:
+    Handle GET blank initial forms and POST creating new entries.
     """
     form = ExampleForm(request.form)
     if request.method == 'POST' and form.validate():
-        print('validated OK')
         # example = Example(**dict(request.values))  # why doesn't this work?
         example = Example(
             title=request.values.get('title'),
@@ -81,7 +79,8 @@ def edit_example():
             description=request.values.get('description'),
             public=request.values.get('public'),
         )
-        print(example)
+        log.info('form validated ok')
+        log.info(example)
     else:
         # You probably don't have args at this route with GET
         # method, but if you do, you can access them like so:
@@ -89,18 +88,33 @@ def edit_example():
 
     return render_template('example.html', form=form, title='Example Edit')
 
-# @app.route('/register', methods=['GET', 'POST'])
-# def register():
-#     if flask.request.method == 'POST':
-#         username = flask.request.values.get('user') # Your form's
-#         password = flask.request.values.get('pass') # input names
-#         your_register_routine(username, password)
-#     else:
-#         # You probably don't have args at this route with GET
-#         # method, but if you do, you can access them like so:
-#         yourarg = flask.request.args.get('argname')
-#         your_register_template_rendering(yourarg)
+@app.route('/example/<int:id>', methods=['GET', 'POST'])
+def example_edit(id):
+    """
+    Handle GET existing example and POST updating it.  Forms cannot send put verb.
+    If pass param ?delete=1 then do a DELETE.  Forms cannot send delete verb.
+    """
+    delete = request.args.get('delete')  # Wish forms could send delete verb properly...
+    example = Example.get(id)
+    log.info(f'example edit id {id} delete flag {delete} example is {example}')
 
+    if request.method == 'GET':
+        form = ExampleForm(**example.asdict)
+        return render_template('example.html', form=form, title='Example Edit')
+
+    elif request.method == 'POST':  # Wish forms could send put verb properly...
+        form = ExampleForm(request.form)
+        if form.validate():
+            log.info('edit form validated ok')
+            example.title=request.values.get('title')
+            example.source=request.values.get('source')
+            example.description=request.values.get('description')
+            example.public=request.values.get('public')
+            example.save()
+            log.info(f'example {id} edited and saved {example}')
+        else:
+            log.debug('form did not validate')
+        return render_template('example.html', form=form, title='Example Edit')
 
 @app.route('/help')
 def help():

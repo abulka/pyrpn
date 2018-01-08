@@ -14,7 +14,8 @@
 
     <div class="andy_content">
 
-        <form id="mainform" method="POST" action="/example">
+        <!--leave action="" out of form so that post goes back to originating url incl. /example/id or /example - meaning form can be used for both create and edit-->
+        <form id="mainform" method="POST">
             {{ form.source(class_='python', id='id_python_text') }}
 
             <table class="form_table table-expand">
