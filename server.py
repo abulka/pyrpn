@@ -62,7 +62,7 @@ def list_examples():
         log.info('first example re-created', example.asdict)
         # return f'<html><body><pre>{example}</pre></body></html>'
     examples_data = [Example.get(id) for id in Example.ids()]
-    return render_template('examples_list.html', examples=examples_data, title="examples")
+    return render_template('examples_list.html', examples=examples_data, title="Examples")
 
 
 @app.route('/example', methods=['GET', 'POST'])
@@ -87,7 +87,7 @@ def edit_example():
         # method, but if you do, you can access them like so:
         yourarg = request.args.get('argname')
 
-    return render_template('example.html', form=form, title='example Edit')
+    return render_template('example.html', form=form, title='Example Edit')
 
 # @app.route('/register', methods=['GET', 'POST'])
 # def register():
@@ -104,7 +104,7 @@ def edit_example():
 
 @app.route('/help')
 def help():
-    return render_template('help.html')
+    return render_template('help.html', title='Help & User Guide')
 
 @app.route('/hello')
 def hello():

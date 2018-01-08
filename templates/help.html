@@ -1,56 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Python to RPN - Help</title>
+{% extends "base.html" %}
+
+{% block additional_js %}
+{% endblock %}
+
+{% block content %}
+    <ul>
+        <li><a href="/">Converter</a></li>
+        <li><a href="/examples">Examples</a></li>
+        <li><a href="/example">Add Example</a></li>
+    </ul>
 
     <style>
-        /*body, html {width: 100%; height: 100%; margin: 0; padding: 0}*/
-        /*.row-container {display: flex; width: 100%; height: 100%; flex-direction: column; overflow: hidden;}*/
-        .first-row {padding: 1em; }
-        /*.second-row { flex-grow: 1; border: none; margin: 0; padding: 0; }*/
         .second-row {
             height: 300em;
             width: 50em;
             border: none; margin: 0; padding: 0; }
-
     </style>
-</head>
-<body>
 
     <div class="row-container">
-      <div class="first-row">
-        Goto <a href="/">Python to RPN</a> converter
-      </div>
           <iframe class="second-row" src="https://docs.google.com/document/d/e/2PACX-1vRV7G4VAQtATvpJ7VaNlN5kjdTMHI97FVybvPjeEwHnPqttnkqa9zRMbym4h--0QAlltgadqO4fDnAX/pub?embedded=true"></iframe>
     </div>
-
-
-   <br>
-   <br>
-   <br>
-   <hr>
-
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-21552030-5"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'UA-21552030-5');
-    </script>
-
-    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-    <!-- 300x250, created 09/02/10 -->
-    <ins class="adsbygoogle"
-         style="display:inline-block;width:300px;height:250px"
-         data-ad-client="ca-pub-3729777633760054"
-         data-ad-slot="0535527882"></ins>
-    <script>
-    (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
-
-
-</body>
-</html>
+{% endblock %}
