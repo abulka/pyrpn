@@ -179,3 +179,27 @@ class CheapRecord:
         r.set(key, config.initial_id)  # reset the id counter
         log.debug(f'id_allocator {key} reset')
 
+    """
+    Important: true or false is not supported in redis - only strings are.  
+    CheapDB convention is to use 'yes' or '' strings to indicate boolean.
+    Even integers are just strings
+    
+    When creating wtforms which require booleans, use the utility methods below 
+    to convert from our convention into what wtforms need.
+    
+    Note: the resulting wtform object may have a rendered output of value='y' 
+    but this has nothing to do with our yes/'' - the true indicator is the presence
+    of 'checked' in the html of the <input type='checkbox'...> which means true,
+    its absence means html input is unchecked. 
+    """
+
+    @staticmethod
+    def redis_bool_to_bool(redis_val):
+        # hack to convert redis bool of 'y'/'' into real bool
+        return redis_val == 'yes'
+
+    @staticmethod
+    def bool_to_redis_bool(val):
+        # hack to convert bool into redis bool of 'y'/''.  Returns the value to store into redis
+        return 'yes' if val else ''
+

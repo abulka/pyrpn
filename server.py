@@ -29,7 +29,7 @@ class Example(cheap_redis_db.CheapRecord):
     title = attrib(default='Untitled')
     description = attrib(default='Description here')
     source = attrib(default='python source code goes here')
-    public = attrib(default='')  # true or false is not supported in redis - only strings are.  Even integers are just strings
+    public = attrib(default='')  # true or false is not supported in redis - only strings are.  Use 'yes' or ''.  Even integers are just strings
 
 cheap_redis_db.config.register_class(Example, namespace='pyrpn')
 
@@ -65,15 +65,6 @@ def examples_list():
     return render_template('examples_list.html', examples=examples_data, title="Examples")
 
 
-def redis_bool_to_bool(redis_val):
-    # hack to convert redis bool of 'y'/'' into real bool
-    return redis_val == 'yes'
-
-def bool_to_redis_bool(val):
-    # hack to convert bool into redis bool of 'y'/''.  Returns the value to store into redis
-    return 'yes' if val else ''
-
-
 @app.route('/example', methods=['GET', 'POST'])
 def example_create():
     """
@@ -88,7 +79,7 @@ def example_create():
                 title=request.values.get('title'),
                 source=request.values.get('source'),
                 description=request.values.get('description'),
-                public = bool_to_redis_bool(request.values.get('public')),
+                public = Example.bool_to_redis_bool(request.values.get('public')),
             )
             log.info(example)
             return redirect(url_for('example_edit', id=example.id))
@@ -112,7 +103,7 @@ def example_edit(id):
 
     if request.method == 'GET':
         dic = example.asdict
-        dic['public'] = redis_bool_to_bool(example.public)
+        dic['public'] = Example.redis_bool_to_bool(example.public)
         form = ExampleForm(**dic)
         return render_template('example.html', form=form, title='Example Edit')
 
@@ -123,7 +114,7 @@ def example_edit(id):
             example.source=request.values.get('source')
             example.description=request.values.get('description')
             # example.public=request.values.get('public')
-            example.public = bool_to_redis_bool(request.values.get('public'))
+            example.public = Example.bool_to_redis_bool(request.values.get('public'))
             example.save()
             log.info(f'example_edit: {id} edited and saved {example}')
         else:
