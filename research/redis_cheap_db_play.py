@@ -31,6 +31,8 @@ config.register_class(Fred)
 e1 = Eg(code='def blah(): pass')
 e2 = Eg(code='x = 100')
 f1 = Fred(x=1, y=2)  # since we didn't register with any namespace, this record will be created under 'fred' in root namespace
+f1.x = 2000
+f1.save()
 
 print(e1.asdict)
 print(f1.asdict)
@@ -51,7 +53,7 @@ print(Eg.get(1))
 
 # Delete all records (static method calls)
 
-dry_run=True
+dry_run=False
 Eg.purge_all_records(dry_run)
 Fred.purge_all_records(dry_run)
 

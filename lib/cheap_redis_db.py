@@ -20,8 +20,13 @@ All the name spacing is done automatically by CheapRecord, by pulling out the na
 namespace.  Plus you can prepend addition namespacing when you register your class with _CheapRecordManager.  So you
 can end up with keys like 'my.silly.user:id'
 
+Only works with decode_responses=True at the moment.
+
+# db = redis.StrictRedis()
+db = redis.StrictRedis('localhost', 6379, charset="utf-8", decode_responses=True)
+
 Usage:
-  See research/redis_cheap_db_play.py
+    See research/redis_cheap_db_play.py
 
 """
 
@@ -109,12 +114,10 @@ class CheapRecord:
         r = config.redis_conn
         key = cls._get_id_allocator_key()  # represents the next ID to allocate, stores last value allocated
         if r.exists(key):
-            # id = r.get(key).decode('utf-8')
             id = r.get(key)
-            print(f'redis key {key} already there has val of {id}')
+            log.debug(f'redis key {key} already there has val of {id}')
         else:
-            r.set(key, config.initial_id)
-            print(f'key {key} created', config.initial_id)
+            cls._reset_id_allocator()
 
     @property
     def asdict(self):
@@ -139,15 +142,15 @@ class CheapRecord:
         r = config.redis_conn
         to_delete = cls._keys()
         if dry_run:
-            print(cls.__name__, 'would delete', *to_delete)
+            log.debug(cls.__name__, 'would delete', *to_delete)
             return
-
-        # delete all records
         r.delete(*to_delete)
+        cls._reset_id_allocator()
 
-        # reset the id counter
-        r.set(cls._get_id_allocator_key(), 0)
-
-        keys = cls._keys()
-        print('done deleting, keys left', keys)
+    @classmethod
+    def _reset_id_allocator(cls):
+        r = config.redis_conn
+        key = cls._get_id_allocator_key()
+        r.set(key, config.initial_id)  # reset the id counter
+        log.debug(f'id_allocator {key} reset')
 
