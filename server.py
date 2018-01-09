@@ -6,7 +6,7 @@ from server_forms import MyForm, ExampleForm
 from examples import example_01
 import redis
 import json
-from attr import attrs, attrib
+from attr import attrs, attrib, evolve
 from lib import cheap_redis_db
 
 log = logging.getLogger(__name__)
@@ -98,12 +98,18 @@ def example_edit(id):
     If pass param ?delete=1 then do a DELETE.  Forms cannot send delete verb.
     """
     delete = request.args.get('delete')  # Wish forms could send delete verb properly...
+    clone = request.args.get('clone')
+
     example = Example.get(id)
     log.info(f'example_edit: id {id} delete flag {delete} example is {example}')
 
     if request.method == 'GET' and delete:
         example.delete()
         return redirect(url_for('examples_list'))  # 'url_for' takes the name of view def
+
+    if request.method == 'GET' and clone:
+        example_clone = evolve(example, id=None, title=example.title + ' copy')  # hopefully will reallocate id and save it to redis
+        return redirect(url_for('example_edit', id=example_clone.id))
 
     if request.method == 'GET':
         dic = example.asdict
