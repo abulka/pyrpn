@@ -16,13 +16,13 @@
         <tr>
             <th>Example</th>
             <th><img src="https://www.python.org/static/community_logos/python-logo-master-v3-TM-flattened.png" width="40%"></th>
-            <th>Action</th>
+            <th><img src="static/calc_icon2.png" width="90px"></th>
         </tr>
         {% for example in examples %}
         <tr>
             <td>
                 <div class="top">
-                    <p><b>{{ example.title }}</b></p>
+                    <h2>{{ example.title }}</h2>
                     {{ example.description.strip()|safe }}
                 </div>
                 <div class="bot">
@@ -35,15 +35,7 @@
                 <pre><code class="language-python">{{ example.source.strip() }}</code></pre>
             </td>
             <td>
-                <!--<input type="button" value="RPN...">-->
-                <p>
-                    <a href="/example/{{ example.id }}">
-                        <figure>
-                            <img src="static/calc_icon1.png" width="85%">
-                            <figcaption>View</figcaption>
-                        </figure>
-                    </a>
-                </p>
+                <a href="/example/{{ example.id }}">View</a>
             </td>
         </tr>
 
