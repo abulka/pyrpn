@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Stimulus test</title>
+
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+  <script src="https://unpkg.com/stimulus/dist/stimulus.umd.js"></script>
+  <script>
+    (function() {
+      const application = Stimulus.Application.start()
+      application.register("hello", class extends Stimulus.Controller {
+          connect() {
+            console.log("Hello, Stimulus!", this.element)
+          }
+      })
+      application.register("hello2", class extends Stimulus.Controller {
+          greet() {
+            const element = this.targets.find("name")
+            const name = element.value
+            console.log(`Hello2, ${name}`)
+          }
+      })
+      application.register("andy_out", class extends Stimulus.Controller {
+          clear() {
+            const element = this.targets.find("name")
+            const name = element.value
+            $(element).val('')
+            console.log(`Cleared, ${name} ok`)
+          }
+      })
+    })()
+  </script>
+
+    
+</head>
+<body>
+
+    <!-- ------------------------- -->
+
+    <h1>hello div here</h1>
+    <div data-controller="hello">
+        …
+    </div>
+
+    <h1>hello2 div here</h1>
+    <div data-controller="hello2">
+      <input data-target="hello2.name" type="text">
+      <button data-action="click->hello2#greet">Greet</button>
+    </div>
+
+    <div data-controller="andy_out">
+      <input data-target="andy_out.name" type="text" value="initial crap">
+      <button data-action="click->andy_out#clear">Clear</button>
+    </div>
+
+    <!-- ------------------------- -->
+
+    <p>open the console to see the results</p>
+
+    <hr>
+
+    <p>
+        See <a href="https://github.com/stimulusjs/stimulus/blob/master/handbook/04_managing_state.md">tutorial</a>
+    </p>
+</body>
+</html>
