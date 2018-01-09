@@ -26,16 +26,16 @@
                     {{ example.description.strip()|safe }}
                 </div>
                 <div class="bot">
-                    <span class="examples_action_link"><a href="/example/{{ example.id }}?delete=1">Delete</a></span>
-                    <span class="examples_action_link"><a href="/example/{{ example.id }}?clone=1">Clone</a></span>
                     <span class="examples_action_link"><a href="/example/{{ example.id }}">Edit</a></span>
+                    <span class="examples_action_link"><a href="/example/{{ example.id }}?clone=1">Clone</a></span>
+                    <span class="examples_action_link"><a href="/example/{{ example.id }}?delete=1">Delete</a></span>
                 </div>
             </td>
             <td>
                 <pre><code class="language-python">{{ example.source.strip() }}</code></pre>
             </td>
             <td>
-                <a href="/example/{{ example.id }}">View</a>
+                <a href="/{{ example.id }}">View</a>
             </td>
         </tr>
 

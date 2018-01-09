@@ -35,17 +35,21 @@ cheap_redis_db.config.register_class(Example, namespace='pyrpn')
 
 
 @app.route('/', methods=["GET", "POST"])
-def index():
-    rpn = ''
-    rpn_free42 = ''
-    form = MyForm()
-    if form.validate_on_submit():
-        program = parse(form.source.data)
-        rpn = program.lines_to_str(comments=form.comments.data, linenos=form.line_numbers.data)
-        rpn_free42 = program.lines_to_str(comments=False, linenos=True)
-    else:
-        rpn = rpn_free42 = 'Press Convert'
-
+@app.route('/<int:id>', methods=["GET"])
+def index(id=None):
+    rpn = rpn_free42 = 'Press Convert'
+    if request.method == 'GET':
+        form = MyForm()
+        if id:
+            example = Example.get(id)
+            form.source.process_data(example.source)
+    elif request.method == 'POST':
+        # We are asking for the source to be converted to RPN
+        form = MyForm(request.form)
+        if form.validate_on_submit():
+            program = parse(form.source.data)
+            rpn = program.lines_to_str(comments=form.comments.data, linenos=form.line_numbers.data)
+            rpn_free42 = program.lines_to_str(comments=False, linenos=True)
     return render_template('index.html', form=form, rpn=rpn, rpn_free42=rpn_free42, title='source code converter')
 
 
