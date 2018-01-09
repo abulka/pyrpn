@@ -4,64 +4,84 @@
     <meta charset="UTF-8">
     <title>Stimulus test</title>
 
-  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
-  <script src="https://unpkg.com/stimulus/dist/stimulus.umd.js"></script>
-  <script>
-    (function() {
-      const application = Stimulus.Application.start()
-      application.register("hello", class extends Stimulus.Controller {
-          connect() {
-            console.log("Hello, Stimulus!", this.element)
-          }
-      })
-      application.register("hello2", class extends Stimulus.Controller {
-          greet() {
-            const element = this.targets.find("name")
-            const name = element.value
-            console.log(`Hello2, ${name}`)
-          }
-      })
-      application.register("andy_out", class extends Stimulus.Controller {
-          clear() {
-            const element = this.targets.find("name")
-            const name = element.value
-            $(element).val('')
-            console.log(`Cleared, ${name} ok`)
-          }
-      })
-    })()
-  </script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://unpkg.com/stimulus/dist/stimulus.umd.js"></script>
+    <script>
+        (function () {
+            const application = Stimulus.Application.start()
+            application.register("hello", class extends Stimulus.Controller {
+                connect() {
+                    console.log("Hello, Stimulus!", this.element)
+                    console.log("1. find hello", this.application.getControllerForElementAndIdentifier(this.element, "hello"))
+                    console.log("1. find hello2", this.application.getControllerForElementAndIdentifier(this.element, "hello2"))
+                    console.log("1. find hello - no str", this.application.getControllerForElementAndIdentifier(this.element))
+                    console.log("1. find hello - bad str", this.application.getControllerForElementAndIdentifier(this.element, "xx"))
+                    console.log("1. find hello - only str", this.application.getControllerForElementAndIdentifier("hello"))
+                    console.log("1. find hello - specify id", this.application.getControllerForElementAndIdentifier(
+                        $('#hello2_')[0], "hello2"))
+                }
+            })
+            application.register("hello2", class extends Stimulus.Controller {
+                greet() {
+                    const element = this.targets.find("name")
+                    const name = element.value
+                    console.log(`Hello2, ${name}`)
 
-    
+                    // how to get to a target not related to this controller?
+                    let out = this.andy_outController
+                    out.clear()
+                }
+
+                get andy_outController() {
+
+                    return this.application.getControllerForElementAndIdentifier(this.element, "andy_out")
+                    // return this.application.getControllerForElementAndIdentifier("andy_out")
+                }
+            })
+            application.register("andy_out", class extends Stimulus.Controller {
+                clear() {
+                    const element = this.targets.find("name")
+                    const name = element.value
+                    $(element).val('')
+                    console.log(`Cleared, ${name} ok`)
+                }
+            })
+        })()
+    </script>
+
+
 </head>
 <body>
 
-    <!-- ------------------------- -->
+<!-- ------------------------- -->
 
-    <h1>hello div here</h1>
-    <div data-controller="hello">
-        …
-    </div>
+<h1>hello div here</h1>
+<div data-controller="hello">
+    …
+</div>
 
-    <h1>hello2 div here</h1>
-    <div data-controller="hello2">
-      <input data-target="hello2.name" type="text">
-      <button data-action="click->hello2#greet">Greet</button>
-    </div>
+<h1>hello2 div here</h1>
+<div data-controller="hello2">
+    <input data-target="hello2.name" type="text" id="hello2_" >
+    <button data-action="click->hello2#greet">Greet</button>
+</div>
 
-    <div data-controller="andy_out">
-      <input data-target="andy_out.name" type="text" value="initial crap">
-      <button data-action="click->andy_out#clear">Clear</button>
-    </div>
+<div data-controller="andy_out">
+    <input data-target="andy_out.name" type="text" value="initial crap">
+    <button data-action="click->andy_out#clear">Clear</button>
+</div>
 
-    <!-- ------------------------- -->
+<!-- ------------------------- -->
 
-    <p>open the console to see the results</p>
+<p>open the console to see the results</p>
 
-    <hr>
+<hr>
 
-    <p>
-        See <a href="https://github.com/stimulusjs/stimulus/blob/master/handbook/04_managing_state.md">tutorial</a>
-    </p>
+<p>
+    See <a href="https://github.com/stimulusjs/stimulus/blob/master/handbook/04_managing_state.md">tutorial</a>
+</p>
+<p>
+    See <a href="https://github.com/stimulusjs/stimulus/issues/35">my issue re referencing controllers</a>
+</p>
 </body>
 </html>
