@@ -28,6 +28,6 @@ example_01 = {
           e.g. <pre>aview('Counter ', i, ' result= ', total)</pre> Time saver!</p>
     """).strip(),
     'public': 'y',
-    'fingerprint': '00101demo1234',
+    'fingerprint': 'demo_01',
 }
 

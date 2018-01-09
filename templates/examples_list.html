@@ -1,39 +1,54 @@
 {% extends "base.html" %}
 {% block additional_js %}
-    <link rel="stylesheet" href="../static/js/lib/prism.css">
-    <script src="../static/js/lib/prism.js"></script>
+<link rel="stylesheet" href="../static/js/lib/prism.css">
+<script src="../static/js/lib/prism.js"></script>
 {% endblock %}
 
 {% block content %}
-    <ul>
-        <li><a href="/">Converter</a></li>
-        <li><a href="/example">Create Example</a></li>
-        <li><a href="/help">Help</a></li>
-    </ul>
+<ul>
+    <li><a href="/">Converter</a></li>
+    <li><a href="/example">Create Example</a></li>
+    <li><a href="/help">Help</a></li>
+</ul>
 
-    <div class="andy_content">
-        <table border = 1>
-            <tr>
-               <th> Title </th>
-               <th> <img src="https://www.python.org/static/community_logos/python-logo-master-v3-TM-flattened.png" width="40%"> </th>
-               <th> Description </th>
-               <th> <img src="static/calc_icon1.png"> </th>
-            </tr>
-             {% for example in examples %}
-                <tr>
-                   <td> {{ example.title }} </td>
-                   <td> <pre><code class="language-python">{{ example.source.strip() }}</code></pre></td>
-                   <td> {{ example.description.strip()|safe }}</td>
-                   <td>
-                       <!--<input type="button" value="RPN...">-->
-                       <p><a href="/example/{{ example.id }}">Convert to RPN</a></p>
-                       <p><a href="/example/{{ example.id }}">Edit</a></p>
-                       <p><a href="/example/{{ example.id }}?delete=1">Delete</a></p>
-                   </td>
-                </tr>
+<div class="andy_content">
+    <table border=1 class="examples_table">
+        <tr>
+            <th>Example</th>
+            <th><img src="https://www.python.org/static/community_logos/python-logo-master-v3-TM-flattened.png" width="40%"></th>
+            <th>Action</th>
+        </tr>
+        {% for example in examples %}
+        <tr>
+            <td>
+                <div class="top">
+                    <p><b>{{ example.title }}</b></p>
+                    {{ example.description.strip()|safe }}
+                </div>
+                <div class="bot">
+                    <span class="examples_action_link"><a href="/example/{{ example.id }}?delete=1">Delete</a></span>
+                    <span class="examples_action_link"><a href="/example/{{ example.id }}?clone=1">Clone</a></span>
+                    <span class="examples_action_link"><a href="/example/{{ example.id }}">Edit</a></span>
+                </div>
+            </td>
+            <td>
+                <pre><code class="language-python">{{ example.source.strip() }}</code></pre>
+            </td>
+            <td>
+                <!--<input type="button" value="RPN...">-->
+                <p>
+                    <a href="/example/{{ example.id }}">
+                        <figure>
+                            <img src="static/calc_icon1.png" width="85%">
+                            <figcaption>View</figcaption>
+                        </figure>
+                    </a>
+                </p>
+            </td>
+        </tr>
 
-             {% endfor %}
-        </table>
-    </div>
+        {% endfor %}
+    </table>
+</div>
 
 {% endblock %}

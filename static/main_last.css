@@ -48,3 +48,55 @@ article pre {
      font-size: inherit;
      /*font-size: 13px;*/
 }
+
+/*Examples Page*/
+
+table.examples_table {
+    border: 1px solid black;
+    border-collapse: collapse;
+    width: 100%;
+}
+table.examples_table th, td {
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+}
+table.examples_table th {
+    text-align: center;
+    vertical-align: center;
+    font-size: x-large;
+    background-color: rgba(88, 200, 212, 0.2);
+    color: #fa6b0f;
+}
+table.examples_table td {
+    text-align: left;
+    vertical-align: top;
+}
+
+table.examples_table td:nth-child(3) {
+    text-align: center;
+    vertical-align: middle;
+}
+
+/*table.examples_table td:nth-child(1) {*/
+    /*position: relative;*/
+    /*width: auto;*/
+    /*height: auto;*/
+    /*border: solid 1px;*/
+/*}*/
+
+/*div.top, div.bot {*/
+    /*position:absolute;*/
+/*}*/
+/*div.top {*/
+    /*top: 0;*/
+/*}*/
+/*div.bot {*/
+    /*bottom:0; right:0;*/
+/*}*/
+
+span.examples_action_link {
+    float: right;
+    margin-left: 1em;
+    margin-right: 1em;
+    font-size: smaller;
+}
