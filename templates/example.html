@@ -3,6 +3,8 @@
     <script src="../static/js/lib/codemirror-5.33.0/codemirror.js"></script>
     <link rel="stylesheet" href="../static/js/lib/codemirror-5.33.0/codemirror.css">
     <script src="../static/js/lib/codemirror-5.33.0/python.js"></script>
+    <script src="../static/js/lib/tinymce/tinymce.min.js"></script>
+
 {% endblock %}
 
 {% block content %}
@@ -25,7 +27,7 @@
                 </tr>
                 <tr>
                    <td> {{ form.description.label }} </td>
-                   <td> {{ form.description(class_='description') }} </td>
+                   <td> {{ form.description(class_='description', id='id_description_text') }} </td>
                 </tr>
                 <tr>
                    <td> {{ form.public.label }} </td>
@@ -43,6 +45,35 @@
                         mode: "python",
                         lineWrapping: true}
         var myCodeMirror1 = CodeMirror.fromTextArea($('#id_python_text').get(0), options1);
+
+        function isMobileDevice() {
+            return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
+        };
+        options2 = {
+            selector: '#id_description_text',
+            theme: 'modern',
+            mode: "textareas",
+
+            plugins: "table lists code link charmap codesample emoticons fullscreen help hr preview",
+
+            theme_advanced_buttons3_add: "tablecontrols",
+            table_styles: "Header 1=header1;Header 2=header2;Header 3=header3",
+            table_cell_styles: "Header 1=header1;Header 2=header2;Header 3=header3;Table Cell=tableCel1",
+            table_row_styles: "Header 1=header1;Header 2=header2;Header 3=header3;Table Row=tableRow1",
+            table_cell_limit: 100,
+            table_row_limit: 5,
+            table_col_limit: 5,
+
+            toolbar: "undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | " +
+                     "bullist numlist outdent indent | " +
+                     "link table emoticons codesample"
+
+        }
+        if (isMobileDevice()) {
+          options2['theme'] = 'mobile'
+        }
+        tinyMCE.init(options2);
+
 
     </script>
 {% endblock %}

@@ -27,16 +27,13 @@ h3 {
 
 .python {
     width: 100%;
-    /*height: 30em;*/
-    /*height: 100%;*/
-    /*flex: 1; !* consume available width *!*/
     font-family: monospace;
     font-size: large;
 }
 
 .description {
     width: 50%;
-    height: 10em;
+    height: 40em;
     align-content: left;
 }
 
