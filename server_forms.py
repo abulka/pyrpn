@@ -9,13 +9,14 @@ class MyForm(FlaskForm):
     line_numbers = BooleanField('Generate line numbers', default=False)
 
 class ExampleForm(FlaskForm):
-    source = TextAreaField('source', default='', validators=[])
-    title = StringField('title', default='Untitled')
-    description = TextAreaField('description', default=dedent("""
+    source = TextAreaField('Python Source code', default='', validators=[])
+    title = StringField('Title', default='Untitled')
+    description = TextAreaField('Description', default=dedent("""
         <p>Enter a description here<p>    
         <p>Add some more information here.  Use <b>html tags</b> if you like.<p>
         <h3>HP42S result</h3>    
         <p>The result of this will be some flashing on the screen 
             followed by the answer.</p>
     """))
-    public = BooleanField('make public', default=True)
+    public = BooleanField('Make public', default=True)
+    fingerprint = StringField('Fingerprint id', default='')

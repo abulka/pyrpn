@@ -14,20 +14,24 @@
         <li><a href="/help">Help</a></li>
     </ul>
 
+    <br>
     <div class="andy_content">
 
         <!--leave action="" out of form so that post goes back to originating url incl. /example/id or /example - meaning form can be used for both create and edit-->
         <form id="mainform" method="POST">
+            <!--<p>{{ form.title.label }}</p>-->
+            <p> <b>{{ form.title.label }}: </b> {{ form.title() }} </p>
+
+            <h3> {{ form.source.label }} </h3>
             {{ form.source(class_='python', id='id_python_text') }}
+
+            <h3> {{ form.description.label }} </h3>
+            {{ form.description(class_='description', id='id_description_text') }}
 
             <table class="form_table table-expand">
                 <tr>
-                   <td> {{ form.title.label }} </td>
-                   <td> {{ form.title() }} </td>
-                </tr>
-                <tr>
-                   <td> {{ form.description.label }} </td>
-                   <td> {{ form.description(class_='description', id='id_description_text') }} </td>
+                   <td> {{ form.fingerprint.label }} </td>
+                   <td> {{ form.fingerprint() }} </td>
                 </tr>
                 <tr>
                    <td> {{ form.public.label }} </td>
