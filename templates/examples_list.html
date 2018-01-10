@@ -34,10 +34,11 @@
             </td>
             <td>
                 <pre><code class="language-python">{{ example.source.strip() }}</code></pre>
-                <rpn example_id="{{ example.id }}" source="{{ example.source.strip() }}"></rpn>
             </td>
             <td>
-                <p><a href="/{{ example.id }}">View</a></p>
+                <rpn example_id="{{ example.id }}" source="{{ example.source.strip() }}"></rpn>
+                <br>
+                <p><a href="/{{ example.id }}">Load in Converter Editor</a></p>
             </td>
         </tr>
 
@@ -53,7 +54,7 @@
           template: `
             {% raw %}
             <div>
-                <a v-on:click="calc_rpn" href="#/">Preview RPN</a>
+                <a v-on:click="calc_rpn" href="#/" v-show="! is_visible">Preview</a>
                 <div v-show="is_visible">
                     <label>comments <input type="checkbox" v-model="show_rpn_comments" v-on:change="toggle_rpn_comments()"></label>
                     <button type="button" @click="hide_me" style="float: right">x</button>

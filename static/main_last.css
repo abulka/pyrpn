@@ -74,7 +74,13 @@ table.examples_table td {
 
 table.examples_table td:nth-child(3) {
     text-align: center;
+    /*text-align: left;*/
     vertical-align: middle;
+    width: 25em;
+}
+
+table.examples_table td:nth-child(3) div div {
+    text-align: left;
 }
 
 table.examples_table div.bot {
