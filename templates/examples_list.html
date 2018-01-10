@@ -53,9 +53,10 @@
           template: `
             {% raw %}
             <div>
-                <a v-on:click="calc_rpn" href="#/">Preview</a>
+                <a v-on:click="calc_rpn" href="#/">Preview RPN</a>
                 <div v-show="is_visible">
-                    <button type="button" @click="hide_me">x</button>
+                    <label>comments <input type="checkbox" v-model="show_rpn_comments" v-on:change="toggle_rpn_comments()"></label>
+                    <button type="button" @click="hide_me" style="float: right">x</button>
                     <pre v-if="show_rpn_pre">{{ rpn }}</pre>
                     <p style="font-size: smaller">{{ num_python_lines }} python lines, {{ num_rpn_lines }} rpn lines.</p>
                     <hr>
@@ -67,30 +68,40 @@
             return {
               is_visible: false,
               show_rpn_pre: false,
+              show_rpn_comments: false,
               rpn: '',
+              rpn_comments: '',
               rpn_free42: '',
               num_python_lines: -1,
               num_rpn_lines: -1,
             }
           },
           methods: {
-            hide_me() { this.is_visible = false },
+            hide_me() {
+              this.is_visible = false
+            },
             calc_rpn() {
               this.is_visible = !this.is_visible
-              if (! this.is_visible)
+              if (!this.is_visible)
                 return
               if (this.rpn == '') {
                 this.num_python_lines = this.source.split('\n').length
                 let url = `/example/${this.example_id}?to-rpn=1`
                 $.get(url).then((response) => {  // I think the use of this.$http() is only in vue components and data is in response.data
-                    this.rpn = response.rpn;
-                    this.show_rpn_pre = true
-                    this.num_rpn_lines = this.rpn.split('\n').length
+                  this.rpn_comments = response.rpn;
+                  this.rpn_free42 = response.rpn_free42;
+                  this.toggle_rpn_comments();
+                  this.show_rpn_pre = true
+                  this.num_rpn_lines = this.rpn.split('\n').length
                 });
               }
             },
-            xxxx() {
-              console.log('num lines in source=', this.source.split('\n').length)
+
+            toggle_rpn_comments() {
+              if (this.show_rpn_comments)
+                this.rpn = this.rpn_comments
+              else
+                this.rpn = this.rpn_free42
             }
           }
         })

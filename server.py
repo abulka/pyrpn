@@ -114,8 +114,9 @@ def example_edit(id):
         return redirect(url_for('example_edit', id=example_clone.id))
 
     if request.method == 'GET' and to_rpn:
-        rpn = parse(example.source).lines_to_str(comments=False, linenos=False)
-        return jsonify(rpn=rpn, rpn_free42='rpn_free42 stuff wuld go here')
+        rpn = parse(example.source).lines_to_str(comments=True, linenos=True)
+        rpn_free42 = parse(example.source).lines_to_str(comments=False, linenos=True)
+        return jsonify(rpn=rpn, rpn_free42=rpn_free42)
 
     if request.method == 'GET':
         dic = example.asdict
