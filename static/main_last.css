@@ -83,6 +83,12 @@ table.examples_table td:nth-child(3) div div {
     text-align: left;
 }
 
+/*Get rid of background color and border in pre of descriptions */
+table.examples_table td:nth-child(1) pre {
+    background-color: white;
+    border: none;
+}
+
 table.examples_table div.bot {
     margin-top:1em;
 }
