@@ -34,14 +34,10 @@
             </td>
             <td>
                 <pre><code class="language-python">{{ example.source.strip() }}</code></pre>
+                <rpn title="{{ example.title }}" example_id="{{ example.id }}" source="{{ example.source.strip() }}"></rpn>
             </td>
             <td>
                 <p><a href="/{{ example.id }}">View</a></p>
-                <br>
-                <div id="calculated_rpn">
-                    <a v-on:click="calc({{ example.id }})" href="#/">Preview</a>
-                    <pre v-if="seen">{% raw %}{{ rpn }}{% endraw %}</pre>
-                </div>
             </td>
         </tr>
 
@@ -51,27 +47,76 @@
 
 <script>
     $(document).ready(function () {
-        let vm = new Vue({
-            el: '#calculated_rpn',
-            data: {
-                rpn: '',
-                rpn_free42: '',
-                seen: false,
-            },
-            methods: {
-                calc: function (example_id) {
-                    if (this.seen) {
-                        this.seen = false
-                        return
-                    }
-                    let url = `/example/${example_id}?to-rpn=1`
-                    $.get(url).then((response) => {  // I think the use of this.$http() is only in vue components and data is in response.data
-                        this.rpn = response.rpn;
-                    });
-                    this.seen = true
-                },
+
+        Vue.component('rpn', {
+          props: ['title', 'example_id', 'source'],
+          template: `
+            {% raw %}
+            <div v-show="is_visible">
+                <a v-on:click="calc_rpn" href="#/">Preview</a>
+                <!--Preview RPN <span> {{ title }} </span>-->
+                <!--<p> {{ example_id }} </p>-->
+                <button type="button" @click="hide_me">x</button>
+                <button type="button" @click="calc_rpn">get</button>
+                <button type="button" @click="calc_lines">calc_lines</button>
+                <pre v-if="seen">{{ rpn }}</pre>
+                <hr>
+            </div>
+            {% endraw %}
+          `,
+          data() {
+            return {
+              is_visible: true,
+              seen: false,
+              rpn: '',
+              rpn_free42: '',
             }
+          },
+          methods: {
+            hide_me() { this.is_visible = false },
+            calc_rpn() {
+              console.log('hi', this.example_id)
+                let url = `/example/${this.example_id}?to-rpn=1`
+                $.get(url).then((response) => {  // I think the use of this.$http() is only in vue components and data is in response.data
+                    this.rpn = response.rpn;
+                    this.seen = true
+                });
+            },
+            calc_lines() {
+              console.log('num lines in source=', this.source.split('\n').length)
+            }
+          }
         })
+
+      new Vue({
+        el: '.andy_content',
+      })
+
+      // let vm = new Vue({
+      //       el: '#calculated_rpn',
+      //       data: {
+      //           rpn: '',
+      //           rpn_free42: '',
+      //           seen: false,
+      //       },
+      //       methods: {
+      //           calc: function (example_id) {
+      //               if (this.seen) {
+      //                   this.seen = false
+      //                   return
+      //               }
+      //               let url = `/example/${example_id}?to-rpn=1`
+      //               $.get(url).then((response) => {  // I think the use of this.$http() is only in vue components and data is in response.data
+      //                   this.rpn = response.rpn;
+      //               });
+      //               this.seen = true
+      //           },
+      //       }
+      //   })
+
+
+
+
     })
 </script>
 

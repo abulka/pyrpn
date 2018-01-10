@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vue test</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.13/vue.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+
+</head>
+<body>
+
+    <div id="main">
+      <task-list></task-list>
+    </div>
+
+    <div id="main2">
+      <message title="ssssss" body="aaaa"></message>
+      <message title="another header" body="this is some body text ok"></message>
+      <message title="yet another header" body="this is even more body text."></message>
+    </div>
+
+<script>
+    
+    $(document).ready(function () {
+
+        /*
+            Component techniques
+        */
+
+        Vue.component('task-list', {
+          template: `
+            <ul>
+                <todo v-for="task in tasks"> {{ task.description }} </todo>
+            </ul>
+          `,
+          data() {
+            return {
+              tasks:
+                [
+                  {description: 'Go to market', complete: true},
+                  {description: 'Go to mall', complete: false},
+                  {description: 'Buy vegetables', complete: true},
+                  {description: 'Clean room', complete: false},
+                  {description: 'Wash clothes', complete: true}
+                ]
+            }
+          }
+        })
+
+        Vue.component('todo', {
+          template: '<li><slot></slot></li>'
+        })
+
+        // create a root instance
+        new Vue({
+          el: '#main'
+        })
+
+
+        // main 2
+
+        Vue.component('message', {
+          props: ['title', 'body'],
+          template: `
+            <div v-show="is_visible">
+                <h1> {{ title }} </h1>
+                <p> {{ body }} </p>
+                <button type="button" @click="hide_me">x</button>
+                <hr>
+            </div>
+          `,
+          data() {
+            return {
+              is_visible: true
+            }
+          },
+          methods: {
+            hide_me() { this.is_visible = false }
+          }
+        })
+
+        new Vue({
+          el: '#main2'
+        })
+    })
+</script>
+
+</body>
+</html>
