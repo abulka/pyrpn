@@ -2,6 +2,7 @@
 {% block additional_js %}
 <link rel="stylesheet" href="../static/js/lib/prism.css">
 <script src="../static/js/lib/prism.js"></script>
+<script src="../static/js/lib/vue.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -35,12 +36,43 @@
                 <pre><code class="language-python">{{ example.source.strip() }}</code></pre>
             </td>
             <td>
-                <a href="/{{ example.id }}">View</a>
+                <p><a href="/{{ example.id }}">View</a></p>
+                <br>
+                <div id="calculated_rpn">
+                    <a v-on:click="calc({{ example.id }})" href="#/">Preview</a>
+                    <pre v-if="seen">{% raw %}{{ rpn }}{% endraw %}</pre>
+                </div>
             </td>
         </tr>
 
         {% endfor %}
     </table>
 </div>
+
+<script>
+    $(document).ready(function () {
+        let vm = new Vue({
+            el: '#calculated_rpn',
+            data: {
+                rpn: '',
+                rpn_free42: '',
+                seen: false,
+            },
+            methods: {
+                calc: function (example_id) {
+                    if (this.seen) {
+                        this.seen = false
+                        return
+                    }
+                    let url = `/example/${example_id}?to-rpn=1`
+                    $.get(url).then((response) => {  // I think the use of this.$http() is only in vue components and data is in response.data
+                        this.rpn = response.rpn;
+                    });
+                    this.seen = true
+                },
+            }
+        })
+    })
+</script>
 
 {% endblock %}

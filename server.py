@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, request
+from flask import Flask, render_template, redirect, url_for, request, jsonify
 from parse import parse
 import logging
 from logger import config_log
@@ -99,6 +99,8 @@ def example_edit(id):
     """
     delete = request.args.get('delete')  # Wish forms could send delete verb properly...
     clone = request.args.get('clone')
+    to_rpn = request.args.get('to-rpn')
+    # to_rpnfree42 = request.args.get('to-rpnfree42')
 
     example = Example.get(id)
     log.info(f'example_edit: id {id} delete flag {delete} example is {example}')
@@ -110,6 +112,10 @@ def example_edit(id):
     if request.method == 'GET' and clone:
         example_clone = evolve(example, id=None, title=example.title + ' copy')  # hopefully will reallocate id and save it to redis
         return redirect(url_for('example_edit', id=example_clone.id))
+
+    if request.method == 'GET' and to_rpn:
+        rpn = parse(example.source).lines_to_str(comments=False, linenos=False)
+        return jsonify(rpn=rpn, rpn_free42='rpn_free42 stuff wuld go here')
 
     if request.method == 'GET':
         dic = example.asdict
