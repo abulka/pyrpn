@@ -12,7 +12,7 @@ config_log(log)
 
 
 @attrs
-class ExampleProperties():
+class MappingInfo():
     has_filename = attrib(default=False)
     has_redis = attrib(default=False)
     filename = attrib(default='')
@@ -33,34 +33,39 @@ class ExamplesSync():
     def __attrs_post_init__(self):
         self.build_mappings()
 
+    def data_from_file(self, filename):
+        with open(os.path.join(self.examples_dir, filename), 'r') as f:
+            s = f.read()
+            data = json.loads(s)
+        return data
+
     def build_mappings(self):
+        self.mappings = []
 
         # Scan the files
         files = os.listdir(self.examples_dir)
         for filename in files:
-            ex = ExampleProperties(filename=filename)
-            with open(os.path.join(self.examples_dir, filename), 'r') as f:
-                s = f.read()
-                dic = json.loads(s)
-                ex.has_filename = True
-                ex.fingerprint = dic['fingerprint']
-            self.mappings.append(ex)
+            info = MappingInfo(filename=filename)
+            data = self.data_from_file(filename)
+            info.has_filename = True
+            info.fingerprint = data['fingerprint']
+            self.mappings.append(info)
 
         # Scan redis
         for id in Example.ids():
             example = Example.get(id)
             found = False
-            for ex in self.mappings:
-                if example.fingerprint and ex.fingerprint == example.fingerprint:
+            for info in self.mappings:
+                if example.fingerprint and info.fingerprint == example.fingerprint:
                     found = True
                     break
             if not found:
                 # ex was not created by a file - create an ex
-                ex = ExampleProperties()
-                ex.has_filename = False
-                self.mappings.append(ex)
-            ex.has_redis = True
-            ex.redis_id = id
+                info = MappingInfo()
+                info.has_filename = False
+                self.mappings.append(info)
+            info.has_redis = True
+            info.redis_id = id
 
         pprint.pprint(self.mappings)
 
@@ -74,34 +79,21 @@ class ExamplesSync():
                 f.write(json.dumps(dic, sort_keys=True, indent=4))
             log.info(f'wrote example {filename} to disk')
 
+    def ls(self):
+        return os.listdir(self.examples_dir)
+
     def redis_to_files(self):
         if self.is_production:
             return
-        for id in Example.ids():
-            example = Example.get(id)
-            self.save_to_file(example)
-        files = '\n'.join(os.listdir(self.examples_dir))
-        return files
+        for info in self.mappings:
+            if info.redis_id and info.fingerprint:
+                example = Example.get(id)
+                self.save_to_file(example)
+        self.build_mappings()
 
     def files_to_redis(self, delete_redis_extras=False):
-        files = os.listdir(self.examples_dir)
-        report = ''
-        for filename in files:
-            with open(os.path.join(self.examples_dir, filename), 'r') as f:
-                s = f.read()
-                dic = json.loads(s)
-                fingerprint = dic['fingerprint']
-                report += f'File {filename} - found fingerprint "{fingerprint}" in this file\n'
-
-                """
-                scan to see if redis has an example with this fingerprint
-                if yes - update it
-                if no - create it 
-                """
-                for id in Example.ids():
-                    example = Example.get(id)
-                    if example.fingerprint == fingerprint:
-                        report += f'  found corresponding redis record {example.id}\n'
-
-                return report
-
+        for info in self.mappings:
+            if info.has_filename and info.fingerprint and not info.redis_id:
+                data = self.data_from_file(info.filename)
+                example = Example(**data)
+        self.build_mappings()

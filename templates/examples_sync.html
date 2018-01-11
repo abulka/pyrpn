@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block additional_js %}
+{% endblock %}
+
+{% block content %}
+
+{% if admin %}
+<ul>
+    <li><a href="/redis_to_files">redis -> files (dump to disk)</a></li>
+    <li><a href="/files_to_redis">files -> redis (sync)</a></li>
+</ul>
+{% endif %}
+
+<ul>
+    <li><a href="/">Converter</a></li>
+    <li><a href="/examples">Examples</a></li>
+    <li><a href="/help">Help</a></li>
+</ul>
+
+<div class="andy_content">
+    <table border=1 class="examples_table">
+        <tr>
+            <th>has_filename</th>
+            <th>has_redis</th>
+            <th>filename</th>
+            <th>redis_id</th>
+            <th>fingerprint</th>
+        </tr>
+        {% for ex in infos %}
+            <tr>
+                <td> {{ ex.has_filename }} </td>
+                <td> {{ ex.has_redis }} </td>
+                <td> {{ ex.filename }} </td>
+                <td> {{ ex.redis_id }} </td>
+                <td> {{ ex.fingerprint }} </td>
+            </tr>
+        {% endfor %}
+    </table>
+
+</div>
+
+{% endblock %}

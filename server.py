@@ -76,16 +76,19 @@ def examples_list():
     return render_template('examples_list.html', examples=examples_data, title="Examples", admin=admin)
 
 
+@app.route('/sync')
+def examples_sync():
+    return render_template('examples_sync.html', infos=es.mappings, ls=es.ls(), admin=True)
+
 @app.route('/redis_to_files')
 def example_redis_to_files():
-    result = es.redis_to_files()
-    return f'<html><body><pre>{result}</pre></body></html>'
-
+    es.redis_to_files()
+    return redirect(url_for('examples_sync'))
 
 @app.route('/files_to_redis')
 def example_files_to_redis():
-    result = es.files_to_redis()
-    return f'<html><body><pre>{result}</pre></body></html>'
+    es.files_to_redis()
+    return redirect(url_for('examples_sync'))
 
 
 @app.route('/example', methods=['GET', 'POST'])
@@ -156,6 +159,7 @@ def example_edit(id):
             example.fingerprint=request.values.get('fingerprint')
             example.save()
             log.info(f'example_edit: {id} edited and saved {example}')
+            es.build_mappings()
         else:
             log.warning('form did not validate')
         return render_template('example.html', form=form, title='Example Edit')
