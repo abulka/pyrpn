@@ -39,6 +39,9 @@
             </td>
             <td>
                 <pre><code class="language-python">{{ example.source.strip() }}</code></pre>
+                {% if admin and example.fingerprint %}
+                <p style="font-size: small; color: green">fingerprint: <b>{{ example.fingerprint }}</b></p>
+                {% endif %}
             </td>
             <td>
                 <rpn example_id="{{ example.id }}" source="{{ example.source.strip() }}"></rpn>
