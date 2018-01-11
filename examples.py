@@ -1,6 +1,7 @@
 from textwrap import dedent
 
 example_01 = {
+    'title': 'Demo 1',
     'source': dedent("""
         def demo():
             total = 0
@@ -14,7 +15,6 @@ example_01 = {
             # adds two numbers then squares them
             return (a + b)**2
     """).strip(),
-    'title': 'Demo 1',
     'description': dedent("""
         <p>This example shows off for loops, variable assignments and function calls 
         incl. the passing of parameters.</p> 
