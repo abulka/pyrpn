@@ -17,16 +17,12 @@
 <div class="andy_content">
     <table border=1 class="examples_table">
         <tr>
-            <th>has_filename</th>
-            <th>has_redis</th>
             <th>filename</th>
             <th>redis_id</th>
             <th>fingerprint</th>
         </tr>
         {% for ex in infos %}
             <tr>
-                <td> {{ ex.has_filename }} </td>
-                <td> {{ ex.has_redis }} </td>
                 <td> {{ ex.filename }} </td>
                 <td> {{ ex.redis_id }} </td>
                 <td> {{ ex.fingerprint }} </td>

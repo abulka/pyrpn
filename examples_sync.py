@@ -13,11 +13,17 @@ config_log(log)
 
 @attrs
 class MappingInfo():
-    has_filename = attrib(default=False)
-    has_redis = attrib(default=False)
     filename = attrib(default='')
     redis_id = attrib(default='')
     fingerprint = attrib(default='')
+
+    @property
+    def get_has_filename(self):
+        return self.filename != ''
+
+    @property
+    def get_has_redis(self):
+        return self.redis_id != ''
 
 @attrs
 class ExamplesSync():
