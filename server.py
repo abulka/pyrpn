@@ -13,6 +13,9 @@ import os
 log = logging.getLogger(__name__)
 config_log(log)
 
+PRODUCTION = 'I_AM_ON_HEROKU' in os.environ
+LOCAL = not PRODUCTION
+
 if os.environ.get("REDIS_URL"):
     # Heroku
     db = redis.from_url(os.environ.get("REDIS_URL"), charset="utf-8", decode_responses=True)
@@ -68,6 +71,8 @@ def do(source, comments=True, linenos=True):
 @app.route('/examples')
 def examples_list():
     admin = request.args.get('admin')
+    if LOCAL: admin = True
+
     if len(Example.ids()) == 0:
         example = Example(**example_01)  # create the first example
         log.info('first example re-created', example.asdict)
@@ -83,6 +88,7 @@ def example_create():
     """
     admin = request.args.get('admin')
     disabled = '' if admin else 'disabled'
+    if LOCAL: disabled = False
 
     if request.method == 'POST':
         log.debug(f'example_create POST public {request.values.get("public")}')
