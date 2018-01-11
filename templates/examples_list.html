@@ -46,11 +46,13 @@
 
         {% endfor %}
     </table>
+    <br>
     {% if not admin %}
-        <br>
         <p><i>The ability to edit, delete examples has disabled because you are not logged in.</i></p>
         <p><i>If you are interested in creating useful examples of the community please contact <a href="mailto:abulka@gmail.com">Andy</a> for rights.
             I encourage people to do so!</i></p>
+    {% else %}
+        <p><a href="/examples_save_to_file">Save redis examples to files</a></p>
     {% endif %}
 </div>
 

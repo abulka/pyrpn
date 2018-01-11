@@ -43,14 +43,18 @@ class Example(cheap_redis_db.CheapRecord):
     fingerprint = attrib(default='')  # unique uuid/other, independent of the redis id
 
     def save_to_file(self):
-        if self.fingerprint:
+        if LOCAL and self.fingerprint:
             filename = f'example_{self.fingerprint}.json'
             dic = self.asdict
             with open(os.path.join(EXAMPLES_JSON_DIR, filename), 'w') as f:
                 f.write(json.dumps(dic, sort_keys=True, indent=4))
             log.info(f'wrote example {filename} to disk')
-        else:
-            log.info(f'example not written - no fingerprint')
+
+    @classmethod
+    def redis_to_files(cls):
+        for id in cls.ids():
+            example = cls.get(id)
+            example.save_to_file()
 
 cheap_redis_db.config.register_class(Example, namespace='pyrpn')
 
@@ -91,6 +95,13 @@ def examples_list():
         # return f'<html><body><pre>{example}</pre></body></html>'
     examples_data = [Example.get(id) for id in Example.ids()]
     return render_template('examples_list.html', examples=examples_data, title="Examples", admin=admin)
+
+
+@app.route('/examples_save_to_file')
+def examples_save_to_file():
+    Example.redis_to_files()
+    files = '\n'.join(os.listdir(EXAMPLES_JSON_DIR))
+    return f'<html><body><pre>{files}</pre></body></html>'
 
 
 @app.route('/example', methods=['GET', 'POST'])
@@ -161,7 +172,7 @@ def example_edit(id):
             example.fingerprint=request.values.get('fingerprint')
             example.save()
             log.info(f'example_edit: {id} edited and saved {example}')
-            example.save_to_file()
+            # example.save_to_file()
         else:
             log.warning('form did not validate')
         return render_template('example.html', form=form, title='Example Edit')
