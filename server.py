@@ -61,12 +61,13 @@ def do(source, comments=True, linenos=True):
 
 @app.route('/examples')
 def examples_list():
+    admin = request.args.get('admin')
     if len(Example.ids()) == 0:
         example = Example(**example_01)  # create the first example
         log.info('first example re-created', example.asdict)
         # return f'<html><body><pre>{example}</pre></body></html>'
     examples_data = [Example.get(id) for id in Example.ids()]
-    return render_template('examples_list.html', examples=examples_data, title="Examples")
+    return render_template('examples_list.html', examples=examples_data, title="Examples", admin=admin)
 
 
 @app.route('/example', methods=['GET', 'POST'])
@@ -74,6 +75,9 @@ def example_create():
     """
     Handle GET blank initial forms and POST creating new entries.
     """
+    admin = request.args.get('admin')
+    disabled = '' if admin else 'disabled'
+
     if request.method == 'POST':
         log.debug(f'example_create POST public {request.values.get("public")}')
         form = ExampleForm(request.form)
@@ -89,7 +93,7 @@ def example_create():
             return redirect(url_for('example_edit', id=example.id))
     else:  # GET
         form = ExampleForm()
-    return render_template('example.html', form=form, title='Example Edit')
+    return render_template('example.html', form=form, title='Example Edit', disabled=disabled)
 
 @app.route('/example/<int:id>', methods=['GET', 'POST'])
 def example_edit(id):
@@ -100,7 +104,6 @@ def example_edit(id):
     delete = request.args.get('delete')  # Wish forms could send delete verb properly...
     clone = request.args.get('clone')
     to_rpn = request.args.get('to-rpn')
-    # to_rpnfree42 = request.args.get('to-rpnfree42')
 
     example = Example.get(id)
     log.info(f'example_edit: id {id} delete flag {delete} example is {example}')

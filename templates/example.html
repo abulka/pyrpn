@@ -28,17 +28,26 @@
             <h3> {{ form.description.label }} </h3>
             {{ form.description(class_='description', id='id_description_text') }}
 
-            <table class="form_table table-expand">
-                <tr>
-                   <td> {{ form.fingerprint.label }} </td>
-                   <td> {{ form.fingerprint() }} </td>
-                </tr>
-                <tr>
-                   <td> {{ form.public.label }} </td>
-                   <td> {{ form.public() }} </td>
-                </tr>
+            {% if not disabled %}
+                <h3>Advanced</h3>
+                <table class="form_table table-expand">
+                    <tr>
+                       <td> {{ form.fingerprint.label }} </td>
+                       <td> {{ form.fingerprint() }} </td>
+                    </tr>
+                    <tr>
+                       <td> {{ form.public.label }} </td>
+                       <td> {{ form.public() }} </td>
+                    </tr>
+                {% endif %}
             </table>
-            <input class="submit_button" title='Save this as an example' data-toggle="tooltip" type="submit" value="Save">
+                <input class="submit_button" {{ disabled }} title='Save this as an example' data-toggle="tooltip" type="submit" value="Save">
+            {% if disabled %}
+                <p><i>The ability to save this example has disabled because you are not logged in.</i></p>
+                <p><i>If you are interested in creating useful examples of the community please contact <a href="mailto:abulka@gmail.com">Andy</a> for rights.
+                    I encourage people to do so!</i></p>
+            {% endif %}
+
             {{ form.csrf_token }}
         </form>
 
@@ -55,6 +64,7 @@
         };
         options2 = {
             selector: '#id_description_text',
+            height: "10em",
             theme: 'modern',
             mode: "textareas",
 

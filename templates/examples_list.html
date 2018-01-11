@@ -26,11 +26,13 @@
                     <h2>{{ example.title }}</h2>
                     {{ example.description.strip()|safe }}
                 </div>
-                <div class="bot">
-                    <span class="examples_action_link"><a href="/example/{{ example.id }}">Edit</a></span>
-                    <span class="examples_action_link"><a href="/example/{{ example.id }}?clone=1">Clone</a></span>
-                    <span class="examples_action_link"><a href="/example/{{ example.id }}?delete=1">Delete</a></span>
-                </div>
+                {% if admin %}
+                    <div class="bot">
+                        <span class="examples_action_link"><a href="/example/{{ example.id }}">Edit</a></span>
+                        <span class="examples_action_link"><a href="/example/{{ example.id }}?clone=1">Clone</a></span>
+                        <span class="examples_action_link"><a href="/example/{{ example.id }}?delete=1">Delete</a></span>
+                    </div>
+                {% endif %}
             </td>
             <td>
                 <pre><code class="language-python">{{ example.source.strip() }}</code></pre>
@@ -44,6 +46,12 @@
 
         {% endfor %}
     </table>
+    {% if not admin %}
+        <br>
+        <p><i>The ability to edit, delete examples has disabled because you are not logged in.</i></p>
+        <p><i>If you are interested in creating useful examples of the community please contact <a href="mailto:abulka@gmail.com">Andy</a> for rights.
+            I encourage people to do so!</i></p>
+    {% endif %}
 </div>
 
 <script>
@@ -54,7 +62,7 @@
           template: `
             {% raw %}
             <div>
-                <a v-on:click="calc_rpn" href="#/" v-show="! is_visible">Preview</a>
+                <a v-on:click.prevent="calc_rpn" href="#" v-show="! is_visible">Preview</a>
                 <div v-show="is_visible">
                     <label>comments <input type="checkbox" v-model="show_rpn_comments" v-on:change="toggle_rpn_comments()"></label>
                     <button type="button" @click="hide_me" style="float: right">x</button>
@@ -81,7 +89,7 @@
             hide_me() {
               this.is_visible = false
             },
-            calc_rpn() {
+            calc_rpn(e) {
               this.is_visible = !this.is_visible
               if (!this.is_visible)
                 return
