@@ -1,0 +1,2 @@
+echo $1 $2 $3
+redis-commander $1 $2 $3
