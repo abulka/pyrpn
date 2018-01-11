@@ -11,6 +11,12 @@
     <li><a href="/example">Create Example</a></li>
     <li><a href="/help">Help</a></li>
 </ul>
+{% if admin %}
+<ul>
+    <li><a href="/example_redis_to_files">redis -> files</a></li>
+    <li><a href="/example_files_to_redis">files -> redis</a></li>
+</ul>
+{% endif %}
 
 <div class="andy_content">
     <table border=1 class="examples_table">
@@ -52,7 +58,6 @@
         <p><i>If you are interested in creating useful examples of the community please contact <a href="mailto:abulka@gmail.com">Andy</a> for rights.
             I encourage people to do so!</i></p>
     {% else %}
-        <p><a href="/examples_save_to_file">Save redis examples to files</a></p>
     {% endif %}
 </div>
 

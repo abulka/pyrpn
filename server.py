@@ -56,6 +56,25 @@ class Example(cheap_redis_db.CheapRecord):
             example = cls.get(id)
             example.save_to_file()
 
+    @classmethod
+    def files_to_redis(cls, delete_redis_extras=False):
+        files = os.listdir(EXAMPLES_JSON_DIR)
+        report = ''
+        for filename in files:
+            with open(os.path.join(EXAMPLES_JSON_DIR, filename), 'r') as f:
+                s = f.read()
+                dic = json.loads(s)
+                fingerprint = dic['fingerprint']
+                report += f'File {filename} - found fingerprint "{fingerprint}" in this file'
+
+                """
+                scan to see if redis has an example with this fingerprint
+                if yes - update it
+                if no - create it 
+                """
+                return report
+
+
 cheap_redis_db.config.register_class(Example, namespace='pyrpn')
 
 
@@ -97,11 +116,16 @@ def examples_list():
     return render_template('examples_list.html', examples=examples_data, title="Examples", admin=admin)
 
 
-@app.route('/examples_save_to_file')
-def examples_save_to_file():
+@app.route('/example_redis_to_files')
+def example_redis_to_files():
     Example.redis_to_files()
     files = '\n'.join(os.listdir(EXAMPLES_JSON_DIR))
     return f'<html><body><pre>{files}</pre></body></html>'
+
+@app.route('/example_files_to_redis')
+def example_files_to_redis():
+    report = Example.files_to_redis()
+    return f'<html><body><pre>{report}</pre></body></html>'
 
 
 @app.route('/example', methods=['GET', 'POST'])
