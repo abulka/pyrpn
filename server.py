@@ -31,6 +31,8 @@ app.config.update(dict(
     WTF_CSRF_SECRET_KEY="a csrf secret key"
 ))
 
+CURRDIR = os.path.dirname(os.path.realpath(__file__))
+EXAMPLES_JSON_DIR = os.path.join(CURRDIR, 'examples_json')
 
 @attrs
 class Example(cheap_redis_db.CheapRecord):
@@ -39,6 +41,16 @@ class Example(cheap_redis_db.CheapRecord):
     description = attrib(default='Description here')
     public = attrib(default='')  # true or false is not supported in redis - only strings are.  Use 'yes' or ''.  Even integers are just strings
     fingerprint = attrib(default='')  # unique uuid/other, independent of the redis id
+
+    def save_to_file(self):
+        if self.fingerprint:
+            filename = f'example_{self.fingerprint}.json'
+            dic = self.asdict
+            with open(os.path.join(EXAMPLES_JSON_DIR, filename), 'w') as f:
+                f.write(json.dumps(dic, sort_keys=True, indent=4))
+            log.info(f'wrote example {filename} to disk')
+        else:
+            log.info(f'example not written - no fingerprint')
 
 cheap_redis_db.config.register_class(Example, namespace='pyrpn')
 
@@ -118,7 +130,7 @@ def example_edit(id):
     to_rpn = request.args.get('to-rpn')
 
     example = Example.get(id)
-    log.info(f'example_edit: id {id} delete flag {delete} example is {example}')
+    # log.info(f'example_edit: id {id} delete flag {delete} example is {example}')
 
     if request.method == 'GET' and delete:
         example.delete()
@@ -145,10 +157,11 @@ def example_edit(id):
             example.title=request.values.get('title')
             example.source=request.values.get('source')
             example.description=request.values.get('description')
-            # example.public=request.values.get('public')
             example.public = Example.bool_to_redis_bool(request.values.get('public'))
+            example.fingerprint=request.values.get('fingerprint')
             example.save()
             log.info(f'example_edit: {id} edited and saved {example}')
+            example.save_to_file()
         else:
             log.warning('form did not validate')
         return render_template('example.html', form=form, title='Example Edit')
