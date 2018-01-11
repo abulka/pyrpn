@@ -8,12 +8,17 @@ import redis
 import json
 from attr import attrs, attrib, evolve
 from lib import cheap_redis_db
+import os
 
 log = logging.getLogger(__name__)
 config_log(log)
 
-# db = redis.StrictRedis()
-db = redis.StrictRedis('localhost', 6379, charset="utf-8", decode_responses=True)
+if os.environ.get("REDIS_URL"):
+    # Heroku
+    db = redis.from_url(os.environ.get("REDIS_URL"), charset="utf-8", decode_responses=True)
+else:
+    db = redis.StrictRedis('localhost', 6379, charset="utf-8", decode_responses=True)
+
 cheap_redis_db.config.set_connection(db)
 
 app = Flask(__name__)
