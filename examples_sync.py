@@ -52,8 +52,8 @@ class ExamplesSync():
             self.mappings.append(info)
 
         # Scan redis
-        for id in Example.ids():
-            example = Example.get(id)
+        for redis_id in Example.ids():
+            example = Example.get(redis_id)
             found = False
             for info in self.mappings:
                 if example.fingerprint and info.fingerprint == example.fingerprint:
@@ -63,9 +63,10 @@ class ExamplesSync():
                 # ex was not created by a file - create an ex
                 info = MappingInfo()
                 info.has_filename = False
+                info.fingerprint = example.fingerprint
                 self.mappings.append(info)
             info.has_redis = True
-            info.redis_id = id
+            info.redis_id = redis_id
 
         pprint.pprint(self.mappings)
 
@@ -87,7 +88,7 @@ class ExamplesSync():
             return
         for info in self.mappings:
             if info.redis_id and info.fingerprint:
-                example = Example.get(id)
+                example = Example.get(info.redis_id)
                 self.save_to_file(example)
         self.build_mappings()
 
