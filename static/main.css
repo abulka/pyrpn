@@ -32,11 +32,9 @@ h3 {
 }
 
 .description {
-    /*These don't matter since this will be replaced by tiny-mce editor, which has its own height property, too. */
-    /*width: 50%;*/
-    /*align-content: left;*/
-    /*height: 0em;*/
+    /* The styles of the description textbox don't matter since this will be replaced by tiny-mce editor */
 }
+
 .submit_button {
     margin-top: 1em;
     margin-bottom: 1em;
@@ -72,4 +70,9 @@ table.form_table th, td {
 .andy_content {
     margin-left: 1em;
     margin-right: 1em;
+}
+
+/* unused at present */
+.hidden {
+    visibility:hidden;
 }
