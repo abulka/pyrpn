@@ -5,14 +5,10 @@
 
 {% block content %}
 
-{% if admin %}
 <ul>
-    <li><a href="/redis_to_files">redis -> files (dump to disk)</a></li>
-    <li><a href="/files_to_redis">files -> redis (sync)</a></li>
-</ul>
-{% endif %}
-
-<ul>
+    {% if admin %}
+    <li><a href="/sync?do=1">Sync now (admin)</a></li>
+    {% endif %}
     <li><a href="/">Converter</a></li>
     <li><a href="/examples">Examples</a></li>
     <li><a href="/help">Help</a></li>

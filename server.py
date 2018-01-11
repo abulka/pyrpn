@@ -78,18 +78,12 @@ def examples_list():
 
 @app.route('/sync')
 def examples_sync():
+    do = request.args.get('do')
+    if do:
+        es.files_to_redis()
+        es.redis_to_files()
     es.build_mappings()
-    return render_template('examples_sync.html', infos=es.mappings, ls=es.ls(), admin=True)
-
-@app.route('/redis_to_files')
-def example_redis_to_files():
-    es.redis_to_files()
-    return redirect(url_for('examples_sync'))
-
-@app.route('/files_to_redis')
-def example_files_to_redis():
-    es.files_to_redis()
-    return redirect(url_for('examples_sync'))
+    return render_template('examples_sync.html', title="Example Synchronisation", infos=es.mappings, ls=es.ls(), admin=True)
 
 
 @app.route('/example', methods=['GET', 'POST'])

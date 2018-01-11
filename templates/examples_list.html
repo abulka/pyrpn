@@ -10,12 +10,10 @@
     <li><a href="/">Converter</a></li>
     <li><a href="/example">Create Example</a></li>
     <li><a href="/help">Help</a></li>
+    {% if admin %}
+    <li><a href="/sync">Examples Synchronisation (admin)</a></li>
+    {% endif %}
 </ul>
-{% if admin %}
-<ul>
-    <li><a href="/sync">examples sync admin</a></li>
-</ul>
-{% endif %}
 
 <div class="andy_content">
     <table border=1 class="examples_table">

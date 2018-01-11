@@ -68,7 +68,7 @@ class ExamplesSync():
             info.has_redis = True
             info.redis_id = redis_id
 
-        pprint.pprint(self.mappings)
+        # pprint.pprint(self.mappings)
 
     def save_to_file(self, example):
         if self.is_production:
