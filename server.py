@@ -8,6 +8,8 @@ import redis
 import json
 from attr import attrs, attrib, evolve
 from lib import cheap_redis_db
+from example_model import Example
+from examples_sync import ExamplesSync
 import os
 
 log = logging.getLogger(__name__)
@@ -31,51 +33,9 @@ app.config.update(dict(
     WTF_CSRF_SECRET_KEY="a csrf secret key"
 ))
 
-CURRDIR = os.path.dirname(os.path.realpath(__file__))
-EXAMPLES_JSON_DIR = os.path.join(CURRDIR, 'examples_json')
+APP_DIR = os.path.dirname(os.path.realpath(__file__))
 
-@attrs
-class Example(cheap_redis_db.CheapRecord):
-    title = attrib(default='Untitled')
-    source = attrib(default='python source code goes here')
-    description = attrib(default='Description here')
-    public = attrib(default='')  # true or false is not supported in redis - only strings are.  Use 'yes' or ''.  Even integers are just strings
-    fingerprint = attrib(default='')  # unique uuid/other, independent of the redis id
-
-    def save_to_file(self):
-        if LOCAL and self.fingerprint:
-            filename = f'example_{self.fingerprint}.json'
-            dic = self.asdict
-            with open(os.path.join(EXAMPLES_JSON_DIR, filename), 'w') as f:
-                f.write(json.dumps(dic, sort_keys=True, indent=4))
-            log.info(f'wrote example {filename} to disk')
-
-    @classmethod
-    def redis_to_files(cls):
-        for id in cls.ids():
-            example = cls.get(id)
-            example.save_to_file()
-
-    @classmethod
-    def files_to_redis(cls, delete_redis_extras=False):
-        files = os.listdir(EXAMPLES_JSON_DIR)
-        report = ''
-        for filename in files:
-            with open(os.path.join(EXAMPLES_JSON_DIR, filename), 'r') as f:
-                s = f.read()
-                dic = json.loads(s)
-                fingerprint = dic['fingerprint']
-                report += f'File {filename} - found fingerprint "{fingerprint}" in this file'
-
-                """
-                scan to see if redis has an example with this fingerprint
-                if yes - update it
-                if no - create it 
-                """
-                return report
-
-
-cheap_redis_db.config.register_class(Example, namespace='pyrpn')
+es = ExamplesSync.create(APP_DIR, PRODUCTION)
 
 
 @app.route('/', methods=["GET", "POST"])
@@ -116,16 +76,16 @@ def examples_list():
     return render_template('examples_list.html', examples=examples_data, title="Examples", admin=admin)
 
 
-@app.route('/example_redis_to_files')
+@app.route('/redis_to_files')
 def example_redis_to_files():
-    Example.redis_to_files()
-    files = '\n'.join(os.listdir(EXAMPLES_JSON_DIR))
-    return f'<html><body><pre>{files}</pre></body></html>'
+    result = es.redis_to_files()
+    return f'<html><body><pre>{result}</pre></body></html>'
 
-@app.route('/example_files_to_redis')
+
+@app.route('/files_to_redis')
 def example_files_to_redis():
-    report = Example.files_to_redis()
-    return f'<html><body><pre>{report}</pre></body></html>'
+    result = es.files_to_redis()
+    return f'<html><body><pre>{result}</pre></body></html>'
 
 
 @app.route('/example', methods=['GET', 'POST'])
@@ -196,7 +156,6 @@ def example_edit(id):
             example.fingerprint=request.values.get('fingerprint')
             example.save()
             log.info(f'example_edit: {id} edited and saved {example}')
-            # example.save_to_file()
         else:
             log.warning('form did not validate')
         return render_template('example.html', form=form, title='Example Edit')
