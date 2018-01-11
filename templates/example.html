@@ -14,6 +14,11 @@
         <li><a href="/help">Help</a></li>
     </ul>
 
+    <script>
+        // stop the flashing as tiny-mce applies itself.
+        $('html').hide();
+    </script>
+
     <br>
     <div class="andy_content">
 
@@ -80,7 +85,13 @@
 
             toolbar: "undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | " +
                      "bullist numlist outdent indent | " +
-                     "link table emoticons codesample"
+                     "link table emoticons codesample",
+
+            setup: function(ed) {
+                ed.on('init', function(e) {
+                    $('html').show();  // by now tiny-mce has finished, so show the page
+                });
+            },
 
         }
         if (isMobileDevice()) {
