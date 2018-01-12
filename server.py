@@ -4,19 +4,19 @@ import logging
 from logger import config_log
 from server_forms import ConverterForm, ExampleForm
 import redis
+import re
 import json
 from attr import attrs, attrib, evolve
 from lib import cheap_redis_db
 from example_model import Example
 from examples_sync import ExamplesSync
 import os
+import settings
 
 log = logging.getLogger(__name__)
 config_log(log)
 
-PRODUCTION = 'I_AM_ON_HEROKU' in os.environ
-LOCAL = not PRODUCTION
-FORCE_ADMIN = LOCAL
+FORCE_ADMIN = settings.LOCAL
 # FORCE_ADMIN = False
 
 if os.environ.get("REDIS_URL"):
@@ -34,9 +34,7 @@ app.config.update(dict(
     WTF_CSRF_SECRET_KEY="a csrf secret key"
 ))
 
-APP_DIR = os.path.dirname(os.path.realpath(__file__))
-
-es = ExamplesSync.create(APP_DIR, PRODUCTION)
+es = ExamplesSync.create(settings.APP_DIR, settings.PRODUCTION)
 
 
 @app.route('/', methods=["GET", "POST"])
@@ -54,11 +52,22 @@ def index(id=None):
         form = ConverterForm(request.form)
         if form.validate_on_submit():
             program = parse(form.source.data)
-            log.info(f'main converter converting python code:\n{form.source.data}')
+            spy(form.source.data, form.source.default)
             rpn = program.lines_to_str(comments=form.comments.data, linenos=form.line_numbers.data)
             rpn_free42 = program.lines_to_str(comments=False, linenos=True)
     return render_template('index.html', form=form, rpn=rpn, rpn_free42=rpn_free42, title='source code converter')
 
+def spy(source, default_source):
+    s = source.replace('\r', '')
+    if s.strip() == default_source.strip():
+        log.info('main converter - default demo converted.')
+        return
+    line = '-' * 10
+    s = s.replace('\n', '|').replace('\r', '')
+    s = re.sub(r"\s+", ' ', s)  # Replace all runs of whitespace with a single space
+    source_trimmed = s
+    source_full = f'{line}\n{source}\n{line}'
+    log.info(f'main converter converting python code: {source_trimmed}\n{source_full}')
 
 def do(source, comments=True, linenos=True):
     program = parse(source)
