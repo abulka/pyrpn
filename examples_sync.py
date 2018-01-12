@@ -121,6 +121,10 @@ class ExamplesSync():
                 example = Example(**data)
         self.build_mappings()
 
+    def purge_redis(self):
+        Example.purge_all_records()
+        log.info('redis db purged of all Example records.')
+
     def repopulate_redis(self):
         self.build_mappings()
         self.files_to_redis()
