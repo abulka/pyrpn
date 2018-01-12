@@ -13,15 +13,16 @@ config_log(log)
 
 @attrs
 class MappingInfo():
-    filename = attrib(default='')
+    # filename = attrib(default='')
     redis_id = attrib(default=0)
-    fingerprint = attrib(default='')
+    has_file = attrib(default=False)
+    fingerprint = attrib(default='')  # TODO same as filename
     title = attrib(default='')
     sortnum = attrib(default=0)
 
-    @property
-    def has_filename(self):
-        return self.filename != ''
+    # @property
+    # def has_filename(self):
+    #     return self.filename != ''
 
     @property
     def has_redis(self):
@@ -41,6 +42,12 @@ class ExamplesSync():
     def __attrs_post_init__(self):
         self.build_mappings()
 
+    def filename_to_fingerprint(self, filename):
+        return os.path.splitext(filename)[0]
+
+    def fingerprint_to_filename(self, fingerprint):
+        return f'{fingerprint}.json'
+
     def data_from_file(self, filename):
         with open(os.path.join(self.examples_dir, filename), 'r') as f:
             s = f.read()
@@ -50,13 +57,14 @@ class ExamplesSync():
     def build_mappings(self):
         mappings = []
 
-        # Scan the files
+        # Scan the files - cannot have duplicates because all files in a dir are by definition unique
         files = os.listdir(self.examples_dir)
         for filename in files:
-            info = MappingInfo(filename=filename)
+            info = MappingInfo()
             data = self.data_from_file(filename)
-            info.filename = filename
-            info.fingerprint = data['fingerprint']
+            # info.filename = filename
+            info.fingerprint = self.filename_to_fingerprint(filename)
+            info.has_file = True  # by definition
             info.sortnum = data['sortnum']
             info.title = data['title']
             mappings.append(info)
@@ -68,6 +76,7 @@ class ExamplesSync():
             for info in mappings:
                 if example.fingerprint and info.fingerprint == example.fingerprint:
                     found = True
+                    # print('found existing info', info)
                     break
             if not found:
                 # ex was not created by a file - create an ex
@@ -78,17 +87,24 @@ class ExamplesSync():
                 mappings.append(info)
             info.redis_id = redis_id
 
-        self.mappings = sorted(mappings, key=lambda mp: (mp.sortnum, mp.redis_id), reverse=True)
+        self.mappings = sorted(mappings, key=lambda mp: (mp.sortnum, mp.fingerprint, mp.redis_id), reverse=True)
+        self._ensure_fingerprints_unique()
         # pprint.pprint(self.mappings)
+
+    def _ensure_fingerprints_unique(self):
+        fingerprints = [info.fingerprint for info in self.mappings if info.fingerprint]
+        if len(list(set(fingerprints))) != len(fingerprints):
+            raise RuntimeError("multiple occurrences of the same fingerprint %s" % fingerprints)
 
     def save_to_file(self, example):
         if self.is_production:
             return
         if example.fingerprint:
-            filename = f'example_{example.fingerprint}.json'
+            filename = self.fingerprint_to_filename(example.fingerprint)
             dic = example.asdict
             dic['sortnum'] = int(example.sortnum)  # TODO this should be automatic? when create example obj from redis - but how does example obj know since redis fields are all strings!
             del dic['id']  # don't persist the key
+            del dic['fingerprint']  # don't persist the fingerprint cos that's the filename
             with open(os.path.join(self.examples_dir, filename), 'w') as f:
                 f.write(json.dumps(dic, sort_keys=True, indent=4))
             log.info(f'wrote example {filename} to disk')
@@ -107,7 +123,8 @@ class ExamplesSync():
 
     def files_to_redis(self, delete_redis_extras=False):
         for info in self.mappings:
-            if info.has_filename and info.fingerprint and not info.redis_id:
-                data = self.data_from_file(info.filename)
+            if info.has_file and info.fingerprint and not info.redis_id:
+                data = self.data_from_file(self.fingerprint_to_filename(info.fingerprint))
+                data['fingerprint'] = info.fingerprint
                 example = Example(**data)
         self.build_mappings()

@@ -21,15 +21,20 @@
             <th>sortnum</th>
             <th>redis_id</th>
             <th>fingerprint</th>
-            <th>filename</th>
+            <th>file exists</th>
         </tr>
         {% for ex in infos %}
             <tr>
-                <td><span class="examples_action_link"><a href="/example/{{ ex.redis_id }}">{{ ex.title }}</a></span></td>
+                <td>
+                    <span class="examples_action_link">
+                        <a href="/example/{{ ex.redis_id }}">{{ ex.title }}</a>
+                        <a href="/example/{{ ex.redis_id }}?delete=1" style="float: right">del</a>
+                    </span>
+                </td>
                 <td> {{ ex.sortnum }} </td>
-                {% if ex.redis_id == 0 %} <td class="redis-missing"> redis needs updating!  {% else %} <td> {% endif %} {{ ex.redis_id }} </td>
+                {% if ex.redis_id == 0 %} <td class="redis-missing"> {% else %} <td> {% endif %} {{ ex.redis_id }} </td>
                 <td> {{ ex.fingerprint }} </td>
-                {% if ex.fingerprint and not ex.filename %} <td class="file-missing"> file needs saving! {% else %} <td> {% endif %} {{ ex.filename }} </td>
+                {% if ex.fingerprint and not ex.has_file %} <td class="file-missing"> {% else %} <td> {% endif %} {{ ex.has_file }} </td>
             </tr>
         {% endfor %}
     </table>

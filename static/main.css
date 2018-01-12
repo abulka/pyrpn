@@ -80,7 +80,7 @@ table.form_table th, td {
 /*example sync*/
 
 td.file-missing {
-    background-color: #00bb00;
+    background-color: #95bbc8;
 }
 td.redis-missing {
     background-color: #ffcc64;

@@ -131,7 +131,8 @@ def example_edit(id):
 
     if request.method == 'GET' and delete:
         example.delete()
-        return redirect(url_for('examples_list'))  # 'url_for' takes the name of view def
+        # return redirect(url_for('examples_list'))  # 'url_for' takes the name of view def
+        return redirect(request.referrer)
 
     if request.method == 'GET' and clone:
         example_clone = evolve(example, id=None, title=example.title + ' copy')  # hopefully will reallocate id and save it to redis
