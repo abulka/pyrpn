@@ -54,7 +54,7 @@ def index(id=None):
         form = ConverterForm(request.form)
         if form.validate_on_submit():
             program = parse(form.source.data)
-            log.info(f'main converter converting:, python code:\n{form.source.data}')
+            log.info(f'main converter converting python code:\n{form.source.data}')
             rpn = program.lines_to_str(comments=form.comments.data, linenos=form.line_numbers.data)
             rpn_free42 = program.lines_to_str(comments=False, linenos=True)
     return render_template('index.html', form=form, rpn=rpn, rpn_free42=rpn_free42, title='source code converter')
