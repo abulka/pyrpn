@@ -82,9 +82,13 @@ def examples_list():
 @app.route('/sync')
 def examples_sync():
     do = request.args.get('do')
+    purge = request.args.get('purge')
     if do:
         es.repopulate_redis()
-        return redirect(url_for('examples_sync'))  # so that the 'do' is removed after each do
+        return redirect(url_for('examples_sync'))  # so that the 'do' and 'purge' are removed after each do/purge
+    elif purge:
+        es.purge_redis()
+        return redirect(url_for('examples_sync'))
     else:
         es.build_mappings()
     return render_template('examples_sync.html', title="Example Synchronisation", infos=es.mappings, ls=es.ls(), admin=True)
