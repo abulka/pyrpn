@@ -1,0 +1,7 @@
+{
+    "description": "<p>This example shows off for loops, variable assignments and function calls \nincl. the passing of parameters.</p> \n\n<p>I'm especially proud of the text functionality I just implemented, which \ntakes long strings and <b>breaks them up for \nyou</b>, making it easier to create messages in the alpha register.</p>  \n\n<p>It also allows you to build up message strings by <b>referring to variable names</b>\n mixed in with descriptive text.\n  e.g. <pre>aview('Counter ', i, ' result= ', total)</pre> Time saver!</p>",
+    "public": "y",
+    "sortnum": 0,
+    "source": "def demo():\n    total = 0\n    for i in range(10):\n        result = calc_something(i, 5)\n        aview('Counter ', i, ' result= ', total)\n        total += result\n    aview('Final total was: ', total)\n\ndef calc_something(a,b):\n    # adds two numbers then squares them\n    return (a + b)**2",
+    "title": "Demo 1"
+}
