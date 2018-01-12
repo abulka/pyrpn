@@ -42,6 +42,9 @@
                 {% if admin and example.fingerprint %}
                 <p style="font-size: small; color: green">fingerprint: <b>{{ example.fingerprint }}</b></p>
                 {% endif %}
+                {% if admin and example.sortnum %}
+                <p style="font-size: small; color: green">sort num: <b>{{ example.sortnum }}</b></p>
+                {% endif %}
             </td>
             <td>
                 <rpn example_id="{{ example.id }}" source="{{ example.source.strip() }}"></rpn>

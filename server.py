@@ -72,8 +72,9 @@ def examples_list():
         example = Example(**example_01)  # create the first example
         log.info('first example re-created', example.asdict)
         # return f'<html><body><pre>{example}</pre></body></html>'
-    examples_data = [Example.get(id) for id in Example.ids()]
-    return render_template('examples_list.html', examples=examples_data, title="Examples", admin=admin)
+    examples = [Example.get(id) for id in Example.ids()]
+    examples_sorted = sorted(examples, key=lambda eg: eg.sortnum, reverse=True)
+    return render_template('examples_list.html', examples=examples_sorted, title="Examples", admin=admin)
 
 
 @app.route('/sync')
@@ -152,6 +153,7 @@ def example_edit(id):
             example.description=request.values.get('description')
             example.public = Example.bool_to_redis_bool(request.values.get('public'))
             example.fingerprint=request.values.get('fingerprint')
+            example.sortnum=request.values.get('sortnum')
             example.save()
             log.info(f'example_edit: {id} edited and saved {example}')
             es.build_mappings()

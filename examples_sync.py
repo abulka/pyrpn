@@ -46,7 +46,7 @@ class ExamplesSync():
         return data
 
     def build_mappings(self):
-        self.mappings = []
+        mappings = []
 
         # Scan the files
         files = os.listdir(self.examples_dir)
@@ -55,13 +55,13 @@ class ExamplesSync():
             data = self.data_from_file(filename)
             info.has_filename = True
             info.fingerprint = data['fingerprint']
-            self.mappings.append(info)
+            mappings.append(info)
 
         # Scan redis
         for redis_id in Example.ids():
             example = Example.get(redis_id)
             found = False
-            for info in self.mappings:
+            for info in mappings:
                 if example.fingerprint and info.fingerprint == example.fingerprint:
                     found = True
                     break
@@ -70,10 +70,11 @@ class ExamplesSync():
                 info = MappingInfo()
                 info.has_filename = False
                 info.fingerprint = example.fingerprint
-                self.mappings.append(info)
+                mappings.append(info)
             info.has_redis = True
             info.redis_id = redis_id
 
+        self.mappings = sorted(mappings, key=lambda mp: mp.redis_id, reverse=False)
         # pprint.pprint(self.mappings)
 
     def save_to_file(self, example):

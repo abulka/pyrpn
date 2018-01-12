@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import TextAreaField, BooleanField, StringField
+from wtforms import TextAreaField, BooleanField, StringField, IntegerField
 from examples import example_01
 from textwrap import dedent
 
@@ -25,3 +25,4 @@ class ExampleForm(FlaskForm):
     """))
     public = BooleanField('Make public', default=True)
     fingerprint = StringField('Fingerprint id', default='')
+    sortnum = IntegerField('Sort number', default=0)

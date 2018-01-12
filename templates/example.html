@@ -15,8 +15,8 @@
     </ul>
 
     <script>
-        // stop the flashing as tiny-mce applies itself.
-        $('html').hide();
+        // stop the flashing as tiny-mce applies itself.  Unused now, since it breaks codemirror.
+        // $('html').hide();
     </script>
 
     <br>
@@ -43,6 +43,10 @@
                     <tr>
                        <td> {{ form.public.label }} </td>
                        <td> {{ form.public() }} </td>
+                    </tr>
+                    <tr>
+                       <td> {{ form.sortnum.label }} </td>
+                       <td> {{ form.sortnum() }} </td>
                     </tr>
                 {% endif %}
             </table>
@@ -89,7 +93,7 @@
 
             setup: function(ed) {
                 ed.on('init', function(e) {
-                    $('html').show();  // by now tiny-mce has finished, so show the page
+                    // $('html').show();  // by now tiny-mce has finished, so show the page
                 });
             },
 
