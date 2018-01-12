@@ -3,7 +3,7 @@ from parse import parse
 import logging
 from logger import config_log
 from server_forms import MyForm, ExampleForm
-from examples import example_01
+from example1 import example_01
 import redis
 import json
 from attr import attrs, attrib, evolve
@@ -81,11 +81,11 @@ def examples_list():
 @app.route('/sync')
 def examples_sync():
     do = request.args.get('do')
+    es.build_mappings()
     if do:
         es.files_to_redis()
         es.redis_to_files()
         return redirect(url_for('examples_sync'))  # so that the 'do' is removed after each do
-    es.build_mappings()
     return render_template('examples_sync.html', title="Example Synchronisation", infos=es.mappings, ls=es.ls(), admin=True)
 
 
@@ -163,7 +163,7 @@ def example_edit(id):
             example.sortnum=form.sortnum.data  # int(request.values.get('sortnum'))
             example.save()
             log.info(f'example_edit: {id} updated and saved {example}')
-            es.build_mappings()
+            es.save_to_file(example)
         else:
             log.warning('form did not validate')
         return render_template('example.html', form=form, title='Example Edit', admin=admin)

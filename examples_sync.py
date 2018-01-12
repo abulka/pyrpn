@@ -1,7 +1,7 @@
 import json
 import os
 from attr import attrs, attrib, evolve, Factory
-from examples import example_01
+from example1 import example_01
 from example_model import Example
 import logging
 from logger import config_log
@@ -36,7 +36,7 @@ class ExamplesSync():
 
     @classmethod
     def create(cls, app_dir, is_production):  # factory, cos no __init__
-        examples_dir = os.path.join(app_dir, 'examples_json')
+        examples_dir = os.path.join(app_dir, 'examples')
         return ExamplesSync(examples_dir, is_production)
 
     def __attrs_post_init__(self):

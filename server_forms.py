@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import TextAreaField, BooleanField, StringField, IntegerField, validators
-from examples import example_01
+from example1 import example_01
 from textwrap import dedent
 
 class MyForm(FlaskForm):
