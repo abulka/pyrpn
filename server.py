@@ -44,6 +44,7 @@ es = ExamplesSync.create(APP_DIR, PRODUCTION)
 def index(id=None):
     rpn = rpn_free42 = 'Press Convert'
     if request.method == 'GET':
+        log.info(f'main converter page viewed, example {id}')
         form = ConverterForm()
         if id:
             example = Example.get(id)
@@ -53,6 +54,7 @@ def index(id=None):
         form = ConverterForm(request.form)
         if form.validate_on_submit():
             program = parse(form.source.data)
+            log.info(f'main converter converting:, python code:\n{form.source.data}')
             rpn = program.lines_to_str(comments=form.comments.data, linenos=form.line_numbers.data)
             rpn_free42 = program.lines_to_str(comments=False, linenos=True)
     return render_template('index.html', form=form, rpn=rpn, rpn_free42=rpn_free42, title='source code converter')
@@ -66,6 +68,7 @@ def do(source, comments=True, linenos=True):
 
 @app.route('/examples')
 def examples_list():
+    log.info(f'examples being listed.')
     admin = request.args.get('admin')
     if FORCE_ADMIN: admin = True
 
@@ -115,7 +118,7 @@ def example_create():
                 filename=form.filename.data,
                 sortnum=form.sortnum.data,
             )
-            log.info(example)
+            log.info(f'created example {example}')
             return redirect(url_for('example_edit', id=example.id))
     else:  # GET
         form = ExampleForm()

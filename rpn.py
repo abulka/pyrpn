@@ -72,8 +72,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             return ''
 
     def log_state(self, msg=''):
-        log.info(f'{self.indent}{msg}')
-        log.info(f'{self.indent}{self.scopes.dump()}{self.labels.dump()}')
+        log.debug(f'{self.indent}{msg}')
+        log.debug(f'{self.indent}{self.scopes.dump()}{self.labels.dump()}')
 
     def log_children(self, node):
         result = []
@@ -86,7 +86,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             log.debug(f'{self.indent}{s}')
 
     def begin(self, node):
-        log.info('')
+        log.debug('')
         self.log_indent += 1
         s = self.get_node_name_id_or_n(node)
         s = f"'{s}'" if s else ""
@@ -96,7 +96,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def end(self, node):
         s = f'END {type(node).__name__}'
-        log.info(f'{self.indent}{s}')
+        log.debug(f'{self.indent}{s}')
         self.log_indent -= 1
 
     def children_complete(self, node):
@@ -121,7 +121,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def body_or_else(self, node):
         self.body(node.body)
         if node.orelse:
-            log.info('else:')
+            log.debug('else:')
             self.body(node.orelse)
 
     def has_rpn_def_directive(self, node):
@@ -281,7 +281,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.visit(node.right)
         self.visit(node.op)
 
-        log.info(self.pending_ops)
+        log.debug(self.pending_ops)
         assert self.pending_ops
         if len(self.pending_ops) > 4:
             raise RpnError("We blew our expression stack %s" % self.pending_ops)
@@ -301,8 +301,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 Manually looped through and visited.  Each visit emits a register rcl or literal onto the stack.
         """
         self.begin(node)
-        # log.info(list(cmd_list.keys()))
-        # log.info(node.func.id in cmd_list)
+        # log.debug(list(cmd_list.keys()))
+        # log.debug(node.func.id in cmd_list)
 
         func_name = node.func.id
         if func_name == 'FS':
@@ -461,10 +461,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         or the orelse list might be empty (no else situation).
         """
         self.begin(node)
-        log.info(f'{self.indent} if')
+        log.debug(f'{self.indent} if')
 
         self.visit(node.test)
-        log.info(f'{self.indent} :')
+        log.debug(f'{self.indent} :')
 
         f = LabelFactory(local_label_allocator=self.local_labels, descriptive=self.debug_gen_descriptive_labels)
         insert = self.insert
@@ -490,10 +490,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             else_ = node.orelse
             if len(else_) == 1 and isinstance(else_[0], ast.If):
                 node = else_[0]
-                log.info(f'{self.indent} elif')
+                log.debug(f'{self.indent} elif')
                 insert('LBL', label_elif)
                 self.visit(node.test)
-                log.info(f'{self.indent} :')
+                log.debug(f'{self.indent} :')
 
                 label_elif_body = f.new('elif body')
 
@@ -510,7 +510,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 insert('GTO', label_resume)
             else:
                 if len(else_) > 0:
-                    log.info(f'{self.indent} else')
+                    log.debug(f'{self.indent} else')
                     insert('LBL', label_else)
                     self.body(else_)
                 break
@@ -532,9 +532,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         label_while = f.new('while')
         insert('LBL', label_while)
-        log.info(f'{self.indent} while')
+        log.debug(f'{self.indent} while')
         self.visit(node.test)
-        log.info(f'{self.indent} :')
+        log.debug(f'{self.indent} :')
 
         label_while_body = f.new('while body')
         label_resume = f.new('resume')
@@ -583,9 +583,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         pass
 
     def generic_visit(self,node):
-        log.warning(f'skipping {node}')
+        log.debug(f'skipping {node}')
         if getattr(node, 'name', ''):
-            log.warning(f'name {node.name}')
+            log.debug(f'name {node.name}')
 
     def visit_Name(self, node):
         self.begin(node)
@@ -662,16 +662,16 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         label_for_body = f.new('for body')
         label_resume = f.new('resume')
 
-        log.info(f'{self.indent} for')
+        log.debug(f'{self.indent} for')
         self.visit(node.target)
         varname = node.target.id
         register = self.scopes.var_to_reg(varname)
         self.for_loop_info.append(ForLoopItem(varname, register, label_for))
 
-        log.info(f'{self.indent} in')
+        log.debug(f'{self.indent} in')
         self.visit(node.iter)
 
-        log.info(f'{self.indent} :')
+        log.debug(f'{self.indent} :')
 
         self.resume_labels.append(label_resume)  # just in case we hit a break
         self.continue_labels.append(label_for)  # just in case we hit a continue

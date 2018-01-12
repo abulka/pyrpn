@@ -12,17 +12,17 @@ class BaseTest(unittest.TestCase):
     @staticmethod
     def space():
         for i in range(BaseTest.LOG_BLANK_LINES):
-            log.info('')
+            log.debug('')
 
     @classmethod
     def setUpClass(cls):
         BaseTest.space()
-        log.info(f'RUN {maya.now()}')
+        log.debug(f'RUN {maya.now()}')
         BaseTest.space()
 
     def setUp(self):
         BaseTest.space()
-        log.info(f'/{"-"*20} {self._testMethodName} {"-"*20}\\')
+        log.debug(f'/{"-"*20} {self._testMethodName} {"-"*20}\\')
 
     def tearDown(self):
-        log.info(f'\\{"_"*20} {self._testMethodName} {"_"*20}/')
+        log.debug(f'\\{"_"*20} {self._testMethodName} {"_"*20}/')

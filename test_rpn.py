@@ -56,7 +56,7 @@ class RpnCodeGenTests(BaseTest):
         if trace:
             expected = expected.strip().split('\n')
             for i, line in enumerate(lines):
-                log.info(f'expected={expected[i]}, got {line.text}')
+                log.debug(f'expected={expected[i]}, got {line.text}')
                 self.assertEqual(expected[i], line.text)
 
     # TESTS

@@ -21,6 +21,8 @@ def config_log(log):
 
     # create console logging
     ch = logging.StreamHandler()
+    ch.setLevel(logging.INFO)
+    formatter = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
     ch.setFormatter(formatter)
 
     # add them all

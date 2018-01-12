@@ -123,10 +123,10 @@ class ExamplesSync():
 
     def purge_redis(self):
         Example.purge_all_records()
-        log.info('redis db purged of all Example records.')
+        log.warning('redis db purged of all Example records.')
 
     def repopulate_redis(self):
         self.build_mappings()
         self.files_to_redis()
         self.redis_to_files()
-        log.info('redis db repopulated from example files on disk.')
+        log.warning('redis db repopulated from example files on disk.')
