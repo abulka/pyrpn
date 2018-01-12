@@ -41,8 +41,8 @@
                 <pre><code class="language-python">{{ example.source.strip() }}</code></pre>
                 {% if admin %}
                     <p style="font-size: small; color: green">id: <b>{{ example.id }}</b></p>
-                    {% if example.fingerprint %}
-                        <p style="font-size: small; color: green">fingerprint: <b>{{ example.fingerprint }}</b></p>
+                    {% if example.filename %}
+                        <p style="font-size: small; color: green">filename: <b>{{ example.filename }}</b></p>
                     {% endif %}
                     {% if example.sortnum %}
                         <p style="font-size: small; color: green">sort num: <b>{{ example.sortnum }}</b></p>

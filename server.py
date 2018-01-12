@@ -103,12 +103,12 @@ def example_create():
         # example = Example(**dict(request.values))  # why doesn't this work?
         if form.validate():
             example = Example(
-                title=form.title.data, # request.values.get('title'),
-                source=form.source.data, # request.values.get('source'),
-                description=form.description.data, # request.values.get('description'),
-                public = Example.bool_to_redis_bool(form.public.data), # Example.bool_to_redis_bool(request.values.get('public')),
-                fingerprint=form.fingerprint.data,  # request.values.get('fingerprint')
-                sortnum=form.sortnum.data,  # int(request.values.get('sortnum'))
+                title=form.title.data,
+                source=form.source.data,
+                description=form.description.data,
+                public = Example.bool_to_redis_bool(form.public.data),
+                filename=form.filename.data,
+                sortnum=form.sortnum.data,
             )
             log.info(example)
             return redirect(url_for('example_edit', id=example.id))
@@ -133,7 +133,6 @@ def example_edit(id):
 
     if request.method == 'GET' and delete:
         example.delete()
-        # return redirect(url_for('examples_list'))  # 'url_for' takes the name of view def
         return redirect(request.referrer)
 
     if request.method == 'GET' and clone:
@@ -155,12 +154,12 @@ def example_edit(id):
         form = ExampleForm(request.form)
         if form.validate():
             # Update
-            example.title=form.title.data  # request.values.get('title')
-            example.source=form.source.data  # request.values.get('source')
-            example.description=form.description.data  # request.values.get('description')
-            example.public = Example.bool_to_redis_bool(form.public.data)  # Example.bool_to_redis_bool(request.values.get('public'))
-            example.fingerprint=form.fingerprint.data  # request.values.get('fingerprint')
-            example.sortnum=form.sortnum.data  # int(request.values.get('sortnum'))
+            example.title=form.title.data
+            example.source=form.source.data
+            example.description=form.description.data
+            example.public = Example.bool_to_redis_bool(form.public.data)
+            example.filename=form.filename.data
+            example.sortnum=form.sortnum.data
             example.save()
             log.info(f'example_edit: {id} updated and saved {example}')
             es.save_to_file(example)

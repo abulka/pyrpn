@@ -7,7 +7,7 @@ class Example(cheap_redis_db.CheapRecord):
     source = attrib(default='python source code goes here')
     description = attrib(default='Description here')
     public = attrib(default='')  # true or false is not supported in redis - only strings are.  Use 'yes' or ''.  Even integers are just strings
-    fingerprint = attrib(default='')  # unique uuid/other, independent of the redis id
+    filename = attrib(default='')  # unique, independent of the redis id
     sortnum = attrib(default=0)
 
 cheap_redis_db.config.register_class(Example, namespace='pyrpn')

@@ -20,7 +20,7 @@
             <th>title</th>
             <th>sortnum</th>
             <th>redis_id</th>
-            <th>fingerprint</th>
+            <th>filename</th>
             <th>file exists</th>
         </tr>
         {% for ex in infos %}
@@ -33,8 +33,8 @@
                 </td>
                 <td> {{ ex.sortnum }} </td>
                 {% if ex.redis_id == 0 %} <td class="redis-missing"> {% else %} <td> {% endif %} {{ ex.redis_id }} </td>
-                <td> {{ ex.fingerprint }} </td>
-                {% if ex.fingerprint and not ex.has_file %} <td class="file-missing"> {% else %} <td> {% endif %} {{ ex.has_file }} </td>
+                <td> {{ ex.filename }} </td>
+                {% if ex.filename and not ex.has_file %} <td class="file-missing"> {% else %} <td> {% endif %} {{ ex.has_file }} </td>
             </tr>
         {% endfor %}
     </table>
