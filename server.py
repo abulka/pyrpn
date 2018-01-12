@@ -16,7 +16,8 @@ config_log(log)
 
 PRODUCTION = 'I_AM_ON_HEROKU' in os.environ
 LOCAL = not PRODUCTION
-FORCE_ADMIN = False
+FORCE_ADMIN = LOCAL
+# FORCE_ADMIN = False
 
 if os.environ.get("REDIS_URL"):
     # Heroku
