@@ -26,5 +26,4 @@ def config_log(log):
     # add them all
     log.addHandler(fh)  # add handler to logger object
     if settings.LOG_TO_CONSOLE:
-        print('logging to console too')
         log.addHandler(ch)  # add handler to logger object
