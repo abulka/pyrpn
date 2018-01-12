@@ -15,17 +15,21 @@
 </ul>
 
 <div class="andy_content">
-    <table border=1 class="examples_table">
+    <table border=1 class="example_sync_table">
         <tr>
-            <th>filename</th>
+            <th>title</th>
+            <th>sortnum</th>
             <th>redis_id</th>
             <th>fingerprint</th>
+            <th>filename</th>
         </tr>
         {% for ex in infos %}
             <tr>
-                <td> {{ ex.filename }} </td>
-                <td> {{ ex.redis_id }} </td>
+                <td><span class="examples_action_link"><a href="/example/{{ ex.redis_id }}">{{ ex.title }}</a></span></td>
+                <td> {{ ex.sortnum }} </td>
+                {% if ex.redis_id == 0 %} <td class="redis-missing"> redis needs updating!  {% else %} <td> {% endif %} {{ ex.redis_id }} </td>
                 <td> {{ ex.fingerprint }} </td>
+                {% if ex.fingerprint and not ex.filename %} <td class="file-missing"> file needs saving! {% else %} <td> {% endif %} {{ ex.filename }} </td>
             </tr>
         {% endfor %}
     </table>

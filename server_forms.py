@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import TextAreaField, BooleanField, StringField, IntegerField
+from wtforms import TextAreaField, BooleanField, StringField, IntegerField, validators
 from examples import example_01
 from textwrap import dedent
 
@@ -25,4 +25,4 @@ class ExampleForm(FlaskForm):
     """))
     public = BooleanField('Make public', default=True)
     fingerprint = StringField('Fingerprint id', default='')
-    sortnum = IntegerField('Sort number', default=0)
+    sortnum = IntegerField('Sort number', default=0, validators=[validators.NumberRange(message='Range should be between 0 and 999.', min=0, max=999)])

@@ -17,6 +17,7 @@ config_log(log)
 
 PRODUCTION = 'I_AM_ON_HEROKU' in os.environ
 LOCAL = not PRODUCTION
+FORCE_ADMIN = True
 
 if os.environ.get("REDIS_URL"):
     # Heroku
@@ -66,7 +67,7 @@ def do(source, comments=True, linenos=True):
 @app.route('/examples')
 def examples_list():
     admin = request.args.get('admin')
-    if LOCAL: admin = True
+    if FORCE_ADMIN: admin = True
 
     if len(Example.ids()) == 0:
         example = Example(**example_01)  # create the first example
@@ -83,6 +84,7 @@ def examples_sync():
     if do:
         es.files_to_redis()
         es.redis_to_files()
+        return redirect(url_for('examples_sync'))  # so that the 'do' is removed after each do
     es.build_mappings()
     return render_template('examples_sync.html', title="Example Synchronisation", infos=es.mappings, ls=es.ls(), admin=True)
 
@@ -93,8 +95,7 @@ def example_create():
     Handle GET blank initial forms and POST creating new entries.
     """
     admin = request.args.get('admin')
-    disabled = '' if admin else 'disabled'
-    if LOCAL: disabled = False
+    if FORCE_ADMIN: admin = True
 
     if request.method == 'POST':
         log.debug(f'example_create POST public {request.values.get("public")}')
@@ -111,7 +112,7 @@ def example_create():
             return redirect(url_for('example_edit', id=example.id))
     else:  # GET
         form = ExampleForm()
-    return render_template('example.html', form=form, title='Example Edit', disabled=disabled)
+    return render_template('example.html', form=form, title='Example Edit', admin=admin)
 
 @app.route('/example/<int:id>', methods=['GET', 'POST'])
 def example_edit(id):
@@ -122,6 +123,8 @@ def example_edit(id):
     delete = request.args.get('delete')  # Wish forms could send delete verb properly...
     clone = request.args.get('clone')
     to_rpn = request.args.get('to-rpn')
+    admin = request.args.get('admin')
+    if FORCE_ADMIN: admin = True
 
     example = Example.get(id)
     # log.info(f'example_edit: id {id} delete flag {delete} example is {example}')
@@ -143,7 +146,7 @@ def example_edit(id):
         dic = example.asdict
         dic['public'] = Example.redis_bool_to_bool(example.public)
         form = ExampleForm(**dic)
-        return render_template('example.html', form=form, title='Example Edit')
+        return render_template('example.html', form=form, title='Example Edit', admin=admin)
 
     elif request.method == 'POST':  # Wish forms could send put verb properly...
         form = ExampleForm(request.form)
@@ -153,13 +156,13 @@ def example_edit(id):
             example.description=request.values.get('description')
             example.public = Example.bool_to_redis_bool(request.values.get('public'))
             example.fingerprint=request.values.get('fingerprint')
-            example.sortnum=request.values.get('sortnum')
+            example.sortnum=form.sortnum.data  # int(request.values.get('sortnum'))
             example.save()
             log.info(f'example_edit: {id} edited and saved {example}')
             es.build_mappings()
         else:
             log.warning('form did not validate')
-        return render_template('example.html', form=form, title='Example Edit')
+        return render_template('example.html', form=form, title='Example Edit', admin=admin)
 
 @app.route('/help')
 def help():

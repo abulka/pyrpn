@@ -76,3 +76,22 @@ table.form_table th, td {
 .hidden {
     visibility:hidden;
 }
+
+/*example sync*/
+
+td.file-missing {
+    background-color: #00bb00;
+}
+td.redis-missing {
+    background-color: #ffcc64;
+}
+
+table.example_sync_table {
+    border: 1px solid black;
+    border-collapse: collapse;
+    width: 100%;
+}
+table.example_sync_table th, td {
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+}

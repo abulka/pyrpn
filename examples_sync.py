@@ -14,16 +14,18 @@ config_log(log)
 @attrs
 class MappingInfo():
     filename = attrib(default='')
-    redis_id = attrib(default='')
+    redis_id = attrib(default=0)
     fingerprint = attrib(default='')
+    title = attrib(default='')
+    sortnum = attrib(default=0)
 
     @property
-    def get_has_filename(self):
+    def has_filename(self):
         return self.filename != ''
 
     @property
-    def get_has_redis(self):
-        return self.redis_id != ''
+    def has_redis(self):
+        return self.redis_id != 0
 
 @attrs
 class ExamplesSync():
@@ -53,8 +55,10 @@ class ExamplesSync():
         for filename in files:
             info = MappingInfo(filename=filename)
             data = self.data_from_file(filename)
-            info.has_filename = True
+            info.filename = filename
             info.fingerprint = data['fingerprint']
+            info.sortnum = data['sortnum']
+            info.title = data['title']
             mappings.append(info)
 
         # Scan redis
@@ -68,13 +72,13 @@ class ExamplesSync():
             if not found:
                 # ex was not created by a file - create an ex
                 info = MappingInfo()
-                info.has_filename = False
                 info.fingerprint = example.fingerprint
+                info.sortnum = int(example.sortnum)
+                info.title = example.title
                 mappings.append(info)
-            info.has_redis = True
             info.redis_id = redis_id
 
-        self.mappings = sorted(mappings, key=lambda mp: mp.redis_id, reverse=False)
+        self.mappings = sorted(mappings, key=lambda mp: (mp.sortnum, mp.redis_id), reverse=True)
         # pprint.pprint(self.mappings)
 
     def save_to_file(self, example):
@@ -83,6 +87,8 @@ class ExamplesSync():
         if example.fingerprint:
             filename = f'example_{example.fingerprint}.json'
             dic = example.asdict
+            dic['sortnum'] = int(example.sortnum)  # TODO this should be automatic? when create example obj from redis - but how does example obj know since redis fields are all strings!
+            del dic['id']  # don't persist the key
             with open(os.path.join(self.examples_dir, filename), 'w') as f:
                 f.write(json.dumps(dic, sort_keys=True, indent=4))
             log.info(f'wrote example {filename} to disk')
