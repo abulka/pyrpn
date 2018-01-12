@@ -2,8 +2,7 @@ from flask import Flask, render_template, redirect, url_for, request, jsonify
 from parse import parse
 import logging
 from logger import config_log
-from server_forms import MyForm, ExampleForm
-from example1 import example_01
+from server_forms import ConverterForm, ExampleForm
 import redis
 import json
 from attr import attrs, attrib, evolve
@@ -44,13 +43,13 @@ es = ExamplesSync.create(APP_DIR, PRODUCTION)
 def index(id=None):
     rpn = rpn_free42 = 'Press Convert'
     if request.method == 'GET':
-        form = MyForm()
+        form = ConverterForm()
         if id:
             example = Example.get(id)
             form.source.process_data(example.source)
     elif request.method == 'POST':
         # We are asking for the source to be converted to RPN
-        form = MyForm(request.form)
+        form = ConverterForm(request.form)
         if form.validate_on_submit():
             program = parse(form.source.data)
             rpn = program.lines_to_str(comments=form.comments.data, linenos=form.line_numbers.data)

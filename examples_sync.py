@@ -1,7 +1,6 @@
 import json
 import os
 from attr import attrs, attrib, evolve, Factory
-from example1 import example_01
 from example_model import Example
 import logging
 from logger import config_log
