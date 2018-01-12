@@ -17,7 +17,7 @@ class ExampleForm(FlaskForm):
         def helper_func():
             pass
     """).strip(), validators=[])
-    title = StringField('Title', default='Untitled')
+    title = StringField('Title', default='Untitled', validators=[validators.DataRequired()])
     description = TextAreaField('Description', default=dedent("""
         <p>Enter description and commentary here<p>    
         <p>A full <b>html editor</b> is provided incl. the ability to 

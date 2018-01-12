@@ -27,6 +27,20 @@
     <br>
     <div class="andy_content">
 
+
+        {% if form.errors %}
+            <h3 style="color: red;">Errors</h3>
+            {% for field in form if field.widget.input_type != 'hidden' %}
+                <p>
+                    {% if field.errors %}
+                        {{ field.label }}:
+                        <span style="color: red;">{% for error in field.errors %}{{ error }}{% if not loop.last %} - {% endif %}{% endfor %}</span>
+                    {% endif %}
+                </p>
+            {% endfor %}
+            <hr>
+        {% endif %}
+
         <!--leave action="" out of form so that post goes back to originating url incl. /example/id or /example - meaning form can be used for both create and edit-->
         <form id="mainform" method="POST">
             <!--<p>{{ form.title.label }}</p>-->
@@ -55,7 +69,8 @@
                     </tr>
                 {% endif %}
             </table>
-                <input class="submit_button" {{ disabled }} title='Save this as an example' data-toggle="tooltip" type="submit" value="Save">
+
+            <input class="submit_button" {{ disabled }} title='Save this as an example' data-toggle="tooltip" type="submit" value="Save">
             {% if disabled %}
                 <p><i>The ability to save this example has disabled because you are not logged in.</i></p>
                 <p><i>If you are interested in creating useful examples of the community please contact <a href="mailto:abulka@gmail.com">Andy</a> for rights.

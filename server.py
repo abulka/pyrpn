@@ -103,10 +103,12 @@ def example_create():
         # example = Example(**dict(request.values))  # why doesn't this work?
         if form.validate():
             example = Example(
-                title=request.values.get('title'),
-                source=request.values.get('source'),
-                description=request.values.get('description'),
-                public = Example.bool_to_redis_bool(request.values.get('public')),
+                title=form.title.data, # request.values.get('title'),
+                source=form.source.data, # request.values.get('source'),
+                description=form.description.data, # request.values.get('description'),
+                public = Example.bool_to_redis_bool(form.public.data), # Example.bool_to_redis_bool(request.values.get('public')),
+                fingerprint=form.fingerprint.data,  # request.values.get('fingerprint')
+                sortnum=form.sortnum.data,  # int(request.values.get('sortnum'))
             )
             log.info(example)
             return redirect(url_for('example_edit', id=example.id))
@@ -152,14 +154,15 @@ def example_edit(id):
     elif request.method == 'POST':  # Wish forms could send put verb properly...
         form = ExampleForm(request.form)
         if form.validate():
-            example.title=request.values.get('title')
-            example.source=request.values.get('source')
-            example.description=request.values.get('description')
-            example.public = Example.bool_to_redis_bool(request.values.get('public'))
-            example.fingerprint=request.values.get('fingerprint')
+            # Update
+            example.title=form.title.data  # request.values.get('title')
+            example.source=form.source.data  # request.values.get('source')
+            example.description=form.description.data  # request.values.get('description')
+            example.public = Example.bool_to_redis_bool(form.public.data)  # Example.bool_to_redis_bool(request.values.get('public'))
+            example.fingerprint=form.fingerprint.data  # request.values.get('fingerprint')
             example.sortnum=form.sortnum.data  # int(request.values.get('sortnum'))
             example.save()
-            log.info(f'example_edit: {id} edited and saved {example}')
+            log.info(f'example_edit: {id} updated and saved {example}')
             es.build_mappings()
         else:
             log.warning('form did not validate')
