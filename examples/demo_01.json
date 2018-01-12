@@ -1,7 +1,7 @@
 {
-    "description": "<p>This example shows off for loops, variable assignments and function calls \nincl. the passing of parameters.</p> \n\n<p>I'm especially proud of the text functionality I just implemented, which \ntakes long strings and <b>breaks them up for \nyou</b>, making it easier to create messages in the alpha register.</p>  \n\n<p>It also allows you to build up message strings by <b>referring to variable names</b>\n mixed in with descriptive text.\n  e.g. <pre>aview('Counter ', i, ' result= ', total)</pre> Time saver!</p>",
-    "public": "y",
-    "sortnum": 0,
-    "source": "def demo():\n    total = 0\n    for i in range(10):\n        result = calc_something(i, 5)\n        aview('Counter ', i, ' result= ', total)\n        total += result\n    aview('Final total was: ', total)\n\ndef calc_something(a,b):\n    # adds two numbers then squares them\n    return (a + b)**2",
+    "description": "<p>This example shows off for loops, variable assignments and function calls incl. the passing of parameters.</p>\r\n<p>I'm especially proud of the text functionality I just implemented, which takes long strings and <strong>breaks them up for you</strong>, making it easier to create messages in the alpha register.</p>\r\n<p>It also allows you to build up message strings by <strong>referring to variable names</strong> mixed in with descriptive text. e.g.</p>\r\n<pre>aview('Counter ', i, ' result= ', total)</pre>\r\n<p>Time saver!</p>",
+    "public": "",
+    "sortnum": 50,
+    "source": "def demo():\r\n    total = 0\r\n    for i in range(10):\r\n        result = calc_something(i, 5)\r\n        aview('Counter ', i, ' result= ', total)\r\n        total += result\r\n    aview('Final total was: ', total)\r\n\r\ndef calc_something(a,b):\r\n    # adds two numbers then squares them\r\n    return (a + b)**2",
     "title": "Demo 1"
 }
