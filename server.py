@@ -70,22 +70,23 @@ def examples_list():
     if FORCE_ADMIN: admin = True
 
     if len(Example.ids()) == 0:
-        example = Example(**example_01)  # create the first example
-        log.info('first example re-created', example.asdict)
-        # return f'<html><body><pre>{example}</pre></body></html>'
+        es.repopulate_redis()
+        # example = Example(**example_01)  # create the first example
     examples = [Example.get(id) for id in Example.ids()]
-    examples_sorted = sorted(examples, key=lambda eg: eg.sortnum, reverse=True)
+    for eg in examples:
+        eg.sortnum = int(eg.sortnum)  # repair the integer
+    examples_sorted = sorted(examples, key=lambda eg: (eg.sortnum, eg.filename, eg.id), reverse=True)
     return render_template('examples_list.html', examples=examples_sorted, title="Examples", admin=admin)
 
 
 @app.route('/sync')
 def examples_sync():
     do = request.args.get('do')
-    es.build_mappings()
     if do:
-        es.files_to_redis()
-        es.redis_to_files()
+        es.repopulate_redis()
         return redirect(url_for('examples_sync'))  # so that the 'do' is removed after each do
+    else:
+        es.build_mappings()
     return render_template('examples_sync.html', title="Example Synchronisation", infos=es.mappings, ls=es.ls(), admin=True)
 
 

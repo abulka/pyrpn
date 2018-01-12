@@ -121,3 +121,9 @@ class ExamplesSync():
                 data['filename'] = info.filename
                 example = Example(**data)
         self.build_mappings()
+
+    def repopulate_redis(self):
+        self.build_mappings()
+        self.files_to_redis()
+        self.redis_to_files()
+        log.info('redis db repopulated from example files on disk.')
