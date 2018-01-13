@@ -403,7 +403,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         if self.for_loop_info and func_name == 'range':
 
             # Look ahead optimisation for ranges with simple number literals as parameters (no expressions or vars)
-            def both_literals():
+            def all_literals():
                 for arg in node.args:
                     if not isinstance(arg, ast.Num):
                         return False
@@ -415,10 +415,22 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 if '.' not in s: raise RpnError(f'cannot construct range ISG value based on to of {x}')
                 return s[s.index('.') + 1:]
 
-            if both_literals():
-                from_ = int(self.get_node_name_id_or_n(node.args[0])) - 1 if len(node.args) == 2 else -1
-                to_ = int(self.get_node_name_id_or_n(node.args[1])) - 1 if len(node.args) == 2 else int(self.get_node_name_id_or_n(node.args[0])) - 1
-                self.program.insert(f'{from_}.{num_after_point(to_ / 1000)}')
+            if all_literals():
+                args = [int(self.get_node_name_id_or_n(a)) for a in node.args]
+                if len(node.args) == 1:
+                    from_ = 0
+                    to_ = args[0]
+                elif len(node.args) in (2, 3):
+                    from_ = args[0]
+                    to_ = args[1]
+                from_ -= 1
+                to_ -= 1
+                step_ = args[2] if len(node.args) == 3 else None
+                # Calculate the .nnnss
+                rhs = to_ / 1000
+                if step_:
+                    rhs += step_ / 100000
+                self.program.insert(f'{from_}.{num_after_point(rhs)}')
             else:
                 # range call involves complexity (expressions or variables)
                 if len(node.args) == 1:

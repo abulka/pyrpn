@@ -240,6 +240,30 @@ class RpnCodeGenTests(BaseTest):
             """) + ISG_PREPARE
         self.compare(de_comment(expected), lines, trace=False, dump=True)
 
+    # for with step
+
+    def test_for_range_step_two_param_literals(self):
+        lines = self.parse(dedent("""
+            for i in range(1, 200, 2):
+                pass
+            """))
+        expected = dedent("""
+            // setup
+            0.19902
+            STO 00
+
+            LBL 00  // for
+            ISG 00  // test
+            GTO 01  // for body
+            GTO 02  // resume
+            LBL 01  // for body
+            GTO 00  // for
+            LBL 02  // resume
+            """)
+        self.compare(de_comment(expected), lines, trace=False, dump=True)
+
+    # for - other
+
     def test_for_range_loop_view_i(self):
         lines = self.parse(dedent("""
             for i in range(1,20):
