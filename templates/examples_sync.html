@@ -29,7 +29,9 @@
                 <td>
                     <span class="examples_action_link">
                         <a href="/example/{{ ex.redis_id }}">{{ ex.title }}</a>
-                        <a href="/example/{{ ex.redis_id }}?delete=1" style="float: right">del</a>
+                        {% if ex.redis_id != 0 %}
+                            <a href="/example/{{ ex.redis_id }}?delete=1" style="float: right">del</a>
+                        {% endif %}
                     </span>
                 </td>
                 <td> {{ ex.sortnum }} </td>

@@ -3,20 +3,28 @@
 {% endblock %}
 
 {% block content %}
-    <ul>
-        <li><a href="/">Converter</a></li>
-        <li><a href="/examples">Examples</a></li>
-        <li><a href="/example">Create new Example</a></li>
-        <li><a href="/help">Help</a></li>
-        {% if admin %}
-        <li><a href="/sync">Examples Synchronisation (admin)</a></li>
-        {% endif %}
-    </ul>
-    <div class="andy_content">
-
-        <h1>Thanks!</h1>
-        <p>Thanks for voting for this example.</p>
-        <p>The example <b>{{ example.title }}</b> has been sent for moderation.</p>
-    </div>
+<ul>
+    <li><a href="/">Converter</a></li>
+    <li><a href="/examples">Examples</a></li>
+    <li><a href="/example">Create new Example</a></li>
+    <li><a href="/help">Help</a></li>
+    {% if admin %}
+    <li><a href="/sync">Examples Synchronisation (admin)</a></li>
+    {% endif %}
+</ul>
+<div class="andy_content">
+    {% if success %}
+    <h1>Thanks!</h1>
+    <p>Thanks for voting for this example.</p>
+    <p>Your vote for example <b>{{ example.title }}</b> has been sent for moderation.</p>
+    {% else %}
+    <h1>Thanks - but Oops!</h1>
+    <p>Your vote for example <b>{{ example.title }}</b> could not be sent, sorry.
+        Possibly server email problems.</p>
+    <p> Please copy and paste the example and email it to
+        <a href="mailto:abulka@gmail.com">Andy</a>
+        for moderation.</p>
+    {% endif %}
+</div>
 
 {% endblock %}

@@ -166,11 +166,16 @@ def example_edit(id):
     if request.method == 'GET' and to_rpn:
         rpn = parse(example.source).lines_to_str(comments=True, linenos=True)
         rpn_free42 = parse(example.source).lines_to_str(comments=False, linenos=True)
+        log.info(f'main converter converting example {example.id} title "{example.title}"')
         return jsonify(rpn=rpn, rpn_free42=rpn_free42)
 
     if request.method == 'GET' and vote:
-        vote_via_email(example)
-        return render_template('example_vote_thanks.html', title='Example Vote', example=example)
+        try:
+            vote_via_email(example)
+        except:
+            return render_template('example_vote_thanks.html', title='Example Vote', example=example, success=False)
+        else:
+            return render_template('example_vote_thanks.html', title='Example Vote', example=example, success=True)
 
     if request.method == 'GET':
         dic = example.asdict
@@ -197,24 +202,26 @@ def example_edit(id):
 
 def vote_via_email(example):
     dic = example.asdict
-    for key in set(dic.keys()) - set(('title', 'description', 'source')):
+    for key in set(dic.keys()) - set(('title', 'description', 'source', 'sortnum')):
         del dic[key]  # don't persist this key
+    dic['sortnum'] = int(dic['sortnum'])  # repair the integer
     body = json.dumps(dic, sort_keys=True, indent=4)
-    log.info(body)
     # email it
     try:
         sg = sendgrid.SendGridAPIClient(apikey=SENDGRID_API_KEY)
         from_email = Email("pyrpn-donotreply@gmail.com")
         to_email = Email("abulka@gmail.com")
-        subject = "Vote for python example"
+        subject = f'Vote for python rpn example \"{dic["title"]}\"'
         content = Content("text/plain", body)
         mail = Mail(from_email, subject, to_email, content)
         response = sg.client.mail.send.post(request_body=mail.get())
         log.info(response)
     except Exception as e:
         log.exception("Couldn't send vote email")
+        raise e
     else:
         log.info(f'vote for example {example.id} title {example.title} emailed, response {response.status_code}')
+    log.info(body)
 
 
 @app.route('/help')
