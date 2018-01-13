@@ -12,6 +12,8 @@ from example_model import Example
 from examples_sync import ExamplesSync
 import os
 import settings
+import sendgrid
+from sendgrid.helpers.mail import *
 
 log = logging.getLogger(__name__)
 config_log(log)
@@ -32,6 +34,11 @@ app.config.update(dict(
     SECRET_KEY="powerful secretkey",
     WTF_CSRF_SECRET_KEY="a csrf secret key"
 ))
+
+SENDGRID_API_KEY = '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'
+# app.config['SENDGRID_API_KEY'] = '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'
+# app.config['SENDGRID_DEFAULT_FROM'] = 'abulka@gmail.com'
+# mail = SendGrid(app)
 
 es = ExamplesSync.create(settings.APP_DIR, settings.PRODUCTION)
 
@@ -193,9 +200,21 @@ def vote_via_email(example):
     for key in set(dic.keys()) - set(('title', 'description', 'source')):
         del dic[key]  # don't persist this key
     body = json.dumps(dic, sort_keys=True, indent=4)
-    # email it
-    log.info(f'vote for example {example.id} title {example.title} emailed')
     log.info(body)
+    # email it
+    try:
+        sg = sendgrid.SendGridAPIClient(apikey=SENDGRID_API_KEY)
+        from_email = Email("pyrpn-donotreply@gmail.com")
+        to_email = Email("abulka@gmail.com")
+        subject = "Vote for python example"
+        content = Content("text/plain", body)
+        mail = Mail(from_email, subject, to_email, content)
+        response = sg.client.mail.send.post(request_body=mail.get())
+        log.info(response)
+    except Exception as e:
+        log.exception("Couldn't send vote email")
+    else:
+        log.info(f'vote for example {example.id} title {example.title} emailed, response {response.status_code}')
 
 
 @app.route('/help')
