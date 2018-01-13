@@ -23,5 +23,5 @@ def de_comment(s):
         elif line.strip() == '' and not i in immune:
             continue
         else:
-            result.append(line)
+            result.append(line.strip())
     return '\n'.join(result)

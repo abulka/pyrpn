@@ -201,6 +201,7 @@ class RpnCodeGenTests(BaseTest):
             // setup
             RCL 00
             RCL 01
+            1       // step
             XEQ d
             STO 02  // range i
             
@@ -227,6 +228,7 @@ class RpnCodeGenTests(BaseTest):
             // setup
             0
             RCL 00
+            1       // step
             XEQ d
             STO 01  // i
             
@@ -242,7 +244,7 @@ class RpnCodeGenTests(BaseTest):
 
     # for with step
 
-    def test_for_range_step_two_param_literals(self):
+    def test_for_step_two_param_literals(self):
         lines = self.parse(dedent("""
             for i in range(1, 200, 2):
                 pass
@@ -260,6 +262,33 @@ class RpnCodeGenTests(BaseTest):
             GTO 00  // for
             LBL 02  // resume
             """)
+        self.compare(de_comment(expected), lines, trace=False, dump=True)
+
+    def test_for_step_two_param_var_mixed(self):
+        lines = self.parse(dedent("""
+            b = 200
+            for i in range(5, b, 10):
+                pass
+            """))
+        expected = dedent("""
+            200
+            STO 00  // b
+
+            // setup
+            5
+            RCL 00  // b
+            10      // step
+            XEQ d
+            STO 01  // range i
+
+            LBL 00  // for
+            ISG 01  // test i
+            GTO 01  // for body
+            GTO 02  // resume
+            LBL 01  // for body
+            GTO 00  // for
+            LBL 02  // resume
+            """) + ISG_PREPARE
         self.compare(de_comment(expected), lines, trace=False, dump=True)
 
     # for - other
@@ -389,6 +418,7 @@ class RpnCodeGenTests(BaseTest):
 
             10        // range start, 10
             RCL 00    // range end, n
+            1         // step
             XEQ d
             STO 02    // i our counter
 

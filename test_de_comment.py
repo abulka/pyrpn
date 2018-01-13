@@ -78,3 +78,16 @@ class UtilCommentTests(BaseTest):
             """)
         self.assertEqual(expected, de_comment(commented))
 
+    def test_remove_trailing_spaces(self):
+        # commented version has trailing spaces, expected has no trailing spaces
+        commented = dedent("""
+            LBL "LOOPER"    
+
+            RTN   
+            """)
+        expected = dedent("""
+            LBL "LOOPER"
+            RTN
+            """)
+        self.assertEqual(expected, de_comment(commented))
+

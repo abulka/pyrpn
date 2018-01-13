@@ -2,26 +2,41 @@ from textwrap import dedent
 
 ISG_PREPARE = dedent("""
     RTN     // prevent any code above running into below inserted functions
-
-    LBL d   // template function "calculate_ISG", takes two params
-    CF 99
+    
+    LBL d   // def calculate_ISG(z:from, y:to, x:step)
+    CF 99   // neg_case = False 
+    CF 98   // have_step = False (other than 1)
+    1
+    X=Y?
+    SF 98   // have_step = True
+    RDN
+    RCL ST Z
+    RCL ST Z // stack now: z:step y:from x:to
     1
     -
     X<>Y
     1
-    -
-    X>=0?
-    GTO e
-    ABS
-    SF 99
+    -        // stack now: z:step y:to-1 x:from-1 
+    X>=0?    // if from > 0
+    GTO e    //      easy (non negative)
+    ABS      // else from = abs(from)
+    SF 99    //      neg_case = True 
     LBL e
-    X<>Y
+    X<>Y     // stack now: z:step y:from x:to
     1000
     /
-    +
-    FS?C 99
+    +        // stack now: y:step x:a.bbb
+    FS?C 98  // if not have_step
+    GTO c
+    RCL ST Z // else step
+    100000   //      step = step / 100,000
+    /
+    +        // stack now: a.bbbnn
+    LBL c
+    FS?C 99  // if neg_case
     +/-
-    RTN  // returns ISG number in form a.bbb
+    RTN 
+    // returns ISG number in form a.bbbnn
     """)
 
 LIST_PUSH_POP = dedent("""

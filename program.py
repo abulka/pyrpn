@@ -44,7 +44,7 @@ class Program(object):
             elif line.strip() == '':
                 continue
             else:
-                self.insert(line)
+                self.insert(line.strip())
 
     def lines_to_str(self, comments=False, linenos=False):
         result = []

@@ -439,6 +439,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                     self.program.insert(0)  # no longer adjusted cos isg routine will do that
                 for item in node.args:
                     self.visit(item)
+                if len(node.args) in (1, 2):
+                    # if step not specified, specify it, because the 'd' isg subroutine needs it, takes 3 params.
+                    self.program.insert(1)
                 self.program.insert('XEQ d')
                 self.needed_templates.append('isg_prepare')
             register = self.for_loop_info[-1].register
