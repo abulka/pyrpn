@@ -402,12 +402,31 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         if self.for_loop_info and func_name == 'range':
 
-            # Look ahead optimisation for ranges with simple number literals as parameters (no expressions or vars)
-            def all_literals():
-                for arg in node.args:
+            def all_literals(nodes):
+                """
+                Look ahead optimisation for ranges with simple number literals as parameters (no expressions or vars)
+                But we do cater for Unary operators (e.g. -4) with a tiny little extra lookahead - tricky!
+                :return: the list of arguments as numbers, incl all negative signs etc. already applied e.g. [-2, 200, 2]
+                """
+                arg_vals = []
+                for arg in nodes:
                     if not isinstance(arg, ast.Num):
-                        return False
-                return True
+                        if isinstance(arg, ast.UnaryOp):
+                            # still could be a literal number if we drill down past the Unary stuff
+                            children = [arg.operand, arg.op]  # must do operand first to get the number onto the arg_vals list - not simply list(ast.iter_child_nodes(arg))
+                            result = all_literals(children)  # recursive
+                            if result:
+                                arg_vals.extend(result)
+                            else:
+                                return []
+                        elif isinstance(arg, (ast.UAdd, ast.USub)):
+                            if isinstance(arg, ast.USub):
+                                arg_vals[-1] = - arg_vals[-1]
+                        else:
+                            return []
+                    else:
+                        arg_vals.append(int(self.get_node_name_id_or_n(arg)))
+                return arg_vals
 
             def num_after_point(x):
                 # returns the frac digits, excluding the .
@@ -415,17 +434,17 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 if '.' not in s: raise RpnError(f'cannot construct range ISG value based on to of {x}')
                 return s[s.index('.') + 1:]
 
-            if all_literals():
-                args = [int(self.get_node_name_id_or_n(a)) for a in node.args]
-                if len(node.args) == 1:
+            args = all_literals(node.args)
+            if args:
+                step_ = args[2] if len(args) == 3 else None
+                if len(args) == 1:
                     from_ = 0
                     to_ = args[0]
-                elif len(node.args) in (2, 3):
+                elif len(args) in (2, 3):
                     from_ = args[0]
                     to_ = args[1]
-                from_ -= 1
+                from_ -= step_ if step_ else 1
                 to_ -= 1
-                step_ = args[2] if len(node.args) == 3 else None
                 # Calculate the .nnnss
                 rhs = to_ / 1000
                 if step_:

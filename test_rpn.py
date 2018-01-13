@@ -251,7 +251,27 @@ class RpnCodeGenTests(BaseTest):
             """))
         expected = dedent("""
             // setup
-            0.19902
+            -1.19902
+            STO 00
+
+            LBL 00  // for
+            ISG 00  // test
+            GTO 01  // for body
+            GTO 02  // resume
+            LBL 01  // for body
+            GTO 00  // for
+            LBL 02  // resume
+            """)
+        self.compare(de_comment(expected), lines, trace=False, dump=True)
+
+    def test_for_step_two_param_literals_negative(self):
+        lines = self.parse(dedent("""
+            for i in range(-2, 200, 2):
+                pass
+            """))
+        expected = dedent("""
+            // setup
+            -4.19902  // initial value must be -step value so that first incr. will bring it to the start range val
             STO 00
 
             LBL 00  // for
