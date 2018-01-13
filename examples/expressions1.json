@@ -1,0 +1,7 @@
+{
+    "description": "<p>You can type in long complex expressions and they will be converted to RPN.</p>",
+    "public": "yes",
+    "sortnum": 30,
+    "source": "x = 1 + 2 * 6 + 1 * 9 / 100 + 1 + 2 * 6\r\ny = ((1 + 2) * (6 + 2 - 3) * (2 + 7)) / 200  # brackets",
+    "title": "Long expressions"
+}

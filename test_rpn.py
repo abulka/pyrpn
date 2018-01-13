@@ -1705,3 +1705,25 @@ class RpnCodeGenTests(BaseTest):
             """)
         self.compare(de_comment(expected), lines, dump=True)
 
+    @unittest.skip('tough one - how to return expr when not in a def')
+    def test_add_inside_print(self):
+        """
+        Power function
+        """
+        lines = self.parse(dedent("""
+            x = 1
+            y = 2
+            print(x+y)
+            """))
+        expected = dedent("""
+            1
+            STO 00
+            2
+            STO 01
+            RCL 00
+            RCL 01
+            +
+            AVIEW
+            """)
+        self.compare(de_comment(expected), lines, dump=True)
+

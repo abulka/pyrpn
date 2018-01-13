@@ -34,7 +34,9 @@
                         <span class="examples_action_link"><a href="/example/{{ example.id }}" title="Edit">Edit</a></span>
                         <span class="examples_action_link"><a href="/example/{{ example.id }}?clone=1" title="Make a new copy of this example">Clone</a></span>
                         <span class="examples_action_link"><a href="/example/{{ example.id }}?delete=1" title="Delete this example - no confirmation.  Please be careful about deleting other people's work.">Delete</a></span>
+                        {% if not (admin and example.filename) %}
                         <span class="examples_action_link"><a href="/example/{{ example.id }}?vote=1" title="Send request to make this example permanent">Vote</a></span>
+                        {% endif %}
                     {% elif not admin and example.filename %}
                         <span class="examples_action_link"><a href="/example/{{ example.id }}?clone=1" title="Make a new, editable copy of this example">Clone</a></span>
                     {% endif %}
