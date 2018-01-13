@@ -170,7 +170,7 @@ def example_edit(id):
 
     if request.method == 'GET' and vote:
         vote_via_email(example)
-        return redirect(url_for('example_edit', id=example.id))
+        return render_template('example_vote_thanks.html', title='Example Vote', example=example)
 
     if request.method == 'GET':
         dic = example.asdict
