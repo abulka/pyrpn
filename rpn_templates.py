@@ -14,9 +14,9 @@ ISG_PREPARE = dedent("""
     RCL ST Z // stack now: z:step y:from x:to
     1
     -
-    X<>Y
-    1
-    -        // stack now: z:step y:to-1 x:from-1 
+    X<>Y     // stack now: z:step y:to-1 x:from 
+    RCL ST Z // step
+    -        // stack now: z:step y:to-1 x:from-step 
     X>=0?    // if from > 0
     GTO e    //      easy (non negative)
     ABS      // else from = abs(from)
