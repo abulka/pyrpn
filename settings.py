@@ -11,3 +11,7 @@ LOCAL = not PRODUCTION
 
 if PRODUCTION:
     LOG_TO_CONSOLE = True
+
+ADMIN = LOCAL
+# ADMIN = False
+# ADMIN = True

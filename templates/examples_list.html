@@ -29,13 +29,16 @@
                     <h2>{{ example.title }}</h2>
                     {{ example.description.strip()|safe }}
                 </div>
-                {% if admin %}
-                    <div class="bot">
-                        <span class="examples_action_link"><a href="/example/{{ example.id }}">Edit</a></span>
-                        <span class="examples_action_link"><a href="/example/{{ example.id }}?clone=1">Clone</a></span>
-                        <span class="examples_action_link"><a href="/example/{{ example.id }}?delete=1">Delete</a></span>
-                    </div>
-                {% endif %}
+                <div class="bot">
+                    {% if admin or not example.filename %}
+                        <span class="examples_action_link"><a href="/example/{{ example.id }}" title="Edit">Edit</a></span>
+                        <span class="examples_action_link"><a href="/example/{{ example.id }}?clone=1" title="Make a new copy of this example">Clone</a></span>
+                        <span class="examples_action_link"><a href="/example/{{ example.id }}?delete=1" title="Delete this example - no confirmation.  Please be careful about deleting other people's work.">Delete</a></span>
+                        <span class="examples_action_link"><a href="/example/{{ example.id }}?vote=1" title="Send request to make this example permanent">Vote</a></span>
+                    {% elif not admin and example.filename %}
+                        <span class="examples_action_link"><a href="/example/{{ example.id }}?clone=1" title="Make a new, editable copy of this example">Clone</a></span>
+                    {% endif %}
+                </div>
             </td>
             <td>
                 <pre><code class="language-python">{{ example.source.strip() }}</code></pre>
@@ -60,10 +63,9 @@
     </table>
     <br>
     {% if not admin %}
-        <p><i>The ability to edit, delete examples has disabled because you are not logged in.</i></p>
-        <p><i>If you are interested in creating useful examples of the community please contact <a href="mailto:abulka@gmail.com">Andy</a> for rights.
-            </i></p>
-    {% else %}
+        <p><i>Warning: Any examples you create will be purged periodically.</i><p>
+        <p><i>To help the community and make new examples permanent, click the <b>vote</b> link next to any user created examples.</i></p>
+        <br>
     {% endif %}
 </div>
 

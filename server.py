@@ -16,8 +16,7 @@ import settings
 log = logging.getLogger(__name__)
 config_log(log)
 
-FORCE_ADMIN = settings.LOCAL
-# FORCE_ADMIN = False
+FORCE_ADMIN = settings.ADMIN
 
 if os.environ.get("REDIS_URL"):
     # Heroku
@@ -142,6 +141,7 @@ def example_edit(id):
     delete = request.args.get('delete')  # Wish forms could send delete verb properly...
     clone = request.args.get('clone')
     to_rpn = request.args.get('to-rpn')
+    vote = request.args.get('vote')
     admin = request.args.get('admin')
     if FORCE_ADMIN: admin = True
 
@@ -160,6 +160,10 @@ def example_edit(id):
         rpn = parse(example.source).lines_to_str(comments=True, linenos=True)
         rpn_free42 = parse(example.source).lines_to_str(comments=False, linenos=True)
         return jsonify(rpn=rpn, rpn_free42=rpn_free42)
+
+    if request.method == 'GET' and vote:
+        vote_via_email(example)
+        return redirect(url_for('example_edit', id=example.id))
 
     if request.method == 'GET':
         dic = example.asdict
@@ -183,6 +187,16 @@ def example_edit(id):
         else:
             log.warning('form did not validate')
         return render_template('example.html', form=form, title='Example Edit', admin=admin)
+
+def vote_via_email(example):
+    dic = example.asdict
+    for key in set(dic.keys()) - set(('title', 'description', 'source')):
+        del dic[key]  # don't persist this key
+    body = json.dumps(dic, sort_keys=True, indent=4)
+    # email it
+    log.info(f'vote for example {example.id} title {example.title} emailed')
+    log.info(body)
+
 
 @app.route('/help')
 def help():

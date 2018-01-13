@@ -11,6 +11,7 @@
     <ul>
         <li><a href="/">Converter</a></li>
         <li><a href="/examples">Examples</a></li>
+        <li><a href="/example">Create new Example</a></li>
         <li><a href="/help">Help</a></li>
         {% if admin %}
         <li><a href="/sync">Examples Synchronisation (admin)</a></li>
@@ -22,11 +23,17 @@
         // $('html').hide();
     </script>
 
-    {% set disabled = '' if admin else 'disabled' %}
+    {% set disabled = '' if admin or (not admin and not form.filename.data) else 'disabled' %}
+
 
     <br>
     <div class="andy_content">
 
+        {% if not admin and not form.filename.data %}
+            <p><i>Warning: Any examples you create will be purged periodically.</i><p>
+            <p><i>To help the community and make new examples permanent, click the <b>vote</b> link next to any user created examples on the <a href="/examples">Examples</a> list page.</i></p>
+            <br>
+        {% endif %}
 
         {% if form.errors %}
             <h3 style="color: red;">Errors</h3>
@@ -52,7 +59,7 @@
             <h3> {{ form.description.label }} </h3>
             {{ form.description(class_='description', id='id_description_text') }}
 
-            {% if not disabled %}
+            {% if admin %}
                 <h3>Advanced</h3>
                 <table class="form_table table-expand">
                     <tr>
@@ -72,7 +79,7 @@
 
             <input class="submit_button" {{ disabled }} title='Save this as an example' data-toggle="tooltip" type="submit" value="Save">
             {% if disabled %}
-                <p><i>The ability to save this example has disabled because you are not logged in.</i></p>
+                <p><i>The ability to save this example has disabled because this example is protected by the admin.</i></p>
                 <p><i>If you are interested in creating useful examples of the community please contact <a href="mailto:abulka@gmail.com">Andy</a> for rights.
                     </i></p>
             {% endif %}
