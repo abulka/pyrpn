@@ -336,6 +336,53 @@ class RpnCodeGenTests(BaseTest):
             """)
         self.compare(de_comment(expected), lines, trace=False, dump=True)
 
+
+    # weird aview and view edge cases
+
+    """
+    AVIEW()             - view alpha register
+    aview()             - AVIEW
+    
+    aview(a,b,c)        - appends all into alpha register and does an AVIEW
+    aview(a)            - should append one thing
+    for i ... aview(i)  - should append one this, the i with IP trick
+    
+    but then, aview with a single parameter is silly.  might as well just do a VIEW
+    though if a string is involved then yes, it needs to go view the alpha register.
+    
+    view(a)             -- VIEW nn
+    view("hello")       -- same as aview("hello") 
+    view(1)             -- VIEW ST X 
+    """
+
+    @unittest.skip('edge cases')
+    def test_for_access_i_aview(self):
+        """
+        ensure can access i
+        """
+        lines = self.parse(dedent("""
+            for i in range(2):
+              aview(i)  # aview means display the alpha register - taking params is an optional extra
+            """))
+        expected = dedent("""
+            -1.001
+            STO 00
+            LBL 00
+            ISG 00
+            GTO 01
+            GTO 02
+            LBL 01
+            RCL 00
+            IP
+            VIEW ST X
+            GTO 00
+            LBL 02
+            """)
+        self.compare(de_comment(expected), lines, dump=True)
+
+
+    # for continues ....
+
     def test_for_range_with_body_accessing_i(self):
         lines = self.parse(dedent("""
             def range_i():
