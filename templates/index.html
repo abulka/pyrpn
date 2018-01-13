@@ -52,8 +52,15 @@
 
         var options1 = {lineNumbers: true,
                         mode: "python",
-                        lineWrapping: true}
+                        lineWrapping: true,
+        }
         var myCodeMirror1 = CodeMirror.fromTextArea($('#id_python_text').get(0), options1);
+        myCodeMirror1.setOption("extraKeys", {
+          Tab: function(cm) {
+            var spaces = Array(cm.getOption("indentUnit") + 1).join(" ");
+            cm.replaceSelection(spaces);
+          }
+        });
 
         $(document).keydown(function(e) {
               // console.log('key code is: ' + e.which + ' ' + (e.ctrlKey ? 'Ctrl' : '') + ' ' +

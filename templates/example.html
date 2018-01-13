@@ -94,6 +94,12 @@
                         mode: "python",
                         lineWrapping: true}
         var myCodeMirror1 = CodeMirror.fromTextArea($('#id_python_text').get(0), options1);
+        myCodeMirror1.setOption("extraKeys", {
+          Tab: function(cm) {
+            var spaces = Array(cm.getOption("indentUnit") + 1).join(" ");
+            cm.replaceSelection(spaces);
+          }
+        });
 
         function isMobileDevice() {
             return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
