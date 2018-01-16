@@ -228,6 +228,10 @@ def vote_via_email(example):
 def help():
     return render_template('help.html', title='Help & User Guide')
 
+@app.route('/subscribe')
+def subscribe():
+    return render_template('subscribe.html', title='Subscribe to Mailing List')
+
 @app.route('/hello')
 def hello():
     return render_template('hello.html', name='andy')
