@@ -108,6 +108,14 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def find_comment(self, node):
         # Finds comment in the original python source code associated with this token
+        # node.find_token
+
+        # # Test proper technique once I get asttokens > 1.1.7
+        # import tokenize
+        # self.atok.find_token(node.last_token, tokenize.COMMENT)
+        # log.info('finding comment using other technique last tok %s', self.atok.find_token(node.last_token, tokenize.COMMENT))
+        # log.info('finding comment using other technique first tok %s', self.atok.find_token(node.first_token, tokenize.COMMENT))
+
         line = node.first_token.line
         comment_i = line.find('#')
         return line[comment_i:] if comment_i != -1 else ''
