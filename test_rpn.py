@@ -1,15 +1,12 @@
 import unittest
 from test_base import BaseTest
 from de_comment import de_comment
-import ast
-import astunparse
 from textwrap import dedent
-from rpn import RecursiveRpnVisitor
 import logging
 from logger import config_log
-import asttokens
 from rpn import RpnError
 from rpn_templates import ISG_PREPARE
+from parse import parse
 
 log = logging.getLogger(__name__)
 config_log(log)
@@ -17,24 +14,11 @@ config_log(log)
 class RpnCodeGenTests(BaseTest):
 
     def parse(self, text, debug_gen_descriptive_labels=False):
-        # self.tree = ast.parse(text)
-
-        self.atok = asttokens.ASTTokens(text, parse=True)  # this keeps source code in the AST tree
-        self.tree = self.atok.tree
-
-        self.dump_ast()
-        self.visitor = RecursiveRpnVisitor()
-        self.visitor.debug_gen_descriptive_labels=debug_gen_descriptive_labels
-        self.visitor.atok = self.atok
-        self.visitor.visit(self.tree)
-        self.visitor.finish()
-        # self.visitor.program.dump()
-        return self.visitor.program.lines
-
-    def dump_ast(self):
-        """Pretty dump AST"""
-        log.debug(astunparse.dump(self.tree))  # nice and compact
-        log.debug(f"{'~'*25}")
+        debug_options = {'gen_descriptive_labels': debug_gen_descriptive_labels,
+                         'dump_ast': True}
+        self.program = parse(text, debug_options)
+        self.program.dump()
+        return self.program.lines
 
     def compare(self, expected, lines, trace=False, dump=False, keep_comments=False):
         """
@@ -48,10 +32,10 @@ class RpnCodeGenTests(BaseTest):
         :return: -
         """
         if dump:
-            self.visitor.program.dump(comments=True)
+            self.program.dump(comments=True)
 
         # All in one comparison
-        self.assertEqual(expected.strip(), self.visitor.program.lines_to_str(comments=keep_comments).strip())
+        self.assertEqual(expected.strip(), self.program.lines_to_str(comments=keep_comments).strip())
 
         if trace:
             expected = expected.strip().split('\n')
