@@ -659,8 +659,17 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         pass
 
     # Most of these operators map to rpn in the opposite way, because of the stack order etc.
-    cmpops = {"Eq":"X=Y?", "NotEq":"//!=", "Lt":"X>Y?", "LtE":"//<=", "Gt":"X<Y?", "GtE":"//>=",
-              "Is":"//is", "IsNot":"//is not", "In":"//in", "NotIn":"//not in"}
+    # There are 12 RPN operators, p332
+    cmpops = {"Eq":"X=Y?",
+              "NotEq":"//!=",
+              "Lt":"X>Y?",
+              "LtE":"//<=",
+              "Gt":"X<Y?",
+              "GtE":"//>=",
+              "Is":"//is",
+              "IsNot":"//is not",
+              "In":"//in",
+              "NotIn":"//not in"}
     def visit_Compare(self, node):
         """
         A comparison of two or more values. left is the first value in the comparison, ops the list of operators,
@@ -685,6 +694,32 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         operand=Num(n=1))],
         """
         pass
+
+    def visit_Or(self, node):
+        self.program.insert('OR')
+
+    def visit_And(self, node):
+        self.program.insert('AND')
+
+    def visit_BoolOp(self, node):
+        """
+        BoolOp(
+          op=Or(),
+          values=[
+            Num(n=1),
+            Num(n=0),
+            Num(n=1)]))])
+
+        Push each pair and apply OP on-goingly, so as not to blow the stack.
+        """
+        self.begin(node)
+        two_count = 0
+        for child in node.values:
+            self.visit(child)
+            two_count += 1
+            if two_count >= 2:
+                self.visit(node.op)
+        self.end(node)
 
     @recursive
     def visit_Pass(self, node):
