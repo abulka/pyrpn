@@ -8,12 +8,10 @@ import settings
 from cmd_list import cmd_list
 import tokenize
 import logging
+from rpn_exceptions import RpnError
 
 log = logging.getLogger(__name__)
 config_log(log)
-
-class RpnError(Exception):
-    pass
 
 class RecursiveRpnVisitor(ast.NodeVisitor):
     """ recursive visitor with RPN generating capability :-) """
