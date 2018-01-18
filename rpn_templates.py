@@ -115,3 +115,28 @@ LIST_PUSH_POP = dedent("""
     INDEX "ZLIST"
     RTN
     """)
+
+PRE_LOGIC_NORMALISE = dedent("""
+    // takes two params, which will be both converted to either 1 or 0
+
+    LBL "LGICNM"
+    CF 00  // represents that x is true
+    CF 01  // represents that y is true
+    X≠0?
+    SF 00
+    X<>Y
+    X≠0?
+    SF 01
+    RDN
+    RDN    // have gotten rid of args
+    FS? 01
+    1
+    FC? 01
+    0
+    FS? 00
+    1
+    FC? 00
+    0
+    RTN
+    """)
+
