@@ -22,6 +22,42 @@ class RpnTests2(BaseTest):
 
     # TESTS
 
+    def test_and_two_param(self):
+        self.parse(dedent("""
+            1 and 0
+            """))
+        expected = dedent("""
+            1
+            0
+            XEQ "LGICNM"  // tobool
+            AND
+            X≠O?  // true?
+            """)
+        self.compare(de_comment(expected))
+
+    def test_and_two_param_if(self):
+        self.parse(dedent("""
+            if 1 and 0:
+                CF(5)
+            """))
+        expected = dedent("""
+            1
+            0
+            XEQ "LGICNM"  // tobool
+            AND
+            X≠O?  // true?
+            
+            GTO 00  // true
+            GTO 01  // jump to resume
+            
+            LBL 00  // true
+            CF 05
+            
+            LBL 01  // resume (code block after the if)
+            """)
+        self.compare(de_comment(expected))
+
+    @unittest.skip('if needs revamp')
     def test_or(self):
         self.parse(dedent("""
             1 or 0 or 1
@@ -35,6 +71,7 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+    @unittest.skip('if needs revamp')
     def test_and(self):
         self.parse(dedent("""
             a = 1
