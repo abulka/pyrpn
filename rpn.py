@@ -372,11 +372,11 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.end(node)
             return
 
-        # DEBUG
-        elif func_name in self.program.rpn_templates.template_names:
-            # insert any rpn template by name - use for debugging
-            self.program.rpn_templates.need_template(func_name)
-            return
+        # # DEBUG
+        # elif func_name in self.program.rpn_templates.template_names:
+        #     # insert any rpn template by name - use for debugging
+        #     self.program.rpn_templates.need_template(func_name)
+        #     return
 
         elif func_name == 'PyLibAll':
             self.program.rpn_templates.need_all_templates()
@@ -474,7 +474,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 for item in node.args:
                     self.visit(item)
                 if len(node.args) in (1, 2):
-                    # if step not specified, specify it, because the 'd' isg subroutine needs it, takes 3 params.
+                    # if step not specified, specify it, because the rpn lib isg subroutine needs it - takes 3 params.
                     self.program.insert(1)
                 self.program.insert_xeq('PyIsgPr')
             register = self.for_loop_info[-1].register
@@ -492,10 +492,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             # The built-in command is a simple one without command arg fragment "parameter" parts - yes it may take
             # actual parameters but these are generated through normal visit parsing and available on the stack.
             self.program.insert(f'{func_name}', comment=cmd_list[func_name]['description'])
-        elif func_name in self.rpn_templates.user_insertable_pyrpn_cmds():
+        elif func_name in self.program.rpn_templates.get_user_insertable_pyrpn_cmds().keys():
             # Call our std. library with normal xeq, though may one day convert to embedded local labels
-            self.program.insert(f'XEQ "{func_name}"', comment=self.rpn_templates.user_insertable_pyrpn_cmds()[func_name]['description'])
-            self.rpn_templates.need_template(func_name)
+            self.program.insert(f'XEQ "{func_name}"', comment=self.program.rpn_templates.get_user_insertable_pyrpn_cmds()[func_name]['description'])
+            self.program.rpn_templates.need_template(func_name)
         else:
             # Local subroutine call - map to a local label A..?
             label = self.labels.func_to_lbl(func_name)

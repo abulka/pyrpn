@@ -5,7 +5,6 @@ from textwrap import dedent
 import logging
 from logger import config_log
 from rpn import RpnError
-from rpn_templates import ISG_PREPARE
 from parse import parse
 
 log = logging.getLogger(__name__)
@@ -15,7 +14,8 @@ class RpnCodeGenTests(BaseTest):
 
     def parse(self, text, debug_gen_descriptive_labels=False):
         debug_options = {'gen_descriptive_labels': debug_gen_descriptive_labels,
-                         'dump_ast': True}
+                         'dump_ast': True,
+                         'emit_pyrpn_lib': False}
         self.program = parse(text, debug_options)
         self.program.dump()
         return self.program.lines
@@ -186,7 +186,7 @@ class RpnCodeGenTests(BaseTest):
             RCL 00
             RCL 01
             1       // step
-            XEQ d
+            XEQ "PyIsgPr"
             STO 02  // range i
             
             LBL 00  // for
@@ -196,7 +196,7 @@ class RpnCodeGenTests(BaseTest):
             LBL 01  // for body
             GTO 00  // for
             LBL 02  // resume
-            """) + ISG_PREPARE
+            """)
         self.compare(de_comment(expected), lines, trace=False, dump=True)
 
     def test_for_range_one_param_var(self):
@@ -213,7 +213,7 @@ class RpnCodeGenTests(BaseTest):
             0
             RCL 00
             1       // step
-            XEQ d
+            XEQ "PyIsgPr"
             STO 01  // i
             
             LBL 00  // for
@@ -223,7 +223,7 @@ class RpnCodeGenTests(BaseTest):
             LBL 01  // for body
             GTO 00  // for
             LBL 02  // resume
-            """) + ISG_PREPARE
+            """)
         self.compare(de_comment(expected), lines, trace=False, dump=True)
 
     # for with step
@@ -282,7 +282,7 @@ class RpnCodeGenTests(BaseTest):
             5
             RCL 00  // b
             10      // step
-            XEQ d
+            XEQ "PyIsgPr"
             STO 01  // range i
 
             LBL 00  // for
@@ -292,7 +292,7 @@ class RpnCodeGenTests(BaseTest):
             LBL 01  // for body
             GTO 00  // for
             LBL 02  // resume
-            """) + ISG_PREPARE
+            """)
         self.compare(de_comment(expected), lines, trace=False, dump=True)
 
     # for - other
@@ -425,7 +425,7 @@ class RpnCodeGenTests(BaseTest):
             10        // range start, 10
             RCL 00    // range end, n
             1         // step
-            XEQ d
+            XEQ "PyIsgPr"
             STO 02    // i our counter
 
             LBL 00  // for
@@ -445,7 +445,7 @@ class RpnCodeGenTests(BaseTest):
             LBL 02  // resume
             RCL 01    // leave x on stack
             RTN
-            """) + ISG_PREPARE
+            """)
         self.compare(de_comment(expected), lines, dump=True, trace=True)
 
     def test_for_continue(self):

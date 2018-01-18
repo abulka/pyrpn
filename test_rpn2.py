@@ -5,7 +5,6 @@ from textwrap import dedent
 import logging
 from logger import config_log
 from rpn import RpnError
-from rpn_templates import ISG_PREPARE
 from parse import parse
 
 log = logging.getLogger(__name__)
@@ -14,7 +13,7 @@ config_log(log)
 class RpnTests2(BaseTest):
 
     def parse(self, text):
-        self.program = parse(text, debug_options={'dump_ast': True})
+        self.program = parse(text, debug_options={'dump_ast': True, 'emit_pyrpn_lib': False})
         self.program.dump()
 
     def compare(self, expected, keep_comments=False):
