@@ -113,12 +113,21 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         # Technique 1
         comment_ = self.atok.find_token(node.first_token, tokenize.COMMENT)  # requires asttokens >= 1.1.8
 
+        # Technique 1A
+        def find_line_comment(start_token):
+            t = start_token
+            while t.type not in (tokenize.COMMENT, tokenize.NL, tokenize.NEWLINE, tokenize.ENDMARKER):
+                t = self.atok.next_token(t, include_extra=True)
+            return t.string if t.type == tokenize.COMMENT else ''
+        comment2 = find_line_comment(node.first_token)
+
         # Technique 2
         line = node.first_token.line
         comment_i = line.find('#')
         comment = line[comment_i:].strip() if comment_i != -1 else ''
 
         # assert comment_.string == comment
+        assert comment2 == comment
         return comment
 
     # For visit support
