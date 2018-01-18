@@ -695,10 +695,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         "Gt":     "PyGT",
         "GtE":    "PyGTE",
         # TODO
-        "Is":     "PyIS",
-        "IsNot":  "PyISNOT",
-        "In":     "PyIN",
-        "NotIn":  "PyNOTIN",
+        "Is":     "PyIs",
+        "IsNot":  "PyIsNot",
+        "In":     "PyIn",
+        "NotIn":  "PyNotIn",
         }
     def visit_Compare(self, node):
         """

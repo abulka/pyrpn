@@ -233,8 +233,8 @@ class RpnTemplates:
         RTN
         """)
 
-    PyNOT = dedent("""
-        LBL "PyNOT"  // (a) -> boolean of not a
+    PyNot = dedent("""
+        LBL "PyNot"  // (a) -> boolean of not a
         X≠0?
         SF 00  // is a true value
         RDN
@@ -313,5 +313,5 @@ class RpnTemplates:
             'PyFC': {'description': 'is flag clear?'},
         }
 
-# print(RpnTemplates._get_class_attrs())
+print(RpnTemplates._get_class_attrs())
 
