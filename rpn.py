@@ -745,6 +745,13 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.program.insert('XEQ "PyBool"')
         self.program.insert('XEQ "PyNot"')
 
+    def visit_NameConstant(self, node):
+        # True or False constants - node.value is either True or False (booleans). Are there any other NameConstants?
+        if node.value:
+            self.program.insert('1', comment='True')
+        else:
+            self.program.insert('0', comment='False')
+
     def visit_BoolOp(self, node):
         """
         BoolOp(

@@ -145,7 +145,7 @@ class RpnTests2(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
 
-    # not
+    # not logic, incl true and false
 
     def test_not(self):
         self.parse(dedent("""
@@ -157,6 +157,25 @@ class RpnTests2(BaseTest):
             XEQ "PyGT"
             XEQ "PyBool"
             XEQ "PyNot"
+            """)
+        self.compare(de_comment(expected))
+
+    def test_not_and_or_t_f(self):
+        self.parse(dedent("""
+            not (5 > 6) and (True or False)
+            """))
+        expected = dedent("""
+            5
+            6
+            XEQ "PyGT"
+            XEQ "PyBool"
+            XEQ "PyNot"
+            1              // True
+            0              // False
+            XEQ "Py2Bool"  // redundant
+            OR
+            XEQ "Py2Bool"  // redundant
+            AND
             """)
         self.compare(de_comment(expected))
 
