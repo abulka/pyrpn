@@ -181,40 +181,23 @@ class RpnTests2(BaseTest):
 
     # more....
 
-    @unittest.skip('if needs revamp')
-    def test_and(self):
+    def test_and_true_vars(self):
         self.parse(dedent("""
-            a = 1
-            b = 0
+            a = True
+            b = 2 == 3
             a and b
             """))
         expected = dedent("""
-            1
-            STO 00
-            0
-            STO 01
+            1           // True
+            STO 00      // a
+            2
+            3
+            XEQ "PyEQ"
+            STO 01      // b
             RCL 00
             RCL 01
+            XEQ "Py2Bool"
             AND
             """)
         self.compare(de_comment(expected))
 
-    @unittest.skip('if needs revamp')
-    def test_if_or(self):
-        self.parse(dedent("""
-            if 1 or 0:
-                a = 88
-            """))
-        expected = dedent("""
-            1
-            0
-            OR
-            X<>0?  // if (anything non zero is True)
-            GTO 00
-            GTO 01
-            LBL 00 // true
-            88
-            STO 00
-            LBL 01 // resume
-            """)
-        self.compare(de_comment(expected))
