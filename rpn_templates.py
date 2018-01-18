@@ -116,10 +116,8 @@ LIST_PUSH_POP = dedent("""
     RTN
     """)
 
-PRE_LOGIC_NORMALISE = dedent("""
-    // takes two params, which will be both converted to either 1 or 0
-
-    LBL "LGICNM"
+Py2Bool = dedent("""
+    LBL "Py2Bool"  // (a,b) -> returns (a,b) each converted to either 1 or 0
     CF 00  // represents that x is true
     CF 01  // represents that y is true
     X≠0?
@@ -138,5 +136,132 @@ PRE_LOGIC_NORMALISE = dedent("""
     FC? 00
     0
     RTN
+    """)
+
+"""
+Python a > b ends up on stack as y:a, x:b so we test y > x  
+which translates into operator X<Y? and quick else operator of X≥Y?
+Params (a,b) -> where y:a, x:b returns bool of a > b (params dropped)   
+"""
+PyGT = dedent("""
+    LBL "PyGT"  // (y:a, x:b) -> (boolean) of a > b
+    CF 00
+    X<Y?
+    SF 00  // true
+    XEQ "_PyDFTB"  // get bool of flag 00
+    RTN    
+    """)
+
+PyLT = dedent("""
+    LBL "PyLT"  // (y:a, x:b) -> (boolean) of a < b
+    CF 00
+    X>Y?
+    SF 00  // true
+    XEQ "_PyDFTB"  // get bool of flag 00
+    RTN    
+    """)
+
+PyEQ = dedent("""
+    LBL "PyEQ"  // (y:a, x:b) -> boolean of a == b
+    CF 00
+    X=Y?
+    SF 00  // true
+    XEQ "_PyDFTB"  // get bool of flag 00
+    RTN    
+    """)
+
+PyGTE = dedent("""
+    LBL "PyGTE"  // (y:a, x:b) -> (boolean) of a >= b
+    CF 00
+    X≤Y?
+    SF 00  // true
+    XEQ "_PyDFTB"  // get bool of flag 00
+    RTN    
+    """)
+
+PyLTE = dedent("""
+    LBL "PyLT"  // (y:a, x:b) -> (boolean) of a <= b
+    CF 00
+    X≥Y?
+    SF 00  // true
+    XEQ "_PyDFTB"  // get bool of flag 00
+    RTN    
+    """)
+
+PyNEQ = dedent("""
+    LBL "PyNEQ"  // (y:a, x:b) -> boolean of a != b
+    CF 00
+    X≠Y?
+    SF 00  // true
+    XEQ "_PyDFTB"  // get bool of flag 00
+    RTN    
+    """)
+
+"""
+Utility
+Drop params, get bool of flag 00
+"""
+_PyDFTB = dedent("""
+    LBL "_PyDFTB"  // (a,b) -> (boolean) of whether flag 00 is set
+    RDN
+    RDN    // params dropped 
+    FS? 00
+    1
+    FC? 00
+    0
+    RTN    
+    """)
+
+PyNOT = dedent("""
+    LBL "PyNOT"  // (a) -> boolean of not a
+    X≠0?
+    SF 00  // is a true value
+    RDN
+    FS? 00
+    0      // false
+    FC? 00
+    1      // true
+    RTN    
+    """)
+
+"""
+Test any flag, except flag 00 which is reserved.
+Meant for testing system flags, not for Python programming use.
+Disallow FSC? because that is a flow of control command - not relevant in Python.
+
+These RPN commands are ok, use for setting and clearing system flags, not for Python programming use.
+    CF      ok      
+    SF      ok
+These RPN commands are not allowed in Python because they are flow of control commands - not relevant 
+in Python programming.  To test (typically system) flags use the library functions listed, which return a bool.
+    FC?C    - 
+    FS?C    -
+    FS?     - use isFS(flag) instead
+    FC?     - use isFC(flag) instead
+"""
+PyFS = dedent("""
+    LBL "PyFS"  // (flag) -> boolean of flag
+    CF 00
+    FS? IND X
+    SF 00
+    RDN    // drop parameter
+    FS? 00
+    1
+    FC? 00
+    0
+    RTN    
+    """)
+
+PyFC = dedent("""
+    LBL "PyFS"  // (flag) -> boolean of flag
+    CF 00
+    FC? IND X
+    SF 00
+    RDN    // drop parameter
+    FS? 00
+    1
+    FC? 00
+    0
+    RTN    
     """)
 

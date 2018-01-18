@@ -29,9 +29,23 @@ class RpnTests2(BaseTest):
         expected = dedent("""
             1
             0
-            XEQ "LGICNM"  // tobool
+            XEQ "Py2Bool"
             AND
-            X≠O?  // true?
+            """)
+        self.compare(de_comment(expected))
+
+    def test_and_or_two_param(self):
+        self.parse(dedent("""
+            1 and 0 or 1
+            """))
+        expected = dedent("""
+            1
+            0
+            XEQ "Py2Bool"
+            AND
+            1
+            XEQ "Py2Bool"
+            OR
             """)
         self.compare(de_comment(expected))
 
@@ -43,10 +57,10 @@ class RpnTests2(BaseTest):
         expected = dedent("""
             1
             0
-            XEQ "LGICNM"  // tobool
+            XEQ "Py2Bool"
             AND
-            X≠O?  // true?
-            
+
+            X≠O?    // if true?
             GTO 00  // true
             GTO 01  // jump to resume
             
