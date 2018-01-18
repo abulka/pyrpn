@@ -36,7 +36,9 @@ class RpnTemplates:
 
     def __init__(self):
         self.needed_templates = []  # extra fragments that need to be emitted at the end
+        self.local_alpha_labels = {}
         self.template_names = self._get_class_attrs()
+        self._create_local_alpha_labels()
 
     PyIsgPr = dedent("""
         LBL "PyIsgPr"
@@ -313,5 +315,18 @@ class RpnTemplates:
             'PyFC': {'description': 'is flag clear?'},
         }
 
-print(RpnTemplates._get_class_attrs())
+    def _create_local_alpha_labels(self):
+        """
+        Map to local labels, to avoid exposing py rpn library globally.
+        Can't map to single letter alpha labels because they are used by user
+        functions. Only 14 of them.
+        :return:
+        """
+        next_label = 50
+        for name in self.template_names:
+            self.local_alpha_labels[name] = str(next_label)
+            next_label += 1
+        # print(self.local_alpha_labels)
+
+# print(RpnTemplates._get_class_attrs())
 

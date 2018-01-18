@@ -493,11 +493,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             # actual parameters but these are generated through normal visit parsing and available on the stack.
             self.program.insert(f'{func_name}', comment=cmd_list[func_name]['description'])
         elif func_name in self.program.rpn_templates.get_user_insertable_pyrpn_cmds().keys():
-            # Call our std. library with normal xeq, though may one day convert to embedded local labels
-            self.program.insert(f'XEQ "{func_name}"', comment=self.program.rpn_templates.get_user_insertable_pyrpn_cmds()[func_name]['description'])
-            self.program.rpn_templates.need_template(func_name)
+            # Call to a rpn template function - not usually allowed, but some are exposed
+            self.program.insert_xeq(func_name)
         else:
-            # Local subroutine call - map to a local label A..?
+            # Local subroutine call to a local user python def - map these to a local label A..e (15 max)
             label = self.labels.func_to_lbl(func_name)
             comment = f'{func_name}()' if not self.labels.is_global_def(func_name) else ''  # only emit comment if local label
             self.program.insert(f'XEQ {label}', comment=comment)

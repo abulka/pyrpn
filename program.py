@@ -33,11 +33,18 @@ class Program(object):
         self._add_line(line)
         log.debug(line.text)
 
+    @property
+    def user_insertable_pyrpn_cmds(self):
+        return self.rpn_templates.get_user_insertable_pyrpn_cmds().keys()
+
     def insert_xeq(self, func_name, comment=''):
         # insert global function call
-        self.insert(f'XEQ "{func_name}"', comment=comment)
         if func_name in self.rpn_templates.template_names:
             self.rpn_templates.need_template(func_name)
+        if func_name in self.user_insertable_pyrpn_cmds:
+            # YUK
+            comment = self.rpn_templates.get_user_insertable_pyrpn_cmds()[func_name]['description']
+        self.insert(f'XEQ "{func_name}"', comment=comment)
 
     def insert_raw_lines(self, text):
         # inserts rpn text, removes any blank lines, preserves comments
