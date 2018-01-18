@@ -320,51 +320,6 @@ class RpnCodeGenTests(BaseTest):
             """)
         self.compare(de_comment(expected), lines, trace=False, dump=True)
 
-
-    # weird aview and view edge cases
-
-    """
-    AVIEW()             - view alpha register
-    aview()             - AVIEW
-    
-    aview(a,b,c)        - appends all into alpha register and does an AVIEW
-    aview(a)            - should append one thing
-    for i ... aview(i)  - should append one this, the i with IP trick
-    
-    but then, aview with a single parameter is silly.  might as well just do a VIEW
-    though if a string is involved then yes, it needs to go view the alpha register.
-    
-    view(a)             -- VIEW nn
-    view("hello")       -- same as aview("hello") 
-    view(1)             -- VIEW ST X 
-    """
-
-    @unittest.skip('edge cases')
-    def test_for_access_i_aview(self):
-        """
-        ensure can access i
-        """
-        lines = self.parse(dedent("""
-            for i in range(2):
-              aview(i)  # aview means display the alpha register - taking params is an optional extra
-            """))
-        expected = dedent("""
-            -1.001
-            STO 00
-            LBL 00
-            ISG 00
-            GTO 01
-            GTO 02
-            LBL 01
-            RCL 00
-            IP
-            VIEW ST X
-            GTO 00
-            LBL 02
-            """)
-        self.compare(de_comment(expected), lines, dump=True)
-
-
     # for continues ....
 
     def test_for_range_with_body_accessing_i(self):
@@ -977,7 +932,6 @@ class RpnCodeGenTests(BaseTest):
         """)
         self.compare(de_comment(expected), lines, dump=True)
 
-
     def test_multi_cmd_two_arg_frag(self):
         """
         multi-part commands that require two arg fragments "parameters" as part of the single rpn command
@@ -991,6 +945,8 @@ class RpnCodeGenTests(BaseTest):
             ASSIGN "someprog" 18
         """)
         self.compare(de_comment(expected), lines, dump=True)
+
+    # if
 
     def test_if(self):
         lines = self.parse(dedent("""
@@ -1205,51 +1161,7 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines, dump=True)
 
-
-    def test_view_variable(self):
-        src = """
-            a = 100
-            VIEW(a)
-        """
-        expected = dedent("""
-            100
-            STO 00
-            VIEW 00
-        """)
-        lines = self.parse(dedent(src))
-        self.compare(de_comment(expected), lines, dump=True)
-
-    # returns and strings and compares
-
-    def test_return(self):
-        src = """
-            def main():
-                return
-        """
-        expected = dedent("""
-            LBL "main"
-            RTN
-        """)
-        lines = self.parse(dedent(src), debug_gen_descriptive_labels=False)
-        self.compare(de_comment(expected), lines, dump=True)
-
-    def test_return_multiple(self):
-        src = """
-            def main():
-                return 5
-                pass
-                return
-        """
-        expected = dedent("""
-            LBL "main"
-            5
-            RTN
-            RTN
-        """)
-        lines = self.parse(dedent(src), debug_gen_descriptive_labels=False)
-        self.compare(de_comment(expected), lines, dump=True)
-
-    def test_compare(self):
+    def test_compare_GT(self):
         src = """
             if 2 > 1:
                 PSE()
@@ -1396,6 +1308,37 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(expected, lines, dump=True, keep_comments=False)
 
+    # returns and strings and compares
+
+    def test_return(self):
+        src = """
+            def main():
+                return
+        """
+        expected = dedent("""
+            LBL "main"
+            RTN
+        """)
+        lines = self.parse(dedent(src), debug_gen_descriptive_labels=False)
+        self.compare(de_comment(expected), lines, dump=True)
+
+    def test_return_multiple(self):
+        src = """
+            def main():
+                return 5
+                pass
+                return
+        """
+        expected = dedent("""
+            LBL "main"
+            5
+            RTN
+            RTN
+        """)
+        lines = self.parse(dedent(src), debug_gen_descriptive_labels=False)
+        self.compare(de_comment(expected), lines, dump=True)
+
+    # Expressions
 
     def test_expr_two_ops(self):
         src = """
@@ -1435,21 +1378,6 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(expected, lines, dump=True, keep_comments=False)
 
-    @unittest.skip('hard to actually blow the stack')
-    def test_expr_blow_stack(self):
-        src = """
-            x = 1 + 2 * 6 + 1 * 9 / 100 + 1 + 2 * 6       
-        """
-        expected = dedent("""
-            1
-            2
-            6
-            *
-            +
-            STO 00
-        """)
-        self.assertRaises(RpnError, self.parse, dedent(src))
-
     def test_expr_brackets(self):
         src = """
             x = ((1 + 2) * (6 + 2 - 3) * (2 + 7)) / 200       
@@ -1474,6 +1402,14 @@ class RpnCodeGenTests(BaseTest):
         """)
         lines = self.parse(dedent(src))
         self.compare(expected, lines, dump=True, keep_comments=False)
+
+    @unittest.skip('hard to actually blow the stack - not any more - please enable')
+    def test_expr_blow_stack(self):
+        src = """
+            # x = 1 + 2 * 6 + 1 * 9 / 100 + 1 + 2 * 6
+            x = 1+2*(3+4*(5+6*(7+8*9)))       
+        """
+        self.assertRaises(RpnError, self.parse, dedent(src))
 
     # More control structures
 
@@ -1608,6 +1544,19 @@ class RpnCodeGenTests(BaseTest):
         self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
 
     # Text and the alpha register
+
+    def test_view_variable(self):
+        src = """
+            a = 100
+            VIEW(a)
+        """
+        expected = dedent("""
+            100
+            STO 00
+            VIEW 00
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines, dump=True)
 
     def test_alpha_AVIEW_no_args(self):
         src = """
@@ -1762,6 +1711,48 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
 
+    # weird aview and view edge cases
+
+    """
+    AVIEW()             - view alpha register
+    aview()             - AVIEW
+
+    aview(a,b,c)        - appends all into alpha register and does an AVIEW
+    aview(a)            - should append one thing
+    for i ... aview(i)  - should append one this, the i with IP trick
+
+    but then, aview with a single parameter is silly.  might as well just do a VIEW
+    though if a string is involved then yes, it needs to go view the alpha register.
+
+    view(a)             -- VIEW nn
+    view("hello")       -- same as aview("hello") 
+    view(1)             -- VIEW ST X 
+    """
+
+    @unittest.skip('edge cases')
+    def test_for_access_i_aview(self):
+        """
+        ensure can access i
+        """
+        lines = self.parse(dedent("""
+            for i in range(2):
+              aview(i)  # aview means display the alpha register - taking params is an optional extra
+            """))
+        expected = dedent("""
+            -1.001
+            STO 00
+            LBL 00
+            ISG 00
+            GTO 01
+            GTO 02
+            LBL 01
+            RCL 00
+            IP
+            VIEW ST X
+            GTO 00
+            LBL 02
+            """)
+        self.compare(de_comment(expected), lines, dump=True)
 
     # Scope
 
@@ -1794,7 +1785,6 @@ class RpnCodeGenTests(BaseTest):
             RTN
             """)
         self.compare(de_comment(expected), lines, dump=True)
-
 
     def test_Pow(self):
         """
