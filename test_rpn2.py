@@ -145,21 +145,22 @@ class RpnTests2(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
 
-    # more....
+    # not
 
-    @unittest.skip('if needs revamp')
-    def test_or(self):
+    def test_not(self):
         self.parse(dedent("""
-            1 or 0 or 1
+            not (1 > 0)
             """))
         expected = dedent("""
             1
             0
-            OR
-            1
-            OR
+            XEQ "PyGT"
+            XEQ "PyBool"
+            XEQ "PyNot"
             """)
         self.compare(de_comment(expected))
+
+    # more....
 
     @unittest.skip('if needs revamp')
     def test_and(self):

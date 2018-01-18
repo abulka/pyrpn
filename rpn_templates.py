@@ -117,20 +117,21 @@ LIST_PUSH_POP = dedent("""
     """)
 
 Py2Bool = dedent("""
-    LBL "Py2Bool"  // (a,b) -> returns (a,b) each converted to either 1 or 0
-    CF 00  // represents that x is true
-    CF 01  // represents that y is true
-    X≠0?
-    SF 00
+    LBL "Py2Bool"  // (a,b) -> (bool, bool)
+    XEQ "PyBool"    
     X<>Y
+    XEQ "PyBool"    
+    X<>Y
+    RTN
+    """)
+
+# TODO handle empty string or (empty matrix?) as False
+PyBool = dedent("""
+    LBL "PyBool"  // (a) -> (bool)
+    CF 00
     X≠0?
-    SF 01
-    RDN
-    RDN    // have gotten rid of args
-    FS? 01
-    1
-    FC? 01
-    0
+    SF 00  // is non zero, thus true
+    RDN    // drop parameter
     FS? 00
     1
     FC? 00
@@ -265,14 +266,11 @@ PyFC = dedent("""
     RTN    
     """)
 
+"""
+These are the commands that are exposed to the user.
+"""
 py_cmds = \
 {
-    # 'PyGT': {'description': '>'},
-    # 'PyLT': {'description': '<'},
-    # 'PyGTE': {'description': '>='},
-    # 'PyLTE': {'description': '<='},
-    # 'PyEQ': {'description': '=='},
-    # 'PyNEQ': {'description': '!='},
     'PyFS': {'description': 'is flag set?'},
     'PyFC': {'description': 'is flag clear?'},
 }
