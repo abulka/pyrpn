@@ -8,17 +8,16 @@ config_log(log)
 
 
 @attrs
-class Line(object):
+class Line:
     text = attrib(default='')
     lineno = attrib(default=0)
     comment = attrib(default='')
 
 
 @attrs
-class Program(object):
+class BaseRpnProgram:
     lines = attrib(default=Factory(list))  # cannot just have [] because same [] gets re-used in new instances of 'Program'
     next_lineno = attrib(default=0)
-    rpn_templates = attrib(default=Factory(RpnTemplates))
 
     def _add_line(self, line):
         self._incr_line(line)
@@ -32,19 +31,6 @@ class Program(object):
         line = Line(text=str(text), comment=comment)
         self._add_line(line)
         log.debug(line.text)
-
-    @property
-    def user_insertable_pyrpn_cmds(self):
-        return self.rpn_templates.get_user_insertable_pyrpn_cmds().keys()
-
-    def insert_xeq(self, func_name, comment=''):
-        # insert global function call
-        if func_name in self.rpn_templates.template_names:
-            self.rpn_templates.need_template(func_name)
-        if func_name in self.user_insertable_pyrpn_cmds:
-            # YUK
-            comment = self.rpn_templates.get_user_insertable_pyrpn_cmds()[func_name]['description']
-        self.insert(f'XEQ "{func_name}"', comment=comment)
 
     def insert_raw_lines(self, text):
         # inserts rpn text, removes any blank lines, preserves comments
@@ -60,6 +46,39 @@ class Program(object):
                 continue
             else:
                 self.insert(line.strip())
+
+    def lines_to_str(self, comments=False, linenos=False):
+        result = []
+        for line in self.lines:
+            comment = f'  // {line.comment}' if comments and line.comment else ''
+            lineno = f'{line.lineno:02d} ' if linenos else ''
+            result.append(f'{lineno}{line.text}{comment}')
+        return '\n'.join(result)
+
+    # logging
+
+    def dump(self, comments=False, linenos=False):
+        log.debug(f"{'='*20} | (Program lines dump)")
+        log.debug(self.lines_to_str(comments, linenos))
+        log.debug(f"{'='*20} |")
+
+
+@attrs
+class Program(BaseRpnProgram):
+    rpn_templates = attrib(default=Factory(RpnTemplates))
+
+    @property
+    def user_insertable_pyrpn_cmds(self):
+        return self.rpn_templates.get_user_insertable_pyrpn_cmds().keys()
+
+    def insert_xeq(self, func_name, comment=''):
+        # insert global function call
+        if func_name in self.rpn_templates.template_names:
+            self.rpn_templates.need_template(func_name)
+        if func_name in self.user_insertable_pyrpn_cmds:
+            # YUK
+            comment = self.rpn_templates.get_user_insertable_pyrpn_cmds()[func_name]['description']
+        self.insert(f'XEQ "{func_name}"', comment=comment)
 
     def emit_needed_rpn_templates(self):
         if not self.rpn_templates.needed_templates:
@@ -83,19 +102,4 @@ class Program(object):
             text = getattr(self.rpn_templates, template)  # look up the field dynamically
             self.insert_raw_lines(text)
             log.debug(f'inserting rpn template {template}')
-
-    def lines_to_str(self, comments=False, linenos=False):
-        result = []
-        for line in self.lines:
-            comment = f'  // {line.comment}' if comments and line.comment else ''
-            lineno = f'{line.lineno:02d} ' if linenos else ''
-            result.append(f'{lineno}{line.text}{comment}')
-        return '\n'.join(result)
-
-    # logging
-
-    def dump(self, comments=False, linenos=False):
-        log.debug(f"{'='*20} | (Program lines dump)")
-        log.debug(self.lines_to_str(comments, linenos))
-        log.debug(f"{'='*20} |")
 
