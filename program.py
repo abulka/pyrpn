@@ -1,6 +1,7 @@
 from attr import attrs, attrib, Factory
 from logger import config_log
 import logging
+from rpn_templates import RpnTemplates
 
 log = logging.getLogger(__name__)
 config_log(log)
@@ -17,6 +18,7 @@ class Line(object):
 class Program(object):
     lines = attrib(default=Factory(list))  # cannot just have [] because same [] gets re-used in new instances of 'Program'
     next_lineno = attrib(default=0)
+    rpn_templates = attrib(default=Factory(RpnTemplates))
 
     def _add_line(self, line):
         self._incr_line(line)
@@ -30,6 +32,12 @@ class Program(object):
         line = Line(text=str(text), comment=comment)
         self._add_line(line)
         log.debug(line.text)
+
+    def insert_xeq(self, func_name, comment=''):
+        # insert global function call
+        self.insert(f'XEQ "{func_name}"', comment=comment)
+        if func_name in self.rpn_templates.template_names:
+            self.rpn_templates.need_template(func_name)
 
     def insert_raw_lines(self, text):
         # inserts rpn text, removes any blank lines, preserves comments
@@ -45,6 +53,29 @@ class Program(object):
                 continue
             else:
                 self.insert(line.strip())
+
+    def emit_needed_rpn_templates(self):
+        if not self.rpn_templates.needed_templates:
+            return
+
+        templates_needed = set(self.rpn_templates.needed_templates)
+        templates_who_need_PyBool = {'Py2Bool'}
+        templates_who_need_PyDFTB = {'PyEQ', 'PyGT', 'PyGTE', 'PyLT', 'PyLTE', 'PyNEQ'}
+
+        # Add any dependent templates, using set technology
+        if templates_who_need_PyBool & templates_needed:
+            templates_needed.add('PyBool')
+        if templates_who_need_PyDFTB & templates_needed:
+            templates_needed.add('_PyDFTB')
+
+        self.insert('RTN', comment='--------------------------------------')
+        self.insert('LBL "PyLIB"', comment='PyRPN Standard Support Library')
+        self.insert('RTN', comment='--------------------------------------')
+
+        for template in templates_needed:
+            text = getattr(self.rpn_templates, template)  # look up the field dynamically
+            self.insert_raw_lines(text)
+            log.debug(f'inserting rpn template {template}')
 
     def lines_to_str(self, comments=False, linenos=False):
         result = []

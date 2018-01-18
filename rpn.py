@@ -1,5 +1,4 @@
 import ast
-import logging
 from logger import config_log
 from program import Program
 from scope import Scopes
@@ -7,8 +6,8 @@ from labels import FunctionLabels
 from attr import attrs, attrib, Factory
 import settings
 from cmd_list import cmd_list
-import rpn_templates
 import tokenize
+import logging
 
 log = logging.getLogger(__name__)
 config_log(log)
@@ -29,7 +28,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.resume_labels = []  # created by the current while or for loop so that break and continue know where to go
         self.continue_labels = []  # created by the current while or for loop so that break and continue know where to go
         self.for_loop_info = []
-        self.needed_templates = []  # extra fragments that need to be emitted at the end
         self.log_indent = 0
         self.first_def_label = None
         self.debug_gen_descriptive_labels = False
@@ -165,9 +163,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     # Finishing up
 
     def finish(self):
-        if 'isg_prepare' in self.needed_templates:
-            self.program.insert_raw_lines(rpn_templates.ISG_PREPARE)
-
+        self.program.emit_needed_rpn_templates()
 
     # Visit functions
 
@@ -376,12 +372,14 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.end(node)
             return
 
-        elif func_name == 'list':
-            self.program.insert_raw_lines(rpn_templates.LIST_PUSH_POP)
+        # DEBUG
+        elif func_name in self.program.rpn_templates.template_names:
+            # insert any rpn template by name - use for debugging
+            self.program.rpn_templates.need_template(func_name)
             return
 
-        elif func_name == 'nm':
-            self.program.insert_raw_lines(rpn_templates.PRE_LOGIC_NORMALISE)
+        elif func_name == 'PyLibAll':
+            self.program.rpn_templates.need_all_templates()
             return
 
         elif func_name in cmd_list and cmd_list[func_name]['num_arg_fragments'] > 0:
@@ -478,8 +476,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 if len(node.args) in (1, 2):
                     # if step not specified, specify it, because the 'd' isg subroutine needs it, takes 3 params.
                     self.program.insert(1)
-                self.program.insert('XEQ d')
-                self.needed_templates.append('isg_prepare')
+                self.program.insert_xeq('PyIsgPr')
             register = self.for_loop_info[-1].register
             var_name = self.for_loop_info[-1].var_name
             self.program.insert(f'STO {register}', comment=f'range {var_name}')
@@ -495,9 +492,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             # The built-in command is a simple one without command arg fragment "parameter" parts - yes it may take
             # actual parameters but these are generated through normal visit parsing and available on the stack.
             self.program.insert(f'{func_name}', comment=cmd_list[func_name]['description'])
-        elif func_name in rpn_templates.py_cmds:
+        elif func_name in self.rpn_templates.user_insertable_pyrpn_cmds():
             # Call our std. library with normal xeq, though may one day convert to embedded local labels
-            self.program.insert(f'XEQ "{func_name}"', comment=rpn_templates.py_cmds[func_name]['description'])
+            self.program.insert(f'XEQ "{func_name}"', comment=self.rpn_templates.user_insertable_pyrpn_cmds()[func_name]['description'])
+            self.rpn_templates.need_template(func_name)
         else:
             # Local subroutine call - map to a local label A..?
             label = self.labels.func_to_lbl(func_name)
@@ -716,7 +714,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         for o, e in zip(node.ops, node.comparators):
             self.visit(e)
             subf = self.cmpops[o.__class__.__name__]
-            self.program.insert(f'XEQ "{subf}"', comment='compare, return bool')
+            self.program.insert_xeq(subf, comment='compare, return bool')
 
         self.end(node)
 
@@ -734,16 +732,16 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.visit(node.operand)
 
     def visit_Or(self, node):
-        self.program.insert('XEQ "Py2Bool"')
+        self.program.insert_xeq('Py2Bool')
         self.program.insert('OR')
 
     def visit_And(self, node):
-        self.program.insert('XEQ "Py2Bool"')
+        self.program.insert_xeq('Py2Bool')
         self.program.insert('AND')
 
     def visit_Not(self, node):
-        self.program.insert('XEQ "PyBool"')
-        self.program.insert('XEQ "PyNot"')
+        self.program.insert_xeq('PyBool')
+        self.program.insert_xeq('PyNot')
 
     def visit_NameConstant(self, node):
         # True or False constants - node.value is either True or False (booleans). Are there any other NameConstants?
