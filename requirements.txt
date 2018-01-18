@@ -2,7 +2,7 @@
 astunparse
 #redbaron
 attrs
-asttokens
+asttokens>=1.1.8
 Flask
 flask_wtf
 gunicorn

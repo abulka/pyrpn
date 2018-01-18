@@ -8,6 +8,7 @@ from attr import attrs, attrib, Factory
 import settings
 from cmd_list import cmd_list
 import rpn_templates
+import tokenize
 
 log = logging.getLogger(__name__)
 config_log(log)
@@ -108,17 +109,17 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def find_comment(self, node):
         # Finds comment in the original python source code associated with this token
-        # node.find_token
 
-        # # Test proper technique once I get asttokens > 1.1.7
-        # import tokenize
-        # self.atok.find_token(node.last_token, tokenize.COMMENT)
-        # log.info('finding comment using other technique last tok %s', self.atok.find_token(node.last_token, tokenize.COMMENT))
-        # log.info('finding comment using other technique first tok %s', self.atok.find_token(node.first_token, tokenize.COMMENT))
+        # Technique 1
+        comment_ = self.atok.find_token(node.first_token, tokenize.COMMENT)  # requires asttokens >= 1.1.8
 
+        # Technique 2
         line = node.first_token.line
         comment_i = line.find('#')
-        return line[comment_i:] if comment_i != -1 else ''
+        comment = line[comment_i:].strip() if comment_i != -1 else ''
+
+        # assert comment_.string == comment
+        return comment
 
     # For visit support
 
