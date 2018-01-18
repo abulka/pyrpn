@@ -948,14 +948,17 @@ class RpnCodeGenTests(BaseTest):
 
     # if
 
-    def test_if(self):
+    def test_if_isFS(self):
         lines = self.parse(dedent("""
-            if FS(1):
+            if isFS(1):
                 CF(1)
             FIX(2)
             """))
         expected = dedent("""
-            FS? 01
+            1
+            XEQ "PyFS"
+            
+            X≠O?
             GTO 00  // true, flag is set
             GTO 01  // jump to resume
             
@@ -969,14 +972,17 @@ class RpnCodeGenTests(BaseTest):
 
     def test_if_else(self):
         lines = self.parse(dedent("""
-            if FS(1):
+            if isFS(1):
                 CF(5)
             else:
                 CF(6)
             FIX(2)  
             """))
         expected = dedent("""
-            FS? 01
+            1
+            XEQ "PyFS"
+            
+            X≠O?
             GTO 00  // true, flag is set
             GTO 02  // else (false), jump to else
 
@@ -994,16 +1000,18 @@ class RpnCodeGenTests(BaseTest):
 
     def test_if_elif(self):
         src = """
-            if FS(20):
+            if isFS(20):
                 CF(5)
-            elif FS(21):
+            elif isFS(21):
                 CF(6)
             else:
                 CF(7)
             FIX(2)  
         """
         expected_descriptive = dedent("""
-            FS? 20
+            20
+            XEQ "PyFS"
+            X≠O?
             GTO if body
             GTO elif 1
 
@@ -1012,7 +1020,9 @@ class RpnCodeGenTests(BaseTest):
             GTO resume
 
             LBL elif 1
-            FS? 21
+            21
+            XEQ "PyFS"
+            X≠O?
             GTO elif body 1
             GTO else
 
@@ -1036,7 +1046,9 @@ class RpnCodeGenTests(BaseTest):
             label_elif_body 04
         """
         expected = dedent("""
-            FS? 20
+            20
+            XEQ "PyFS"
+            X≠O?
             GTO 00  // if body
             GTO 03  // elif
 
@@ -1045,7 +1057,9 @@ class RpnCodeGenTests(BaseTest):
             GTO 01  // resume
 
             LBL 03  // elif
-            FS? 21
+            21
+            XEQ "PyFS"
+            X≠O?
             GTO 04  // elif body
             GTO 02  // else
 
@@ -1068,18 +1082,20 @@ class RpnCodeGenTests(BaseTest):
 
     def test_if_elif_elif(self):
         src = """
-            if FS(20):
+            if isFS(20):
                 pass
-            elif FS(21):
+            elif isFS(21):
                 pass
-            elif FS(22):
+            elif isFS(22):
                 pass
             else:
                 pass
             FIX(2)  
         """
         expected_descriptive = dedent("""
-            FS? 20
+            20
+            XEQ "PyFS"
+            X≠O?
             GTO if body
             GTO elif 1
 
@@ -1087,7 +1103,9 @@ class RpnCodeGenTests(BaseTest):
             GTO resume
 
             LBL elif 1
-            FS? 21
+            21
+            XEQ "PyFS"
+            X≠O?
             GTO elif body 1   // new
             GTO elif 2  // 2nd
 
@@ -1097,7 +1115,9 @@ class RpnCodeGenTests(BaseTest):
             // ---- new ------ \.
             
             LBL elif 2 // 2nd
-            FS? 22
+            22
+            XEQ "PyFS"
+            X≠O?
             GTO elif body 2
             GTO else
 
@@ -1123,7 +1143,9 @@ class RpnCodeGenTests(BaseTest):
             label_elif_body 2 06  // new
         """
         expected = dedent("""
-            FS? 20
+            20
+            XEQ "PyFS"
+            X≠O?
             GTO 00  // if body
             GTO 03  // elif
 
@@ -1131,7 +1153,9 @@ class RpnCodeGenTests(BaseTest):
             GTO 01  // resume
 
             LBL 03  // elif
-            FS? 21
+            21
+            XEQ "PyFS"
+            X≠O?
             GTO 04  // elif body
             GTO 05  // elif (2nd)
 
@@ -1141,7 +1165,9 @@ class RpnCodeGenTests(BaseTest):
 
             // This is the second elif
             LBL 05  // elif (2nd)
-            FS? 22
+            22
+            XEQ "PyFS"
+            X≠O?
             GTO 06  // elif body (2nd)
             GTO 02  // else
             // This is the second elif body
@@ -1161,7 +1187,7 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines, dump=True)
 
-    def test_compare_GT(self):
+    def test_compare_GT_if(self):
         src = """
             if 2 > 1:
                 PSE()
@@ -1169,7 +1195,8 @@ class RpnCodeGenTests(BaseTest):
         expected = dedent("""
             2
             1
-            X<Y?
+            XEQ "PyGT"
+            X≠O?
             GTO 00  // if body
             GTO 01  // resume
             LBL 00  // if body
@@ -1177,7 +1204,7 @@ class RpnCodeGenTests(BaseTest):
             LBL 01  // resume
         """)
         lines = self.parse(dedent(src))
-        self.compare(de_comment(expected), lines, dump=True)
+        self.compare(de_comment(expected), lines)
 
     def test_elif_view(self):
         src = """
@@ -1213,7 +1240,8 @@ class RpnCodeGenTests(BaseTest):
             RDN
             RCL 02  // n
             0
-            X=Y?
+            XEQ "PyEQ"
+            X≠O?    // if true?
             GTO 00  // if body
             GTO 03  // elif 1
             LBL 00  // if body
@@ -1223,7 +1251,8 @@ class RpnCodeGenTests(BaseTest):
             LBL 03  // elif 1
             RCL 02  // n
             1
-            X=Y?
+            XEQ "PyEQ"
+            X≠O?    // if true?
             GTO 04  // elif body 1
             GTO 05  // elif 2
             LBL 04  // elif body 1
@@ -1234,7 +1263,8 @@ class RpnCodeGenTests(BaseTest):
             LBL 05  // elif 2
             RCL 02  // n
             2
-            X=Y?
+            XEQ "PyEQ"
+            X≠O?    // if true?
             GTO 06  // elif body 2
             GTO 02  // else
             LBL 06  // elif body 2
@@ -1422,7 +1452,8 @@ class RpnCodeGenTests(BaseTest):
             LBL 00  // while
             1
             2
-            X>Y?
+            XEQ "PyLT"
+            X≠O?    // while true?
             GTO 01  // while body
             GTO 02  // resume
             LBL 01  // while body
@@ -1454,7 +1485,8 @@ class RpnCodeGenTests(BaseTest):
             LBL 00  // while
             RCL 00
             2
-            X<Y?
+            XEQ "PyGT"
+            X≠O?    // while true?
             GTO 01  // while body
             GTO 03  // else
             LBL 01  // while body
@@ -1477,7 +1509,8 @@ class RpnCodeGenTests(BaseTest):
             LBL 00  // while
             1
             2
-            X>Y?
+            XEQ "PyLT"
+            X≠O?    // while true?
             GTO 01  // while body
             GTO 02  // resume
             LBL 01  // while body
@@ -1497,7 +1530,8 @@ class RpnCodeGenTests(BaseTest):
             LBL 00  // while
             1
             2
-            X>Y?
+            XEQ "PyLT"
+            X≠O?    // while true?
             GTO 01  // while body
             GTO 02  // resume
             LBL 01  // while body
@@ -1527,7 +1561,8 @@ class RpnCodeGenTests(BaseTest):
             LBL 00  // while
             RCL 00
             2
-            X=Y?
+            XEQ "PyEQ"
+            X≠O?    // while true?
             GTO 01  // while body
             GTO 03  // else
             

@@ -265,3 +265,14 @@ PyFC = dedent("""
     RTN    
     """)
 
+py_cmds = \
+{
+    # 'PyGT': {'description': '>'},
+    # 'PyLT': {'description': '<'},
+    # 'PyGTE': {'description': '>='},
+    # 'PyLTE': {'description': '<='},
+    # 'PyEQ': {'description': '=='},
+    # 'PyNEQ': {'description': '!='},
+    'PyFS': {'description': 'is flag set?'},
+    'PyFC': {'description': 'is flag clear?'},
+}

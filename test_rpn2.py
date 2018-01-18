@@ -71,6 +71,82 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+    # Comparison operators
+
+    def test_compare_GT(self):
+        src = """
+            2 > 1
+        """
+        expected = dedent("""
+            2
+            1
+            XEQ "PyGT"
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines)
+
+    def test_compare_LT(self):
+        src = """
+            2 < 1
+        """
+        expected = dedent("""
+            2
+            1
+            XEQ "PyLT"
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines)
+
+    def test_compare_GTE(self):
+        src = """
+            2 >= 1
+        """
+        expected = dedent("""
+            2
+            1
+            XEQ "PyGTE"
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines)
+
+    def test_compare_LTE(self):
+        src = """
+            2 <= 1
+        """
+        expected = dedent("""
+            2
+            1
+            XEQ "PyLTE"
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines)
+
+    def test_compare_EQ(self):
+        src = """
+            2 == 1
+        """
+        expected = dedent("""
+            2
+            1
+            XEQ "PyEQ"
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines)
+
+    def test_compare_NEQ(self):
+        src = """
+            2 != 1
+        """
+        expected = dedent("""
+            2
+            1
+            XEQ "PyNEQ"
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines)
+
+    # more....
+
     @unittest.skip('if needs revamp')
     def test_or(self):
         self.parse(dedent("""

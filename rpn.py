@@ -314,8 +314,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         # log.debug(node.func.id in cmd_list)
 
         func_name = node.func.id
-        if func_name == 'FS':
-            func_name = 'FS?'  # Hack to allow question marks
+
+        if func_name == 'isFS':
+            func_name = 'PyFS'
+
+        if func_name == 'isFC':
+            func_name = 'PyFC'
 
         if func_name == 'varmenu':
             for arg in node.args:
@@ -491,7 +495,11 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             # The built-in command is a simple one without command arg fragment "parameter" parts - yes it may take
             # actual parameters but these are generated through normal visit parsing and available on the stack.
             self.program.insert(f'{func_name}', comment=cmd_list[func_name]['description'])
+        elif func_name in rpn_templates.py_cmds:
+            # Call our std. library with normal xeq, though may one day convert to embedded local labels
+            self.program.insert(f'XEQ "{func_name}"', comment=rpn_templates.py_cmds[func_name]['description'])
         else:
+            # Local subroutine call - map to a local label A..?
             label = self.labels.func_to_lbl(func_name)
             comment = f'{func_name}()' if not self.labels.is_global_def(func_name) else ''  # only emit comment if local label
             self.program.insert(f'XEQ {label}', comment=comment)
@@ -568,6 +576,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 insert('LBL', label_elif)
                 self.visit(node.test)
                 log.debug(f'{self.indent} :')
+                self.program.insert('X≠O?', comment='if true?')
 
                 label_elif_body = f.new('elif body')
 
@@ -616,6 +625,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         self.resume_labels.append(label_resume)  # just in case we hit a break
         self.continue_labels.append(label_while)  # just in case we hit a continue
+
+        """
+        At this point, the last line in our rpn program is a boolean value.
+        We now add the test for truth and a couple of gotos...
+        """
+        self.program.insert('X≠O?', comment='while true?')
 
         insert('GTO', label_while_body)
         if label_else: insert('GTO', label_else)
@@ -692,16 +707,19 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     # Most of these operators map to rpn in the opposite way, because of the stack order etc.
     # There are 12 RPN operators, p332
-    cmpops = {"Eq":"X=Y?",
-              "NotEq":"//!=",
-              "Lt":"X>Y?",
-              "LtE":"//<=",
-              "Gt":"X<Y?",
-              "GtE":"//>=",
-              "Is":"//is",
-              "IsNot":"//is not",
-              "In":"//in",
-              "NotIn":"//not in"}
+    cmpops = {
+        "Eq":     "PyEQ",
+        "NotEq":  "PyNEQ",
+        "Lt":     "PyLT",
+        "LtE":    "PyLTE",
+        "Gt":     "PyGT",
+        "GtE":    "PyGTE",
+        # TODO
+        "Is":     "PyIS",
+        "IsNot":  "PyISNOT",
+        "In":     "PyIN",
+        "NotIn":  "PyNOTIN",
+        }
     def visit_Compare(self, node):
         """
         A comparison of two or more values. left is the first value in the comparison, ops the list of operators,
@@ -715,7 +733,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.visit(node.left)
         for o, e in zip(node.ops, node.comparators):
             self.visit(e)
-            self.program.insert(self.cmpops[o.__class__.__name__])
+            subf = self.cmpops[o.__class__.__name__]
+            self.program.insert(f'XEQ "{subf}"', comment='compare, return bool')
 
         self.end(node)
 
