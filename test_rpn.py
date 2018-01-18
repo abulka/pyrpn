@@ -5,7 +5,6 @@ from textwrap import dedent
 import logging
 from logger import config_log
 from rpn import RpnError
-from rpn_templates import ISG_PREPARE
 from parse import parse
 
 log = logging.getLogger(__name__)
@@ -15,7 +14,8 @@ class RpnCodeGenTests(BaseTest):
 
     def parse(self, text, debug_gen_descriptive_labels=False):
         debug_options = {'gen_descriptive_labels': debug_gen_descriptive_labels,
-                         'dump_ast': True}
+                         'dump_ast': True,
+                         'emit_pyrpn_lib': False}
         self.program = parse(text, debug_options)
         self.program.dump()
         return self.program.lines
@@ -186,7 +186,7 @@ class RpnCodeGenTests(BaseTest):
             RCL 00
             RCL 01
             1       // step
-            XEQ d
+            XEQ "PyIsgPr"
             STO 02  // range i
             
             LBL 00  // for
@@ -196,7 +196,7 @@ class RpnCodeGenTests(BaseTest):
             LBL 01  // for body
             GTO 00  // for
             LBL 02  // resume
-            """) + ISG_PREPARE
+            """)
         self.compare(de_comment(expected), lines, trace=False, dump=True)
 
     def test_for_range_one_param_var(self):
@@ -213,7 +213,7 @@ class RpnCodeGenTests(BaseTest):
             0
             RCL 00
             1       // step
-            XEQ d
+            XEQ "PyIsgPr"
             STO 01  // i
             
             LBL 00  // for
@@ -223,7 +223,7 @@ class RpnCodeGenTests(BaseTest):
             LBL 01  // for body
             GTO 00  // for
             LBL 02  // resume
-            """) + ISG_PREPARE
+            """)
         self.compare(de_comment(expected), lines, trace=False, dump=True)
 
     # for with step
@@ -282,7 +282,7 @@ class RpnCodeGenTests(BaseTest):
             5
             RCL 00  // b
             10      // step
-            XEQ d
+            XEQ "PyIsgPr"
             STO 01  // range i
 
             LBL 00  // for
@@ -292,7 +292,7 @@ class RpnCodeGenTests(BaseTest):
             LBL 01  // for body
             GTO 00  // for
             LBL 02  // resume
-            """) + ISG_PREPARE
+            """)
         self.compare(de_comment(expected), lines, trace=False, dump=True)
 
     # for - other
@@ -319,51 +319,6 @@ class RpnCodeGenTests(BaseTest):
             LBL 02  // resume
             """)
         self.compare(de_comment(expected), lines, trace=False, dump=True)
-
-
-    # weird aview and view edge cases
-
-    """
-    AVIEW()             - view alpha register
-    aview()             - AVIEW
-    
-    aview(a,b,c)        - appends all into alpha register and does an AVIEW
-    aview(a)            - should append one thing
-    for i ... aview(i)  - should append one this, the i with IP trick
-    
-    but then, aview with a single parameter is silly.  might as well just do a VIEW
-    though if a string is involved then yes, it needs to go view the alpha register.
-    
-    view(a)             -- VIEW nn
-    view("hello")       -- same as aview("hello") 
-    view(1)             -- VIEW ST X 
-    """
-
-    @unittest.skip('edge cases')
-    def test_for_access_i_aview(self):
-        """
-        ensure can access i
-        """
-        lines = self.parse(dedent("""
-            for i in range(2):
-              aview(i)  # aview means display the alpha register - taking params is an optional extra
-            """))
-        expected = dedent("""
-            -1.001
-            STO 00
-            LBL 00
-            ISG 00
-            GTO 01
-            GTO 02
-            LBL 01
-            RCL 00
-            IP
-            VIEW ST X
-            GTO 00
-            LBL 02
-            """)
-        self.compare(de_comment(expected), lines, dump=True)
-
 
     # for continues ....
 
@@ -470,7 +425,7 @@ class RpnCodeGenTests(BaseTest):
             10        // range start, 10
             RCL 00    // range end, n
             1         // step
-            XEQ d
+            XEQ "PyIsgPr"
             STO 02    // i our counter
 
             LBL 00  // for
@@ -490,7 +445,7 @@ class RpnCodeGenTests(BaseTest):
             LBL 02  // resume
             RCL 01    // leave x on stack
             RTN
-            """) + ISG_PREPARE
+            """)
         self.compare(de_comment(expected), lines, dump=True, trace=True)
 
     def test_for_continue(self):
@@ -977,7 +932,6 @@ class RpnCodeGenTests(BaseTest):
         """)
         self.compare(de_comment(expected), lines, dump=True)
 
-
     def test_multi_cmd_two_arg_frag(self):
         """
         multi-part commands that require two arg fragments "parameters" as part of the single rpn command
@@ -992,14 +946,19 @@ class RpnCodeGenTests(BaseTest):
         """)
         self.compare(de_comment(expected), lines, dump=True)
 
-    def test_if(self):
+    # if
+
+    def test_if_isFS(self):
         lines = self.parse(dedent("""
-            if FS(1):
+            if isFS(1):
                 CF(1)
             FIX(2)
             """))
         expected = dedent("""
-            FS? 01
+            1
+            XEQ "PyFS"
+            
+            X≠O?
             GTO 00  // true, flag is set
             GTO 01  // jump to resume
             
@@ -1013,14 +972,17 @@ class RpnCodeGenTests(BaseTest):
 
     def test_if_else(self):
         lines = self.parse(dedent("""
-            if FS(1):
+            if isFS(1):
                 CF(5)
             else:
                 CF(6)
             FIX(2)  
             """))
         expected = dedent("""
-            FS? 01
+            1
+            XEQ "PyFS"
+            
+            X≠O?
             GTO 00  // true, flag is set
             GTO 02  // else (false), jump to else
 
@@ -1038,16 +1000,18 @@ class RpnCodeGenTests(BaseTest):
 
     def test_if_elif(self):
         src = """
-            if FS(20):
+            if isFS(20):
                 CF(5)
-            elif FS(21):
+            elif isFS(21):
                 CF(6)
             else:
                 CF(7)
             FIX(2)  
         """
         expected_descriptive = dedent("""
-            FS? 20
+            20
+            XEQ "PyFS"
+            X≠O?
             GTO if body
             GTO elif 1
 
@@ -1056,7 +1020,9 @@ class RpnCodeGenTests(BaseTest):
             GTO resume
 
             LBL elif 1
-            FS? 21
+            21
+            XEQ "PyFS"
+            X≠O?
             GTO elif body 1
             GTO else
 
@@ -1080,7 +1046,9 @@ class RpnCodeGenTests(BaseTest):
             label_elif_body 04
         """
         expected = dedent("""
-            FS? 20
+            20
+            XEQ "PyFS"
+            X≠O?
             GTO 00  // if body
             GTO 03  // elif
 
@@ -1089,7 +1057,9 @@ class RpnCodeGenTests(BaseTest):
             GTO 01  // resume
 
             LBL 03  // elif
-            FS? 21
+            21
+            XEQ "PyFS"
+            X≠O?
             GTO 04  // elif body
             GTO 02  // else
 
@@ -1112,18 +1082,20 @@ class RpnCodeGenTests(BaseTest):
 
     def test_if_elif_elif(self):
         src = """
-            if FS(20):
+            if isFS(20):
                 pass
-            elif FS(21):
+            elif isFS(21):
                 pass
-            elif FS(22):
+            elif isFS(22):
                 pass
             else:
                 pass
             FIX(2)  
         """
         expected_descriptive = dedent("""
-            FS? 20
+            20
+            XEQ "PyFS"
+            X≠O?
             GTO if body
             GTO elif 1
 
@@ -1131,7 +1103,9 @@ class RpnCodeGenTests(BaseTest):
             GTO resume
 
             LBL elif 1
-            FS? 21
+            21
+            XEQ "PyFS"
+            X≠O?
             GTO elif body 1   // new
             GTO elif 2  // 2nd
 
@@ -1141,7 +1115,9 @@ class RpnCodeGenTests(BaseTest):
             // ---- new ------ \.
             
             LBL elif 2 // 2nd
-            FS? 22
+            22
+            XEQ "PyFS"
+            X≠O?
             GTO elif body 2
             GTO else
 
@@ -1167,7 +1143,9 @@ class RpnCodeGenTests(BaseTest):
             label_elif_body 2 06  // new
         """
         expected = dedent("""
-            FS? 20
+            20
+            XEQ "PyFS"
+            X≠O?
             GTO 00  // if body
             GTO 03  // elif
 
@@ -1175,7 +1153,9 @@ class RpnCodeGenTests(BaseTest):
             GTO 01  // resume
 
             LBL 03  // elif
-            FS? 21
+            21
+            XEQ "PyFS"
+            X≠O?
             GTO 04  // elif body
             GTO 05  // elif (2nd)
 
@@ -1185,7 +1165,9 @@ class RpnCodeGenTests(BaseTest):
 
             // This is the second elif
             LBL 05  // elif (2nd)
-            FS? 22
+            22
+            XEQ "PyFS"
+            X≠O?
             GTO 06  // elif body (2nd)
             GTO 02  // else
             // This is the second elif body
@@ -1205,51 +1187,7 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines, dump=True)
 
-
-    def test_view_variable(self):
-        src = """
-            a = 100
-            VIEW(a)
-        """
-        expected = dedent("""
-            100
-            STO 00
-            VIEW 00
-        """)
-        lines = self.parse(dedent(src))
-        self.compare(de_comment(expected), lines, dump=True)
-
-    # returns and strings and compares
-
-    def test_return(self):
-        src = """
-            def main():
-                return
-        """
-        expected = dedent("""
-            LBL "main"
-            RTN
-        """)
-        lines = self.parse(dedent(src), debug_gen_descriptive_labels=False)
-        self.compare(de_comment(expected), lines, dump=True)
-
-    def test_return_multiple(self):
-        src = """
-            def main():
-                return 5
-                pass
-                return
-        """
-        expected = dedent("""
-            LBL "main"
-            5
-            RTN
-            RTN
-        """)
-        lines = self.parse(dedent(src), debug_gen_descriptive_labels=False)
-        self.compare(de_comment(expected), lines, dump=True)
-
-    def test_compare(self):
+    def test_compare_GT_if(self):
         src = """
             if 2 > 1:
                 PSE()
@@ -1257,7 +1195,8 @@ class RpnCodeGenTests(BaseTest):
         expected = dedent("""
             2
             1
-            X<Y?
+            XEQ "PyGT"
+            X≠O?
             GTO 00  // if body
             GTO 01  // resume
             LBL 00  // if body
@@ -1265,7 +1204,7 @@ class RpnCodeGenTests(BaseTest):
             LBL 01  // resume
         """)
         lines = self.parse(dedent(src))
-        self.compare(de_comment(expected), lines, dump=True)
+        self.compare(de_comment(expected), lines)
 
     def test_elif_view(self):
         src = """
@@ -1301,7 +1240,8 @@ class RpnCodeGenTests(BaseTest):
             RDN
             RCL 02  // n
             0
-            X=Y?
+            XEQ "PyEQ"
+            X≠O?    // if true?
             GTO 00  // if body
             GTO 03  // elif 1
             LBL 00  // if body
@@ -1311,7 +1251,8 @@ class RpnCodeGenTests(BaseTest):
             LBL 03  // elif 1
             RCL 02  // n
             1
-            X=Y?
+            XEQ "PyEQ"
+            X≠O?    // if true?
             GTO 04  // elif body 1
             GTO 05  // elif 2
             LBL 04  // elif body 1
@@ -1322,7 +1263,8 @@ class RpnCodeGenTests(BaseTest):
             LBL 05  // elif 2
             RCL 02  // n
             2
-            X=Y?
+            XEQ "PyEQ"
+            X≠O?    // if true?
             GTO 06  // elif body 2
             GTO 02  // else
             LBL 06  // elif body 2
@@ -1396,6 +1338,37 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(expected, lines, dump=True, keep_comments=False)
 
+    # returns and strings and compares
+
+    def test_return(self):
+        src = """
+            def main():
+                return
+        """
+        expected = dedent("""
+            LBL "main"
+            RTN
+        """)
+        lines = self.parse(dedent(src), debug_gen_descriptive_labels=False)
+        self.compare(de_comment(expected), lines, dump=True)
+
+    def test_return_multiple(self):
+        src = """
+            def main():
+                return 5
+                pass
+                return
+        """
+        expected = dedent("""
+            LBL "main"
+            5
+            RTN
+            RTN
+        """)
+        lines = self.parse(dedent(src), debug_gen_descriptive_labels=False)
+        self.compare(de_comment(expected), lines, dump=True)
+
+    # Expressions
 
     def test_expr_two_ops(self):
         src = """
@@ -1435,21 +1408,6 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(expected, lines, dump=True, keep_comments=False)
 
-    @unittest.skip('hard to actually blow the stack')
-    def test_expr_blow_stack(self):
-        src = """
-            x = 1 + 2 * 6 + 1 * 9 / 100 + 1 + 2 * 6       
-        """
-        expected = dedent("""
-            1
-            2
-            6
-            *
-            +
-            STO 00
-        """)
-        self.assertRaises(RpnError, self.parse, dedent(src))
-
     def test_expr_brackets(self):
         src = """
             x = ((1 + 2) * (6 + 2 - 3) * (2 + 7)) / 200       
@@ -1475,6 +1433,14 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(expected, lines, dump=True, keep_comments=False)
 
+    @unittest.skip('hard to actually blow the stack - not any more - please enable')
+    def test_expr_blow_stack(self):
+        src = """
+            # x = 1 + 2 * 6 + 1 * 9 / 100 + 1 + 2 * 6
+            x = 1+2*(3+4*(5+6*(7+8*9)))       
+        """
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
     # More control structures
 
     def test_while(self):
@@ -1486,7 +1452,8 @@ class RpnCodeGenTests(BaseTest):
             LBL 00  // while
             1
             2
-            X>Y?
+            XEQ "PyLT"
+            X≠O?    // while true?
             GTO 01  // while body
             GTO 02  // resume
             LBL 01  // while body
@@ -1518,7 +1485,8 @@ class RpnCodeGenTests(BaseTest):
             LBL 00  // while
             RCL 00
             2
-            X<Y?
+            XEQ "PyGT"
+            X≠O?    // while true?
             GTO 01  // while body
             GTO 03  // else
             LBL 01  // while body
@@ -1541,7 +1509,8 @@ class RpnCodeGenTests(BaseTest):
             LBL 00  // while
             1
             2
-            X>Y?
+            XEQ "PyLT"
+            X≠O?    // while true?
             GTO 01  // while body
             GTO 02  // resume
             LBL 01  // while body
@@ -1561,7 +1530,8 @@ class RpnCodeGenTests(BaseTest):
             LBL 00  // while
             1
             2
-            X>Y?
+            XEQ "PyLT"
+            X≠O?    // while true?
             GTO 01  // while body
             GTO 02  // resume
             LBL 01  // while body
@@ -1591,7 +1561,8 @@ class RpnCodeGenTests(BaseTest):
             LBL 00  // while
             RCL 00
             2
-            X=Y?
+            XEQ "PyEQ"
+            X≠O?    // while true?
             GTO 01  // while body
             GTO 03  // else
             
@@ -1608,6 +1579,19 @@ class RpnCodeGenTests(BaseTest):
         self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
 
     # Text and the alpha register
+
+    def test_view_variable(self):
+        src = """
+            a = 100
+            VIEW(a)
+        """
+        expected = dedent("""
+            100
+            STO 00
+            VIEW 00
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines, dump=True)
 
     def test_alpha_AVIEW_no_args(self):
         src = """
@@ -1762,6 +1746,48 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
 
+    # weird aview and view edge cases
+
+    """
+    AVIEW()             - view alpha register
+    aview()             - AVIEW
+
+    aview(a,b,c)        - appends all into alpha register and does an AVIEW
+    aview(a)            - should append one thing
+    for i ... aview(i)  - should append one this, the i with IP trick
+
+    but then, aview with a single parameter is silly.  might as well just do a VIEW
+    though if a string is involved then yes, it needs to go view the alpha register.
+
+    view(a)             -- VIEW nn
+    view("hello")       -- same as aview("hello") 
+    view(1)             -- VIEW ST X 
+    """
+
+    @unittest.skip('edge cases')
+    def test_for_access_i_aview(self):
+        """
+        ensure can access i
+        """
+        lines = self.parse(dedent("""
+            for i in range(2):
+              aview(i)  # aview means display the alpha register - taking params is an optional extra
+            """))
+        expected = dedent("""
+            -1.001
+            STO 00
+            LBL 00
+            ISG 00
+            GTO 01
+            GTO 02
+            LBL 01
+            RCL 00
+            IP
+            VIEW ST X
+            GTO 00
+            LBL 02
+            """)
+        self.compare(de_comment(expected), lines, dump=True)
 
     # Scope
 
@@ -1794,7 +1820,6 @@ class RpnCodeGenTests(BaseTest):
             RTN
             """)
         self.compare(de_comment(expected), lines, dump=True)
-
 
     def test_Pow(self):
         """

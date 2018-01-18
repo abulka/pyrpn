@@ -9,6 +9,18 @@ log = logging.getLogger(__name__)
 config_log(log)
 
 def parse(text, debug_options={}):
+    """
+    Parse source code and emit a program object which has many line objects
+    representing the RPN.
+
+    :param text: python source code
+    :param debug_options: a dictionary of debug options
+        'gen_descriptive_labels': default False
+        'dump_ast': default False,
+        'emit_pyrpn_lib': default True
+    :return: program object
+    """
+
     # self.tree = ast.parse(text)
 
     atok = asttokens.ASTTokens(text, parse=True)
@@ -21,7 +33,8 @@ def parse(text, debug_options={}):
     visitor.debug_gen_descriptive_labels = debug_options.get('gen_descriptive_labels', False)
     visitor.atok = atok
     visitor.visit(tree)
-    visitor.finish()
+    if debug_options.get('emit_pyrpn_lib', True):
+        visitor.finish()
 
     return visitor.program
 

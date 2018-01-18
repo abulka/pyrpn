@@ -1,0 +1,3 @@
+class RpnError(Exception):
+    pass
+
