@@ -2,6 +2,7 @@ from textwrap import dedent
 import inspect
 import logging
 from logger import config_log
+import settings
 
 log = logging.getLogger(__name__)
 config_log(log)
@@ -322,7 +323,7 @@ class RpnTemplates:
         functions. Only 14 of them.
         :return:
         """
-        next_label = 50
+        next_label = settings.LOCAL_LABEL_START_FOR_Py
         for name in self.template_names:
             self.local_alpha_labels[name] = str(next_label)
             next_label += 1

@@ -3,6 +3,7 @@ from logger import config_log
 import logging
 from rpn_templates import RpnTemplates
 from rpn_exceptions import RpnError
+import settings
 
 log = logging.getLogger(__name__)
 config_log(log)
@@ -118,13 +119,16 @@ class Program(BaseRpnProgram):
             s = s[:i]
             return s
 
-        def replace_with_local_label(line, cmd='XEQ'):
-            text = line.text
-            func_name = extract_func_name(text)
-            if func_name in self.rpn_templates.template_names:
-                label = self.rpn_templates.local_alpha_labels[func_name]
-                line.text = f'{cmd} {label}'
-                log.debug(f'replaced global label "{func_name}" with local label {label}')
+        def replace_with_local_label(line, cmd):
+            if line.text == 'LBL "PyLIB"':  # special case
+                line.text = f'LBL {settings.LOCAL_LABEL_FOR_PyLIB}'
+            else:
+                text = line.text
+                func_name = extract_func_name(text)
+                if func_name in self.rpn_templates.template_names:
+                    label = self.rpn_templates.local_alpha_labels[func_name]
+                    line.text = f'{cmd} {label}'
+                    log.debug(f'replaced global label "{func_name}" with local label {label}')
 
         for line in self.lines:
             if 'XEQ "' in line.text:
