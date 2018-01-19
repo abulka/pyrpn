@@ -1,7 +1,7 @@
 {
-    "description": "<p>A very simple example of if else and expressions.</p>\r\n<p>A function which figures out which number is bigger than another, and displays a message on the screen telling you the result.</p>",
+    "description": "<p>A very simple example of if else and expressions.</p>\r\n<p>A function which figures out which number is bigger than another, and displays a message on the screen telling you the result.</p>\r\n<p>To run <code>bigger(100, 1)</code>&nbsp;load the RPN into your calculator then type <code>100 ENTER 1 XEQ \"bigger\"</code></p>",
     "public": "yes",
     "sortnum": 0,
-    "source": "def bigger(a, b):\r\n  if a > b:\r\n    aview('Parameter a ', a, ' is bigger than b which is ', b)\r\n  else:\r\n    aview('Parameter a ', a, ' is not bigger than b which is ', b, ' sorry!')",
+    "source": "def bigger(a, b):\r\n  if a > b:\r\n    aview('Param a=', a, ' is bigger than b=', b, ' yey!')\r\n  else:\r\n    aview('Param a=', a, ' is not bigger than b=', b, ' sorry!')",
     "title": "If"
 }
