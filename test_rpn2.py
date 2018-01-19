@@ -200,3 +200,9 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+    def test_unsupported_OR(self):
+        src = dedent("""
+            OR
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
+

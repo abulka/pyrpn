@@ -159,6 +159,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def finish(self):
         self.program.emit_needed_rpn_templates()
 
+    # Util
+
+    def check_supported(self, name, node):
+        if name in ['NOT', 'OR', 'AND']:
+            raise RpnError(f'The RPN command "{name}" is not supported - use native Python instead. Linenum {node.lineno} Line "{node.first_token.line}"')
+
     # Visit functions
 
     def visit_FunctionDef(self,node):
@@ -304,6 +310,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         # log.debug(node.func.id in cmd_list)
 
         func_name = node.func.id
+
+        self.check_supported(func_name, node)
 
         if func_name == 'isFS':
             func_name = 'PyFS'
@@ -651,6 +659,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def visit_Name(self, node):
         self.begin(node)
+        self.check_supported(node.id, node)
         if '.Load' in str(node.ctx):
             assert isinstance(node.ctx, ast.Load)
             self.program.insert(f'RCL {self.scopes.var_to_reg(node.id)}', comment=node.id)
