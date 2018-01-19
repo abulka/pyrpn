@@ -13,7 +13,6 @@
         </ul>
         <section class="container custom-container">
           <div class="left-half">
-              <span class="parse_errors">{{ parse_errors }}</span>
               <article>
                     <h3>Enter Python Source Code:</h3>
                     <form id="mainform" method="POST" action="/">
@@ -43,7 +42,9 @@
                 </div>
             </article>
           </div>
+        <pre class="parse_errors">{{ parse_errors }}</pre>
         </section>
+
 
     <script>
         var first_time = $('.right-half pre').text() == "Press Convert"

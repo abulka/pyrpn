@@ -163,7 +163,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def check_supported(self, name, node):
         if name in ['NOT', 'OR', 'AND']:
-            raise RpnError(f'The RPN command "{name}" is not supported - use native Python instead. Linenum {node.lineno} Line "{node.first_token.line}"')
+            raise RpnError(f'The RPN command "{name}" is not supported - use native Python instead, line: {node.lineno}\n{node.first_token.line.strip()}')
 
     # Visit functions
 
