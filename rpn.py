@@ -374,9 +374,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                         skip_first = False
                         continue
                     self.visit(arg)
-                    # if isinstance(arg, ast.Num):
-                    if isinstance(arg, ast.Name):  # probably a recall of a register into stack X
+                    if isinstance(arg, ast.Num):
                         self.program.insert('AIP')
+                    elif isinstance(arg, ast.Name):  # probably a recall of a register into stack X
+                        self.program.insert('AIP')  # Append Integer part of x to the Alpha register. (not documented in HP42S manual, but is in cmd_list)
                     elif isinstance(arg, ast.Str):  # a literal string
                         pass  # visit_Name will insert a alpha text append for us
                     else:

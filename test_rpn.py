@@ -1647,6 +1647,20 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
 
+    def test_alpha_long_plus_literal(self):
+        src = """
+            alpha("Hello there all is well in London!!", 3)
+        """
+        expected = dedent("""
+            "Hello there al"
+            ├"l is well in L"
+            ├"ondon!!"
+            3
+            AIP  // Append Integer part of x to the Alpha register
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
+
     def test_alpha_print(self):
         src = """
             print("Hello")
