@@ -1482,6 +1482,23 @@ class RpnCodeGenTests(BaseTest):
         """
         self.parse(dedent(src))  # don't care about the result, as long as we don't blow
 
+    def test_expr_mixed_bool(self):
+        # this was reported to me as a bug
+        src = """
+            a < 0 or b < 0
+        """
+        self.parse(dedent(src))  # don't care about the result, as long as we don't blow
+
+    def test_expr_mixed_bool_in_def(self):
+        # this was reported to me as a bug
+        src = """
+            def x(a, b):
+              if a < 0 or b < 0:
+                return 0
+              return a+b
+        """
+        self.parse(dedent(src))  # don't care about the result, as long as we don't blow
+
     # More control structures
 
     def test_while(self):

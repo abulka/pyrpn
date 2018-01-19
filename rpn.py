@@ -302,10 +302,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.begin(node)
 
         self.visit(node.left)
-        # log.debug("pending_stack_args %s", self.pending_stack_args)
+        log.debug("pending_stack_args %s", self.pending_stack_args)
 
         self.visit(node.right)
-        # log.debug("pending_stack_args %s", self.pending_stack_args)
+        log.debug("pending_stack_args %s", self.pending_stack_args)
 
         if len(self.pending_stack_args) > 4:
             raise RpnError(f'Potential RPN stack overflow detected - expression too complex for 4 level stack - simplify! {self.pending_stack_args}')
@@ -615,6 +615,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 break
 
         insert('LBL', label_resume)
+        self.pending_stack_args = []
         self.end(node)
 
     def visit_While(self,node):
@@ -661,6 +662,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.body(node.orelse)
 
         insert('LBL', label_resume)
+        self.pending_stack_args = []
         self.end(node)
 
     @recursive
@@ -669,6 +671,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         if self.resume_labels:
             label = self.resume_labels.pop()
             self.insert('GTO', label)
+        self.pending_stack_args = []
 
     @recursive
     def visit_Continue(self,node):
@@ -676,6 +679,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         if self.continue_labels:
             label = self.continue_labels.pop()
             self.insert('GTO', label)
+        self.pending_stack_args = []
 
     @recursive
     def visit_Lambda(self,node):
@@ -724,6 +728,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     @recursive
     def visit_Expr(self, node):
         pass
+        log.debug('visit_Expr - gonna clear all pending_stack_args')
+        self.pending_stack_args = []  # maybe this is the key place to put this reset?
 
     # Most of these operators map to rpn in the opposite way, because of the stack order etc.
     # There are 12 RPN operators, p332
