@@ -254,7 +254,7 @@ class RpnTemplates:
         CF 00
         FS? IND X
         SF 00
-        RDN    // drop parameter
+        RDN
         FS? 00
         1
         FC? 00
@@ -267,7 +267,7 @@ class RpnTemplates:
         CF 00
         FC? IND X
         SF 00
-        RDN    // drop parameter
+        RDN
         FS? 00
         1
         FC? 00

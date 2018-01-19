@@ -96,9 +96,10 @@ class Program(BaseRpnProgram):
         if templates_who_need_PyDFTB & templates_needed:
             templates_needed.add('_PyDFTB')
 
-        self.insert('RTN', comment='--------------------------------------')
-        self.insert('LBL "PyLIB"', comment='PyRPN Standard Support Library')
-        self.insert('RTN', comment='--------------------------------------')
+        self.insert('RTN', comment='---------------------------')
+        self.insert('LBL "PyLIB"', comment='PyRPN Support Library of')
+        self.insert('"-Utility Funcs-"')
+        self.insert('RTN', comment='---------------------------')
 
         for template in templates_needed:
             text = getattr(self.rpn_templates, template)  # look up the field dynamically
