@@ -1,5 +1,6 @@
 from flask import Flask, render_template, redirect, url_for, request, jsonify
 from parse import parse
+from rpn_exceptions import RpnError
 import logging
 from logger import config_log
 from server_forms import ConverterForm, ExampleForm
@@ -47,6 +48,7 @@ es = ExamplesSync.create(settings.APP_DIR, settings.PRODUCTION)
 @app.route('/<int:id>', methods=["GET"])
 def index(id=None):
     rpn = rpn_free42 = 'Press Convert'
+    parse_errors = ''
     if request.method == 'GET':
         log.info(f'main converter page viewed, example {id}')
         form = ConverterForm()
@@ -57,11 +59,14 @@ def index(id=None):
         # We are asking for the source to be converted to RPN
         form = ConverterForm(request.form)
         if form.validate_on_submit():
-            program = parse(form.source.data)
             spy(form.source.data, form.source.default)
-            rpn = program.lines_to_str(comments=form.comments.data, linenos=form.line_numbers.data)
-            rpn_free42 = program.lines_to_str(comments=False, linenos=True)
-    return render_template('index.html', form=form, rpn=rpn, rpn_free42=rpn_free42, title='source code converter')
+            try:
+                program = parse(form.source.data)
+                rpn = program.lines_to_str(comments=form.comments.data, linenos=form.line_numbers.data)
+                rpn_free42 = program.lines_to_str(comments=False, linenos=True)
+            except RpnError as e:
+                parse_errors = str(e)
+    return render_template('index.html', form=form, rpn=rpn, rpn_free42=rpn_free42, title='source code converter', parse_errors=parse_errors)
 
 def spy(source, default_source):
     s = source.replace('\r', '')
