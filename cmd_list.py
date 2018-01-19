@@ -775,21 +775,11 @@ cmd_list = \
                         'program line. (Not programmable.)',
          'indirect_allowed': False,
          'num_arg_fragments': 0},
- 'ST0': {'description': 'Store a copy of x into a destination register or '
+ 'STO': {'description': 'Store a copy of x into a destination register or '
                         'variable. Parameter: register or variable (indirect '
                         'allowed)',
          'indirect_allowed': True,
          'num_arg_fragments': 1},
- 'ST0×': {'description': 'Store multiplication. Multiplies an existing '
-                         'register or variable by x. Parameter: register or '
-                         'variable (indirect allowed)',
-          'indirect_allowed': True,
-          'num_arg_fragments': 1},
- 'ST0÷': {'description': 'Store division. Divides an existing register or '
-                         'variable by x. Parameter: register or variable '
-                         '(indirect allowed)',
-          'indirect_allowed': True,
-          'num_arg_fragments': 1},
  'STO+': {'description': 'Store addition. Adds x to an existing register or '
                          'variable. Parameter: register or variable (indirect '
                          'allowed)',
@@ -806,6 +796,16 @@ cmd_list = \
  'STOP': {'description': 'Stop program execution. (R/S in program entry mode).',
           'indirect_allowed': False,
           'num_arg_fragments': 0},
+ 'STO×': {'description': 'Store multiplication. Multiplies an existing '
+                         'register or variable by x. Parameter: register or '
+                         'variable (indirect allowed)',
+          'indirect_allowed': True,
+          'num_arg_fragments': 1},
+ 'STO÷': {'description': 'Store division. Divides an existing register or '
+                         'variable by x. Parameter: register or variable '
+                         '(indirect allowed)',
+          'indirect_allowed': True,
+          'num_arg_fragments': 1},
  'STO–': {'description': 'Store subtraction. Subtracts x from an existing '
                          'register or variable. Parameter: register or '
                          'variable (indirect allowed)',
@@ -859,23 +859,23 @@ cmd_list = \
                          'from growing.',
           'indirect_allowed': False,
           'num_arg_fragments': 0},
- 'X< >': {'description': 'Swaps the contents of the x-register with another '
-                         'register or variable. Parameter: register or '
-                         'variable (indirect allowed)',
-          'indirect_allowed': True,
-          'num_arg_fragments': 1},
- 'X<>Y': {'description': 'Swaps the contents of the x- and y-registers.',
+ 'X<0?': {'description': ' X less than zero test. If true, execute the next '
+                         'program line; if false, skip the next program line',
           'indirect_allowed': False,
           'num_arg_fragments': 0},
- 'X<O?': {'description': ' X less than zero test. If true, execute the next '
-                         'program line; if false, skip the next program line',
+ 'X<>': {'description': 'Swaps the contents of the x-register with another '
+                        'register or variable. Parameter: register or variable '
+                        '(indirect allowed)',
+         'indirect_allowed': True,
+         'num_arg_fragments': 1},
+ 'X<>Y': {'description': 'Swaps the contents of the x- and y-registers.',
           'indirect_allowed': False,
           'num_arg_fragments': 0},
  'X<Y?': {'description': ' X less than y test. If true, execute the next '
                          'program line; if false, skip the next program line',
           'indirect_allowed': False,
           'num_arg_fragments': 0},
- 'X=O?': {'description': ' X equal to zero test. If true, execute the next '
+ 'X=0?': {'description': ' X equal to zero test. If true, execute the next '
                          'program line; if false, skip the next program line',
           'indirect_allowed': False,
           'num_arg_fragments': 0},
@@ -883,7 +883,7 @@ cmd_list = \
                          'program line; if false, skip the next program line',
           'indirect_allowed': False,
           'num_arg_fragments': 0},
- 'X>O?': {'description': 'X greater than zero test. If true, execute the next '
+ 'X>0?': {'description': 'X greater than zero test. If true, execute the next '
                          'program line; if false, skip the next program line',
           'indirect_allowed': False,
           'num_arg_fragments': 0},
@@ -907,7 +907,7 @@ cmd_list = \
  'X↑2': {'description': 'Square. Returns x2.',
          'indirect_allowed': False,
          'num_arg_fragments': 0},
- 'X≠O?': {'description': ' X not equal to zero test. If true, execute the next '
+ 'X≠0?': {'description': ' X not equal to zero test. If true, execute the next '
                          'program line; if false, skip the next program line',
           'indirect_allowed': False,
           'num_arg_fragments': 0},
@@ -915,7 +915,7 @@ cmd_list = \
                          'program line; if false, skip the next program line',
           'indirect_allowed': False,
           'num_arg_fragments': 0},
- 'X≤O?': {'description': ' X less than or equal to zero test. If true, execute '
+ 'X≤0?': {'description': ' X less than or equal to zero test. If true, execute '
                          'the next program line; if false, skip the next '
                          'program line',
           'indirect_allowed': False,
@@ -925,7 +925,7 @@ cmd_list = \
                          'program line',
           'indirect_allowed': False,
           'num_arg_fragments': 0},
- 'X≥O?': {'description': 'X greater than or equal to zero test. If true, '
+ 'X≥0?': {'description': 'X greater than or equal to zero test. If true, '
                          'execute the next program line; if false, skip the '
                          'next program line',
           'indirect_allowed': False,
@@ -977,12 +977,6 @@ cmd_list = \
  '→': {'description': 'Move right one element in the indexed matrix.',
        'indirect_allowed': False,
        'num_arg_fragments': 0},
- '→0CT': {'description': 'To octal. Converts a decimal number to the octal '
-                         'representation. Note: This function is included to '
-                         'provide program compatibility with the HP-41 (which '
-                         'uses the function name OCT).',
-          'indirect_allowed': False,
-          'num_arg_fragments': 0},
  '→DEC': {'description': 'To decimal. Converts the octal (base 8) '
                          'representation of a number to decimal (base 10). '
                          'Note: This function is included to provide program '
@@ -1002,6 +996,12 @@ cmd_list = \
                         'a decimal fraction.',
          'indirect_allowed': False,
          'num_arg_fragments': 0},
+ '→OCT': {'description': 'To octal. Converts a decimal number to the octal '
+                         'representation. Note: This function is included to '
+                         'provide program compatibility with the HP-41 (which '
+                         'uses the function name OCT).',
+          'indirect_allowed': False,
+          'num_arg_fragments': 0},
  '→POL': {'description': 'To polar. Converts x and y to the corresponding '
                          'polar coordinates r and θ. If the x-register '
                          'contains a complex number, converts the two parts of '

@@ -185,11 +185,11 @@ SLOPE,Return the slope of the linear transformation of the current curve-fitting
 SOLVE,Solve for an unknown variable. Parameter: variable name (indirect allowed)
 SORT,Square root. Returns √x.
 SST,Single step. Moves the program pointer to the next program line. (Not programmable.)
-ST0,Store a copy of x into a destination register or variable. Parameter: register or variable (indirect allowed)
+STO,Store a copy of x into a destination register or variable. Parameter: register or variable (indirect allowed)
 STO+,Store addition. Adds x to an existing register or variable. Parameter: register or variable (indirect allowed)
 STO–,Store subtraction. Subtracts x from an existing register or variable. Parameter: register or variable (indirect allowed)
-ST0×,Store multiplication. Multiplies an existing register or variable by x. Parameter: register or variable (indirect allowed)
-ST0÷,Store division. Divides an existing register or variable by x. Parameter: register or variable (indirect allowed)
+STO×,Store multiplication. Multiplies an existing register or variable by x. Parameter: register or variable (indirect allowed)
+STO÷,Store division. Divides an existing register or variable by x. Parameter: register or variable (indirect allowed)
 STOEL,Store element. Stores a copy of x into the current element of the indexed matrix.
 STOIJ,Moves the row- and column-pointers to I = x and J = y in the indexed matrix.
 STOP,Stop program execution. (R/S in program entry mode).
@@ -205,19 +205,19 @@ VARMENU,Create a variable menu using MVAR instructions following the specified g
 VIEW,View the contents of a register or variable. Parameter: register or variable (indirect allowed)
 WMEAN,Weighted mean. Return the mean of x-values weighted by the y-values  Σxy / Σ y
 WRAP,"Select Wrap mode, which prevents the indexed matrix from growing."
-X< >,Swaps the contents of the x-register with another register or variable. Parameter: register or variable (indirect allowed)
+X<>,Swaps the contents of the x-register with another register or variable. Parameter: register or variable (indirect allowed)
 X<>Y,Swaps the contents of the x- and y-registers.
-X<O?," X less than zero test. If true, execute the next program line; if false, skip the next program line"
+X<0?," X less than zero test. If true, execute the next program line; if false, skip the next program line"
 X<Y?," X less than y test. If true, execute the next program line; if false, skip the next program line"
-X≤O?," X less than or equal to zero test. If true, execute the next program line; if false, skip the next program line"
+X≤0?," X less than or equal to zero test. If true, execute the next program line; if false, skip the next program line"
 X≤Y?," X less than or equal to y test. If true, execute the next program line; if false, skip the next program line"
-X=O?," X equal to zero test. If true, execute the next program line; if false, skip the next program line"
+X=0?," X equal to zero test. If true, execute the next program line; if false, skip the next program line"
 X=Y?," X equal to y test. If true, execute the next program line; if false, skip the next program line"
-X≠O?," X not equal to zero test. If true, execute the next program line; if false, skip the next program line"
+X≠0?," X not equal to zero test. If true, execute the next program line; if false, skip the next program line"
 X≠Y?,"X not equal to y test. If true, execute the next program line; if false, skip the next program line"
-X>O?,"X greater than zero test. If true, execute the next program line; if false, skip the next program line"
+X>0?,"X greater than zero test. If true, execute the next program line; if false, skip the next program line"
 X>Y?,"X greater than y test. If true, execute the next program line; if false, skip the next program line"
-X≥O?,"X greater than or equal to zero test. If true, execute the next program line; if false, skip the next program line"
+X≥0?,"X greater than or equal to zero test. If true, execute the next program line; if false, skip the next program line"
 X≥Y?,"X greater than or equal to y test. If true, execute the next program line; if false, skip the next program line"
 XEQ,Execute a function or program. Parameter: function or label (indirect allowed)
 XOR,Logical XOR (exclusive OR). Returns x XOR y.
@@ -240,7 +240,7 @@ Y↑X,Power. Returns yx.
 →DEG,To degrees. Convert an angle-value from radians to degrees. Returns x×(180/π).
 →HMS,"To hours, minutes, and seconds. Convert x from a decimal fraction to a minutes-seconds format."
 →HR,To hours. Converts x from a minutes-seconds format to a decimal fraction.
-→0CT,To octal. Converts a decimal number to the octal representation. Note: This function is included to provide program compatibility with the HP-41 (which uses the function name OCT).
+→OCT,To octal. Converts a decimal number to the octal representation. Note: This function is included to provide program compatibility with the HP-41 (which uses the function name OCT).
 →POL,"To polar. Converts x and y to the corresponding polar coordinates r and θ. If the x-register contains a complex number, converts the two parts of the number to polar values."
 →RAD,To radians. Converts a angle value in degrees to radians. Returns x×(π/180).
 →REC,"To rectangular. Converts r (in the x-register) and θ (in the y-register) to the corresponding rectangular coordinates, x and y. If the X-register contains a complex number, converts the two parts of the number to rectangular values."
