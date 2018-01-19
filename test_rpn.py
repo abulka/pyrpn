@@ -1499,6 +1499,16 @@ class RpnCodeGenTests(BaseTest):
         """
         self.parse(dedent(src))  # don't care about the result, as long as we don't blow
 
+    def test_expr_blow_reset4(self):
+        # Need to be careful and reset the tracking of stack values after new lines.
+        src = """
+            for i in range(3, max_iterations, 2):
+                if subtract:
+                    result -= 1.0/i
+                    subtract = False
+        """
+        self.parse(dedent(src))  # don't care about the result, as long as we don't blow
+
     def test_expr_mixed_bool(self):
         # this was reported to me as a bug
         src = """

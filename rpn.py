@@ -538,6 +538,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             comment = f'{func_name}()' if not self.labels.is_global_def(func_name) else ''  # only emit comment if local label
             self.program.insert(f'XEQ {label}', comment=comment)
             self.log_state('scope after XEQ')
+        self.pending_stack_args = []  # TODO though if the call is part of an long expression, we could be prematurely clearing
         self.end(node)
 
     def visit_If(self, node):
@@ -564,6 +565,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         self.visit(node.test)
         log.debug(f'{self.indent} :')
+        self.pending_stack_args = []
 
         """
         At this point, the last line in our rpn program is a boolean value.
@@ -635,6 +637,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         log.debug(f'{self.indent} while')
         self.visit(node.test)
         log.debug(f'{self.indent} :')
+        self.pending_stack_args = []
 
         label_while_body = f.new('while body')
         label_resume = f.new('resume')
@@ -703,6 +706,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             assert isinstance(node.ctx, ast.Load)
             self.program.insert(f'RCL {self.scopes.var_to_reg(node.id)}', comment=node.id)
             self.pending_stack_args.append(node.id)
+            log.debug("pending_stack_args %s", self.pending_stack_args)
             if self.var_name_is_loop_counter(node.id):
                 self.program.insert('IP')  # just get the integer portion of isg counter
         self.end(node)
@@ -712,6 +716,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         n = int(node.n)
         self.program.insert(f'{self.pending_unary_op}{n}')
         self.pending_stack_args.append(node.n)
+        log.debug("pending_stack_args %s", self.pending_stack_args)
         self.pending_unary_op = ''
         self.end(node)
 
