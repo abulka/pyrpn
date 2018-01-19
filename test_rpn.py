@@ -1490,7 +1490,8 @@ class RpnCodeGenTests(BaseTest):
         self.parse(dedent(src))  # don't care about the result, as long as we don't blow
 
     def test_expr_mixed_bool_in_def(self):
-        # this was reported to me as a bug
+        # this was reported to me as a bug because of expressions and booleans
+        # interestingly, the visit_Expr is never done cos 'if' takes a BoolOp
         src = """
             def x(a, b):
               if a < 0 or b < 0:
