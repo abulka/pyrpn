@@ -1482,6 +1482,23 @@ class RpnCodeGenTests(BaseTest):
         """
         self.parse(dedent(src))  # don't care about the result, as long as we don't blow
 
+    def test_expr_blow_reset2(self):
+        # Need to be careful and reset the tracking of stack values after new lines.
+        src = """
+            FROM -= 1
+            TO -= 1
+            result = ABS(FROM) + TO / 1000
+        """
+        self.parse(dedent(src))  # don't care about the result, as long as we don't blow
+
+    def test_expr_blow_reset3(self):
+        # Need to be careful and reset the tracking of stack values after new lines.
+        src = """
+            hard = TO >= 0
+            result = ABS(FROM) + TO / 1000
+        """
+        self.parse(dedent(src))  # don't care about the result, as long as we don't blow
+
     def test_expr_mixed_bool(self):
         # this was reported to me as a bug
         src = """

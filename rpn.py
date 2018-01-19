@@ -242,7 +242,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.program.insert(f'STO {self.scopes.var_to_reg(target.id)}', comment=f'{target.id}')
             assert '.Store' in str(target.ctx)
             assert isinstance(target.ctx, ast.Store)
-        # self.pending_stack_args = []
+        self.pending_stack_args = []  # must have, cos could just be assigning single values, not BinOp and not Expr
         self.end(node)
 
     def visit_AugAssign(self,node):
@@ -253,7 +253,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         assert '.Store' in str(node.target.ctx)
         assert isinstance(node.target.ctx, ast.Store)
         self.pending_ops.pop()
-        # self.pending_stack_args = []
+        self.pending_stack_args = []  # must have, cos could just be assigning single values, not BinOp and not Expr
         self.end(node)
 
     def visit_Add(self,node):
@@ -302,10 +302,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.begin(node)
 
         self.visit(node.left)
-        # log.debug("pending_stack_args %s", self.pending_stack_args)
+        log.debug("pending_stack_args %s", self.pending_stack_args)
 
         self.visit(node.right)
-        # log.debug("pending_stack_args %s", self.pending_stack_args)
+        log.debug("pending_stack_args %s", self.pending_stack_args)
 
         if len(self.pending_stack_args) > 4:
             raise RpnError(f'Potential RPN stack overflow detected - expression too complex for 4 level stack - simplify! {self.pending_stack_args}')
@@ -727,7 +727,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     @recursive
     def visit_Expr(self, node):
-        # log.debug('visit_Expr - gonna clear all pending_stack_args')
+        log.debug('visit_Expr - gonna clear all pending_stack_args')
         self.pending_stack_args = []  # a key place to put this reset, but still need one in if/while cos they often get BoolOp not Expr
 
     # Most of these operators map to rpn in the opposite way, because of the stack order etc.
