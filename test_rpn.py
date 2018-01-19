@@ -1659,7 +1659,21 @@ class RpnCodeGenTests(BaseTest):
             AIP  // Append Integer part of x to the Alpha register
         """)
         lines = self.parse(dedent(src))
-        self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
+        self.compare(de_comment(expected), lines, keep_comments=False)
+
+    def test_alpha_two_str_params(self):
+        src = """
+            alpha("hello there this is a test of things", "fred is a very big man")
+        """
+        expected = dedent("""
+            "hello there th"
+            ├"is is a test o"
+            ├"f things"
+            ├"fred is a very"
+            ├" big man"
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines, keep_comments=False)
 
     def test_alpha_print(self):
         src = """

@@ -144,9 +144,11 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def make_local_label(self, node):
         self.program.insert(f'LBL {self.labels.func_to_lbl(node.name, called_from_def=True)}', comment=f'def {node.name}')
 
-    def split_alpha_text(self, alpha_text):
+    def split_alpha_text(self, alpha_text, append=False):
         first = True
         s = alpha_text
+        if append:
+            first = False
         while s:
             fragment = s[0:14]
             s = s[14:]
@@ -692,7 +694,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def visit_Str(self, node):
         self.begin(node)
         if self.inside_alpha:
-            self.program.insert(f'├"{node.s[0:15]}"')
+            # self.program.insert(f'├"{node.s[0:15]}"')
+            self.split_alpha_text(node.s, append=True)
         else:
             self.program.insert(f'"{node.s[0:15]}"')
             self.program.insert('ASTO ST X')
