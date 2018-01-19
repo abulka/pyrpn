@@ -42,8 +42,7 @@ class RpnTemplates:
         self._create_local_alpha_labels()
 
     PyIsgPr = dedent("""
-        LBL "PyIsgPr"
-        LBL d   // def calculate_ISG(z:from, y:to, x:step)
+        LBL "PyIsgPr"  // (z:from, y:to, x:step) -> (ccccccc.fffii)
         CF 99   // neg_case = False 
         CF 98   // have_step = False (other than 1)
         1
@@ -58,21 +57,21 @@ class RpnTemplates:
         RCL ST Z // step
         -        // stack now: z:step y:to-1 x:from-step 
         X>=0?    // if from > 0
-        GTO e    //      easy (non negative)
+        GTO 70   //      easy (non negative)
         ABS      // else from = abs(from)
         SF 99    //      neg_case = True 
-        LBL e
+        LBL 70
         X<>Y     // stack now: z:step y:from x:to
         1000
         /
         +        // stack now: y:step x:a.bbb
         FS?C 98  // if not have_step
-        GTO c
+        GTO 71
         RCL ST Z // else step
         100000   //      step = step / 100,000
         /
         +        // stack now: a.bbbnn
-        LBL c
+        LBL 71
         FS?C 99  // if neg_case
         +/-
         RTN 
