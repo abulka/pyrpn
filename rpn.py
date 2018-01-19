@@ -19,6 +19,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def __init__(self):
         self.program = Program()
         self.pending_ops = []
+        self.pending_stack_args = []
         self.pending_unary_op = ''
         self.scopes = Scopes()
         self.labels = FunctionLabels()
@@ -241,6 +242,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.program.insert(f'STO {self.scopes.var_to_reg(target.id)}', comment=f'{target.id}')
             assert '.Store' in str(target.ctx)
             assert isinstance(target.ctx, ast.Store)
+        self.pending_stack_args = []
         self.end(node)
 
     def visit_AugAssign(self,node):
@@ -251,6 +253,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         assert '.Store' in str(node.target.ctx)
         assert isinstance(node.target.ctx, ast.Store)
         self.pending_ops.pop()
+        self.pending_stack_args = []
         self.end(node)
 
     def visit_Add(self,node):
@@ -299,16 +302,31 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.begin(node)
 
         self.visit(node.left)
+        # log.debug("pending_stack_args %s", self.pending_stack_args)
+
         self.visit(node.right)
+        # log.debug("pending_stack_args %s", self.pending_stack_args)
+
+        if len(self.pending_stack_args) > 4:
+            raise RpnError(f'Potential RPN stack overflow detected - expression too complex for 4 level stack - simplify! {self.pending_stack_args}')
+
         self.visit(node.op)
 
-        log.debug(self.pending_ops)
-        assert self.pending_ops
-        if len(self.pending_ops) > 4:
-            raise RpnError("We blew our expression stack %s" % self.pending_ops)
+        # not sure this works.  pending_ops never gets above 2, no matter how complex the expression.  the operators
+        # don't stack up so much as the parameters on the stack
         # assert len(self.pending_ops) == 1  # TODO if this is true, then we don't need a op list
+        # assert self.pending_ops
+        # if len(self.pending_ops) > 4:
+        #     raise RpnError("Potential RPN stack overflow detected - we blew our expression operator stack %s" % self.pending_ops)
+
         self.program.insert(self.pending_ops[-1])
+
         self.pending_ops.pop()
+
+        if (len(self.pending_stack_args)):
+            self.pending_stack_args.pop()
+        if (len(self.pending_stack_args) == 1):  # hack?, do an extra pop to keep tracking from erroneously overflowing
+            self.pending_stack_args.pop()
         self.end(node)
 
     def visit_Call(self,node):
@@ -680,6 +698,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         if '.Load' in str(node.ctx):
             assert isinstance(node.ctx, ast.Load)
             self.program.insert(f'RCL {self.scopes.var_to_reg(node.id)}', comment=node.id)
+            self.pending_stack_args.append(node.id)
             if self.var_name_is_loop_counter(node.id):
                 self.program.insert('IP')  # just get the integer portion of isg counter
         self.end(node)
@@ -688,6 +707,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.begin(node)
         n = int(node.n)
         self.program.insert(f'{self.pending_unary_op}{n}')
+        self.pending_stack_args.append(node.n)
         self.pending_unary_op = ''
         self.end(node)
 

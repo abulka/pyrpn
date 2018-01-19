@@ -1440,13 +1440,47 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(expected, lines, dump=True, keep_comments=False)
 
-    @unittest.skip('hard to actually blow the stack - not any more - please enable')
-    def test_expr_blow_stack(self):
+    # expression complexity protection
+
+    def test_expr_ok_simple(self):
         src = """
-            # x = 1 + 2 * 6 + 1 * 9 / 100 + 1 + 2 * 6
+            x = 1+2*(3+4)
+        """
+        self.parse(dedent(src))  # don't care about the result, as long as we don't blow
+
+    def test_expr_ok_at_limit(self):
+        src = """
+            x = 1+2*(3+4)*(5+6) # still ok
+        """
+        self.parse(dedent(src))  # don't care about the result, as long as we don't blow
+
+    def test_expr_blows_by_one(self):
+        src = """
+            1+2*(3+4)*(5+6*7)  # blows
+        """
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    def test_expr_blow_stack_complex(self):
+        # Complex expressions compile OK but may in practice overflow the stack, so warn
+        src = """
             x = 1+2*(3+4*(5+6*(7+8*9)))       
         """
         self.assertRaises(RpnError, self.parse, dedent(src))
+
+    def test_expr_blow_stack_no_assign(self):
+        # Complex expressions compile OK but may in practice overflow the stack, so warn
+        src = """
+            1+2*(3+4*(5+6*(7+8*9)))       
+        """
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    def test_expr_blow_reset(self):
+        # Need to be careful and reset the tracking of stack values after new lines.
+        src = """
+            1+2*(3+4)
+            1+2*(3+4)
+        """
+        self.parse(dedent(src))  # don't care about the result, as long as we don't blow
 
     # More control structures
 
