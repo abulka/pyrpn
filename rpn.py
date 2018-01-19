@@ -195,6 +195,20 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def visit_arguments(self,node):
         """ visit arguments to a function"""
         self.begin(node)
+
+        # reorder parameters into reverse order, ready for mapping and storage into registers
+        num_args = len(node.args)
+        if num_args in (0, 1):
+            pass
+        elif num_args == 2:
+            self.program.insert_xeq('p2Param', comment='reorder 2 params for storage')
+        elif num_args == 3:
+            self.program.insert_xeq('p3Param', comment='reorder 3 params for storage')
+        elif num_args == 4:
+            self.program.insert_xeq('p4Param', comment='reorder 4 params for storage')
+        else:
+            raise RpnError(f'cannot handle more then four parameters to a function (4 level stack, remember), sorry.  You have {num_args}.')
+
         self.visit_children(node)
         self.end(node)
 
@@ -534,7 +548,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         At this point, the last line in our rpn program is a boolean value.
         We now add the test for truth and a couple of gotos...
         """
-        self.program.insert('X≠O?', comment='if true?')
+        self.program.insert('X≠0?', comment='if true?')
 
         insert('GTO', label_if_body)                # true
 
@@ -557,7 +571,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 insert('LBL', label_elif)
                 self.visit(node.test)
                 log.debug(f'{self.indent} :')
-                self.program.insert('X≠O?', comment='if true?')
+                self.program.insert('X≠0?', comment='if true?')
 
                 label_elif_body = f.new('elif body')
 
@@ -611,7 +625,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         At this point, the last line in our rpn program is a boolean value.
         We now add the test for truth and a couple of gotos...
         """
-        self.program.insert('X≠O?', comment='while true?')
+        self.program.insert('X≠0?', comment='while true?')
 
         insert('GTO', label_while_body)
         if label_else: insert('GTO', label_else)

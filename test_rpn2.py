@@ -59,7 +59,7 @@ class RpnTests2(BaseTest):
             XEQ "Py2Bool"
             AND
 
-            X≠O?    // if true?
+            X≠0?    // if true?
             GTO 00  // true
             GTO 01  // jump to resume
             

@@ -275,6 +275,31 @@ class RpnTemplates:
         RTN    
         """)
 
+    # Param reordering - needed cos users push args from left to right, which puts early params in the wrong order when parsing params for RDN, STO nn
+
+    p2Param = dedent("""
+        LBL "p2Param"  // reverse params (a,b) -> (b,a)
+        X<>Y
+        RTN    
+        """)
+
+    p3Param = dedent("""
+        LBL "p3Param"  // reverse params (a,b,c) -> (c,b,a)
+        RCL ST Z
+        RCL ST Z
+        RCL ST Z
+        RTN    
+        """)
+
+    p4Param = dedent("""
+        LBL "p4Param"  // reverse params (a,b,c,d) -> (d,c,b,a)
+        X<>Y
+        RDN
+        RDN
+        X<>Y
+        RTN    
+        """)
+
     # Util
 
     _PyDFTB = dedent("""
