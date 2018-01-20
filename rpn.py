@@ -238,8 +238,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.begin(node)
         self.visit_children(node)
         for target in node.targets:
-            comment = self.find_comment(target)
-            self.program.insert(f'STO {self.scopes.var_to_reg(target.id)}', comment=f'{target.id}')
+            self.program.insert_sto(self.scopes.var_to_reg(target.id), comment=f'{target.id}')
             assert '.Store' in str(target.ctx)
             assert isinstance(target.ctx, ast.Store)
         self.pending_stack_args = []  # must have, cos could just be assigning single values, not BinOp and not Expr
@@ -728,8 +727,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             # self.program.insert(f'├"{node.s[0:15]}"')
             self.split_alpha_text(node.s, append=True)
         else:
-            self.program.insert(f'"{node.s[0:15]}"')
-            self.program.insert('ASTO ST X')
+            self.program.insert(f'"{node.s[0:15]}"', type_='string')
+            # self.program.insert('ASTO ST X')
         self.end(node)
 
     @recursive

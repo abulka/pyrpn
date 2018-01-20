@@ -14,6 +14,7 @@ class Line:
     text = attrib(default='')
     lineno = attrib(default=0)
     comment = attrib(default='')
+    type_ = attrib(default='')
 
 
 @attrs
@@ -29,8 +30,8 @@ class BaseRpnProgram:
         line.lineno = self.next_lineno
         self.next_lineno += 1
 
-    def insert(self, text, comment=''):
-        line = Line(text=str(text), comment=comment)
+    def insert(self, text, comment='', type_=''):
+        line = Line(text=str(text), comment=comment, type_=type_)
         self._add_line(line)
         log.debug(line.text)
 
@@ -72,6 +73,13 @@ class Program(BaseRpnProgram):
     @property
     def user_insertable_pyrpn_cmds(self):
         return self.rpn_templates.get_user_insertable_pyrpn_cmds().keys()
+
+    def is_previous_line(self, type_='string'):
+        return self.lines[-1].type_ == type_
+
+    def insert_sto(self, func_name, comment=''):
+        cmd = 'ASTO' if self.is_previous_line('string') else 'STO'
+        self.insert(f'{cmd} {func_name}', comment=comment)
 
     def insert_xeq(self, func_name, comment=''):
         # insert global function call
