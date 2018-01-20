@@ -432,6 +432,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         elif func_name in cmd_list and cmd_list[func_name]['num_arg_fragments'] > 0:
             # The built-in command has arg fragment "parameter" parts which must be emitted immediately as part of the
             # command, thus we cannot rely on normal visit parsing but must look ahead and extract needed info.
+
+            if len(node.args) == 0:
+                raise RpnError(f'{func_name} requires {cmd_list[func_name]["num_arg_fragments"]} parameters to be supplied')
+
             cmd_info = cmd_list[func_name]
             args = ''
             comment = cmd_info['description']
