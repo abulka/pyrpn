@@ -497,6 +497,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                     to_ = args[1]
                 from_ -= step_ if step_ else 1
                 to_ -= 1
+                if to_ > 1000:
+                    raise RpnError(f'for range() loops are limited to max to value of 999 (ISG ccccccc.fffii limitation of fff')
                 # Calculate the .nnnss
                 rhs = to_ / 1000
                 if step_:

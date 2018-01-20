@@ -39,7 +39,7 @@ class RpnTemplates:
         self.needed_templates = []  # extra fragments that need to be emitted at the end
         self.local_alpha_labels = {}
         self.template_names = self._get_class_attrs()
-        self._create_local_alpha_labels()
+        self._create_local_labels()
 
     PyIsgPr = dedent("""
         LBL "PyIsgPr"  // (z:from, y:to, x:step) -> (ccccccc.fffii)
@@ -53,30 +53,36 @@ class RpnTemplates:
         RCL ST Z // stack now: z:step y:from x:to
         1
         -
+        
+        999      // check don't exceed max 'to' value of 999 (ISG ccccccc.fffii)
+        X<Y?
+        XEQ "pErrRange"
+        RDN
+        
         X<>Y     // stack now: z:step y:to-1 x:from 
         RCL ST Z // step
         -        // stack now: z:step y:to-1 x:from-step 
         X>=0?    // if from > 0
-        GTO 70   //      easy (non negative)
+        GTO {0}   //      easy (non negative)
         ABS      // else from = abs(from)
         SF 99    //      neg_case = True 
-        LBL 70
+        LBL {0}
         X<>Y     // stack now: z:step y:from x:to
         1000
         /
         +        // stack now: y:step x:a.bbb
         FS?C 98  // if not have_step
-        GTO 71
+        GTO {1}
         RCL ST Z // else step
         100000   //      step = step / 100,000
         /
         +        // stack now: a.bbbnn
-        LBL 71
+        LBL {1}
         FS?C 99  // if neg_case
         +/-
         RTN 
         // returns ISG number in form a.bbbnn
-        """)
+        """.format(settings.LOCAL_LABEL1_FOR_ISG_PREP, settings.LOCAL_LABEL2_FOR_ISG_PREP))
 
     PyList = dedent("""
         // p 176. HP42S programming manual
@@ -313,6 +319,17 @@ class RpnTemplates:
         RTN    
         """)
 
+    pErrRange = dedent("""
+        LBL "pErrRange"  // (to,999) -> display error & stop.
+        RDN
+        "range() limited"
+        ├" to 999: got "
+        ARCL ST X
+        AVIEW
+        STOP
+        RTN    
+        """)
+
     # Code
 
     @classmethod
@@ -340,7 +357,7 @@ class RpnTemplates:
             'PyFC': {'description': 'is flag clear?'},
         }
 
-    def _create_local_alpha_labels(self):
+    def _create_local_labels(self):
         """
         Map to local labels, to avoid exposing py rpn library globally.
         Can't map to single letter alpha labels because they are used by user
@@ -349,6 +366,8 @@ class RpnTemplates:
         """
         next_label = settings.LOCAL_LABEL_START_FOR_Py
         for name in self.template_names:
+            if next_label > 99:
+                raise RuntimeError(f'Not enough labels for rpn templates, max label is 99 got {next_label} mappings so far: {self.local_alpha_labels}')
             self.local_alpha_labels[name] = str(next_label)
             next_label += 1
         # print(self.local_alpha_labels)

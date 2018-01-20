@@ -23,12 +23,14 @@ Registers 00-NN - allocated as variables as needed
 Uppercase Named Registers e.g. "FRED" - created when python code has uppercase variable names
 Lowercase Named Registers - not used
 
-Labels ABCDEFGHIJabcde - allocated for user python functions as needed
-Labels 70, 71   - used in pyrpn template code library ISG
-Labels 80-NN    - used as entry points for pyrpn library functions if deploying locally
-
 Flags 00, 01    - used in pyrpn template code library
 Flags 99, 98    - used in pyrpn template code library ISG
+
+Labels ABCDEFGHIJabcde - allocated for user python functions as needed
+
+Rpn template library labels as follows:
 """
-LOCAL_LABEL_FOR_PyLIB = 80
-LOCAL_LABEL_START_FOR_Py = 81
+LOCAL_LABEL_FOR_PyLIB = 70
+LOCAL_LABEL1_FOR_ISG_PREP = 71
+LOCAL_LABEL2_FOR_ISG_PREP = 72
+LOCAL_LABEL_START_FOR_Py = 73  # .. 99

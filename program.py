@@ -88,6 +88,7 @@ class Program(BaseRpnProgram):
 
         templates_needed = set(self.rpn_templates.needed_templates)
         templates_who_need_PyBool = {'Py2Bool'}
+        templates_who_need_pErrRange = {'PyIsgPr'}
         templates_who_need_PyDFTB = {'PyEQ', 'PyGT', 'PyGTE', 'PyLT', 'PyLTE', 'PyNEQ'}
 
         # Add any dependent templates, using set technology
@@ -95,6 +96,8 @@ class Program(BaseRpnProgram):
             templates_needed.add('PyBool')
         if templates_who_need_PyDFTB & templates_needed:
             templates_needed.add('_PyDFTB')
+        if templates_who_need_pErrRange & templates_needed:
+            templates_needed.add('pErrRange')
 
         self.insert('RTN', comment='---------------------------')
         self.insert('LBL "PyLIB"', comment='PyRPN Support Library of')
