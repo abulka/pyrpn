@@ -389,25 +389,17 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         elif func_name in ('alpha', 'AVIEW', 'print', 'PROMPT'):
             if len(node.args) == 0:
-                if func_name in ('alpha', 'print', 'PROMPT'):
+                if func_name != 'AVIEW':
                     self.program.insert('""', comment='empty string', type_='string')
-            # else:
-            #     alpha_text = self.get_node_name_id_or_n(node.args[0])
-            #     self.split_alpha_text(alpha_text)
-
-            if len(node.args) > 0:
+            else:
                 self.inside_alpha = True
-                # skip_first = True
                 self.alpha_append_mode = False
-                skip_first = False
                 for arg in node.args:
-                    if skip_first:
-                        skip_first = False
-                        continue
-
                     self.visit(arg)
+
                     if isinstance(arg, ast.Num):
                         self.program.insert('AIP')
+                        # pass
                     elif isinstance(arg, ast.Name):  # probably a recall of a register into stack X
                         # self.program.insert('AIP')  # Append Integer part of x to the Alpha register. (not documented in HP42S manual, but is in cmd_list)
                         pass
@@ -415,7 +407,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                         pass  # visit_Name will insert a alpha text append for us
                     else:
                         raise RpnError(f'Do not know how to alpha {arg} with value {self.get_node_name_id_or_n(arg)}')
-                    # TODO what about string and string concatination etc.?
 
                     if not self.alpha_append_mode:
                         self.alpha_append_mode = True
