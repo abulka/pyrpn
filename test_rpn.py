@@ -1820,25 +1820,25 @@ class RpnCodeGenTests(BaseTest):
         expected = dedent("""
             "this"
             1
-            AIP
+            ARCL ST X
             ├" is "
             2
-            AIP
+            ARCL ST X
             ├"my "
             3
-            AIP
+            ARCL ST X
             ├"string"
             4
-            AIP
+            ARCL ST X
             ├"and"
             5
-            AIP
+            ARCL ST X
             ├"I"
             6
-            AIP
+            ARCL ST X
             ├"can"
             7
-            AIP
+            ARCL ST X
             ├"break it up"
         """)
         lines = self.parse(dedent(src))
@@ -1851,19 +1851,19 @@ class RpnCodeGenTests(BaseTest):
         expected = dedent("""
             "a"
             1
-            AIP
+            ARCL ST X
             2
-            AIP
+            ARCL ST X
             3
-            AIP
+            ARCL ST X
             4
-            AIP
+            ARCL ST X
             5
-            AIP
+            ARCL ST X
             6
-            AIP
+            ARCL ST X
             7
-            AIP
+            ARCL ST X
         """)
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
@@ -2043,7 +2043,7 @@ class RpnCodeGenTests(BaseTest):
             ├"l is well in L"
             ├"ondon!!"
             3
-            AIP  // Append Integer part of x to the Alpha register
+            ARCL ST X
         """)
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)

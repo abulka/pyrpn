@@ -398,8 +398,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                     self.visit(arg)
 
                     if isinstance(arg, ast.Num):
-                        self.program.insert('AIP')
-                        # pass
+                        # self.program.insert('AIP')  # TODO what if we have a float literal - not sure about this
+                        self.program.insert('ARCL ST X')
+                        pass
                     elif isinstance(arg, ast.Name):  # probably a recall of a register into stack X
                         # self.program.insert('AIP')  # Append Integer part of x to the Alpha register. (not documented in HP42S manual, but is in cmd_list)
                         pass
