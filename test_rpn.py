@@ -1866,7 +1866,6 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
 
-    @unittest.skip('text handling - advanced - do later')
     def test_text_expression_as_param(self):
         src = """
             alpha("a", 1+2, 3)
@@ -1878,7 +1877,7 @@ class RpnCodeGenTests(BaseTest):
             +
             ARCL ST X
             3
-            AIP
+            ARCL ST X
         """)
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)

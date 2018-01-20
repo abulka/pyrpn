@@ -337,6 +337,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.pending_stack_args.pop()
         if (len(self.pending_stack_args) == 1):  # hack?, do an extra pop to keep tracking from erroneously overflowing
             self.pending_stack_args.pop()
+
+        if self.inside_alpha:
+            if not self.alpha_append_mode:
+                self.program.insert(f'""')
+            self.program.insert(f'ARCL ST X')
+
         self.end(node)
 
     def visit_Call(self,node):
@@ -417,8 +423,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                         pass
                     elif isinstance(arg, ast.Str):
                         pass
-                    else:
-                        raise RpnError(f'Do not know how to alpha {arg} with value {self.get_node_name_id_or_n(arg)}')
+                    # else:
+                    #     raise RpnError(f'Do not know how to alpha {arg} with value {self.get_node_name_id_or_n(arg)}')
 
                     if not self.alpha_append_mode:
                         self.alpha_append_mode = True
