@@ -1899,7 +1899,6 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
 
-    @unittest.skip('text handling - advanced - do later')
     def test_text_all_literal_nums(self):
         src = """
             alpha(1, 2, 3)
@@ -1907,11 +1906,11 @@ class RpnCodeGenTests(BaseTest):
         expected = dedent("""
             ""
             1
-            AIP
+            ARCL ST X
             2
-            AIP
+            ARCL ST X
             3
-            AIP
+            ARCL ST X
         """)
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
