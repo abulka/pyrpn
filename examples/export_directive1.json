@@ -2,6 +2,6 @@
     "description": "<p dir=\"ltr\" style=\"line-height: 1.56; margin-top: 10pt; margin-bottom: 0pt;\"><span style=\"font-size: 12pt; font-family: Roboto; color: #000000; background-color: transparent; font-weight: 400; font-style: normal; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;\">Every function you define with def (except for the first one) will be a local function with a local label. &nbsp;By adding <code># rpn: export</code> next to the def, it will be converted into a global string label.</span></p>",
     "public": "",
     "sortnum": 0,
-    "source": "def main():\r\n  useful()\r\n\r\ndef useful():  # rpn: export yikes\r\n  pass",
+    "source": "def main():\r\n  useful()\r\n\r\ndef useful():  # rpn: export\r\n  pass",
     "title": "Export directive"
 }
