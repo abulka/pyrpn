@@ -325,38 +325,22 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         self.visit(node.op)
 
-        # not sure this works.  pending_ops never gets above 2, no matter how complex the expression.  the operators
-        # don't stack up so much as the parameters on the stack
-        # assert len(self.pending_ops) == 1  # TODO if this is true, then we don't need a op list
-        # assert self.pending_ops
-        # if len(self.pending_ops) > 4:
-        #     raise RpnError("Potential RPN stack overflow detected - we blew our expression operator stack %s" % self.pending_ops)
+        """
+        The expression "x -= 1.0/i" will result in pending_ops growing to ['-', '/'] thus yes, we need pending_ops to be a stack. 
+        """
+        # Never gets triggered. pending_ops never gets above 2, no matter how complex the expression.  the operators
+        # don't stack up so much as the parameters on the stack, which we track with pending_stack_args
+        if len(self.pending_ops) > 4:
+            raise RpnError("Potential RPN stack overflow detected - we blew our expression operator stack %s" % self.pending_ops)
 
         self.program.insert(self.pending_ops[-1])
-
         self.pending_ops.pop()
 
-        # assert len(self.pending_stack_args) == 2  # not sure why we would get to a binop without 2 on the stack
         if len(self.pending_stack_args) >= 2:
             self.pending_stack_args.pop()
             self.pending_stack_args.pop()
             self.pending_stack_args.append('_result_')  # to account for the two args to this binop) and then push a 'result'
             log.debug("pending_stack_args %s", self.pending_stack_args)
-        # elif len(self.pending_stack_args) == 1:  # hack?
-        #     self.pending_stack_args.pop()
-
-        # if (len(self.pending_stack_args)):
-        #     self.pending_stack_args.pop()
-        #     # should pop again
-        #     self.pending_stack_args.pop()
-        #     self.pending_stack_args.append('_result_')
-
-        # BUT where does the stack get properly cleared as the result is used somewhere else?
-        # if (len(self.pending_stack_args) == 1):  # hack?, do an extra pop to keep tracking from erroneously overflowing
-        #     self.pending_stack_args.pop()
-
-        # if self.inside_alpha and len(self.pending_stack_args) == 0:  # is last bin op of a sequence of nested ones
-        #     self.program.insert(f'ARCL ST X')
 
         self.inside_binop = False
         self.end(node)
@@ -411,14 +395,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 self.scopes.var_to_reg(arg, force_reg_name=f'"{arg}"')
             self.end(node)
             return
-
-        # elif func_name == 'AVIEW':
-        #     if len(node.args) > 0:
-        #         alpha_text = self.get_node_name_id_or_n(node.args[0])
-        #         self.split_alpha_text(alpha_text)
-        #     self.program.insert(f'{func_name}')
-        #     self.end(node)
-        #     return
 
         elif func_name in ('aview',):
             raise RpnError('The command "aview" is deprecated - use print or AVIEW.')
