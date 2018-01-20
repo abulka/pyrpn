@@ -2032,6 +2032,26 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
 
+    def test_text_AVIEW_mixed_expr_complex(self):
+        src = """
+            a = 10
+            AVIEW(a+6+7)
+        """
+        expected = dedent("""
+            10
+            STO 00
+            CLA
+            RCL 00
+            6
+            +
+            7
+            +
+            ARCL ST X
+            AVIEW
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines)
+
 
     def test_text_alpha_long_string(self):
         src = """

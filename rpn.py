@@ -336,13 +336,27 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         self.pending_ops.pop()
 
-        if (len(self.pending_stack_args)):
+        # assert len(self.pending_stack_args) == 2  # not sure why we would get to a binop without 2 on the stack
+        if len(self.pending_stack_args) >= 2:
             self.pending_stack_args.pop()
-        if (len(self.pending_stack_args) == 1):  # hack?, do an extra pop to keep tracking from erroneously overflowing
             self.pending_stack_args.pop()
+            self.pending_stack_args.append('_result_')  # to account for the two args to this binop) and then push a 'result'
+            log.debug("pending_stack_args %s", self.pending_stack_args)
+        # elif len(self.pending_stack_args) == 1:  # hack?
+        #     self.pending_stack_args.pop()
 
-        if self.inside_alpha:
-            self.program.insert(f'ARCL ST X')
+        # if (len(self.pending_stack_args)):
+        #     self.pending_stack_args.pop()
+        #     # should pop again
+        #     self.pending_stack_args.pop()
+        #     self.pending_stack_args.append('_result_')
+
+        # BUT where does the stack get properly cleared as the result is used somewhere else?
+        # if (len(self.pending_stack_args) == 1):  # hack?, do an extra pop to keep tracking from erroneously overflowing
+        #     self.pending_stack_args.pop()
+
+        # if self.inside_alpha and len(self.pending_stack_args) == 0:  # is last bin op of a sequence of nested ones
+        #     self.program.insert(f'ARCL ST X')
 
         self.inside_binop = False
         self.end(node)
@@ -427,6 +441,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                         pass
                     elif isinstance(arg, ast.Str):
                         pass
+                    elif isinstance(arg, ast.BinOp):   # other types?
+                        self.program.insert('ARCL ST X')
                     # else:
                     #     raise RpnError(f'Do not know how to alpha {arg} with value {self.get_node_name_id_or_n(arg)}')
 
@@ -441,6 +457,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 self.program.insert('AVIEW')
             elif func_name in ('PROMPT'):
                 self.program.insert('PROMPT')
+
+            if len(self.pending_stack_args):
+                self.pending_stack_args.pop()
             self.end(node)
             return
 
