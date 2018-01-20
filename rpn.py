@@ -35,6 +35,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.inside_alpha = False
         self.alpha_append_mode = False
         self.alpha_already_cleared = False
+        self.inside_binop = False
 
     # Recursion support
 
@@ -311,6 +312,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         before being resolved, so we do need a stack of operators, and we risk blowing the rpn stack.
         """
         self.begin(node)
+        self.inside_binop = True  # TODO probably should be a stack
 
         self.visit(node.left)
         log.debug("pending_stack_args %s", self.pending_stack_args)
@@ -342,6 +344,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         if self.inside_alpha:
             self.program.insert(f'ARCL ST X')
 
+        self.inside_binop = False
         self.end(node)
 
     def visit_Call(self,node):
@@ -748,7 +751,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             assert isinstance(node.ctx, ast.Load)
             if self.inside_alpha and not self.alpha_append_mode:
                 self.program.insert('CLA')
-            cmd = 'ARCL' if self.inside_alpha else 'RCL'
+                self.alpha_already_cleared = True
+            cmd = 'ARCL' if self.inside_alpha and not self.inside_binop else 'RCL'
             self.program.insert(f'{cmd} {self.scopes.var_to_reg(node.id)}', comment=node.id)
             self.pending_stack_args.append(node.id)
             log.debug("pending_stack_args %s", self.pending_stack_args)
