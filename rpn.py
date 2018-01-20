@@ -409,7 +409,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         elif func_name in ('alpha', 'AVIEW', 'print', 'PROMPT'):
             if len(node.args) == 0:
                 if func_name != 'AVIEW':
-                    self.program.insert('""', comment='empty string', type_='string')
+                    self.program.insert('CLA', comment='empty string', type_='string')
             else:
                 self.inside_alpha = True
                 self.alpha_append_mode = False
@@ -747,7 +747,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         if '.Load' in str(node.ctx):
             assert isinstance(node.ctx, ast.Load)
             if self.inside_alpha and not self.alpha_append_mode:
-                self.program.insert(f'""')
+                self.program.insert('CLA')
             cmd = 'ARCL' if self.inside_alpha else 'RCL'
             self.program.insert(f'{cmd} {self.scopes.var_to_reg(node.id)}', comment=node.id)
             self.pending_stack_args.append(node.id)
@@ -760,7 +760,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.begin(node)
         n = int(node.n)
         if self.inside_alpha and not self.alpha_append_mode and not self.alpha_already_cleared:
-            self.program.insert(f'""')
+            self.program.insert('CLA')
             self.alpha_already_cleared = True
         self.program.insert(f'{self.pending_unary_op}{n}')
         self.pending_stack_args.append(node.n)

@@ -1887,11 +1887,23 @@ class RpnCodeGenTests(BaseTest):
             alpha(1+2)
         """
         expected = dedent("""
-            ""
+            CLA
             1
             2
             +
             ARCL ST X
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines)
+
+    def test_text_two_vars_only_one_clear(self):
+        src = """
+            alpha(a, b)
+        """
+        expected = dedent("""
+            CLA
+            ARCL 00
+            ARCL 01
         """)
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
@@ -1904,7 +1916,7 @@ class RpnCodeGenTests(BaseTest):
         expected = dedent("""
             0
             STO 00
-            ""
+            CLA
             ARCL 00
         """)
         lines = self.parse(dedent(src))
@@ -1915,7 +1927,7 @@ class RpnCodeGenTests(BaseTest):
             alpha(1, 2, 3)
         """
         expected = dedent("""
-            ""
+            CLA
             1
             ARCL ST X
             2
@@ -2038,7 +2050,7 @@ class RpnCodeGenTests(BaseTest):
             alpha()
         """
         expected = dedent("""
-            ""
+            CLA
         """)
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
