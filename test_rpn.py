@@ -1666,7 +1666,66 @@ class RpnCodeGenTests(BaseTest):
 
     # Text and the alpha register
 
-    def test_view_variable(self):
+    """
+    Normal string assignment to variables, long strings can be specified but only six chars make it into whatever variable 
+
+    VIEW   - Normal VIEW, specify Python variables only.  Viewing stack or indirect not supported.
+             Nothing to do with alpha register.  any strings in variables will only be 6 chars.
+             
+    AVIEW  - Same as built in, except takes parameters.  
+             No params is allowed, which will insert a single AVIEW, just in case you have something 
+             in the alpha register ready to show.
+             
+    alpha  - Builds strings in the alpha register, typically takes parameters.  
+             No params inserts CLA.  (currently not implemented)
+             If want to append, then add parameter append=True (append currently not implemented)
+             
+    print  - synonym for AVIEW
+    
+    PROMPT - Same as built in, except takes parameters.  See AVIEW re taking multiple parameters.
+    
+    ASTO   - Stores six chars from the alpha register into any Python variable.  
+             Cannot specify stack registers or addressing specific registers.
+    """
+
+    def test_text_AVIEW_of_previous_alpha(self):
+        src = """
+            alpha("this is my string")
+            AVIEW()
+        """
+        expected = dedent("""
+            "this is my str"
+            ├"ing"
+            AVIEW
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines)
+
+    def test_text_ASTO(self):
+        src = """
+        alpha("this is my string")
+        ASTO(s)
+        """
+        expected = dedent("""
+            "this is my str"
+            ├"ing"
+            ASTO(s)
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines)
+
+    def test_text_string_assignment(self):
+        src = """
+            s = "this is my string"  // albeit only six chars make it into whatever register.
+        """
+        expected = dedent("""
+            "this is my stri"
+            ASTO 00
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines)
+
+    def test_text_VIEW_variable(self):
         src = """
             a = 100
             VIEW(a)
@@ -1677,9 +1736,9 @@ class RpnCodeGenTests(BaseTest):
             VIEW 00
         """)
         lines = self.parse(dedent(src))
-        self.compare(de_comment(expected), lines, dump=True)
+        self.compare(de_comment(expected), lines)
 
-    def test_alpha_AVIEW_no_args(self):
+    def test_text_AVIEW_no_args(self):
         src = """
             AVIEW()
         """
@@ -1687,35 +1746,28 @@ class RpnCodeGenTests(BaseTest):
             AVIEW
         """)
         lines = self.parse(dedent(src))
-        self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
+        self.compare(de_comment(expected), lines)
 
-    def test_alpha_AVIEW_with_arg(self):  # TODO - probably should not be allowed to take args?
+    def test_alpha_AVIEW_with_arg(self):
         src = """
             AVIEW("hello")
         """
         expected = dedent("""
             "hello"
-            ASTO ST X
             AVIEW
         """)
         lines = self.parse(dedent(src))
-        self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
+        self.compare(de_comment(expected), lines)
 
-    def test_alpha_AVIEW_with_arg_long(self):  # TODO - probably should not be allowed to take args ?
-        src = """
-            AVIEW("Hello there all is well in London!!")
-        """
-        expected = dedent("""
-            "Hello there all"
-            ASTO ST X
-            AVIEW
-        """)
-        lines = self.parse(dedent(src))
-        self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
-
-    def test_alpha_aview_long_string(self):
+    def test_text_aview_deprecated(self):
         src = """
             aview("Hello there all is well in London!!")
+        """
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    def test_text_AVIEW_long_string(self):
+        src = """
+            AVIEW("Hello there all is well in London!!")
         """
         expected = dedent("""
             "Hello there al"
@@ -1724,9 +1776,21 @@ class RpnCodeGenTests(BaseTest):
             AVIEW
         """)
         lines = self.parse(dedent(src))
-        self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
+        self.compare(de_comment(expected), lines)
 
-    def test_alpha_long_plus_literal(self):
+    def test_text_alpha_long_string(self):
+        src = """
+            alpha("Hello there all is well in London!!")
+        """
+        expected = dedent("""
+            "Hello there al"
+            ├"l is well in L"
+            ├"ondon!!"
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines)
+
+    def test_text_alpha_long_plus_literal(self):
         src = """
             alpha("Hello there all is well in London!!", 3)
         """
@@ -1738,9 +1802,9 @@ class RpnCodeGenTests(BaseTest):
             AIP  // Append Integer part of x to the Alpha register
         """)
         lines = self.parse(dedent(src))
-        self.compare(de_comment(expected), lines, keep_comments=False)
+        self.compare(de_comment(expected), lines)
 
-    def test_alpha_two_str_params(self):
+    def test_text_alpha_two_str_params(self):
         src = """
             alpha("hello there this is a test of things", "fred is a very big man")
         """
@@ -1752,9 +1816,9 @@ class RpnCodeGenTests(BaseTest):
             ├" big man"
         """)
         lines = self.parse(dedent(src))
-        self.compare(de_comment(expected), lines, keep_comments=False)
+        self.compare(de_comment(expected), lines)
 
-    def test_alpha_print(self):
+    def test_text_print(self):
         src = """
             print("Hello")
         """
@@ -1763,21 +1827,9 @@ class RpnCodeGenTests(BaseTest):
             AVIEW
         """)
         lines = self.parse(dedent(src))
-        self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
+        self.compare(de_comment(expected), lines)
 
-    def test_alpha_long_string(self):
-        src = """
-            alpha("Hello there all is well in London!!")
-        """
-        expected = dedent("""
-            "Hello there al"
-            ├"l is well in L"
-            ├"ondon!!"
-        """)
-        lines = self.parse(dedent(src))
-        self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
-
-    def test_alpha_CLA(self):
+    def test_text_CLA(self):
         src = """
             CLA()
         """
@@ -1785,9 +1837,9 @@ class RpnCodeGenTests(BaseTest):
             CLA
         """)
         lines = self.parse(dedent(src))
-        self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
+        self.compare(de_comment(expected), lines)
 
-    def test_alpha_ASTO(self):
+    def test_text_ASTO(self):
         src = """
             alpha("Hello there all is well in London!!")
             ASTO(s)  # Copy the first six characters into a register or variable
@@ -1799,29 +1851,29 @@ class RpnCodeGenTests(BaseTest):
             ASTO 00
         """)
         lines = self.parse(dedent(src))
-        self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
+        self.compare(de_comment(expected), lines)
 
-    def test_alpha_AIP(self):
+    def test_text_AIP(self):
         """
-        But what does it mean to refer to the X stack register?
-        Disallow. We append any register to alpha? Viz.
+        AIP means append integer part of variable to alpha.
+        Stack or specific register addressing not supported.
         """
         src = """
-            n = 100
+            n = 100.12
             alpha("Ans: ")
-            AIP(n)
+            AIP(n) 
         """
         expected = dedent("""
-            100
+            100.12
             STO 00
             "Ans: "
             RCL 00
             AIP
         """)
         lines = self.parse(dedent(src))
-        self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
+        self.compare(de_comment(expected), lines)
 
-    def test_alpha_AIP_extended(self):
+    def test_text_alpha_AIP_extended(self):
         """
         Nicer way to build strings
         """
@@ -1837,9 +1889,9 @@ class RpnCodeGenTests(BaseTest):
             AIP
         """)
         lines = self.parse(dedent(src))
-        self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
+        self.compare(de_comment(expected), lines)
 
-    def test_alpha_AIP_extended_two(self):
+    def test_text_alpha_AIP_extended_two(self):
         """
         Nicer way to build strings
         """
@@ -1858,11 +1910,26 @@ class RpnCodeGenTests(BaseTest):
             AIP
         """)
         lines = self.parse(dedent(src))
-        self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
+        self.compare(de_comment(expected), lines)
 
     # weird aview and view edge cases
 
     """
+    Issues
+    ------
+         
+    How do we achieve? 
+        "asda"
+        ASTO ST X  // albeit only six chars make it into the X register.
+    well we don't support , so we don't need to
+    support this.
+    What about
+        s = "this is my string"  // albeit only six chars make it into whatever register.
+    this would 
+
+    Old Cases:
+    ------
+    
     AVIEW()             - view alpha register
     aview()             - AVIEW
 
@@ -1876,6 +1943,10 @@ class RpnCodeGenTests(BaseTest):
     view(a)             -- VIEW nn
     view("hello")       -- same as aview("hello") 
     view(1)             -- VIEW ST X 
+    
+    The only difference between alpha() and aview() is that aview() adds an AVIEW to the RPN.  Also print() is a 
+    synonym for aview(), and would be familiar to Python programmers. 
+    
     """
 
     @unittest.skip('edge cases')
