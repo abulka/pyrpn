@@ -395,17 +395,14 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 self.inside_alpha = True
                 self.alpha_append_mode = False
                 for arg in node.args:
-                    self.visit(arg)
+                    self.visit(arg)  # usual insertion of a literal number, string or variable
 
                     if isinstance(arg, ast.Num):
-                        # self.program.insert('AIP')  # TODO what if we have a float literal - not sure about this
                         self.program.insert('ARCL ST X')
+                    elif isinstance(arg, ast.Name):
                         pass
-                    elif isinstance(arg, ast.Name):  # probably a recall of a register into stack X
-                        # self.program.insert('AIP')  # Append Integer part of x to the Alpha register. (not documented in HP42S manual, but is in cmd_list)
+                    elif isinstance(arg, ast.Str):
                         pass
-                    elif isinstance(arg, ast.Str):  # a literal string
-                        pass  # visit_Name will insert a alpha text append for us
                     else:
                         raise RpnError(f'Do not know how to alpha {arg} with value {self.get_node_name_id_or_n(arg)}')
 
