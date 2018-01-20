@@ -34,6 +34,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.insert = lambda cmd, label : self.program.insert(f'{cmd} {label.text}', comment=label.description)
         self.inside_alpha = False
         self.alpha_append_mode = False
+        self.alpha_already_cleared = False
 
     # Recursion support
 
@@ -339,8 +340,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.pending_stack_args.pop()
 
         if self.inside_alpha:
-            if not self.alpha_append_mode:
-                self.program.insert(f'""')
             self.program.insert(f'ARCL ST X')
 
         self.end(node)
@@ -414,6 +413,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             else:
                 self.inside_alpha = True
                 self.alpha_append_mode = False
+                self.alpha_already_cleared = False
+
                 for arg in node.args:
                     self.visit(arg)  # usual insertion of a literal number, string or variable
 
@@ -431,6 +432,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
                 self.inside_alpha = False
                 self.alpha_append_mode = False
+                self.alpha_already_cleared = False
 
             if func_name in ('print', 'AVIEW'):
                 self.program.insert('AVIEW')
@@ -757,8 +759,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def visit_Num(self, node):
         self.begin(node)
         n = int(node.n)
-        if self.inside_alpha and not self.alpha_append_mode:
+        if self.inside_alpha and not self.alpha_append_mode and not self.alpha_already_cleared:
             self.program.insert(f'""')
+            self.alpha_already_cleared = True
         self.program.insert(f'{self.pending_unary_op}{n}')
         self.pending_stack_args.append(node.n)
         log.debug("pending_stack_args %s", self.pending_stack_args)

@@ -1882,6 +1882,20 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
 
+    def test_text_expression_as_first_param_clears_alpha(self):
+        src = """
+            alpha(1+2)
+        """
+        expected = dedent("""
+            ""
+            1
+            2
+            +
+            ARCL ST X
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines)
+
     def test_text_first_param_not_string(self):
         src = """
             n = 0
