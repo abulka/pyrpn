@@ -1732,14 +1732,14 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
 
-    unittest.skip('text handling - advanced - do later')
+    @unittest.skip('text handling - advanced - do later')
     def test_text_VIEW_needs_param(self):
         src = """
             VIEW()
         """
         self.assertRaises(RpnError, self.parse, dedent(src))
 
-    unittest.skip('text handling - advanced - do later')
+    @unittest.skip('text handling - advanced - do later')
     def test_text_VIEW_literal_number(self):
         src = """
             VIEW(5)
@@ -1751,7 +1751,7 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
 
-    unittest.skip('text handling - advanced - do later')
+    @unittest.skip('text handling - advanced - do later')
     def test_text_VIEW_literal_expr(self):
         src = """
             VIEW(5+6)
@@ -1765,7 +1765,7 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
 
-    unittest.skip('text handling - advanced - do later')
+    @unittest.skip('text handling - advanced - do later')
     def test_text_VIEW_mixed_expr(self):
         src = """
             a = 10
@@ -1782,7 +1782,7 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
 
-    unittest.skip('text handling - advanced - do later')
+    @unittest.skip('text handling - advanced - do later')
     def test_text_VIEW_bool_and_func_call_expr(self):
         src = """
             VIEW(not isFS(21))
@@ -1869,7 +1869,7 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
 
-    unittest.skip('text handling - advanced - do later')
+    @unittest.skip('text handling - advanced - do later')
     def test_text_expression_as_param(self):
         src = """
             alpha("a", 1+2, 3)
@@ -1886,7 +1886,7 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
 
-    unittest.skip('text handling - advanced - do later')
+    @unittest.skip('text handling - advanced - do later')
     def test_text_first_param_not_string(self):
         src = """
             alpha(1, 2, 3)
@@ -1951,7 +1951,7 @@ class RpnCodeGenTests(BaseTest):
         self.compare(de_comment(expected), lines)
 
 
-    unittest.skip('text handling - advanced - do later')
+    @unittest.skip('text handling - advanced - do later')
     def test_text_AVIEW_literal_number(self):
         src = """
             AVIEW(5)
@@ -1964,7 +1964,7 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
 
-    unittest.skip('text handling - advanced - do later')
+    @unittest.skip('text handling - advanced - do later')
     def test_text_AVIEW_literal_expr(self):
         src = """
             AVIEW(5+6)
@@ -1979,7 +1979,7 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
 
-    unittest.skip('text handling - advanced - do later')
+    @unittest.skip('text handling - advanced - do later')
     def test_text_AVIEW_mixed_expr(self):
         src = """
             a = 10
@@ -2010,7 +2010,7 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
 
-    unittest.skip('text handling - advanced - do later')
+    @unittest.skip('text handling - advanced - do later')
     def test_text_alpha_no_args(self):
         src = """
             alpha()
@@ -2085,7 +2085,7 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
 
-    unittest.skip('text handling - advanced - do later')
+    @unittest.skip('text handling - advanced - do later')
     def test_text_alpha_no_append(self):
         src = """
             alpha("hi")
@@ -2098,7 +2098,7 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
 
-    unittest.skip('text handling - advanced - do later')
+    @unittest.skip('text handling - advanced - do later')
     def test_text_alpha_append(self):
         src = """
             alpha("hi")
@@ -2122,7 +2122,7 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
 
-    unittest.skip('text handling - advanced - do later')
+    @unittest.skip('text handling - advanced - do later')
     def test_text_PROMPT(self):
         src = """
             PROMPT("Hello", "there")
@@ -2166,14 +2166,14 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
 
-    unittest.skip('text handling - advanced - do later')
+    @unittest.skip('text handling - advanced - do later')
     def test_text_AIP_no_args(self):
         src = """
             AIP() 
         """
         self.assertRaises(RpnError, self.parse, dedent(src))
 
-    unittest.skip('text handling - advanced - do later')
+    @unittest.skip('text handling - advanced - do later')
     def test_text_AIP_literal_num(self):
         src = """
             AIP(5) 
@@ -2185,7 +2185,7 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
 
-    unittest.skip('text handling - advanced - do later')
+    @unittest.skip('text handling - advanced - do later')
     def test_text_AIP_literal_num_expr(self):
         src = """
             AIP(5+6) 
@@ -2199,7 +2199,7 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
 
-    unittest.skip('text handling - advanced - do later')
+    @unittest.skip('text handling - advanced - do later')
     def test_text_AIP_string_num(self):
         src = """
             AIP("some string:) 
@@ -2233,7 +2233,7 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
 
-    unittest.skip('text handling - advanced - do later')
+    @unittest.skip('text handling - advanced - do later')
     def test_text_for_range_AVIEW_access_i(self):
         """
         ensure can access i and that is an integer
@@ -2259,7 +2259,7 @@ class RpnCodeGenTests(BaseTest):
             """)
         self.compare(de_comment(expected), lines, dump=True)
 
-    unittest.skip('text handling - advanced - do later')
+    @unittest.skip('text handling - advanced - do later')
     def test_text_for_range_AVIEW_access_i_mixed(self):
         """
         ensure can access i and that is an integer and can repeatedly do so and
@@ -2294,7 +2294,7 @@ class RpnCodeGenTests(BaseTest):
 
     # Number formats
 
-    unittest.skip('text handling - advanced - do later')
+    @unittest.skip('text handling - advanced - do later')
     def test_text_formats_FIX00(self):
         """
         ensure can access i and that is an integer and can repeatedly do so and
