@@ -1999,12 +1999,12 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
 
-    @unittest.skip('text handling - advanced - do later')
     def test_text_AVIEW_literal_expr(self):
         src = """
             AVIEW(5+6)
         """
         expected = dedent("""
+            CLA
             5
             6
             +
@@ -2023,6 +2023,7 @@ class RpnCodeGenTests(BaseTest):
         expected = dedent("""
             10
             STO 00
+            CLA
             RCL 00
             6
             +
