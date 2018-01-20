@@ -230,6 +230,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         """
         self.begin(node)
         self.visit_children(node)
+        if self.program.is_previous_line('string'):
+            self.program.insert('ASTO ST X')
         self.program.insert(f'RTN', comment='return')
         self.end(node)
 
@@ -728,7 +730,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.split_alpha_text(node.s, append=True)
         else:
             self.program.insert(f'"{node.s[0:15]}"', type_='string')
-            # self.program.insert('ASTO ST X')
         self.end(node)
 
     @recursive
