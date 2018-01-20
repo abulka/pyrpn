@@ -406,7 +406,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                     if isinstance(arg, ast.Num):
                         self.program.insert('AIP')
                     elif isinstance(arg, ast.Name):  # probably a recall of a register into stack X
-                        self.program.insert('AIP')  # Append Integer part of x to the Alpha register. (not documented in HP42S manual, but is in cmd_list)
+                        # self.program.insert('AIP')  # Append Integer part of x to the Alpha register. (not documented in HP42S manual, but is in cmd_list)
+                        pass
                     elif isinstance(arg, ast.Str):  # a literal string
                         pass  # visit_Name will insert a alpha text append for us
                     else:
@@ -715,7 +716,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.check_supported(node.id, node)
         if '.Load' in str(node.ctx):
             assert isinstance(node.ctx, ast.Load)
-            self.program.insert(f'RCL {self.scopes.var_to_reg(node.id)}', comment=node.id)
+            cmd = 'ARCL' if self.inside_alpha else 'RCL'
+            self.program.insert(f'{cmd} {self.scopes.var_to_reg(node.id)}', comment=node.id)
             self.pending_stack_args.append(node.id)
             log.debug("pending_stack_args %s", self.pending_stack_args)
             if self.var_name_is_loop_counter(node.id):
