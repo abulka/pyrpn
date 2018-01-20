@@ -1739,7 +1739,6 @@ class RpnCodeGenTests(BaseTest):
         """
         self.assertRaises(RpnError, self.parse, dedent(src))
 
-    @unittest.skip('text handling - advanced - do later')
     def test_text_VIEW_literal_number(self):
         src = """
             VIEW(5)

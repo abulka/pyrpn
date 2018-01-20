@@ -454,7 +454,11 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                         arg_val = self.scopes.var_to_reg(arg_val)
 
                 elif isinstance(arg, ast.Num):
-                    arg_val = f'{arg_val:02d}'  # TODO probably need more formats e.g. nnnn
+                    if func_name in settings.CMDS_WHO_NEED_LITERAL_NUM_ON_STACK_X:
+                        self.visit(arg)
+                        arg_val = 'ST X'
+                    else:
+                        arg_val = f'{arg_val:02d}'  # TODO probably need more formats e.g. nnnn
                 args += ' ' if arg_val else ''
                 args += arg_val
             self.program.insert(f'{func_name}{args}', comment=comment)
