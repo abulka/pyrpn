@@ -1888,6 +1888,21 @@ class RpnCodeGenTests(BaseTest):
     @unittest.skip('text handling - advanced - do later')
     def test_text_first_param_not_string(self):
         src = """
+            n = 0
+            alpha(n)
+        """
+        expected = dedent("""
+            ""  // arguably should CLA or "" if starting with a number - but then again, this could be a secret way to append?
+            0
+            STO 00
+            ARCL 00
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines)
+
+    @unittest.skip('text handling - advanced - do later')
+    def test_text_all_literal_nums(self):
+        src = """
             alpha(1, 2, 3)
         """
         expected = dedent("""

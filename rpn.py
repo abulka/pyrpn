@@ -33,6 +33,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.node_desc_short = lambda node : str(node)[6:9].strip() + '_' + str(node)[-4:-1].strip()
         self.insert = lambda cmd, label : self.program.insert(f'{cmd} {label.text}', comment=label.description)
         self.inside_alpha = False
+        self.alpha_append_mode = False
 
     # Recursion support
 
@@ -390,17 +391,20 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             if len(node.args) == 0:
                 if func_name in ('alpha', 'print', 'PROMPT'):
                     self.program.insert('""', comment='empty string', type_='string')
-            else:
-                alpha_text = self.get_node_name_id_or_n(node.args[0])
-                self.split_alpha_text(alpha_text)
+            # else:
+            #     alpha_text = self.get_node_name_id_or_n(node.args[0])
+            #     self.split_alpha_text(alpha_text)
 
             if len(node.args) > 0:
                 self.inside_alpha = True
-                skip_first = True
+                # skip_first = True
+                self.alpha_append_mode = False
+                skip_first = False
                 for arg in node.args:
                     if skip_first:
                         skip_first = False
                         continue
+
                     self.visit(arg)
                     if isinstance(arg, ast.Num):
                         self.program.insert('AIP')
@@ -412,7 +416,13 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                     else:
                         raise RpnError(f'Do not know how to alpha {arg} with value {self.get_node_name_id_or_n(arg)}')
                     # TODO what about string and string concatination etc.?
+
+                    if not self.alpha_append_mode:
+                        self.alpha_append_mode = True
+
                 self.inside_alpha = False
+                self.alpha_append_mode = False
+
             if func_name in ('print', 'AVIEW'):
                 self.program.insert('AVIEW')
             elif func_name in ('PROMPT'):
@@ -742,7 +752,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.begin(node)
         if self.inside_alpha:
             # self.program.insert(f'├"{node.s[0:15]}"')
-            self.split_alpha_text(node.s, append=True)
+            self.split_alpha_text(node.s, append=self.alpha_append_mode)
         else:
             self.program.insert(f'"{node.s[0:15]}"', type_='string')
         self.end(node)
