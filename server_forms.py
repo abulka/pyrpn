@@ -8,9 +8,9 @@ class ConverterForm(FlaskForm):
             total = 0
             for i in range(10):
                 result = calc_something(i, 5)
-                aview('Counter ', i, ' result= ', total)
+                print('Counter ', i, ' result= ', total)
                 total += result
-            aview('Final total was: ', total)
+            print('Final total was: ', total)
             
         def calc_something(a,b):
             # adds two numbers then squares them

@@ -383,7 +383,17 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         #     self.end(node)
         #     return
 
+        elif func_name in ('aview',):
+            raise RpnError('The command "aview" is deprecated - use print or AVIEW.')
+
+        # elif func_name in ('alpha', 'AVIEW', 'print'):
         elif func_name in ('alpha', 'aview', 'print'):
+            # if len(node.args) == 0:
+            #     self.program.insert('""', comment='empty string', type_='string')
+            # else:
+            #     alpha_text = self.get_node_name_id_or_n(node.args[0])
+            #     self.split_alpha_text(alpha_text)
+
             alpha_text = self.get_node_name_id_or_n(node.args[0])
             self.split_alpha_text(alpha_text)
 
@@ -405,7 +415,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                         raise RpnError(f'Do not know how to alpha {arg} with value {self.get_node_name_id_or_n(arg)}')
                     # TODO what about string and string concatination etc.?
                 self.inside_alpha = False
-            if func_name in ('aview', 'print'):
+            # if func_name in ('aview', 'print'):
+            if func_name in ('print',):
                 self.program.insert('AVIEW')
             self.end(node)
             return
