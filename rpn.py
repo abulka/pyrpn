@@ -158,16 +158,24 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             first = False
             self.program.insert(f'{leading_symbol}"{fragment}"')  # , comment=alpha_text
 
+    def check_supported(self, name, node):
+        if name in ['NOT', 'OR', 'AND']:
+            raise RpnError(f'The RPN command "{name}" is not supported - use native Python instead, line: {node.lineno}\n{node.first_token.line.strip()}')
+
+    def is_built_in_cmd_with_param_fragments(self, func_name, node):
+        return func_name in cmd_list and \
+               cmd_list[func_name]['num_arg_fragments'] > 0
+
+    def cmd_st_x_situation(self, func_name, node):
+        # if its a variable reference, then we can happily construct an all in one cmd with fragment e.g. VIEW 00
+        # otherwise its a cmd_st_x_situation situation where we visit recurse normally and then do a ST X as arg to the built in command
+        return func_name in settings.CMDS_WHO_NEED_LITERAL_NUM_ON_STACK_X and \
+               not isinstance(node.args[0], ast.Name)
+
     # Finishing up
 
     def finish(self):
         self.program.emit_needed_rpn_templates()
-
-    # Util
-
-    def check_supported(self, name, node):
-        if name in ['NOT', 'OR', 'AND']:
-            raise RpnError(f'The RPN command "{name}" is not supported - use native Python instead, line: {node.lineno}\n{node.first_token.line.strip()}')
 
     # Visit functions
 
@@ -355,6 +363,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         if func_name == 'isFC':
             func_name = 'PyFC'
 
+        # Check that built in command has been given enough parameters
+        if func_name in cmd_list and \
+                cmd_list[func_name]['num_arg_fragments'] > 0 and \
+                len(node.args) == 0:
+            raise RpnError(f'{func_name} requires {cmd_list[func_name]["num_arg_fragments"]} parameters to be supplied')
+
         if func_name == 'varmenu':
             for arg in node.args:
                 self.program.insert(f'MVAR "{arg.s}"')
@@ -429,12 +443,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.program.rpn_templates.need_all_templates()
             return
 
-        elif func_name in cmd_list and cmd_list[func_name]['num_arg_fragments'] > 0:
+        elif self.is_built_in_cmd_with_param_fragments(func_name, node) and not self.cmd_st_x_situation(func_name, node):
             # The built-in command has arg fragment "parameter" parts which must be emitted immediately as part of the
             # command, thus we cannot rely on normal visit parsing but must look ahead and extract needed info.
-
-            if len(node.args) == 0:
-                raise RpnError(f'{func_name} requires {cmd_list[func_name]["num_arg_fragments"]} parameters to be supplied')
 
             cmd_info = cmd_list[func_name]
             args = ''
@@ -442,11 +453,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             for i in range(cmd_info['num_arg_fragments']):
                 arg = node.args[i]
                 arg_val = self.get_node_name_id_or_n(arg)
+
                 if isinstance(arg, ast.Str):
                     arg_val = f'"{arg_val}"'
+
                 if isinstance(arg, ast.Name):  # reference to a variable, thus pull out a register name
                     comment = arg_val
-
                     # hack if trying to access i
                     if self.var_name_is_loop_counter(arg_val):
                         comment = arg_val + ' (loop var)'
@@ -459,13 +471,11 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                         arg_val = self.scopes.var_to_reg(arg_val)
 
                 elif isinstance(arg, ast.Num):
-                    if func_name in settings.CMDS_WHO_NEED_LITERAL_NUM_ON_STACK_X:
-                        self.visit(arg)
-                        arg_val = 'ST X'
-                    else:
-                        arg_val = f'{arg_val:02d}'  # TODO probably need more formats e.g. nnnn
+                    arg_val = f'{arg_val:02d}'  # TODO probably need more formats e.g. nnnn
+
                 args += ' ' if arg_val else ''
                 args += arg_val
+
             self.program.insert(f'{func_name}{args}', comment=comment)
             self.end(node)
             return
@@ -545,10 +555,14 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         if self.for_loop_info and func_name == 'range':
             pass  # already done our work, above
+
         elif func_name in cmd_list:
             # The built-in command is a simple one without command arg fragment "parameter" parts - yes it may take
             # actual parameters but these are generated through normal visit parsing and available on the stack.
-            self.program.insert(f'{func_name}', comment=cmd_list[func_name]['description'])
+            # Though we do handle an exception where the command needs to use ST X as its 'parameter' e.g. VIEW
+            arg_val = ' ST X' if self.cmd_st_x_situation(func_name, node) else ''  # e.g. VIEW
+            self.program.insert(f'{func_name}{arg_val}', comment=cmd_list[func_name]['description'])
+
         elif func_name in self.program.rpn_templates.get_user_insertable_pyrpn_cmds().keys():
             # Call to a rpn template function - not usually allowed, but some are exposed
             self.program.insert_xeq(func_name)
