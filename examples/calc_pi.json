@@ -1,0 +1,7 @@
+{
+    "description": "<p>My version of Walsh algorithm to calculate pi by adding 1/n where n is 1, 3, 5, 7... where you add and subtract alternately.&nbsp; Note that the variable 'subtract' is a boolean, and controls whether we are doing an add or a subtract operation.&nbsp; In HP42S we would have used a flag - in Python we simply use any variable as a flag.&nbsp;</p>\r\n<p>Note that when converted to RPN, True and False map to the values 1 and 0, though in Python any non zero value will be treated as True.</p>",
+    "public": "yes",
+    "sortnum": 0,
+    "source": "def calc_pi(max_iterations):\r\n    result = 1.0\r\n    subtract = True\r\n    for i in range(3, max_iterations, 2):\r\n        if subtract:\r\n            result -= 1.0/i\r\n            subtract = False\r\n        else:\r\n            result += 1.0/i\r\n            subtract = True\r\n    result *= 4\r\n    return result",
+    "title": "Calculate Pi"
+}
