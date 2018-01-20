@@ -2145,6 +2145,7 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
 
+    @unittest.skip('text handling - advanced - do later')
     def test_text_AIP(self):
         """
         AIP means append integer part of variable to alpha.
