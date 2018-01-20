@@ -720,6 +720,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.check_supported(node.id, node)
         if '.Load' in str(node.ctx):
             assert isinstance(node.ctx, ast.Load)
+            if self.inside_alpha and not self.alpha_append_mode:
+                self.program.insert(f'""')
             cmd = 'ARCL' if self.inside_alpha else 'RCL'
             self.program.insert(f'{cmd} {self.scopes.var_to_reg(node.id)}', comment=node.id)
             self.pending_stack_args.append(node.id)
@@ -731,6 +733,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def visit_Num(self, node):
         self.begin(node)
         n = int(node.n)
+        if self.inside_alpha and not self.alpha_append_mode:
+            self.program.insert(f'""')
         self.program.insert(f'{self.pending_unary_op}{n}')
         self.pending_stack_args.append(node.n)
         log.debug("pending_stack_args %s", self.pending_stack_args)
