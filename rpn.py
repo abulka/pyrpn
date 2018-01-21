@@ -150,16 +150,19 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.program.insert(f'LBL {self.labels.func_to_lbl(node.name, called_from_def=True)}', comment=f'def {node.name}')
 
     def split_alpha_text(self, alpha_text, append=False):
-        first = True
-        s = alpha_text
-        if append:
-            first = False
-        while s:
-            fragment = s[0:14]
-            s = s[14:]
-            leading_symbol = '' if first else '├'
-            first = False
-            self.program.insert(f'{leading_symbol}"{fragment}"')  # , comment=alpha_text
+        if alpha_text == '':
+            self.program.insert('CLA')
+        else:
+            first = True
+            s = alpha_text
+            if append:
+                first = False
+            while s:
+                fragment = s[0:14]
+                s = s[14:]
+                leading_symbol = '' if first else '├'
+                first = False
+                self.program.insert(f'{leading_symbol}"{fragment}"')  # , comment=alpha_text
 
     def check_supported(self, name, node):
         if name in ['NOT', 'OR', 'AND']:
