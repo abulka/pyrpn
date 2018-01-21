@@ -1628,7 +1628,6 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines, dump=True, keep_comments=False)
 
-    # @unittest.skip('offline')
     def test_while_else_break(self):
         """
         The else clause is only executed when your while condition becomes false. If you break out of the loop,
@@ -1678,8 +1677,8 @@ class RpnCodeGenTests(BaseTest):
              in the alpha register ready to show. Can specify strings and numbers and variables.
              
     alpha  - Builds strings in the alpha register, typically takes parameters.  
-             No params inserts "".  (currently not implemented)
-             If want to append, then add parameter append=True, ├"" any string is appended (currently not implemented)
+             No params inserts CLA.
+             If want to append, then add parameter append=True, ├"" any string is appended
              
     print  - synonym for AVIEW
     
