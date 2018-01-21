@@ -375,6 +375,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 len(node.args) == 0:
             raise RpnError(f'{func_name} requires {cmd_list[func_name]["num_arg_fragments"]} parameters to be supplied')
 
+        # Check that built in command has been given parameters (anti stack philosophy), even though HP41S spec allows params
+        if func_name in cmd_list and \
+                func_name in settings.CMDS_WHO_OPERATE_ON_STACK_SO_DISALLOW_NO_ARGS and \
+                len(node.args) == 0:
+            raise RpnError(f'{func_name} requires parameters (variable or literal number) to be supplied - referring to stack x not allowed')
+
         if func_name == 'varmenu':
             for arg in node.args:
                 self.program.insert(f'MVAR "{arg.s}"')
