@@ -151,7 +151,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def split_alpha_text(self, alpha_text, append=False):
         if alpha_text == '':
-            self.program.insert('CLA')
+            if not append:
+                self.program.insert('CLA')
         else:
             first = True
             s = alpha_text

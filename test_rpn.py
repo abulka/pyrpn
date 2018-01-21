@@ -1957,6 +1957,21 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
 
+    def test_text_AVIEW_empty_string_midway(self):
+        src = """
+            AVIEW(1+3, "")
+        """
+        expected = dedent("""
+            CLA
+            1
+            3
+            +
+            ARCL ST X
+            AVIEW
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines)
+
     def test_text_AVIEW_with_arg(self):
         src = """
             AVIEW("hello")
