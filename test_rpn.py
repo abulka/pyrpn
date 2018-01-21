@@ -1778,7 +1778,6 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
 
-    @unittest.skip('text handling - advanced - do later')
     def test_text_VIEW_bool_and_func_call_expr(self):
         src = """
             VIEW(not isFS(21))
