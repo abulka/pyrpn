@@ -757,11 +757,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def visit_Num(self, node):
         self.begin(node)
-        n = int(node.n)
         if self.inside_alpha and not self.alpha_append_mode and not self.alpha_already_cleared:
             self.program.insert('CLA')
             self.alpha_already_cleared = True
-        self.program.insert(f'{self.pending_unary_op}{n}')
+        self.program.insert(f'{self.pending_unary_op}{node.n}')
         self.pending_stack_args.append(node.n)
         log.debug("pending_stack_args %s", self.pending_stack_args)
         self.pending_unary_op = ''
