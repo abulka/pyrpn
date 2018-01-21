@@ -744,7 +744,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.check_supported(node.id, node)
         if '.Load' in str(node.ctx):
             assert isinstance(node.ctx, ast.Load)
-            if self.inside_alpha and not self.alpha_append_mode:
+            if self.inside_alpha and not self.alpha_append_mode and not self.alpha_already_cleared:
                 self.program.insert('CLA')
                 self.alpha_already_cleared = True
             cmd = 'ARCL' if self.inside_alpha and not self.inside_binop else 'RCL'

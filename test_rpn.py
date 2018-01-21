@@ -2404,11 +2404,7 @@ class RpnCodeGenTests(BaseTest):
             """)
         self.compare(de_comment(expected), lines, dump=True)
 
-    @unittest.skip('tough one - how to return expr when not in a def')
-    def test_add_inside_print(self):
-        """
-        Power function
-        """
+    def test_add_binop_vars_inside_print(self):
         lines = self.parse(dedent("""
             x = 1
             y = 2
@@ -2419,9 +2415,11 @@ class RpnCodeGenTests(BaseTest):
             STO 00
             2
             STO 01
+            CLA
             RCL 00
             RCL 01
             +
+            ARCL ST X
             AVIEW
             """)
         self.compare(de_comment(expected), lines, dump=True)
