@@ -2278,7 +2278,6 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
 
-    @unittest.skip('text handling - advanced - do later')
     def test_text_for_range_AVIEW_access_i(self):
         """
         ensure can access i and that is an integer
@@ -2295,6 +2294,7 @@ class RpnCodeGenTests(BaseTest):
             GTO 01
             GTO 02
             LBL 01
+            CLA
             RCL 00
             IP
             ARCL ST X

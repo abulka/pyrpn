@@ -421,7 +421,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                     if isinstance(arg, ast.Num):
                         self.program.insert('ARCL ST X')
                     elif isinstance(arg, ast.Name):
-                        pass
+                        if self.var_name_is_loop_counter(arg.id):
+                            self.program.insert('ARCL ST X')
                     elif isinstance(arg, ast.Str):
                         pass
                     elif isinstance(arg, ast.BinOp):   # other types?
@@ -757,7 +758,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             if self.inside_alpha and not self.alpha_append_mode and not self.alpha_already_cleared:
                 self.program.insert('CLA')
                 self.alpha_already_cleared = True
-            cmd = 'ARCL' if self.inside_alpha and not self.inside_binop else 'RCL'
+            cmd = 'ARCL' if self.inside_alpha and not self.inside_binop and not self.var_name_is_loop_counter(node.id) else 'RCL'
             self.program.insert(f'{cmd} {self.scopes.var_to_reg(node.id)}', comment=node.id)
             self.pending_stack_args.append(node.id)
             log.debug("pending_stack_args %s", self.pending_stack_args)
