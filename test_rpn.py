@@ -2339,7 +2339,6 @@ class RpnCodeGenTests(BaseTest):
 
     # Number formats
 
-    @unittest.skip('text handling - advanced - do later')
     def test_text_formats_FIX00(self):
         """
         ensure can access i and that is an integer and can repeatedly do so and
