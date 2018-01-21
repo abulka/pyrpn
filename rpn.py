@@ -36,6 +36,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.alpha_append_mode = False
         self.alpha_already_cleared = False
         self.inside_binop = False
+        self.disallow_string_args = False
 
     # Recursion support
 
@@ -561,9 +562,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.program.insert(f'STO {register}', comment=f'range {var_name}')
         else:
             # Common arg parsing for all functions
+            # Note: we don't visit self.visit(node.func) cos we emit the function name ourselves below, RPN style
+            if func_name in settings.CMDS_WHO_DISALLOW_STRINGS:
+                self.disallow_string_args = True
             for item in node.args:
                 self.visit(item)
-            # self.visit(node.func)  # don't visit this name cos we emit it ourselves below, RPN style
+            self.disallow_string_args = False
 
         if self.for_loop_info and func_name == 'range':
             pass  # already done our work, above
@@ -774,6 +778,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def visit_Str(self, node):
         self.begin(node)
+        if self.disallow_string_args:
+            raise RpnError(f'Error: function disallows parameters of type string, line: {node.lineno}\n{node.first_token.line.strip()}')
         if self.inside_alpha:
             # self.program.insert(f'├"{node.s[0:15]}"')
             self.split_alpha_text(node.s, append=self.alpha_append_mode)

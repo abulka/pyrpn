@@ -2221,7 +2221,6 @@ class RpnCodeGenTests(BaseTest):
         """
         self.assertRaises(RpnError, self.parse, dedent(src))
 
-    @unittest.skip('text handling - advanced - do later')
     def test_text_AIP_literal_num(self):
         src = """
             AIP(5) 
@@ -2233,7 +2232,6 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
 
-    @unittest.skip('text handling - advanced - do later')
     def test_text_AIP_literal_num_expr(self):
         src = """
             AIP(5+6) 
@@ -2247,10 +2245,9 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
 
-    @unittest.skip('text handling - advanced - do later')
     def test_text_AIP_string_num(self):
         src = """
-            AIP("some string:) 
+            AIP("some string") 
         """
         self.assertRaises(RpnError, self.parse, dedent(src))
 
