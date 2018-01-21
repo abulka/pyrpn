@@ -415,6 +415,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 self.alpha_append_mode = False
                 self.alpha_already_cleared = False
 
+                if node.keywords and node.keywords[0].arg == 'append':
+                    if not isinstance(node.keywords[0].value, ast.NameConstant):
+                        raise RpnError(f'append= must be set to True or False')
+                    named_constant_t_f = node.keywords[0].value
+                    self.alpha_append_mode = named_constant_t_f.value
+
                 for arg in node.args:
                     self.visit(arg)  # usual insertion of a literal number, string or variable
 
