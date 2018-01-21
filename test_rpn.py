@@ -2304,7 +2304,6 @@ class RpnCodeGenTests(BaseTest):
             """)
         self.compare(de_comment(expected), lines, dump=True)
 
-    @unittest.skip('text handling - advanced - do later')
     def test_text_for_range_AVIEW_access_i_mixed(self):
         """
         ensure can access i and that is an integer and can repeatedly do so and
@@ -2331,6 +2330,7 @@ class RpnCodeGenTests(BaseTest):
             IP
             2
             *
+            ARCL ST X
             AVIEW            
             GTO 00
             LBL 02
