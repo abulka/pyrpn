@@ -18,7 +18,7 @@ class ConverterForm(FlaskForm):
     """).strip())
     comments = BooleanField('Generate comments', default=False)
     line_numbers = BooleanField('Generate line numbers', default=False)
-    emit_pyrpn_lib = BooleanField('Include needed Python RPN Utility Functions', default=True)
+    emit_pyrpn_lib = BooleanField('Auto include needed Python RPN Utility Functions', default=True)
 
 class ExampleForm(FlaskForm):
     source = TextAreaField('Python Source code', default=dedent("""

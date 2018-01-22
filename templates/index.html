@@ -25,6 +25,9 @@
                         <br>
                         <br>
                         {{ form.emit_pyrpn_lib.label }} {{ form.emit_pyrpn_lib() }}
+                        <div id="emit_pyrpn_lib_help" style="display: none">
+                            You have chosen to provide the required utility functions by loading <a href="{{ url_for('py_rpn_lib') }}">this</a> program into your calculator/Free42.
+                        </div>
                         {{ form.csrf_token }}
                         <br>
                         <!--<a href="/example" id="save_to_examples">Save</a>-->
@@ -111,6 +114,16 @@
               setTooltip('Failed!');
               hideTooltip();
         });
+
+        // Display warning if Generate checkbox is off
+        function display_emit_pyrpn_lib_help() {
+            if ($('#emit_pyrpn_lib').prop('checked'))
+                $("#emit_pyrpn_lib_help").hide()
+            else
+                $("#emit_pyrpn_lib_help").show()
+        }
+        $('#emit_pyrpn_lib').on('click', function () { display_emit_pyrpn_lib_help() })
+        display_emit_pyrpn_lib_help()  // when page loads or hit back button
 
     </script>
 
