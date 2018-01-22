@@ -85,8 +85,11 @@ class Program(BaseRpnProgram):
     def is_previous_line_matrix_related(self):
         return 'p1DMtx' in self.last_line.text or 'ZLIST' in self.last_line.text  # hack - list/matrix related
 
+    def is_previous_line_matrix_list_related(self):
+        return 'LIST' in self.last_line.text or 'list' in self.last_line.comment  # hack - need to intelligently figure out type of prev line incl when + operation was acting on lists/matrixes
+
     def insert_sto(self, register, comment=''):
-        if 'LIST' in self.last_line.text or 'list' in self.last_line.comment:  # hack - need to intelligently figour out type of prev line incl when + operation was acting on lists/matrixes
+        if self.is_previous_line_matrix_list_related():
             self.insert('RCL "ZLIST"')
         cmd = 'ASTO' if self.is_previous_line('string') else 'STO'
         self.insert(f'{cmd} {register}', comment=comment)
