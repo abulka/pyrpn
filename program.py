@@ -75,14 +75,21 @@ class Program(BaseRpnProgram):
     def user_insertable_pyrpn_cmds(self):
         return self.rpn_templates.get_user_insertable_pyrpn_cmds().keys()
 
-    def is_previous_line(self, type_='string'):
-        return self.lines[-1].type_ == type_
+    @property
+    def last_line(self):
+        return self.lines[-1]
 
-    def insert_sto(self, func_name, comment=''):
-        if 'LIST' in self.lines[-1].text or 'list' in self.lines[-1].comment:  # hack - need to intelligently figour out type of prev line incl when + operation was acting on lists/matrixes
+    def is_previous_line(self, type_='string'):
+        return self.last_line.type_ == type_
+
+    def is_previous_line_matrix_related(self):
+        return 'p1DMtx' in self.last_line.text or 'ZLIST' in self.last_line.text  # hack - list/matrix related
+
+    def insert_sto(self, register, comment=''):
+        if 'LIST' in self.last_line.text or 'list' in self.last_line.comment:  # hack - need to intelligently figour out type of prev line incl when + operation was acting on lists/matrixes
             self.insert('RCL "ZLIST"')
         cmd = 'ASTO' if self.is_previous_line('string') else 'STO'
-        self.insert(f'{cmd} {func_name}', comment=comment)
+        self.insert(f'{cmd} {register}', comment=comment)
 
     def insert_xeq(self, func_name, comment=''):
         # insert global function call

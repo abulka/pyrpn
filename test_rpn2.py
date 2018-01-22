@@ -329,7 +329,6 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    @unittest.skip("todo")
     def test_list_var_must_be_uppercase(self):
         src = """
             a = []

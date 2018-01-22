@@ -260,6 +260,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.begin(node)
         self.visit_children(node)
         for target in node.targets:
+            if self.program.is_previous_line_matrix_related() and target.id.islower():
+                raise RpnError(f'Can only assign lists to uppercase variable not {target.id}.  This is because lists are implemented as RPN matrices which need to be stored in a named register.')
             self.program.insert_sto(self.scopes.var_to_reg(target.id), comment=f'{target.id}')
             assert '.Store' in str(target.ctx)
             assert isinstance(target.ctx, ast.Store)
