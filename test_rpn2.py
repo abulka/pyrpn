@@ -255,27 +255,23 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    @unittest.skip("offline")
     def test_list_basic_append(self):
         self.parse(dedent("""
-            a = []
-            a.append(5)
+            A = []
+            A.append(5)
             """))
         expected = dedent("""
-            XEQ "CLIST"
-            SF 01
-            RCL "ZLIST"
-            STO 00
+            0             // not a matrix (empty)
+            XEQ "p1DMtx"  // prepare ZLIST
+            STO "A"
 
-            RCL 00
-            STO "ZLIST"
-            SF 01           // 1-D list
-
+            RCL "A"
+            XEQ "p1DMtx"  // prepare ZLIST
             5
             XEQ "LIST+"
 
             RCL "ZLIST"
-            STO 00
+            STO "A"
             """)
         self.compare(de_comment(expected))
 

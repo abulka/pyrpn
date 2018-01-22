@@ -370,11 +370,13 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         if isinstance(node.func, ast.Attribute) and node.func.attr == 'append':
             self.visit(node.func.value)  # the name 'a' of the a.append()
-            self.program.insert_sto('"ZLIST"', comment=f'{node.first_token.line.strip()}')
-            self.program.insert('SF 01', comment='1D list')
+            self.program.insert_xeq('p1DMtx', comment=f'{node.first_token.line.strip()}')
+            # self.program.insert_sto('"ZLIST"')
+            # self.program.insert('SF 01', comment='1D list')
             for arg in node.args:
                 self.visit(arg)
-            self.program.insert_xeq('LIST+')
+                self.program.insert_xeq('LIST+')
+            # self.program.insert('RCL "ZLIST"')
             self.program.insert_sto(self.scopes.var_to_reg(node.func.value.id), comment=f'{node.func.value.id}')
             self.end(node)
             return
@@ -753,7 +755,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.begin(node)
         self.program.insert('0', comment='not a matrix (empty)')
         self.program.insert_xeq('p1DMtx')
-        # self.program.insert('RCL "ZLIST"')
         for child in node.elts:
             self.visit(child)
             self.program.insert_xeq('LIST+')
