@@ -15,6 +15,7 @@ import os
 import settings
 import sendgrid
 from sendgrid.helpers.mail import *
+from program import Program
 
 log = logging.getLogger(__name__)
 config_log(log)
@@ -228,6 +229,17 @@ def vote_via_email(example):
         log.info(f'vote for example {example.id} title {example.title} emailed, response {response.status_code}')
     log.info(body)
 
+@app.route('/py-rpn-lib', methods=['GET'])
+def py_rpn_lib():
+    # comments =
+    program = Program()
+    program.rpn_templates.need_all_templates()
+    program.emit_needed_rpn_templates(as_local_labels=False)
+    rpn = program.lines_to_str(comments=True, linenos=True)  # comments=form.comments.data, linenos=form.line_numbers.data)
+    rpn_free42 = program.lines_to_str(comments=False, linenos=True)
+    # log.info(f'main converter converting example {example.id} title "{example.title}"')
+    # return jsonify(rpn=rpn, rpn_free42=rpn_free42)
+    return render_template('pyrpnlib.html', rpn=rpn, rpn_free42=rpn_free42, title='PyRpn Support Lib')
 
 @app.route('/help')
 def help():

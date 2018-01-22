@@ -107,7 +107,6 @@ class Program(BaseRpnProgram):
         if templates_who_need_pErrRange & templates_needed:
             templates_needed.add('pErrRange')
 
-        self.insert('RTN', comment='---------------------------')
         self.insert('LBL "PyLIB"', comment='PyRPN Support Library of')
         self.insert('"-Utility Funcs-"')
         self.insert('RTN', comment='---------------------------')

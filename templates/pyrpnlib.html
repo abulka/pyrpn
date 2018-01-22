@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block additional_js %}
+    <script src="../static/js/lib/clipboard.min.js"></script>
+{% endblock %}
+
+{% block content %}
+    <ul>
+        <li><a href="/">Converter</a></li>
+        <li><a href="/examples">Examples</a></li>
+		<li><a href="/help">Help</a></li>
+    </ul>
+
+    <div class="andy_content">
+
+		<p>
+			This is the full support library, as a separate program, with all global text labels
+			intact, meaning you can execute and operate all the subroutines manually.
+		</p>
+
+		<img src="static/calc_icon1.png" style="float: right;">
+		<pre>{{ rpn }}</pre>
+
+    </div>
+
+	<div id="result-view">
+		<!-- The buttons used to copy the text -->
+		<button class="btn btn-primary" data-clipboard-text="{{ rpn }}" title="Copy RPN text as shown">Copy</button>
+		<button class="btn btn-primary" data-clipboard-text="{{ rpn_free42 }}" title="Copy RPN text - ready to paste into Free42 calc (no comments, line numbers)">Copy for Free42</button>
+	</div>
+
+
+<script>
+
+        // Clipboard Copy
+        $('[data-toggle="tooltip"]').tooltip()
+        $('.btn').tooltip({
+          trigger: 'click',
+          placement: 'bottom'
+        });
+
+        function setTooltip(btn, message) {
+          btn.tooltip('hide')
+            .attr('data-original-title', message)
+            .tooltip('show');
+        }
+
+        function hideTooltip(btn) {
+          setTimeout(function() {
+            btn.tooltip('hide');
+          }, 1000);
+        }
+
+        // Clipboard Copy
+        var clipboard = new Clipboard('.btn');
+        clipboard.on('success', function(e) {
+            // console.log(e);
+            var btn = $(e.trigger);
+            setTooltip(btn, 'Copied');
+            hideTooltip(btn);
+        });
+        clipboard.on('error', function(e) {
+            // console.log(e);
+              setTooltip('Failed!');
+              hideTooltip();
+        });
+
+</script>
+
+{% endblock %}

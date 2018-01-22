@@ -346,7 +346,7 @@ class RpnTemplates:
 
     def need_all_templates(self):
         self.needed_templates = self.template_names[:]  # copy
-        self.needed_templates.remove('PyList')
+        # self.needed_templates.remove('PyList')
 
     def get_user_insertable_pyrpn_cmds(self):
         """
