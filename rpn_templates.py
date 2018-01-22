@@ -152,8 +152,8 @@ class RpnTemplates:
         FS?C 25
         GTO 01
         
-        LBL "CLIST"
-        CLV "ZLIST"
+        LBL "CLIST" // () -> ()
+        CLV "ZLIST" // clear ZLIST from memory
         RTN
         
         LBL I       // prepare list "ZLIST" for access
@@ -328,6 +328,17 @@ class RpnTemplates:
         AVIEW
         STOP
         RTN    
+        """)
+
+    p1DMtx = dedent("""
+        LBL "p1DMtx"  // (x) -> stores x in ZLIST if matrix else deletes ZLIST to signify empty matrix
+        SF 01   // 1D matrix for lists
+        MAT?    // if is a matrix
+        STO "ZLIST"
+        MAT?
+        RTN
+        XEQ "CLIST" // else empty matrix
+        RTN
         """)
 
     # Code

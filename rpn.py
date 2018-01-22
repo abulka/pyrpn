@@ -751,8 +751,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             - elts (list of elements)
         """
         self.begin(node)
-        self.program.insert_xeq('CLIST')
-        self.program.insert('SF 01', comment='1D list')
+        self.program.insert('0', comment='not a matrix (empty)')
+        self.program.insert_xeq('p1DMtx')
         # self.program.insert('RCL "ZLIST"')
         for child in node.elts:
             self.visit(child)

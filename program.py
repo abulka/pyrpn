@@ -96,6 +96,7 @@ class Program(BaseRpnProgram):
         self.insert(f'XEQ "{func_name}"', comment=comment)
 
     def emit_needed_rpn_templates(self, as_local_labels=True):
+        return
         if not self.rpn_templates.needed_templates:
             return
 
@@ -103,6 +104,7 @@ class Program(BaseRpnProgram):
         templates_who_need_PyBool = {'p2Bool'}
         templates_who_need_pErrRange = {'pISG'}
         templates_who_need_PyDFTB = {'pEQ', 'pGT', 'pGTE', 'pLT', 'pLTE', 'pNEQ'}
+        templates_who_need_pList = {'p1DMtx'}
 
         # Add any dependent templates, using set technology
         if templates_who_need_PyBool & templates_needed:
@@ -111,6 +113,8 @@ class Program(BaseRpnProgram):
             templates_needed.add('p__0Bool')
         if templates_who_need_pErrRange & templates_needed:
             templates_needed.add('p__1ErR')
+        if templates_who_need_pList & templates_needed:
+            templates_needed.add('pList')
 
         self.insert('LBL "PyLIB"', comment='PyRPN Support Library of')
         self.insert('"-Utility Funcs-"')

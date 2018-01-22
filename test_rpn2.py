@@ -210,53 +210,52 @@ class RpnTests2(BaseTest):
 
     def test_list_basic_empty(self):
         self.parse(dedent("""
-            a = []
+            A = []
             """))
         expected = dedent("""
-            XEQ "CLIST"
-            SF 01        // 1D list
-            RCL "ZLIST"
-            STO 00
+            0             // not a matrix (empty)
+            XEQ "p1DMtx"  // prepare ZLIST
+            STO "A"
             """)
         self.compare(de_comment(expected))
 
     def test_list_basic_two(self):
         self.parse(dedent("""
-            a = [1,2]
+            A = [1,2]
             """))
         expected = dedent("""
-            XEQ "CLIST"
-            SF 01
+            0             // not a matrix (empty)
+            XEQ "p1DMtx"  // prepare ZLIST
             1
             XEQ "LIST+"
             2
             XEQ "LIST+"
             RCL "ZLIST"
-            STO 00
+            STO "A"
             """)
         self.compare(de_comment(expected))
 
+    @unittest.skip("offline")
     def test_list_basic_two_vars(self):
         self.parse(dedent("""
-            a = []
-            b = []
-            VIEW(a)
+            A = []
+            B = []
+            VIEW(A)
             """))
         expected = dedent("""
-            XEQ "CLIST"
-            SF 01
-            RCL "ZLIST"
-            STO 00
+            0             // not a matrix (empty)
+            XEQ "p1DMtx"  // prepare ZLIST
+            STO "A"
 
-            XEQ "CLIST"
-            SF 01
-            RCL "ZLIST"
-            STO 01
+            0             // not a matrix (empty)
+            XEQ "p1DMtx"  // prepare ZLIST
+            STO "B"
 
-            VIEW 00
+            VIEW "A"
             """)
         self.compare(de_comment(expected))
 
+    @unittest.skip("offline")
     def test_list_basic_append(self):
         self.parse(dedent("""
             a = []
@@ -280,50 +279,4 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-
-
-
-    # Lists - using home grown
-
-    # @unittest.skip('list homegrown - perhaps later')
-    # def test_list_basic_empty(self):
-    #     self.parse(dedent("""
-    #         a = []
-    #         """))
-    #     expected = dedent("""
-    #         XEQ "pLCreate"
-    #         STO 00
-    #         """)
-    #     self.compare(de_comment(expected))
-    #
-    # @unittest.skip('list homegrown - perhaps later')
-    # def test_list_basic_two(self):
-    #     self.parse(dedent("""
-    #         a = [1,2]
-    #         """))
-    #     expected = dedent("""
-    #         XEQ "pLCreate"
-    #         1
-    #         XEQ "pLAppend"
-    #         2
-    #         XEQ "pLAppend"
-    #         STO 00
-    #         """)
-    #     self.compare(de_comment(expected))
-    #
-    # @unittest.skip('list homegrown - perhaps later - list append is hard')
-    # def test_list_basic_append(self):
-    #     self.parse(dedent("""
-    #         a = []
-    #         a.append(5)
-    #         """))
-    #     expected = dedent("""
-    #         XEQ "pLCreate"
-    #         STO 00
-    #         RCL 00
-    #         5
-    #         XEQ "pLAppend"
-    #         STO 00
-    #         """)
-    #     self.compare(de_comment(expected))
 
