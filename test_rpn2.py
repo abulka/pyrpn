@@ -257,7 +257,6 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    @unittest.skip('todo')
     def test_list_basic_append(self):
         self.parse(dedent("""
             a = []
@@ -265,13 +264,17 @@ class RpnTests2(BaseTest):
             """))
         expected = dedent("""
             XEQ "CLIST"
+            SF 01
             RCL "ZLIST"
             STO 00
+
             RCL 00
             STO "ZLIST"
             SF 01           // 1-D list
+
             5
             XEQ "LIST+"
+
             RCL "ZLIST"
             STO 00
             """)
