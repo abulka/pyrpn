@@ -261,7 +261,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.visit_children(node)
         for target in node.targets:
             if self.program.is_previous_line_matrix_related() and target.id.islower():
-                raise RpnError(f'Can only assign lists to uppercase variable not {target.id}.  This is because lists are implemented as RPN matrices which need to be stored in a named register.')
+                raise RpnError(f'Can only assign lists to uppercase variables not "{target.id}".  Please change the variable name to uppercase e.g. "{target.id.upper()}".')  #  This is because lists are implemented as RPN matrices which need to be stored in a named register.')
             self.program.insert_sto(self.scopes.var_to_reg(target.id), comment=f'{target.id}')
             assert '.Store' in str(target.ctx)
             assert isinstance(target.ctx, ast.Store)
@@ -371,14 +371,14 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         # log.debug(node.func.id in cmd_list)
 
         if isinstance(node.func, ast.Attribute) and node.func.attr == 'append':
-            self.visit(node.func.value)  # the name 'a' of the a.append()
+            var_name = self.get_node_name_id_or_n(node.func.value)  # the name 'a' of the a.append()
+            if var_name.islower():
+                raise RpnError(f'Lists must be stored in uppercase variables not "{var_name}".  Please change the variable name to uppercase e.g. "{var_name.upper()}".')
+            self.visit(node.func.value)
             self.program.insert_xeq('p1DMtx', comment=f'{node.first_token.line.strip()}')
-            # self.program.insert_sto('"ZLIST"')
-            # self.program.insert('SF 01', comment='1D list')
             for arg in node.args:
                 self.visit(arg)
                 self.program.insert_xeq('LIST+')
-            # self.program.insert('RCL "ZLIST"')
             self.program.insert_sto(self.scopes.var_to_reg(node.func.value.id), comment=f'{node.func.value.id}')
             self.end(node)
             return

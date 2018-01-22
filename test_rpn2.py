@@ -335,7 +335,6 @@ class RpnTests2(BaseTest):
         """
         self.assertRaises(RpnError, self.parse, dedent(src))
 
-    @unittest.skip("todo")
     def test_list_append_var_must_be_uppercase(self):
         src = """
             a.append(5)
