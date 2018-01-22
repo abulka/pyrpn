@@ -101,39 +101,39 @@ class RpnTemplates:
         GTO "LIST"
         
         LBL "LIST+"
-        SF 25
-        XEQ I
-        FC?C 25
-        GTO 02
-        GROW
-        J-
+        SF 25       // try: (ignore error) 
+        XEQ I       
+        FC?C 25     // if was error (flag was cleared)
+        GTO 02      //   init list then push
+        GROW        // else
+        J-               grow, j-, j+ wrap, then push   TODO understand
         J+
         WRAP
         
-        LBL 00
-        STOEL
-        FS? 01
-        GTO 01
-        J+
-        X<>Y
+        LBL 00      // push (x,y)
+        STOEL       // zlist[j] = x
+        FS? 01      // if list
+        GTO 01      //   finished
+        J+          // else
+        X<>Y        //   zlist[j+1] = y
         STOEL
         X<>Y
         
-        LBL 01
+        LBL 01      // finished, view zlist
         VIEW "ZLIST"
         RTN
         
-        LBL 02
+        LBL 02      // Init list
         1
         FS? 01
         1
         FC? 01
-        2
+        2           // stack is (y:1,x:1) if flag 1 set, else (y:1,x:2) 
         DIM "ZLIST"
-        XEQ I
+        XEQ I       // prepare list for access
         RDN
-        RDN
-        GTO 00
+        RDN         // drop rubbish off the stack
+        GTO 00      // push
         
         LBL "LIST-"
         SF 25
@@ -156,7 +156,7 @@ class RpnTemplates:
         CLV "ZLIST"
         RTN
         
-        LBL I
+        LBL I       // prepare list "ZLIST" for access
         INDEX "ZLIST"
         RTN
         """)
