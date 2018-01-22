@@ -55,7 +55,8 @@ class BaseRpnProgram:
         for line in self.lines:
             comment = f'  // {line.comment}' if comments and line.comment else ''
             lineno = f'{line.lineno:02d} ' if linenos else ''
-            result.append(f'{lineno}{line.text:14s}{comment}')
+            rpn = f'{line.text:14s}' if comment else line.text
+            result.append(f'{lineno}{rpn}{comment}')
         return '\n'.join(result)
 
     # logging
@@ -96,8 +97,8 @@ class Program(BaseRpnProgram):
 
         templates_needed = set(self.rpn_templates.needed_templates)
         templates_who_need_PyBool = {'Py2Bool'}
-        templates_who_need_pErrRange = {'PyIsgPr'}
-        templates_who_need_PyDFTB = {'PyEQ', 'PyGT', 'PyGTE', 'PyLT', 'PyLTE', 'PyNEQ'}
+        templates_who_need_pErrRange = {'pISG'}
+        templates_who_need_PyDFTB = {'PyEQ', 'pGT', 'PyGTE', 'pLT', 'PyLTE', 'PyNEQ'}
 
         # Add any dependent templates, using set technology
         if templates_who_need_PyBool & templates_needed:

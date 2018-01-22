@@ -571,7 +571,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 if len(node.args) in (1, 2):
                     # if step not specified, specify it, because the rpn lib isg subroutine needs it - takes 3 params.
                     self.program.insert(1)
-                self.program.insert_xeq('PyIsgPr')
+                self.program.insert_xeq('pISG')
             register = self.for_loop_info[-1].register
             var_name = self.for_loop_info[-1].var_name
             self.program.insert(f'STO {register}', comment=f'range {var_name}')
@@ -821,9 +821,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     cmpops = {
         "Eq":     "PyEQ",
         "NotEq":  "PyNEQ",
-        "Lt":     "PyLT",
+        "Lt":     "pLT",
         "LtE":    "PyLTE",
-        "Gt":     "PyGT",
+        "Gt":     "pGT",
         "GtE":    "PyGTE",
         # TODO
         "Is":     "PyIs",

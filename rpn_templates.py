@@ -13,7 +13,7 @@ class RpnTemplates:
 
     Comparison expressions
     ----------------------
-    For example, re PyGT:
+    For example, re pGT:
     Python a > b ends up on stack as y:a, x:b so we test y > x
     which translates into operator X<Y? and quick else operator of X≥Y?
     Params (a,b) -> where y:a, x:b returns bool of a > b (params dropped)
@@ -41,8 +41,8 @@ class RpnTemplates:
         self.template_names = self._get_class_attrs()
         self._create_local_labels()
 
-    PyIsgPr = dedent("""
-        LBL "PyIsgPr"  // (z:from, y:to, x:step) -> (ccccccc.fffii)
+    pISG = dedent("""
+        LBL "pISG"  // (z:from, y:to, x:step) -> (ccccccc.fffii)
         CF 99   // neg_case = False 
         CF 98   // have_step = False (other than 1)
         1
@@ -84,7 +84,7 @@ class RpnTemplates:
         // returns ISG number in form a.bbbnn
         """.format(settings.LOCAL_LABEL1_FOR_ISG_PREP, settings.LOCAL_LABEL2_FOR_ISG_PREP))
 
-    PyList = dedent("""
+    pList = dedent("""
         // p 176. HP42S programming manual
         
         LBL "LIST"
@@ -163,8 +163,8 @@ class RpnTemplates:
 
     # Comparison expressions
 
-    PyGT = dedent("""
-        LBL "PyGT"  // (y:a, x:b) -> (boolean) of a > b
+    pGT = dedent("""
+        LBL "pGT"  // (y:a, x:b) -> (boolean) of a > b
         CF 00
         X<Y?
         SF 00  // true
@@ -172,8 +172,8 @@ class RpnTemplates:
         RTN    
         """)
 
-    PyLT = dedent("""
-        LBL "PyLT"  // (y:a, x:b) -> (boolean) of a < b
+    pLT = dedent("""
+        LBL "pLT"  // (y:a, x:b) -> (boolean) of a < b
         CF 00
         X>Y?
         SF 00  // true
@@ -200,7 +200,7 @@ class RpnTemplates:
         """)
 
     PyLTE = dedent("""
-        LBL "PyLT"  // (y:a, x:b) -> (boolean) of a <= b
+        LBL "pLT"  // (y:a, x:b) -> (boolean) of a <= b
         CF 00
         X≥Y?
         SF 00  // true
@@ -346,7 +346,7 @@ class RpnTemplates:
 
     def need_all_templates(self):
         self.needed_templates = self.template_names[:]  # copy
-        # self.needed_templates.remove('PyList')
+        # self.needed_templates.remove('pList')
 
     def get_user_insertable_pyrpn_cmds(self):
         """

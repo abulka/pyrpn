@@ -186,7 +186,7 @@ class RpnCodeGenTests(BaseTest):
             RCL 00
             RCL 01
             1       // step
-            XEQ "PyIsgPr"
+            XEQ "pISG"
             STO 02  // range i
             
             LBL 00  // for
@@ -213,7 +213,7 @@ class RpnCodeGenTests(BaseTest):
             0
             RCL 00
             1       // step
-            XEQ "PyIsgPr"
+            XEQ "pISG"
             STO 01  // i
             
             LBL 00  // for
@@ -282,7 +282,7 @@ class RpnCodeGenTests(BaseTest):
             5
             RCL 00  // b
             10      // step
-            XEQ "PyIsgPr"
+            XEQ "pISG"
             STO 01  // range i
 
             LBL 00  // for
@@ -425,7 +425,7 @@ class RpnCodeGenTests(BaseTest):
             10        // range start, 10
             RCL 00    // range end, n
             1         // step
-            XEQ "PyIsgPr"
+            XEQ "pISG"
             STO 02    // i our counter
 
             LBL 00  // for
@@ -1202,7 +1202,7 @@ class RpnCodeGenTests(BaseTest):
         expected = dedent("""
             2
             1
-            XEQ "PyGT"
+            XEQ "pGT"
             X≠0?
             GTO 00  // if body
             GTO 01  // resume
@@ -1291,6 +1291,8 @@ class RpnCodeGenTests(BaseTest):
         self.compare(de_comment(expected), lines, dump=True)
 
     def test_comment(self):
+        # user's comments are stripped
+        # auto comment added
         src = """
             # nothing here
             x = 1  # my comment
@@ -1298,7 +1300,7 @@ class RpnCodeGenTests(BaseTest):
         """
         expected = dedent("""
             1
-            STO 00  // x
+            STO 00          // x
         """)
         lines = self.parse(dedent(src))
         self.compare(expected, lines, dump=True, keep_comments=True)
@@ -1538,7 +1540,7 @@ class RpnCodeGenTests(BaseTest):
             LBL 00  // while
             1
             2
-            XEQ "PyLT"
+            XEQ "pLT"
             X≠0?    // while true?
             GTO 01  // while body
             GTO 02  // resume
@@ -1571,7 +1573,7 @@ class RpnCodeGenTests(BaseTest):
             LBL 00  // while
             RCL 00
             2
-            XEQ "PyGT"
+            XEQ "pGT"
             X≠0?    // while true?
             GTO 01  // while body
             GTO 03  // else
@@ -1595,7 +1597,7 @@ class RpnCodeGenTests(BaseTest):
             LBL 00  // while
             1
             2
-            XEQ "PyLT"
+            XEQ "pLT"
             X≠0?    // while true?
             GTO 01  // while body
             GTO 02  // resume
@@ -1616,7 +1618,7 @@ class RpnCodeGenTests(BaseTest):
             LBL 00  // while
             1
             2
-            XEQ "PyLT"
+            XEQ "pLT"
             X≠0?    // while true?
             GTO 01  // while body
             GTO 02  // resume

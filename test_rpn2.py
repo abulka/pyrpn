@@ -79,7 +79,7 @@ class RpnTests2(BaseTest):
         expected = dedent("""
             2
             1
-            XEQ "PyGT"
+            XEQ "pGT"
         """)
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
@@ -91,7 +91,7 @@ class RpnTests2(BaseTest):
         expected = dedent("""
             2
             1
-            XEQ "PyLT"
+            XEQ "pLT"
         """)
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
@@ -153,7 +153,7 @@ class RpnTests2(BaseTest):
         expected = dedent("""
             1
             0
-            XEQ "PyGT"
+            XEQ "pGT"
             XEQ "PyBool"
             XEQ "PyNot"
             """)
@@ -166,7 +166,7 @@ class RpnTests2(BaseTest):
         expected = dedent("""
             5
             6
-            XEQ "PyGT"
+            XEQ "pGT"
             XEQ "PyBool"
             XEQ "PyNot"
             1              // True
