@@ -76,6 +76,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def log_state(self, msg=''):
         log.debug(f'{self.indent}{msg}')
         log.debug(f'{self.indent}{self.scopes.dump()}{self.labels.dump()}')
+        self.log_pending_args()
+
+    def log_pending_args(self):
+        log.debug(f'{self.indent}{self.pending_stack_args}')
 
     def log_children(self, node):
         result = []
@@ -320,10 +324,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.inside_binop = True  # TODO probably should be a stack
 
         self.visit(node.left)
-        log.debug("pending_stack_args %s", self.pending_stack_args)
+        # self.log_pending_args()
 
         self.visit(node.right)
-        log.debug("pending_stack_args %s", self.pending_stack_args)
+        # self.log_pending_args()
 
         if len(self.pending_stack_args) > 4:
             raise RpnError(f'Potential RPN stack overflow detected - expression too complex for 4 level stack - simplify! {self.pending_stack_args}')
@@ -345,7 +349,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.pending_stack_args.pop()
             self.pending_stack_args.pop()
             self.pending_stack_args.append('_result_')  # to account for the two args to this binop) and then push a 'result'
-            log.debug("pending_stack_args %s", self.pending_stack_args)
+            self.log_pending_args()
 
         self.inside_binop = False
         self.end(node)
@@ -729,6 +733,18 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.pending_stack_args = []
         self.end(node)
 
+    def visit_List(self,node):
+        """
+        Children nodes are:
+            - elts (list of elements)
+        """
+        self.begin(node)
+        self.program.insert_xeq('pLCreate')
+        for child in node.elts:
+            self.visit(child)
+            self.program.insert_xeq('pLAppend')
+        self.end(node)
+
     @recursive
     def visit_Break(self,node):
         """ visit a Break node """
@@ -771,7 +787,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             cmd = 'ARCL' if self.inside_alpha and not self.inside_binop and not self.var_name_is_loop_counter(node.id) else 'RCL'
             self.program.insert(f'{cmd} {self.scopes.var_to_reg(node.id)}', comment=node.id)
             self.pending_stack_args.append(node.id)
-            log.debug("pending_stack_args %s", self.pending_stack_args)
             if self.var_name_is_loop_counter(node.id):
                 self.program.insert('IP')  # just get the integer portion of isg counter
         self.end(node)
@@ -783,7 +798,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.alpha_already_cleared = True
         self.program.insert(f'{self.pending_unary_op}{node.n}')
         self.pending_stack_args.append(node.n)
-        log.debug("pending_stack_args %s", self.pending_stack_args)
         self.pending_unary_op = ''
         self.end(node)
 
@@ -800,8 +814,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     @recursive
     def visit_Expr(self, node):
-        log.debug('visit_Expr - gonna clear all pending_stack_args')
-        self.pending_stack_args = []  # a key place to put this reset, but still need one in if/while cos they often get BoolOp not Expr
+        self.pending_stack_args = []
 
     # Most of these operators map to rpn in the opposite way, because of the stack order etc.
     # There are 12 RPN operators, p332

@@ -206,3 +206,45 @@ class RpnTests2(BaseTest):
             """)
         self.assertRaises(RpnError, self.parse, dedent(src))
 
+    # Lists
+
+    def test_list_basic_empty(self):
+        self.parse(dedent("""
+            a = []
+            """))
+        expected = dedent("""
+            XEQ "pLCreate"
+            STO 00
+            """)
+        self.compare(de_comment(expected))
+
+    def test_list_basic_two(self):
+        self.parse(dedent("""
+            a = [1,2]
+            """))
+        expected = dedent("""
+            XEQ "pLCreate"
+            1
+            XEQ "pLAppend"
+            2
+            XEQ "pLAppend"
+            STO 00
+            """)
+        self.compare(de_comment(expected))
+
+    @unittest.skip('list append is hard')
+    def test_list_basic_append(self):
+        self.parse(dedent("""
+            a = []
+            a.append(5)
+            """))
+        expected = dedent("""
+            XEQ "pLCreate"
+            STO 00
+            RCL 00
+            5
+            XEQ "pLAppend"
+            STO 00
+            """)
+        self.compare(de_comment(expected))
+
