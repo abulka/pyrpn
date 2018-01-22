@@ -236,6 +236,27 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+    def test_list_basic_two_vars(self):
+        self.parse(dedent("""
+            a = []
+            b = []
+            VIEW(a)
+            """))
+        expected = dedent("""
+            XEQ "CLIST"
+            SF 01
+            RCL "ZLIST"
+            STO 00
+
+            XEQ "CLIST"
+            SF 01
+            RCL "ZLIST"
+            STO 01
+
+            VIEW 00
+            """)
+        self.compare(de_comment(expected))
+
     @unittest.skip('todo')
     def test_list_basic_append(self):
         self.parse(dedent("""
