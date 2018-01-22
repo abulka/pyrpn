@@ -214,19 +214,19 @@ class RpnTests2(BaseTest):
             """))
         expected = dedent("""
             XEQ "CLIST"
+            SF 01        // 1D list
             RCL "ZLIST"
             STO 00
             """)
         self.compare(de_comment(expected))
 
-    @unittest.skip('todo')
     def test_list_basic_two(self):
         self.parse(dedent("""
             a = [1,2]
             """))
         expected = dedent("""
             XEQ "CLIST"
-            SF 01           // 1-D list
+            SF 01
             1
             XEQ "LIST+"
             2

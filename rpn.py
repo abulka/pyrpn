@@ -740,7 +740,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         """
         self.begin(node)
         self.program.insert_xeq('CLIST')
-        self.program.insert('RCL "ZLIST"')
+        self.program.insert('SF 01', comment='1D list')
+        # self.program.insert('RCL "ZLIST"')
         for child in node.elts:
             self.visit(child)
             self.program.insert_xeq('LIST+')

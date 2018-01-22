@@ -79,6 +79,8 @@ class Program(BaseRpnProgram):
         return self.lines[-1].type_ == type_
 
     def insert_sto(self, func_name, comment=''):
+        if 'LIST' in self.lines[-1].text or 'list' in self.lines[-1].comment:  # hack - need to intelligently figour out type of prev line incl when + operation was acting on lists/matrixes
+            self.insert('RCL "ZLIST"')
         cmd = 'ASTO' if self.is_previous_line('string') else 'STO'
         self.insert(f'{cmd} {func_name}', comment=comment)
 
