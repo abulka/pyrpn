@@ -743,7 +743,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.program.insert('RCL "ZLIST"')
         for child in node.elts:
             self.visit(child)
-            self.program.insert_xeq('pLAppend')
+            self.program.insert_xeq('LIST+')
         self.end(node)
 
     @recursive

@@ -340,7 +340,7 @@ class RpnTemplates:
         return names
 
     def need_template(self, template):
-        assert template in self.template_names
+        assert template in self.template_names, f'template "{template}" missing from {self.template_names}'
         if template not in self.needed_templates:
             self.needed_templates.append(template)
 

@@ -89,6 +89,8 @@ class Program(BaseRpnProgram):
         if func_name in self.user_insertable_pyrpn_cmds:
             # YUK
             comment = self.rpn_templates.get_user_insertable_pyrpn_cmds()[func_name]['description']
+        if func_name in ('LIST+', 'LIST-', 'CLIST'):
+            self.rpn_templates.need_template('pList')
         self.insert(f'XEQ "{func_name}"', comment=comment)
 
     def emit_needed_rpn_templates(self, as_local_labels=True):
