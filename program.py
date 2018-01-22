@@ -55,7 +55,7 @@ class BaseRpnProgram:
         for line in self.lines:
             comment = f'  // {line.comment}' if comments and line.comment else ''
             lineno = f'{line.lineno:02d} ' if linenos else ''
-            result.append(f'{lineno}{line.text}{comment}')
+            result.append(f'{lineno}{line.text:14s}{comment}')
         return '\n'.join(result)
 
     # logging
