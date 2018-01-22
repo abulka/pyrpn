@@ -739,7 +739,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             - elts (list of elements)
         """
         self.begin(node)
-        self.program.insert_xeq('pLCreate')
+        self.program.insert_xeq('CLIST')
+        self.program.insert('RCL "ZLIST"')
         for child in node.elts:
             self.visit(child)
             self.program.insert_xeq('pLAppend')
