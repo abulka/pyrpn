@@ -275,4 +275,58 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+    def test_list_append_to_existing(self):
+        self.parse(dedent("""
+            A = [200]
+            A.append(5)
+            """))
+        expected = dedent("""
+            0
+            XEQ "p1DMtx"
+            200
+            XEQ "LIST+"
+            RCL "ZLIST"
+            STO "A"
+            RCL "A"
+            XEQ "p1DMtx"
+            5
+            XEQ "LIST+"
+            RCL "ZLIST"
+            STO "A"
+            """)
+        self.compare(de_comment(expected))
+
+
+    def test_list_append_i_in_loop(self):
+        self.parse(dedent("""
+            def a10():
+              A = []
+              for i in range(10):
+                A.append(i)
+            """))
+        expected = dedent("""
+            LBL "a10"
+            0
+            XEQ "p1DMtx"
+            STO "A"
+            -1.009
+            STO 00
+            LBL 00
+            ISG 00
+            GTO 01
+            GTO 02
+            LBL 01
+            RCL "A"
+            XEQ "p1DMtx"
+            RCL 00
+            IP
+            XEQ "LIST+"
+            RCL "ZLIST"
+            STO "A"
+            GTO 00
+            LBL 02
+            RTN
+            """)
+        self.compare(de_comment(expected))
+
 

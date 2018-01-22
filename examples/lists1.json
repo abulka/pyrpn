@@ -1,0 +1,7 @@
+{
+    "description": "<p>You must use uppercase variables for lists.&nbsp; You can also initialise a list with values then append to it later e.g.</p>\r\n<pre class=\"language-python\"><code>A = [200]\r\nA.append(5)</code></pre>\r\n<p>Lists are implemented as matrices with one column, and as many rows as is needed (matrix grows as you append elements).</p>",
+    "public": "yes",
+    "sortnum": 0,
+    "source": "def a10():\r\n  A = []\r\n  for i in range(10):\r\n    A.append(i)",
+    "title": "Lists"
+}

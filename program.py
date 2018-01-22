@@ -96,7 +96,7 @@ class Program(BaseRpnProgram):
         self.insert(f'XEQ "{func_name}"', comment=comment)
 
     def emit_needed_rpn_templates(self, as_local_labels=True):
-        return
+        # return
         if not self.rpn_templates.needed_templates:
             return
 
