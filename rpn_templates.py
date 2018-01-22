@@ -103,14 +103,14 @@ class RpnTemplates:
         LBL "LIST+"
         SF 25       // try: (ignore error) 
         XEQ I       
-        FC?C 25     // if was error (flag was cleared)
+        FC?C 25     // if was error (flag cleared)
         GTO 02      //   init list then push
         GROW        // else
-        J-               grow, j-, j+ wrap, then push   TODO understand
+        J-          //   grow, j-, j+ wrap, push()
         J+
         WRAP
         
-        LBL 00      // push (x,y)
+        LBL 00      // push (x[,y]) -> (x[,y])
         STOEL       // zlist[j] = x
         FS? 01      // if list
         GTO 01      //   finished
@@ -119,7 +119,7 @@ class RpnTemplates:
         STOEL
         X<>Y
         
-        LBL 01      // finished, view zlist
+        LBL 01      // finished (), view zlist
         VIEW "ZLIST"
         RTN
         
@@ -128,14 +128,14 @@ class RpnTemplates:
         FS? 01
         1
         FC? 01
-        2           // stack is (y:1,x:1) if flag 1 set, else (y:1,x:2) 
-        DIM "ZLIST"
+        2           // stack is (y:1,x:1) if flag 1 
+        DIM "ZLIST" // else stack is (y:1,x:2)
         XEQ I       // prepare list for access
         RDN
         RDN         // drop rubbish off the stack
-        GTO 00      // push
+        GTO 00      // push()
         
-        LBL "LIST-"
+        LBL "LIST-" // pop () -> () 
         SF 25
         XEQ I
         FC? 25
