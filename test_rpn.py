@@ -963,7 +963,7 @@ class RpnCodeGenTests(BaseTest):
             """))
         expected = dedent("""
             1
-            XEQ "PyFS"
+            XEQ "pFS"
             
             X≠0?
             GTO 00  // true, flag is set
@@ -987,7 +987,7 @@ class RpnCodeGenTests(BaseTest):
             """))
         expected = dedent("""
             1
-            XEQ "PyFS"
+            XEQ "pFS"
             
             X≠0?
             GTO 00  // true, flag is set
@@ -1017,7 +1017,7 @@ class RpnCodeGenTests(BaseTest):
         """
         expected_descriptive = dedent("""
             20
-            XEQ "PyFS"
+            XEQ "pFS"
             X≠0?
             GTO if body
             GTO elif 1
@@ -1028,7 +1028,7 @@ class RpnCodeGenTests(BaseTest):
 
             LBL elif 1
             21
-            XEQ "PyFS"
+            XEQ "pFS"
             X≠0?
             GTO elif body 1
             GTO else
@@ -1054,7 +1054,7 @@ class RpnCodeGenTests(BaseTest):
         """
         expected = dedent("""
             20
-            XEQ "PyFS"
+            XEQ "pFS"
             X≠0?
             GTO 00  // if body
             GTO 03  // elif
@@ -1065,7 +1065,7 @@ class RpnCodeGenTests(BaseTest):
 
             LBL 03  // elif
             21
-            XEQ "PyFS"
+            XEQ "pFS"
             X≠0?
             GTO 04  // elif body
             GTO 02  // else
@@ -1101,7 +1101,7 @@ class RpnCodeGenTests(BaseTest):
         """
         expected_descriptive = dedent("""
             20
-            XEQ "PyFS"
+            XEQ "pFS"
             X≠0?
             GTO if body
             GTO elif 1
@@ -1111,7 +1111,7 @@ class RpnCodeGenTests(BaseTest):
 
             LBL elif 1
             21
-            XEQ "PyFS"
+            XEQ "pFS"
             X≠0?
             GTO elif body 1   // new
             GTO elif 2  // 2nd
@@ -1123,7 +1123,7 @@ class RpnCodeGenTests(BaseTest):
             
             LBL elif 2 // 2nd
             22
-            XEQ "PyFS"
+            XEQ "pFS"
             X≠0?
             GTO elif body 2
             GTO else
@@ -1151,7 +1151,7 @@ class RpnCodeGenTests(BaseTest):
         """
         expected = dedent("""
             20
-            XEQ "PyFS"
+            XEQ "pFS"
             X≠0?
             GTO 00  // if body
             GTO 03  // elif
@@ -1161,7 +1161,7 @@ class RpnCodeGenTests(BaseTest):
 
             LBL 03  // elif
             21
-            XEQ "PyFS"
+            XEQ "pFS"
             X≠0?
             GTO 04  // elif body
             GTO 05  // elif (2nd)
@@ -1173,7 +1173,7 @@ class RpnCodeGenTests(BaseTest):
             // This is the second elif
             LBL 05  // elif (2nd)
             22
-            XEQ "PyFS"
+            XEQ "pFS"
             X≠0?
             GTO 06  // elif body (2nd)
             GTO 02  // else
@@ -1785,7 +1785,7 @@ class RpnCodeGenTests(BaseTest):
         """
         expected = dedent("""
             21
-            XEQ "PyFS"
+            XEQ "pFS"
             XEQ "pBool"
             XEQ "pNot"
             VIEW ST X

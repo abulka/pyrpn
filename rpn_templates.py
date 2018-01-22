@@ -56,7 +56,7 @@ class RpnTemplates:
         
         999      // check don't exceed max 'to' value of 999 (ISG ccccccc.fffii)
         X<Y?
-        XEQ "pErrRange"
+        XEQ "p__1ErR"
         RDN
         
         X<>Y     // stack now: z:step y:to-1 x:from 
@@ -168,7 +168,7 @@ class RpnTemplates:
         CF 00
         X<Y?
         SF 00  // true
-        XEQ "_PyDFTB"  // get bool of flag 00
+        XEQ "p__0Bool"  // get bool of flag 00
         RTN    
         """)
 
@@ -177,7 +177,7 @@ class RpnTemplates:
         CF 00
         X>Y?
         SF 00  // true
-        XEQ "_PyDFTB"  // get bool of flag 00
+        XEQ "p__0Bool"  // get bool of flag 00
         RTN    
         """)
 
@@ -186,7 +186,7 @@ class RpnTemplates:
         CF 00
         X=Y?
         SF 00  // true
-        XEQ "_PyDFTB"  // get bool of flag 00
+        XEQ "p__0Bool"  // get bool of flag 00
         RTN    
         """)
 
@@ -195,7 +195,7 @@ class RpnTemplates:
         CF 00
         X≤Y?
         SF 00  // true
-        XEQ "_PyDFTB"  // get bool of flag 00
+        XEQ "p__0Bool"  // get bool of flag 00
         RTN    
         """)
 
@@ -204,7 +204,7 @@ class RpnTemplates:
         CF 00
         X≥Y?
         SF 00  // true
-        XEQ "_PyDFTB"  // get bool of flag 00
+        XEQ "p__0Bool"  // get bool of flag 00
         RTN    
         """)
 
@@ -213,7 +213,7 @@ class RpnTemplates:
         CF 00
         X≠Y?
         SF 00  // true
-        XEQ "_PyDFTB"  // get bool of flag 00
+        XEQ "p__0Bool"  // get bool of flag 00
         RTN    
         """)
 
@@ -255,8 +255,8 @@ class RpnTemplates:
 
     # Flags
 
-    PyFS = dedent("""
-        LBL "PyFS"  // (flag) -> boolean of flag
+    pFS = dedent("""
+        LBL "pFS"  // (flag) -> boolean of flag
         CF 00
         FS? IND X
         SF 00
@@ -268,8 +268,8 @@ class RpnTemplates:
         RTN    
         """)
 
-    PyFC = dedent("""
-        LBL "PyFS"  // (flag) -> boolean of flag
+    pFC = dedent("""
+        LBL "pFS"  // (flag) -> boolean of flag
         CF 00
         FC? IND X
         SF 00
@@ -308,8 +308,8 @@ class RpnTemplates:
 
     # Util
 
-    _PyDFTB = dedent("""
-        LBL "_PyDFTB"  // (a,b) -> (boolean) of whether flag 00 is set
+    p__0Bool = dedent("""
+        LBL "p__0Bool"  // (a,b) -> (boolean) of whether flag 00 is set
         RDN
         RDN    // params dropped 
         FS? 00
@@ -319,8 +319,8 @@ class RpnTemplates:
         RTN    
         """)
 
-    pErrRange = dedent("""
-        LBL "pErrRange"  // (to,999) -> display error & stop.
+    p__1ErR = dedent("""
+        LBL "p__1ErR"  // (to,999) -> display error & stop.
         RDN
         "range() limited"
         ├" to 999: got "
@@ -353,8 +353,8 @@ class RpnTemplates:
         These are the commands that are exposed to the user and which can be inserted into.
         """
         return {
-            'PyFS': {'description': 'is flag set?'},
-            'PyFC': {'description': 'is flag clear?'},
+            'pFS': {'description': 'is flag set?'},
+            'pFC': {'description': 'is flag clear?'},
         }
 
     def _create_local_labels(self):

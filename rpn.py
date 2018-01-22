@@ -373,10 +373,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.check_supported(func_name, node)
 
         if func_name == 'isFS':
-            func_name = 'PyFS'
+            func_name = 'pFS'
 
         if func_name == 'isFC':
-            func_name = 'PyFC'
+            func_name = 'pFC'
 
 
         if func_name in cmd_list and len(node.args) == 0:
