@@ -235,7 +235,6 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    @unittest.skip("offline")
     def test_list_basic_two_vars(self):
         self.parse(dedent("""
             A = []
