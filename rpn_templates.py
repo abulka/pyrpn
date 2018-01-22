@@ -181,8 +181,8 @@ class RpnTemplates:
         RTN    
         """)
 
-    PyEQ = dedent("""
-        LBL "PyEQ"  // (y:a, x:b) -> boolean of a == b
+    pEQ = dedent("""
+        LBL "pEQ"  // (y:a, x:b) -> boolean of a == b
         CF 00
         X=Y?
         SF 00  // true
@@ -190,8 +190,8 @@ class RpnTemplates:
         RTN    
         """)
 
-    PyGTE = dedent("""
-        LBL "PyGTE"  // (y:a, x:b) -> (boolean) of a >= b
+    pGTE = dedent("""
+        LBL "pGTE"  // (y:a, x:b) -> (boolean) of a >= b
         CF 00
         X≤Y?
         SF 00  // true
@@ -199,7 +199,7 @@ class RpnTemplates:
         RTN    
         """)
 
-    PyLTE = dedent("""
+    pLTE = dedent("""
         LBL "pLT"  // (y:a, x:b) -> (boolean) of a <= b
         CF 00
         X≥Y?
@@ -208,8 +208,8 @@ class RpnTemplates:
         RTN    
         """)
 
-    PyNEQ = dedent("""
-        LBL "PyNEQ"  // (y:a, x:b) -> boolean of a != b
+    pNEQ = dedent("""
+        LBL "pNEQ"  // (y:a, x:b) -> boolean of a != b
         CF 00
         X≠Y?
         SF 00  // true
@@ -219,8 +219,8 @@ class RpnTemplates:
 
     # Logic
 
-    PyBool = dedent("""
-        LBL "PyBool"  // (a) -> (bool)
+    pBool = dedent("""
+        LBL "pBool"  // (a) -> (bool)
         CF 00
         X≠0?
         SF 00  // is non zero, thus true
@@ -232,17 +232,17 @@ class RpnTemplates:
         RTN
         """)
 
-    Py2Bool = dedent("""
-        LBL "Py2Bool"  // (a,b) -> (bool, bool)
-        XEQ "PyBool"    
+    p2Bool = dedent("""
+        LBL "p2Bool"  // (a,b) -> (bool, bool)
+        XEQ "pBool"    
         X<>Y
-        XEQ "PyBool"    
+        XEQ "pBool"    
         X<>Y
         RTN
         """)
 
-    PyNot = dedent("""
-        LBL "PyNot"  // (a) -> boolean of not a
+    pNot = dedent("""
+        LBL "pNot"  // (a) -> boolean of not a
         X≠0?
         SF 00  // is a true value
         RDN

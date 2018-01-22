@@ -96,13 +96,13 @@ class Program(BaseRpnProgram):
             return
 
         templates_needed = set(self.rpn_templates.needed_templates)
-        templates_who_need_PyBool = {'Py2Bool'}
+        templates_who_need_PyBool = {'p2Bool'}
         templates_who_need_pErrRange = {'pISG'}
-        templates_who_need_PyDFTB = {'PyEQ', 'pGT', 'PyGTE', 'pLT', 'PyLTE', 'PyNEQ'}
+        templates_who_need_PyDFTB = {'pEQ', 'pGT', 'pGTE', 'pLT', 'pLTE', 'pNEQ'}
 
         # Add any dependent templates, using set technology
         if templates_who_need_PyBool & templates_needed:
-            templates_needed.add('PyBool')
+            templates_needed.add('pBool')
         if templates_who_need_PyDFTB & templates_needed:
             templates_needed.add('_PyDFTB')
         if templates_who_need_pErrRange & templates_needed:

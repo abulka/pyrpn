@@ -28,7 +28,7 @@ class RpnTests2(BaseTest):
         expected = dedent("""
             1
             0
-            XEQ "Py2Bool"
+            XEQ "p2Bool"
             AND
             """)
         self.compare(de_comment(expected))
@@ -40,10 +40,10 @@ class RpnTests2(BaseTest):
         expected = dedent("""
             1
             0
-            XEQ "Py2Bool"
+            XEQ "p2Bool"
             AND
             1
-            XEQ "Py2Bool"
+            XEQ "p2Bool"
             OR
             """)
         self.compare(de_comment(expected))
@@ -56,7 +56,7 @@ class RpnTests2(BaseTest):
         expected = dedent("""
             1
             0
-            XEQ "Py2Bool"
+            XEQ "p2Bool"
             AND
 
             X≠0?    // if true?
@@ -103,7 +103,7 @@ class RpnTests2(BaseTest):
         expected = dedent("""
             2
             1
-            XEQ "PyGTE"
+            XEQ "pGTE"
         """)
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
@@ -115,7 +115,7 @@ class RpnTests2(BaseTest):
         expected = dedent("""
             2
             1
-            XEQ "PyLTE"
+            XEQ "pLTE"
         """)
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
@@ -127,7 +127,7 @@ class RpnTests2(BaseTest):
         expected = dedent("""
             2
             1
-            XEQ "PyEQ"
+            XEQ "pEQ"
         """)
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
@@ -139,7 +139,7 @@ class RpnTests2(BaseTest):
         expected = dedent("""
             2
             1
-            XEQ "PyNEQ"
+            XEQ "pNEQ"
         """)
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
@@ -154,8 +154,8 @@ class RpnTests2(BaseTest):
             1
             0
             XEQ "pGT"
-            XEQ "PyBool"
-            XEQ "PyNot"
+            XEQ "pBool"
+            XEQ "pNot"
             """)
         self.compare(de_comment(expected))
 
@@ -167,13 +167,13 @@ class RpnTests2(BaseTest):
             5
             6
             XEQ "pGT"
-            XEQ "PyBool"
-            XEQ "PyNot"
+            XEQ "pBool"
+            XEQ "pNot"
             1              // True
             0              // False
-            XEQ "Py2Bool"  // redundant
+            XEQ "p2Bool"  // redundant
             OR
-            XEQ "Py2Bool"  // redundant
+            XEQ "p2Bool"  // redundant
             AND
             """)
         self.compare(de_comment(expected))
@@ -191,11 +191,11 @@ class RpnTests2(BaseTest):
             STO 00      // a
             2
             3
-            XEQ "PyEQ"
+            XEQ "pEQ"
             STO 01      // b
             RCL 00
             RCL 01
-            XEQ "Py2Bool"
+            XEQ "p2Bool"
             AND
             """)
         self.compare(de_comment(expected))

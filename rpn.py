@@ -819,12 +819,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     # Most of these operators map to rpn in the opposite way, because of the stack order etc.
     # There are 12 RPN operators, p332
     cmpops = {
-        "Eq":     "PyEQ",
-        "NotEq":  "PyNEQ",
+        "Eq":     "pEQ",
+        "NotEq":  "pNEQ",
         "Lt":     "pLT",
-        "LtE":    "PyLTE",
+        "LtE":    "pLTE",
         "Gt":     "pGT",
-        "GtE":    "PyGTE",
+        "GtE":    "pGTE",
         # TODO
         "Is":     "PyIs",
         "IsNot":  "PyIsNot",
@@ -863,16 +863,16 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.visit(node.operand)
 
     def visit_Or(self, node):
-        self.program.insert_xeq('Py2Bool')
+        self.program.insert_xeq('p2Bool')
         self.program.insert('OR')
 
     def visit_And(self, node):
-        self.program.insert_xeq('Py2Bool')
+        self.program.insert_xeq('p2Bool')
         self.program.insert('AND')
 
     def visit_Not(self, node):
-        self.program.insert_xeq('PyBool')
-        self.program.insert_xeq('PyNot')
+        self.program.insert_xeq('pBool')
+        self.program.insert_xeq('pNot')
 
     def visit_NameConstant(self, node):
         # True or False constants - node.value is either True or False (booleans). Are there any other NameConstants?

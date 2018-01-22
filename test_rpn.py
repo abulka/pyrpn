@@ -1247,7 +1247,7 @@ class RpnCodeGenTests(BaseTest):
             RDN
             RCL 02  // n
             0
-            XEQ "PyEQ"
+            XEQ "pEQ"
             X≠0?    // if true?
             GTO 00  // if body
             GTO 03  // elif 1
@@ -1258,7 +1258,7 @@ class RpnCodeGenTests(BaseTest):
             LBL 03  // elif 1
             RCL 02  // n
             1
-            XEQ "PyEQ"
+            XEQ "pEQ"
             X≠0?    // if true?
             GTO 04  // elif body 1
             GTO 05  // elif 2
@@ -1270,7 +1270,7 @@ class RpnCodeGenTests(BaseTest):
             LBL 05  // elif 2
             RCL 02  // n
             2
-            XEQ "PyEQ"
+            XEQ "pEQ"
             X≠0?    // if true?
             GTO 06  // elif body 2
             GTO 02  // else
@@ -1648,7 +1648,7 @@ class RpnCodeGenTests(BaseTest):
             LBL 00  // while
             RCL 00
             2
-            XEQ "PyEQ"
+            XEQ "pEQ"
             X≠0?    // while true?
             GTO 01  // while body
             GTO 03  // else
@@ -1786,8 +1786,8 @@ class RpnCodeGenTests(BaseTest):
         expected = dedent("""
             21
             XEQ "PyFS"
-            XEQ "PyBool"
-            XEQ "PyNot"
+            XEQ "pBool"
+            XEQ "pNot"
             VIEW ST X
         """)
         lines = self.parse(dedent(src))
