@@ -62,7 +62,7 @@ def index(id=None):
         if form.validate_on_submit():
             spy(form.source.data, form.source.default)
             try:
-                program = parse(form.source.data)
+                program = parse(form.source.data, {'emit_pyrpn_lib': form.emit_pyrpn_lib.data})
                 rpn = program.lines_to_str(comments=form.comments.data, linenos=form.line_numbers.data)
                 rpn_free42 = program.lines_to_str(comments=False, linenos=True)
             except RpnError as e:
@@ -80,11 +80,6 @@ def spy(source, default_source):
     source_trimmed = s
     source_full = f'{line}\n{source}\n{line}'
     log.info(f'main converter converting python code: {source_trimmed}\n{source_full}')
-
-def do(source, comments=True, linenos=True):
-    program = parse(source)
-    rpn = program.lines_to_str(comments=comments, linenos=linenos)
-    return rpn
 
 
 @app.route('/examples')
@@ -231,14 +226,12 @@ def vote_via_email(example):
 
 @app.route('/py-rpn-lib', methods=['GET'])
 def py_rpn_lib():
-    # comments =
     program = Program()
     program.rpn_templates.need_all_templates()
     program.emit_needed_rpn_templates(as_local_labels=False)
-    rpn = program.lines_to_str(comments=True, linenos=True)  # comments=form.comments.data, linenos=form.line_numbers.data)
+    rpn = program.lines_to_str(comments=True, linenos=True)
     rpn_free42 = program.lines_to_str(comments=False, linenos=True)
-    # log.info(f'main converter converting example {example.id} title "{example.title}"')
-    # return jsonify(rpn=rpn, rpn_free42=rpn_free42)
+    log.info('generating standalone RPN support lib')
     return render_template('pyrpnlib.html', rpn=rpn, rpn_free42=rpn_free42, title='PyRpn Support Lib')
 
 @app.route('/help')
@@ -256,7 +249,7 @@ def hello():
 @app.route('/test')
 def test():
     rpn = do()
-    return f'<html><body><pre>{rpn}</pre></body></html>'
+    return f'<html><body><pre>{"hi there"}</pre></body></html>'
 
 
 if __name__ == '__main__':
