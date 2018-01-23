@@ -762,6 +762,26 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.program.insert_xeq('LIST+')
         self.end(node)
 
+    def visit_Subscript(self,node):
+        """
+        Children nodes are:
+            - value (the Name of the list we are accessing)
+            - slice - with subchild Index.value which is a Num of the list index
+            - ctx - Load or Store? I suppose
+        """
+        self.begin(node)
+        cheat = """
+            RCL "A"
+            XEQ "p1DMtx"
+            INDEX "ZLIST"
+            1
+            1
+            STOIJ
+            RCLEL
+        """
+        self.program.insert_raw_lines(cheat)
+        self.end(node)
+
     @recursive
     def visit_Break(self,node):
         """ visit a Break node """

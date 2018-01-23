@@ -340,4 +340,27 @@ class RpnTests2(BaseTest):
         """
         self.assertRaises(RpnError, self.parse, dedent(src))
 
-
+    def test_list_access_el(self):
+        self.parse(dedent("""
+            A = [200]
+            x = A[0]
+            """))
+        expected = dedent("""
+            0
+            XEQ "p1DMtx"
+            200
+            XEQ "LIST+"
+            RCL "ZLIST"
+            STO "A"
+            
+            RCL "A"
+            XEQ "p1DMtx"
+            INDEX "ZLIST"
+            1
+            1
+            STOIJ
+            RCLEL
+            
+            STO 00
+            """)
+        self.compare(de_comment(expected))
