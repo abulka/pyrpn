@@ -427,3 +427,32 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+
+    def test_list_aview_element(self):
+        self.parse(dedent("""
+            A = ["hi"]
+            AVIEW(A[0])
+          """))
+        expected = dedent("""
+            0
+            XEQ "p1DMtx"
+            "hi"
+            ASTO ST X
+            XEQ "LIST+"
+            RCL "ZLIST"
+            STO "A"
+            CLA
+            RCL "A"
+            XEQ "p1DMtx"
+            INDEX "ZLIST"
+            0
+            1
+            +
+            1
+            STOIJ
+            RCLEL
+            ARCL ST X
+            AVIEW
+            """)
+        self.compare(de_comment(expected))
+

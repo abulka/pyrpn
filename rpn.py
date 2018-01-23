@@ -37,6 +37,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.alpha_already_cleared = False
         self.inside_binop = False
         self.disallow_string_args = False
+        self.inside_list_access = False
 
     # Recursion support
 
@@ -256,6 +257,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.end(node)
 
     def process_list_access(self, subscript_node):
+        self.inside_list_access = True
         self.visit(subscript_node.value)  # RCL list name
 
         prepare_for_access = """
@@ -275,6 +277,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             STOIJ
         """
         self.program.insert_raw_lines(code)
+        self.inside_list_access = False
 
     def visit_Assign(self,node):
         """ visit a Assign node and visits it recursively
@@ -495,6 +498,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                     elif isinstance(arg, ast.Str):
                         pass
                     elif isinstance(arg, ast.BinOp):   # other types?
+                        self.program.insert('ARCL ST X')
+                    elif isinstance(arg, ast.Subscript):
                         self.program.insert('ARCL ST X')
                     # else:
                     #     raise RpnError(f'Do not know how to alpha {arg} with value {self.get_node_name_id_or_n(arg)}')
@@ -860,7 +865,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             if self.inside_alpha and not self.alpha_append_mode and not self.alpha_already_cleared:
                 self.program.insert('CLA')
                 self.alpha_already_cleared = True
-            cmd = 'ARCL' if self.inside_alpha and not self.inside_binop and not self.var_name_is_loop_counter(node.id) else 'RCL'
+
+            cmd = 'ARCL' if self.inside_alpha and \
+                            not self.inside_binop and \
+                            not self.var_name_is_loop_counter(node.id) and \
+                            not self.inside_list_access else 'RCL'
+
             self.program.insert(f'{cmd} {self.scopes.var_to_reg(node.id)}', comment=node.id)
             self.pending_stack_args.append(node.id)
             if self.var_name_is_loop_counter(node.id):
