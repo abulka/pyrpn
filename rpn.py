@@ -767,11 +767,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         Children nodes are:
             - value (the Name of the list we are accessing)
             - slice - with subchild Index.value which is a Num of the list index
-            - ctx - Load or Store? I suppose
+            - ctx - Load or Store
         """
         self.begin(node)
+        assert isinstance(node.ctx, ast.Load)
+        self.visit(node.value)  # name of list
         cheat = """
-            RCL "A"
             XEQ "p1DMtx"
             INDEX "ZLIST"
             1
