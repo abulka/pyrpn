@@ -274,9 +274,14 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             if isinstance(target, ast.Subscript):
                 subscript = target
                 self.visit(subscript.value)  # RCL list name
-                cheat = """
+
+                prepare_for_access = """
                     XEQ "p1DMtx"
                     INDEX "ZLIST"
+                """
+                self.program.insert_raw_lines(prepare_for_access)
+
+                cheat = """
                     0
                     1
                     +
