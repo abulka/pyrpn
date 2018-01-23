@@ -770,17 +770,29 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             - ctx - Load or Store
         """
         self.begin(node)
+
+        # Recall the list onto the stack
         assert isinstance(node.ctx, ast.Load)
         self.visit(node.value)  # name of list
-        cheat = """
+
+        prepare_for_access = """
             XEQ "p1DMtx"
             INDEX "ZLIST"
-            1
-            1
+        """
+        self.program.insert_raw_lines(prepare_for_access)
+
+        # Get the y:row onto the stack
+        assert isinstance(node.slice, ast.Index)
+        self.visit(node.slice.value)  # the index value
+
+        code = f"""
+            1        // y:row (adjust from 0 based to 1)
+            +
+            1        // x:column
             STOIJ
             RCLEL
         """
-        self.program.insert_raw_lines(cheat)
+        self.program.insert_raw_lines(code)
         self.end(node)
 
     @recursive

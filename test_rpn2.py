@@ -356,7 +356,9 @@ class RpnTests2(BaseTest):
             RCL "A"
             XEQ "p1DMtx"
             INDEX "ZLIST"
+            0
             1
+            +
             1
             STOIJ
             RCLEL
