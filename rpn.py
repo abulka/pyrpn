@@ -255,6 +255,15 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.program.insert(f'RTN', comment='return')
         self.end(node)
 
+    def process_list_access(self, subscript_node):
+        self.visit(subscript_node.value)  # RCL list name
+
+        prepare_for_access = """
+            XEQ "p1DMtx"
+            INDEX "ZLIST"
+        """
+        self.program.insert_raw_lines(prepare_for_access)
+
     def visit_Assign(self,node):
         """ visit a Assign node and visits it recursively
             - targets
@@ -272,14 +281,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 raise RpnError(f'Can only assign lists to uppercase variables not "{target.id}".  Please change the variable name to uppercase e.g. "{target.id.upper()}".')  #  This is because lists are implemented as RPN matrices which need to be stored in a named register.')
 
             if isinstance(target, ast.Subscript):
-                subscript = target
-                self.visit(subscript.value)  # RCL list name
-
-                prepare_for_access = """
-                    XEQ "p1DMtx"
-                    INDEX "ZLIST"
-                """
-                self.program.insert_raw_lines(prepare_for_access)
+                assert isinstance(target.ctx, ast.Store)
+                self.process_list_access(target)
 
                 cheat = """
                     0
@@ -802,13 +805,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         # Recall the list onto the stack
         assert isinstance(node.ctx, ast.Load)
-        self.visit(node.value)  # name of list
-
-        prepare_for_access = """
-            XEQ "p1DMtx"
-            INDEX "ZLIST"
-        """
-        self.program.insert_raw_lines(prepare_for_access)
+        self.process_list_access(node)
 
         # Get the y:row onto the stack
         assert isinstance(node.slice, ast.Index)
