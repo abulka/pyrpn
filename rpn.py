@@ -283,8 +283,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         """
         self.begin(node)
 
-        # self.visit_children(node)
-        self.visit(node.value)
+        self.visit(node.value)  # a single Num or Str or Name or List (of elements)
+        if isinstance(node.targets[0], ast.Subscript) and self.program.is_previous_line('string'):  # hack (looking ahead at first target to see if we are assigning to a list element)
+            self.program.insert('ASTO ST X')
 
         for target in node.targets:
             assert '.Store' in str(target.ctx)
@@ -797,6 +798,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.program.insert_xeq('p1DMtx')
         for child in node.elts:
             self.visit(child)
+            if self.program.is_previous_line('string'):
+                self.program.insert('ASTO ST X')
             self.program.insert_xeq('LIST+')
         self.end(node)
 

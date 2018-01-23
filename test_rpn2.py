@@ -394,3 +394,36 @@ class RpnTests2(BaseTest):
             STOEL
             """)
         self.compare(de_comment(expected))
+
+
+    def test_list_strings(self):
+        self.parse(dedent("""
+          A = ["hi", "there"]
+          A[0] = "hello"
+          """))
+        expected = dedent("""
+            0
+            XEQ "p1DMtx"
+            "hi"
+            ASTO ST X
+            XEQ "LIST+"
+            "there"
+            ASTO ST X
+            XEQ "LIST+"
+            RCL "ZLIST"
+            STO "A"
+            "hello"
+            ASTO ST X
+            RCL "A"
+            XEQ "p1DMtx"
+            INDEX "ZLIST"
+            0
+            1
+            +
+            1
+            STOIJ
+            RCL ST T
+            STOEL
+            """)
+        self.compare(de_comment(expected))
+
