@@ -272,8 +272,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 raise RpnError(f'Can only assign lists to uppercase variables not "{target.id}".  Please change the variable name to uppercase e.g. "{target.id.upper()}".')  #  This is because lists are implemented as RPN matrices which need to be stored in a named register.')
 
             if isinstance(target, ast.Subscript):
+                subscript = target
+                self.visit(subscript.value)  # RCL list name
                 cheat = """
-                    RCL "A"
                     XEQ "p1DMtx"
                     INDEX "ZLIST"
                     0
