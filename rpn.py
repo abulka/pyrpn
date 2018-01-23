@@ -256,15 +256,38 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.end(node)
 
     def visit_Assign(self,node):
-        """ visit a Assign node and visits it recursively"""
+        """ visit a Assign node and visits it recursively
+            - targets
+            - value
+        """
         self.begin(node)
-        self.visit_children(node)
+
+        # self.visit_children(node)
+        self.visit(node.value)
+
         for target in node.targets:
-            if self.program.is_previous_line_matrix_related() and target.id.islower():
-                raise RpnError(f'Can only assign lists to uppercase variables not "{target.id}".  Please change the variable name to uppercase e.g. "{target.id.upper()}".')  #  This is because lists are implemented as RPN matrices which need to be stored in a named register.')
-            self.program.insert_sto(self.scopes.var_to_reg(target.id), comment=f'{target.id}')
             assert '.Store' in str(target.ctx)
             assert isinstance(target.ctx, ast.Store)
+            if self.program.is_previous_line_matrix_related() and target.id.islower():
+                raise RpnError(f'Can only assign lists to uppercase variables not "{target.id}".  Please change the variable name to uppercase e.g. "{target.id.upper()}".')  #  This is because lists are implemented as RPN matrices which need to be stored in a named register.')
+
+            if isinstance(target, ast.Subscript):
+                cheat = """
+                    RCL "A"
+                    XEQ "p1DMtx"
+                    INDEX "ZLIST"
+                    0
+                    1
+                    +
+                    1
+                    STOIJ
+                    RCL ST T
+                    STOEL
+                """
+                self.program.insert_raw_lines(cheat)
+            else:
+                self.program.insert_sto(self.scopes.var_to_reg(target.id), comment=f'{target.id}')
+
         self.pending_stack_args = []  # must have, cos could just be assigning single values, not BinOp and not Expr
         self.end(node)
 

@@ -366,3 +366,31 @@ class RpnTests2(BaseTest):
             STO 00
             """)
         self.compare(de_comment(expected))
+
+    def test_list_access_el_store(self):
+        self.parse(dedent("""
+            A = [200]
+            A[0] = 300
+            """))
+        expected = dedent("""
+            0
+            XEQ "p1DMtx"
+            200
+            XEQ "LIST+"
+            RCL "ZLIST"
+            STO "A"
+
+            300
+                        
+            RCL "A"
+            XEQ "p1DMtx"
+            INDEX "ZLIST"
+            0
+            1
+            +
+            1
+            STOIJ
+            RCL ST T
+            STOEL
+            """)
+        self.compare(de_comment(expected))
