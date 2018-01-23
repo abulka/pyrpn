@@ -264,6 +264,18 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         """
         self.program.insert_raw_lines(prepare_for_access)
 
+        # Get the y:row onto the stack
+        assert isinstance(subscript_node.slice, ast.Index)
+        self.visit(subscript_node.slice.value)  # the index value
+
+        code = f"""
+            1        // y:row (adjust from 0 based to 1)
+            +
+            1        // x:column
+            STOIJ
+        """
+        self.program.insert_raw_lines(code)
+
     def visit_Assign(self,node):
         """ visit a Assign node and visits it recursively
             - targets
@@ -283,17 +295,11 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             if isinstance(target, ast.Subscript):
                 assert isinstance(target.ctx, ast.Store)
                 self.process_list_access(target)
-
-                cheat = """
-                    0
-                    1
-                    +
-                    1
-                    STOIJ
+                code = """
                     RCL ST T
                     STOEL
                 """
-                self.program.insert_raw_lines(cheat)
+                self.program.insert_raw_lines(code)
             else:
                 self.program.insert_sto(self.scopes.var_to_reg(target.id), comment=f'{target.id}')
 
@@ -806,16 +812,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         # Recall the list onto the stack
         assert isinstance(node.ctx, ast.Load)
         self.process_list_access(node)
-
-        # Get the y:row onto the stack
-        assert isinstance(node.slice, ast.Index)
-        self.visit(node.slice.value)  # the index value
-
         code = f"""
-            1        // y:row (adjust from 0 based to 1)
-            +
-            1        // x:column
-            STOIJ
             RCLEL
         """
         self.program.insert_raw_lines(code)
