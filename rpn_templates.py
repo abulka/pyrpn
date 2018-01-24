@@ -341,6 +341,19 @@ class RpnTemplates:
         RTN
         """)
 
+    p1DLen = dedent("""
+        LBL "p1DLen"  // () -> length, please INDEX the list first
+        1
+        1
+        STOIJ
+        RDN
+        RDN
+        I-
+        RCLIJ
+        RDN
+        RTN
+        """)
+
     # Code
 
     @classmethod
