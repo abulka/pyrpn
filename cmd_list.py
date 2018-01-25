@@ -560,9 +560,8 @@ cmd_list = \
                        '(3.14159265359).',
         'indirect_allowed': False,
         'num_arg_fragments': 0},
- 'PIXEL': {'description': 'Turn on a single pixel (dot) in the display. The '
-                          'location of the pixel is given by the numbers in '
-                          'the x- and y-registers.',
+ 'PIXEL': {'description': 'Turn on a single pixel (dot) in the display y: row '
+                          '(y axis) x: col (x axis)',
            'indirect_allowed': False,
            'num_arg_fragments': 0},
  'POLAR': {'description': 'Select polar coordinate mode for displaying complex '
