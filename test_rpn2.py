@@ -546,7 +546,6 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    @unittest.skip('hard')
     def test_neg_expr_inside_param(self):
         self.parse(dedent("""
             fred(-y + 1)
@@ -556,7 +555,7 @@ class RpnTests2(BaseTest):
             CHS
             1
             +
-            XEQ "A"
+            XEQ A
             """)
         self.compare(de_comment(expected))
 
