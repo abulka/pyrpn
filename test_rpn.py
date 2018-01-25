@@ -1680,7 +1680,9 @@ class RpnCodeGenTests(BaseTest):
              
     alpha  - Builds strings in the alpha register, typically takes parameters.  
              No params inserts CLA.
-             If want to append, then add parameter append=True, ├"" any string is appended
+             If you want to append, then add parameter append=True, ├"" any string is appended
+             If you want to change or remove the separator, then add parameter sep=' ' with your choice of separator.
+             An empty separator ''  means no separator.  The default separator is a single space ' '
              
     print  - synonym for AVIEW
     
@@ -1796,7 +1798,7 @@ class RpnCodeGenTests(BaseTest):
 
     def test_text_alpha_blow_stack_no(self):
         src = """
-            alpha("this", " is ", "my ", "string", "and", "I", "can", "break it up")
+            alpha("this", " is ", "my ", "string", "and", "I", "can", "break it up", sep='')
         """
         expected = dedent("""
             "this"
@@ -1813,7 +1815,7 @@ class RpnCodeGenTests(BaseTest):
 
     def test_text_alpha_mixed_blow_stack_no(self):
         src = """
-            alpha("this", 1, " is ", 2, "my ", 3, "string", 4, "and", 5, "I", 6, "can", 7, "break it up")
+            alpha("this", 1, " is ", 2, "my ", 3, "string", 4, "and", 5, "I", 6, "can", 7, "break it up", sep='')
         """
         expected = dedent("""
             "this"
@@ -1844,7 +1846,7 @@ class RpnCodeGenTests(BaseTest):
 
     def test_text_alpha_ints_blow_stack_no(self):
         src = """
-            alpha("a", 1, 2, 3, 4, 5, 6, 7)
+            alpha("a", 1, 2, 3, 4, 5, 6, 7, sep='')
         """
         expected = dedent("""
             "a"
@@ -1868,7 +1870,7 @@ class RpnCodeGenTests(BaseTest):
 
     def test_text_expression_as_param(self):
         src = """
-            alpha("a", 1+2, 3)
+            alpha("a", 1+2, 3, sep='')
         """
         expected = dedent("""
             "a"
@@ -1898,7 +1900,7 @@ class RpnCodeGenTests(BaseTest):
 
     def test_text_two_vars_only_one_clear(self):
         src = """
-            alpha(a, b)
+            alpha(a, b, sep='')
         """
         expected = dedent("""
             CLA
@@ -1924,7 +1926,7 @@ class RpnCodeGenTests(BaseTest):
 
     def test_text_all_literal_nums(self):
         src = """
-            alpha(1, 2, 3)
+            alpha(1, 2, 3, sep='')
         """
         expected = dedent("""
             CLA
@@ -1961,7 +1963,7 @@ class RpnCodeGenTests(BaseTest):
 
     def test_text_AVIEW_empty_string_midway(self):
         src = """
-            AVIEW(1+3, "")
+            AVIEW(1+3, "", sep='')
         """
         expected = dedent("""
             CLA
@@ -2102,7 +2104,7 @@ class RpnCodeGenTests(BaseTest):
 
     def test_text_alpha_long_plus_literal(self):
         src = """
-            alpha("Hello there all is well in London!!", 3)
+            alpha("Hello there all is well in London!!", 3, sep='')
         """
         expected = dedent("""
             "Hello there al"
@@ -2116,7 +2118,7 @@ class RpnCodeGenTests(BaseTest):
 
     def test_text_alpha_two_str_params(self):
         src = """
-            alpha("hello there this is a test of things", "fred is a very big man")
+            alpha("hello there this is a test of things", "fred is a very big man", sep='')
         """
         expected = dedent("""
             "hello there th"
@@ -2134,7 +2136,7 @@ class RpnCodeGenTests(BaseTest):
         """
         src = """
             n = 100
-            alpha("Ans: ", n)
+            alpha("Ans: ", n, sep='')
         """
         expected = dedent("""
             100
@@ -2151,7 +2153,7 @@ class RpnCodeGenTests(BaseTest):
         """
         src = """
             n = 100
-            alpha("Ans: ", n, " and ", n)
+            alpha("Ans: ", n, " and ", n, sep='')
         """
         expected = dedent("""
             100
@@ -2188,7 +2190,7 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
 
-    def test_text_sep_big_str(self):
+    def test_text_separator_three_chars(self):
         src = """
             alpha("hi", "there", sep=' | ')
         """
@@ -2196,6 +2198,21 @@ class RpnCodeGenTests(BaseTest):
             "hi"
             ├" | "
             ├"there"
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines)
+
+    def test_text_separator_default(self):
+        src = """
+            alpha("hi", "there", 55, sep=' ')
+        """
+        expected = dedent("""
+            "hi"
+            ├" "
+            ├"there"
+            ├" "
+            55
+            ARCL ST X
         """)
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
@@ -2217,6 +2234,7 @@ class RpnCodeGenTests(BaseTest):
         """
         expected = dedent("""
             "Hello"
+            // ├" "
             ├"there"
             PROMPT
         """)
@@ -2350,7 +2368,7 @@ class RpnCodeGenTests(BaseTest):
         """
         lines = self.parse(dedent("""
             for i in range(2):
-              AVIEW("index ", i, " ", i*2)
+              AVIEW("index ", i, " ", i*2, sep='')
             """))
         expected = dedent("""
             -1.001
