@@ -36,7 +36,7 @@
     }
 
     function draw_line(x0, y0, x1, y1) {
-        console.log('draw_line', x0, y0, x1, y1)
+        // console.log('draw_line', x0, y0, x1, y1)
         x0 = Math.trunc(x0)
         y0 = Math.trunc(y0)
         x1 = Math.trunc(x1)
@@ -209,6 +209,7 @@
 
         // some lines (note the quite likely 'Moire pattern')
         for (x = 1; x <= vinfo.xres / 4 ; x += 2)
+            console.log('Moire', 0, 0, x, vinfo.yres)
             draw_line(0, 0, x, vinfo.yres);
 
 

@@ -2,7 +2,6 @@
 
 def dd1_draw_demo1():
   FIX(0)
-  SIZE(50)
   CLLCD()
   draw_line(0, 0, 10, 10)
   draw_line(10, 10, 20, 5)
@@ -12,6 +11,49 @@ def dd1_draw_demo1():
   fill_rect(18, 9, 12, 4)
   draw_circle(96, 8, 5)
   fill_circle(125, 10, 3)
+
+def dd2_draw_demo():  # rpn: export
+    FIX(0)
+    CLLCD()
+
+    XRES = 131
+    YRES = 16
+
+    # some pixels
+    for i in range(1, XRES, 5):
+        x = i
+        PIXEL(x, YRES / 2)
+
+    # some lines (note the quite likely 'Moire pattern')
+    for i in range(1, XRES / 4, 2):
+        x = i
+        draw_line(0, 0, x, YRES)
+
+    # some rectangles
+    fromx = XRES / 4
+    fromy = YRES / 2
+    width = XRES / 4
+    height = YRES / 4
+    draw_rect(fromx, fromy, width, height)
+
+    fromx = XRES / 4 + 10
+    fromy = YRES / 2 + 4
+    width = XRES / 4 - 20
+    height = YRES / 4
+    draw_rect(fromx, fromy, width, height)
+
+    fromx = XRES / 8
+    width = XRES / 4
+    height = YRES / 4
+    fill_rect(fromx, 1, width, height)
+
+    # some circles
+    for i in range(2, YRES / 2, 2):
+        d = i
+        draw_circle(3 * XRES / 4, 2 * YRES / 4, d)
+
+    fill_circle(15 * XRES / 16, 2 * YRES / 4, YRES / 3)
+    fill_circle(8 * XRES / 13, 3 * YRES / 4, YRES / 2)
 
 def draw_line(x0, y0, x1, y1):  # rpn: int
     dx = ABS(x1 - x0)
@@ -119,5 +161,6 @@ def fill_circle(x0, y0, r):
         else:
             x -= 1
             radiusError += 2 * (y - x + 1)
+
 
 """
