@@ -484,7 +484,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         elif func_name in ('aview',):
             raise RpnError('The command "aview" is deprecated - use print or AVIEW.')
 
-        elif func_name in ('alpha', 'AVIEW', 'print', 'PROMPT'):
+        elif func_name in ('alpha', 'AVIEW', 'print', 'PROMPT', 'PRA'):
             if len(node.args) == 0:
                 if func_name != 'AVIEW':
                     self.program.insert('CLA', comment='empty string', type_='string')
@@ -527,6 +527,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 self.program.insert('AVIEW')
             elif func_name in ('PROMPT'):
                 self.program.insert('PROMPT')
+            elif func_name in ('PRA'):
+                self.program.insert('PRA')
 
             if len(self.pending_stack_args):
                 self.pending_stack_args.pop()
