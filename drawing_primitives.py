@@ -1,4 +1,5 @@
 """
+
 def dd1():
   FIX(0)
   CLLCD()
@@ -8,6 +9,7 @@ def dd1():
   draw_line(100, 16, 131, 1)
   draw_rect(70, 4, 5, 5)
   fill_rect(18, 9, 12, 4)
+  draw_circle(96, 8, 5)
 
 def draw_line(x0, y0, x1, y1):  # rpn: int
     dx = ABS(x1 - x0)
@@ -55,5 +57,28 @@ def fill_rect(x0, y0, w, h):  # rpn: int
     y = i
     y1 = y0 + y
     draw_line(x0, y0 + y, x0 + w, y1)
+
+def draw_circle(x0, y0, r):  # rpn: int
+    x = r;
+    y = 0;
+    radiusError = 1 - x;
+
+    while (x >= y):
+        PIXEL(-y + x0, -x + y0)  # top left
+        PIXEL(y + x0, -x + y0)  # top right
+        PIXEL(-x + x0, -y + y0)  # upper middle left
+        PIXEL(x + x0, -y + y0)  # upper middle right
+        PIXEL(-x + x0, y + y0)  # lower middle left
+        PIXEL(x + x0, y + y0)  # lower middle right
+        PIXEL(-y + x0, x + y0)  # bottom left
+        PIXEL(y + x0, x + y0)  # bottom right
+
+        y += 1;
+        if (radiusError < 0):
+            radiusError += 2 * y + 1
+        else:
+            x -= 1
+            radiusError += 2 * (y - x + 1)
+
 
 """
