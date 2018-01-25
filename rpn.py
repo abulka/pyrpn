@@ -663,6 +663,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             # The built-in command is a simple one without command arg fragment "parameter" parts - yes it may take
             # actual parameters but these are generated through normal visit parsing and available on the stack.
             # Though we do handle an exception where the command needs to use ST X as its 'parameter' e.g. VIEW
+            if func_name in settings.CMDS_WHO_NEED_PARAM_SWAPPING:
+                self.program.insert('X<>Y', comment='change order of params to be more algebraic friendly')
             arg_val = ' ST X' if self.cmd_st_x_situation(func_name, node) else ''  # e.g. VIEW
             self.program.insert(f'{func_name}{arg_val}', comment=cmd_list[func_name]['description'])
 

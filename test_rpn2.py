@@ -475,3 +475,28 @@ class RpnTests2(BaseTest):
             RTN
             """)
         self.compare(de_comment(expected))
+
+    # Parameter reversal for some commands
+
+    def test_params_pixel_swap(self):
+        """
+        Intuitive order for calling a user defined function is a,b,c which results in z:a y:b x:c which is
+        wrong way around for def parsing where parameters are stored in register in order of the param declaration.
+        So RPN code is inserted to reverse the parameter order at the beginning of all user defined functions.
+
+        However a built in function like PIXEL takes y: row (y axis), x: col (x axis) which is not intuitive,
+        cos when you enter coordinate its x,y which means PIXEL should arguably take Y:x X:y - but would have
+        been weird cos of the coincidence re the names being around the wrong way, so probably HP switched it.
+        But for algebraic notation use, it should be the other way around, so I correct this.
+        :return:
+        """
+        self.parse(dedent("""
+            PIXEL(100, 1)
+          """))
+        expected = dedent("""
+            100
+            1
+            X<>Y
+            PIXEL
+            """)
+        self.compare(de_comment(expected))
