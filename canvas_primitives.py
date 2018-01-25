@@ -1,7 +1,8 @@
 """
 
-def dd1():
+def dd1_draw_demo1():
   FIX(0)
+  SIZE(50)
   CLLCD()
   draw_line(0, 0, 10, 10)
   draw_line(10, 10, 20, 5)
@@ -10,6 +11,7 @@ def dd1():
   draw_rect(70, 4, 5, 5)
   fill_rect(18, 9, 12, 4)
   draw_circle(96, 8, 5)
+  fill_circle(125, 10, 3)
 
 def draw_line(x0, y0, x1, y1):  # rpn: int
     dx = ABS(x1 - x0)
@@ -81,41 +83,41 @@ def draw_circle(x0, y0, r):  # rpn: int
             x -= 1
             radiusError += 2 * (y - x + 1)
 
-
-"""
-
-
-
-
-"""
-
-def dd1():
-  FIX(0)
-  CLLCD()
-  draw_circle(96, 8, 5)
-
-def draw_circle(x0, y0, r):  # rpn: int
-    x = r;
-    y = 0;
-    radiusError = 1 - x;
+def fill_circle(x0, y0, r):
+    x = r
+    y = 0
+    radiusError = 1 - x
 
     while (x >= y):
-        PRA('x= ', x, ' y= ', y, ' ', radiusError)
-        PIXEL(-y + x0, -x + y0)  # top left
-        PIXEL(y + x0, -x + y0)  # top right
-        PIXEL(-x + x0, -y + y0)  # upper middle left
-        PIXEL(x + x0, -y + y0)  # upper middle right
-        PIXEL(-x + x0, y + y0)  # lower middle left
-        PIXEL(x + x0, y + y0)  # lower middle right
-        PIXEL(-y + x0, x + y0)  # bottom left
-        PIXEL(y + x0, x + y0)  # bottom right
+        fromx = -y + x0
+        fromy = -x + y0
+        tox = y + x0
+        toy = -x + y0
+        draw_line(fromx, fromy, tox, toy)  # top
 
-        y += 1;
-        if (radiusError < 0):
+        fromx = -x + x0
+        fromy = -y + y0
+        tox = x + x0
+        toy = -y + y0
+        draw_line(fromx, fromy, tox, toy)  # upper middle
+
+        fromx = -x + x0
+        fromy = y + y0
+        tox = x + x0
+        toy = y + y0
+        draw_line(fromx, fromy, tox, toy)  # lower middle
+
+        fromx = -y + x0
+        fromy = x + y0
+        tox = y + x0
+        toy = x + y0
+        draw_line(fromx, fromy, tox, toy)  # bottom
+
+        y += 1
+        if radiusError < 0:
             radiusError += 2 * y + 1
         else:
             x -= 1
             radiusError += 2 * (y - x + 1)
-    
 
 """
