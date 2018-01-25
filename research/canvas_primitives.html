@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Canvas promitive test</title>
+</head>
+<body>
+
+<meta name="description" content="HP42 canvas simulator">
+<canvas id="myCanvas" width="131" height="16" style="border:1px solid #000000; border-color: red;">
+    <p>Some default content can appear here.</p>
+</canvas>
+<p>HP42S canvas!!</p>
+
+
+<script>
+
+    // JavaScript for drawing on canvas only with pixels
+    // Based on http://raspberrycompote.blogspot.com.au/2014/04/low-level-graphics-on-raspberry-pi.html
+
+    let ctx
+    let vinfo = {xres:131, yres:16}
+
+    function pixel(x, y) {
+        // HP42S is 1 based so need to subtract 1
+        x -= 1
+        y -= 1
+        ctx.fillRect(x, y, 1, 1);
+    }
+
+    function setup() {
+        var canvas = document.getElementById('myCanvas');
+        if (canvas.getContext) {
+            ctx = canvas.getContext('2d');
+        }
+    }
+
+    function draw_line(x0, y0, x1, y1) {
+        let dx = x1 - x0;
+        dx = (dx >= 0) ? dx : -dx; // abs()
+        let dy = y1 - y0;
+        dy = (dy >= 0) ? dy : -dy; // abs()
+        let sx;
+        let sy;
+        if (x0 < x1)
+            sx = 1;
+        else
+            sx = -1;
+        if (y0 < y1)
+            sy = 1;
+        else
+            sy = -1;
+        let err = dx - dy;
+        let e2;
+        let done = 0;
+        while (!done) {
+            pixel(x0, y0);
+            if ((x0 == x1) && (y0 == y1))
+                done = 1;
+            else {
+                e2 = 2 * err;
+                if (e2 > -dy) {
+                    err = err - dy;
+                    x0 = x0 + sx;
+                }
+                if (e2 < dx) {
+                    err = err + dx;
+                    y0 = y0 + sy;
+                }
+            }
+        }
+    }
+
+    // (x0, y0) = left top corner coordinates
+    // w = width and h = height
+    function draw_rect(x0, y0, w, h) {
+        draw_line(x0, y0, x0 + w, y0); // top
+        draw_line(x0, y0, x0, y0 + h); // left
+        draw_line(x0, y0 + h, x0 + w, y0 + h); // bottom
+        draw_line(x0 + w, y0, x0 + w, y0 + h); // right
+    }
+
+
+    function fill_rect(x0, y0, w, h) {
+        let y;
+        for (y = 0; y < h; y++) {
+            draw_line(x0, y0 + y, x0 + w, y0 + y);
+        }
+    }
+
+
+    function draw_circle(x0, y0, r) {
+        x = r;
+        y = 0;
+        radiusError = 1 - x;
+
+        while (x >= y) {
+            // top left
+            pixel(-y + x0, -x + y0);
+            // top right
+            pixel(y + x0, -x + y0);
+            // upper middle left
+            pixel(-x + x0, -y + y0);
+            // upper middle right
+            pixel(x + x0, -y + y0);
+            // lower middle left
+            pixel(-x + x0, y + y0);
+            // lower middle right
+            pixel(x + x0, y + y0);
+            // bottom left
+            pixel(-y + x0, x + y0);
+            // bottom right
+            pixel(y + x0, x + y0);
+
+            y++;
+            if (radiusError < 0) {
+                radiusError += 2 * y + 1;
+            } else {
+                x--;
+                radiusError += 2 * (y - x + 1);
+            }
+        }
+    }
+
+    function fill_circle(x0, y0, r) {
+        let x = r;
+        let y = 0;
+        radiusError = 1 - x;
+
+        while (x >= y) {
+            // top
+            draw_line(-y + x0, -x + y0, y + x0, -x + y0);
+            // upper middle
+            draw_line(-x + x0, -y + y0, x + x0, -y + y0);
+            // lower middle
+            draw_line(-x + x0, y + y0, x + x0, y + y0);
+            // bottom
+            draw_line(-y + x0, x + y0, y + x0, x + y0);
+
+            y++;
+            if (radiusError < 0) {
+                radiusError += 2 * y + 1;
+            } else {
+                x--;
+                radiusError += 2 * (y - x + 1);
+            }
+        }
+    }
+
+    // Now let's play
+
+    function draw() {
+        // draw lines
+        for (let x = 1; x <= 131; x++)
+            pixel(x, 1)
+        for (let x = 1; x <= 131; x++)
+            pixel(x, 16)
+
+        draw_line(0, 0, 10, 10)
+        draw_line(10, 10, 20, 5)
+        draw_line(20, 5, 100, 16)
+        draw_line(100, 16, 131, 1)
+
+        draw_rect(70, 4, 5, 5)
+        fill_rect(18, 9, 12, 4)
+
+        draw_circle(96, 8, 5)
+        fill_circle(125, 10, 3)
+    }
+
+
+
+    function draw2()
+    {
+        let x;
+
+        // some pixels
+        for (x = 1; x <= vinfo.xres; x += 5)
+            pixel(x, vinfo.yres / 2);
+
+        // some lines (note the quite likely 'Moire pattern')
+        for (x = 1; x <= vinfo.xres; x += 20)
+            draw_line(0, 0, x, vinfo.yres);
+
+        return
+
+        // some rectangles
+        draw_rect(vinfo.xres / 4, vinfo.yres / 2 + 10,
+            vinfo.xres / 4, vinfo.yres / 4);
+        draw_rect(vinfo.xres / 4 + 10, vinfo.yres / 2 + 20,
+            vinfo.xres / 4 - 20, vinfo.yres / 4 - 20);
+        fill_rect(vinfo.xres / 4 + 20, vinfo.yres / 2 + 30,
+            vinfo.xres / 4 - 40, vinfo.yres / 4 - 40);
+
+        // some circles
+        let d;
+        for (d = 10; d < vinfo.yres / 6; d += 10) {
+            draw_circle(3 * vinfo.xres / 4, vinfo.yres / 4, d);
+        }
+
+        fill_circle(3 * vinfo.xres / 4, 3 * vinfo.yres / 4,
+            vinfo.yres / 6);
+        fill_circle(3 * vinfo.xres / 4, 3 * vinfo.yres / 4,
+            vinfo.yres / 8);
+
+    }
+
+
+    setup()
+    // draw()
+    draw2()
+
+
+</script>
+
+</body>
+</html>
