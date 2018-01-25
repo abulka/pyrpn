@@ -64,6 +64,7 @@ def draw_circle(x0, y0, r):  # rpn: int
     radiusError = 1 - x;
 
     while (x >= y):
+        PRA('x= ', x, ' y= ', y, ' ', radiusError)
         PIXEL(-y + x0, -x + y0)  # top left
         PIXEL(y + x0, -x + y0)  # top right
         PIXEL(-x + x0, -y + y0)  # upper middle left

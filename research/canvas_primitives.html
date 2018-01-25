@@ -85,7 +85,7 @@
     // (x0, y0) = left top corner coordinates
     // w = width and h = height
     function draw_rect(x0, y0, w, h) {
-        console.log('draw_rect', x0, y0, w, h);
+        //console.log('draw_rect', x0, y0, w, h);
         draw_line(x0, y0, x0 + w, y0); // top
         draw_line(x0, y0, x0, y0 + h); // left
         draw_line(x0, y0 + h, x0 + w, y0 + h); // bottom
@@ -94,20 +94,22 @@
 
 
     function fill_rect(x0, y0, w, h) {
-        let y;
-        for (y = 0; y < h; y++) {
+        for (let y = 0; y < h; y++) {
             draw_line(x0, y0 + y, x0 + w, y0 + y);
         }
     }
 
 
     function draw_circle(x0, y0, r) {
+        x0 = Math.trunc(x0)
+        y0 = Math.trunc(y0)
+        r = Math.trunc(r)
         x = r;
         y = 0;
         radiusError = 1 - x;
 
         while (x >= y) {
-            console.log('x= ', x, ' y= ', y, ' ', radiusError, ' ', x >= y)
+            //console.log('x= ', x, ' y= ', y, ' ', radiusError, ' ', x >= y)
             // top left
             pixel(-y + x0, -x + y0);
             // top right
@@ -136,9 +138,12 @@
     }
 
     function fill_circle(x0, y0, r) {
-        let x = Math.trunc(r);
-        let y = 0;
-        radiusError = Math.trunc(1 - x);
+        x0 = Math.trunc(x0)
+        y0 = Math.trunc(y0)
+        r = Math.trunc(r)
+        let x = r
+        let y = 0
+        radiusError = 1 - x
 
         while (x >= y) {
             // top
@@ -226,9 +231,9 @@
 
     setup()
     // draw()
-    // draw2()
+    draw2()
     // draw3()
-    draw4()
+    // draw4()
 
 
 </script>
