@@ -456,3 +456,22 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+    # Parameters forced to be INT
+
+    def test_params_force_int(self):
+        self.parse(dedent("""
+            def f(a, b):  # rpn: int
+                pass
+          """))
+        expected = dedent("""
+            LBL "f"
+            XEQ "p2Param"   // reorder 2 params for storage
+            IP
+            STO 00          // param: a
+            RDN
+            IP
+            STO 01          // param: b
+            RDN
+            RTN
+            """)
+        self.compare(de_comment(expected))

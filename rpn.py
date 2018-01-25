@@ -38,6 +38,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.inside_binop = False
         self.disallow_string_args = False
         self.inside_list_access = False
+        self.def_params_as_ints = False
 
     # Recursion support
 
@@ -136,7 +137,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.body(node.orelse)
 
     def has_rpn_def_directive(self, node):
-        return 'rpn: export' in self.find_comment(node)
+        comment = self.find_comment(node)
+        return 'rpn: ' in comment and 'export' in comment
+
+    def has_rpn_int_directive(self, node):
+        comment = self.find_comment(node)
+        return 'rpn: ' in comment and 'int' in comment
 
     def check_rpn_def_directives(self, node):
         # Adds an additional string label to the rpn code
@@ -208,12 +214,16 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         self.scopes.push()
 
+        if self.has_rpn_int_directive(node):
+            self.def_params_as_ints = True
+
         self.visit_children(node)
 
         if self.program.lines[-1].text != 'RTN':
             self.program.insert('RTN', comment=f'end def {node.name}')
 
         self.scopes.pop()
+        self.def_params_as_ints = False
         self.end(node)
 
     def visit_arguments(self,node):
@@ -239,6 +249,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def visit_arg(self,node):
         """ visit each argument """
         self.begin(node)
+        if self.def_params_as_ints:
+            self.program.insert('IP')
         self.program.insert(f'STO {self.scopes.var_to_reg(node.arg)}', comment=f'param: {node.arg}')
         self.program.insert('RDN')
         self.visit_children(node)
