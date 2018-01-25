@@ -82,3 +82,40 @@ def draw_circle(x0, y0, r):  # rpn: int
 
 
 """
+
+
+
+
+"""
+
+def dd1():
+  FIX(0)
+  CLLCD()
+  draw_circle(96, 8, 5)
+
+def draw_circle(x0, y0, r):  # rpn: int
+    x = r;
+    y = 0;
+    radiusError = 1 - x;
+
+    while (x >= y):
+        PRA('x= ', x, ' y= ', y, ' ', x >= y)
+        PIXEL(-y + x0, -x + y0)  # top left
+        #PIXEL(y + x0, -x + y0)  # top right
+        #PIXEL(-x + x0, -y + y0)  # upper middle left
+        #PIXEL(x + x0, -y + y0)  # upper middle right
+        #PIXEL(-x + x0, y + y0)  # lower middle left
+        #PIXEL(x + x0, y + y0)  # lower middle right
+        #PIXEL(-y + x0, x + y0)  # bottom left
+        #PIXEL(y + x0, x + y0)  # bottom right
+
+        y += 1;
+        if (radiusError < 0):
+            radiusError += 2 * y + 1
+        else:
+            x -= 1
+            radiusError += 2 * (y - x + 1)
+    
+
+
+"""
