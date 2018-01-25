@@ -19,6 +19,7 @@
     // Based on http://raspberrycompote.blogspot.com.au/2014/04/low-level-graphics-on-raspberry-pi.html
 
     let ctx
+    let vinfo = {xres:131, yres:16}
 
     function pixel(x, y) {
         // HP42S is 1 based so need to subtract 1
@@ -32,25 +33,6 @@
         if (canvas.getContext) {
             ctx = canvas.getContext('2d');
         }
-    }
-
-    function draw() {
-        // draw lines
-        for (let x = 1; x <= 131; x++)
-            pixel(x, 1)
-        for (let x = 1; x <= 131; x++)
-            pixel(x, 16)
-
-        draw_line(0, 0, 10, 10)
-        draw_line(10, 10, 20, 5)
-        draw_line(20, 5, 100, 16)
-        draw_line(100, 16, 131, 1)
-
-        draw_rect(70, 4, 5, 5)
-        fill_rect(18, 9, 12, 4)
-
-        draw_circle(96, 8, 5)
-        fill_circle(125, 10, 3)
     }
 
     function draw_line(x0, y0, x1, y1) {
@@ -165,9 +147,68 @@
         }
     }
 
+    // Now let's play
+
+    function draw() {
+        // draw lines
+        for (let x = 1; x <= 131; x++)
+            pixel(x, 1)
+        for (let x = 1; x <= 131; x++)
+            pixel(x, 16)
+
+        draw_line(0, 0, 10, 10)
+        draw_line(10, 10, 20, 5)
+        draw_line(20, 5, 100, 16)
+        draw_line(100, 16, 131, 1)
+
+        draw_rect(70, 4, 5, 5)
+        fill_rect(18, 9, 12, 4)
+
+        draw_circle(96, 8, 5)
+        fill_circle(125, 10, 3)
+    }
+
+
+
+    function draw2()
+    {
+        let x;
+
+        // some pixels
+        for (x = 1; x <= vinfo.xres; x += 5)
+            pixel(x, vinfo.yres / 2);
+
+        // some lines (note the quite likely 'Moire pattern')
+        for (x = 1; x <= vinfo.xres; x += 20)
+            draw_line(0, 0, x, vinfo.yres);
+
+        return
+
+        // some rectangles
+        draw_rect(vinfo.xres / 4, vinfo.yres / 2 + 10,
+            vinfo.xres / 4, vinfo.yres / 4);
+        draw_rect(vinfo.xres / 4 + 10, vinfo.yres / 2 + 20,
+            vinfo.xres / 4 - 20, vinfo.yres / 4 - 20);
+        fill_rect(vinfo.xres / 4 + 20, vinfo.yres / 2 + 30,
+            vinfo.xres / 4 - 40, vinfo.yres / 4 - 40);
+
+        // some circles
+        let d;
+        for (d = 10; d < vinfo.yres / 6; d += 10) {
+            draw_circle(3 * vinfo.xres / 4, vinfo.yres / 4, d);
+        }
+
+        fill_circle(3 * vinfo.xres / 4, 3 * vinfo.yres / 4,
+            vinfo.yres / 6);
+        fill_circle(3 * vinfo.xres / 4, 3 * vinfo.yres / 4,
+            vinfo.yres / 8);
+
+    }
+
 
     setup()
-    draw()
+    // draw()
+    draw2()
 
 
 </script>
