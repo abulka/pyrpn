@@ -35,6 +35,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.inside_alpha = False
         self.alpha_append_mode = False
         self.alpha_already_cleared = False
+        self.alpha_separator = ''
         self.inside_binop = False
         self.disallow_string_args = False
         self.inside_list_access = False
@@ -493,13 +494,17 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 self.alpha_append_mode = False
                 self.alpha_already_cleared = False
 
-                if node.keywords and node.keywords[0].arg == 'append':
+                if node.keywords and node.keywords[0].arg == 'sep':
+                    if not isinstance(node.keywords[0].value, ast.Str):
+                        raise RpnError(f'sep= must be a string separator')
+                    self.alpha_separator = node.keywords[0].value.s
+                elif node.keywords and node.keywords[0].arg == 'append':
                     if not isinstance(node.keywords[0].value, ast.NameConstant):
                         raise RpnError(f'append= must be set to True or False')
                     named_constant_t_f = node.keywords[0].value
                     self.alpha_append_mode = named_constant_t_f.value
 
-                for arg in node.args:
+                for index,arg in enumerate(node.args):
                     self.visit(arg)  # usual insertion of a literal number, string or variable
 
                     if isinstance(arg, ast.Num):
@@ -519,9 +524,13 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                     if not self.alpha_append_mode:
                         self.alpha_append_mode = True
 
+                    if self.alpha_separator and index + 1 < len(node.args):  # don't emit separator on last item
+                        self.program.insert(f'├"{self.alpha_separator}"')
+
                 self.inside_alpha = False
                 self.alpha_append_mode = False
                 self.alpha_already_cleared = False
+                self.alpha_separator = ''
 
             if func_name in ('print', 'AVIEW'):
                 self.program.insert('AVIEW')

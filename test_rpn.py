@@ -1700,7 +1700,8 @@ class RpnCodeGenTests(BaseTest):
              If you want to append variables as ints then change the 
              FIX mode or whatever before you do the AVIEW. I might later support a mode=fix02 option in AVIEW 
              commands. (currently not implemented) 
-                         
+
+    PRA      - same multi parameter features as alpha, adds PRA for printing alpha register to printer/virtual printer.                          
     """
 
     def test_text_string_assignment(self):
@@ -2182,6 +2183,18 @@ class RpnCodeGenTests(BaseTest):
         """
         expected = dedent("""
             "hi"
+            ├"there"
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines)
+
+    def test_text_sep_big_str(self):
+        src = """
+            alpha("hi", "there", sep=' | ')
+        """
+        expected = dedent("""
+            "hi"
+            ├" | "
             ├"there"
         """)
         lines = self.parse(dedent(src))
