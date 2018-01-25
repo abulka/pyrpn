@@ -7,7 +7,7 @@ def dd1():
   draw_line(20, 5, 100, 16)
   draw_line(100, 16, 131, 1)
 
-def draw_line(x0, y0, x1, y1):
+def draw_line(x0, y0, x1, y1):  # rpn: int
     dx = ABS(x1 - x0)
     dy = ABS(y1 - y0)
     if x0 < x1:
