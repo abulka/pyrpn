@@ -135,9 +135,9 @@
     }
 
     function fill_circle(x0, y0, r) {
-        let x = r;
+        let x = Math.trunc(r);
         let y = 0;
-        radiusError = 1 - x;
+        radiusError = Math.trunc(1 - x);
 
         while (x >= y) {
             // top
@@ -197,14 +197,14 @@
             pixel(x, vinfo.yres / 2);
 
         // some lines (note the quite likely 'Moire pattern')
-        for (x = 1; x <= vinfo.xres; x += 20)
+        for (x = 1; x <= vinfo.xres / 4 ; x += 2)
             draw_line(0, 0, x, vinfo.yres);
 
 
         // some rectangles
         draw_rect(vinfo.xres / 4, vinfo.yres / 2, vinfo.xres / 4, vinfo.yres / 4);
         draw_rect(vinfo.xres / 4 + 10, vinfo.yres / 2 +4, vinfo.xres / 4 - 20, vinfo.yres / 4);
-        fill_rect(vinfo.xres / 4 + 40, 1, vinfo.xres / 4 , vinfo.yres / 4);
+        fill_rect(vinfo.xres / 8, 1, vinfo.xres / 4 , vinfo.yres / 4);
 
         // some circles
         let d;
@@ -213,7 +213,7 @@
         }
 
         fill_circle(15 * vinfo.xres / 16, 2 * vinfo.yres / 4, vinfo.yres / 3);
-        fill_circle(8 * vinfo.xres / 16, 3 * vinfo.yres / 4, vinfo.yres / 2);
+        fill_circle(8 * vinfo.xres / 13, 3 * vinfo.yres / 4, vinfo.yres / 2);
 
     }
 
