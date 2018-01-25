@@ -891,6 +891,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.pending_stack_args.append(node.id)
             if self.var_name_is_loop_counter(node.id):
                 self.program.insert('IP')  # just get the integer portion of isg counter
+            if self.pending_unary_op:
+                self.program.insert('CHS')
+                self.pending_unary_op = ''
         self.end(node)
 
     def visit_Num(self, node):

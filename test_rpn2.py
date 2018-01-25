@@ -500,3 +500,80 @@ class RpnTests2(BaseTest):
             PIXEL
             """)
         self.compare(de_comment(expected))
+
+    # += and -= expressions
+
+    def test_y_plus_eq_one(self):
+        self.parse(dedent("""
+            y += 1
+          """))
+        expected = dedent("""
+            1
+            STO+ 00
+            """)
+        self.compare(de_comment(expected))
+
+    def test_y_minus_eq_one(self):
+        self.parse(dedent("""
+            y -= 1
+          """))
+        expected = dedent("""
+            1
+            STO- 00
+            """)
+        self.compare(de_comment(expected))
+
+    def test_y_minus_eq_neg_one(self):
+        self.parse(dedent("""
+            y -= -1
+          """))
+        expected = dedent("""
+            -1
+            STO- 00
+            """)
+        self.compare(de_comment(expected))
+
+    # negatives inside expressions inside parameters
+
+    def test_neg_inside_param(self):
+        self.parse(dedent("""
+            fred(-y)
+          """))
+        expected = dedent("""
+            RCL 00
+            CHS
+            XEQ A
+            """)
+        self.compare(de_comment(expected))
+
+    @unittest.skip('hard')
+    def test_neg_expr_inside_param(self):
+        self.parse(dedent("""
+            fred(-y + 1)
+          """))
+        expected = dedent("""
+            RCL 00
+            CHS
+            1
+            +
+            XEQ "A"
+            """)
+        self.compare(de_comment(expected))
+
+    # boolean expessions inside expressions inside parameters
+
+    @unittest.skip('hard')
+    def test_bool_inside_param(self):
+        self.parse(dedent("""
+            print(x < y)
+          """))
+        expected = dedent("""
+            RCL 00
+            RCL 01
+            XEQ "pLT"
+            CLA
+            ARCL ST X
+            AVIEW
+            """)
+        self.compare(de_comment(expected))
+
