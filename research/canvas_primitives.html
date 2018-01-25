@@ -36,10 +36,13 @@
     }
 
     function draw_line(x0, y0, x1, y1) {
-        let dx = x1 - x0;
-        dx = (dx >= 0) ? dx : -dx; // abs()
-        let dy = y1 - y0;
-        dy = (dy >= 0) ? dy : -dy; // abs()
+        console.log('draw_line', x0, y0, x1, y1)
+        x0 = Math.trunc(x0)
+        y0 = Math.trunc(y0)
+        x1 = Math.trunc(x1)
+        y1 = Math.trunc(y1)
+        let dx = Math.abs(Math.trunc(x1 - x0))
+        let dy = Math.abs(Math.trunc(y1 - y0))
         let sx;
         let sy;
         if (x0 < x1)
@@ -50,22 +53,30 @@
             sy = 1;
         else
             sy = -1;
-        let err = dx - dy;
+        let err = Math.trunc(dx - dy)
         let e2;
         let done = 0;
+        let failsafe = 50;
         while (!done) {
+            failsafe -= 1
+            // console.log('x0=', x0, 'y0=', y0, 'x1=', x1, 'y1=', y1, 'err=', err, 'e2', e2, 'done?', (x0 == x1) && (y0 == y1), )
+            if (failsafe < 0) {
+                console.error('failsafe kicked in')
+                break
+            }
+
             pixel(x0, y0);
             if ((x0 == x1) && (y0 == y1))
                 done = 1;
             else {
-                e2 = 2 * err;
-                if (e2 > -dy) {
-                    err = err - dy;
-                    x0 = x0 + sx;
+                e2 = Math.trunc(2 * err)
+                if (Math.trunc(e2 > -dy)) {
+                    err = Math.trunc(err - dy)
+                    x0 = Math.trunc(x0 + sx)
                 }
                 if (e2 < dx) {
-                    err = err + dx;
-                    y0 = y0 + sy;
+                    err = Math.trunc(err + dx)
+                    y0 = Math.trunc(y0 + sy)
                 }
             }
         }
@@ -74,6 +85,7 @@
     // (x0, y0) = left top corner coordinates
     // w = width and h = height
     function draw_rect(x0, y0, w, h) {
+        console.log('draw_rect', x0, y0, w, h);
         draw_line(x0, y0, x0 + w, y0); // top
         draw_line(x0, y0, x0, y0 + h); // left
         draw_line(x0, y0 + h, x0 + w, y0 + h); // bottom
@@ -168,6 +180,12 @@
         fill_circle(125, 10, 3)
     }
 
+    function draw3() {
+        // draw lines - test whether resilient against floats, which it wasn't previously
+        draw_rect(70, 4, 5, 5)
+        draw_rect(70, 4, 5.1, 5)
+    }
+
 
 
     function draw2()
@@ -182,26 +200,20 @@
         for (x = 1; x <= vinfo.xres; x += 20)
             draw_line(0, 0, x, vinfo.yres);
 
-        return
 
         // some rectangles
-        draw_rect(vinfo.xres / 4, vinfo.yres / 2 + 10,
-            vinfo.xres / 4, vinfo.yres / 4);
-        draw_rect(vinfo.xres / 4 + 10, vinfo.yres / 2 + 20,
-            vinfo.xres / 4 - 20, vinfo.yres / 4 - 20);
-        fill_rect(vinfo.xres / 4 + 20, vinfo.yres / 2 + 30,
-            vinfo.xres / 4 - 40, vinfo.yres / 4 - 40);
+        draw_rect(vinfo.xres / 4, vinfo.yres / 2, vinfo.xres / 4, vinfo.yres / 4);
+        draw_rect(vinfo.xres / 4 + 10, vinfo.yres / 2 +4, vinfo.xres / 4 - 20, vinfo.yres / 4);
+        fill_rect(vinfo.xres / 4 + 40, 1, vinfo.xres / 4 , vinfo.yres / 4);
 
         // some circles
         let d;
-        for (d = 10; d < vinfo.yres / 6; d += 10) {
-            draw_circle(3 * vinfo.xres / 4, vinfo.yres / 4, d);
+        for (d = 2; d < vinfo.yres / 2; d += 2) {
+            draw_circle(3 * vinfo.xres / 4, 2 * vinfo.yres / 4, d);  // read as 3/4 across, 2/4 down
         }
 
-        fill_circle(3 * vinfo.xres / 4, 3 * vinfo.yres / 4,
-            vinfo.yres / 6);
-        fill_circle(3 * vinfo.xres / 4, 3 * vinfo.yres / 4,
-            vinfo.yres / 8);
+        fill_circle(15 * vinfo.xres / 16, 2 * vinfo.yres / 4, vinfo.yres / 3);
+        fill_circle(8 * vinfo.xres / 16, 3 * vinfo.yres / 4, vinfo.yres / 2);
 
     }
 
@@ -209,6 +221,7 @@
     setup()
     // draw()
     draw2()
+    // draw3()
 
 
 </script>
