@@ -131,8 +131,8 @@ OR,Logical OR. Returns x OR y.
 PERM,Permutations of y items taken x at a time. Returns y!/(y – x)!
 PGMINT,Select a program to integrate. Parameter: global label (indirect allowed)
 PGMSLV,"Select a program to solve. Parameter: global label (indirect allowed) ,"
+PIXEL,Turn on a single pixel (dot) in the display y: row (y axis), x: col (x axis)
 PI,Put an approximation of π into the x-register (3.14159265359).
-PIXEL,Turn on a single pixel (dot) in the display. The location of the pixel is given by the numbers in the x- and y-registers.
 POLAR,Select polar coordinate mode for displaying complex numbers.
 POSA,"Position in Alpha. Searches the Alpha register for the target specified in the x-register. If found, returns the character position; if not found, returns -1."
 PRA,Print Alpha register.
