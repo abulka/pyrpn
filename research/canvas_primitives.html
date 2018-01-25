@@ -41,8 +41,8 @@
         y0 = Math.trunc(y0)
         x1 = Math.trunc(x1)
         y1 = Math.trunc(y1)
-        let dx = Math.abs(Math.trunc(x1 - x0))
-        let dy = Math.abs(Math.trunc(y1 - y0))
+        let dx = Math.abs(x1 - x0)
+        let dy = Math.abs(y1 - y0)
         let sx;
         let sy;
         if (x0 < x1)
@@ -53,7 +53,7 @@
             sy = 1;
         else
             sy = -1;
-        let err = Math.trunc(dx - dy)
+        let err = dx - dy
         let e2;
         let done = 0;
         let failsafe = 50;
@@ -69,14 +69,14 @@
             if ((x0 == x1) && (y0 == y1))
                 done = 1;
             else {
-                e2 = Math.trunc(2 * err)
-                if (Math.trunc(e2 > -dy)) {
-                    err = Math.trunc(err - dy)
-                    x0 = Math.trunc(x0 + sx)
+                e2 = 2 * err
+                if (e2 > -dy) {
+                    err = err - dy
+                    x0 = x0 + sx
                 }
                 if (e2 < dx) {
-                    err = Math.trunc(err + dx)
-                    y0 = Math.trunc(y0 + sy)
+                    err = err + dx
+                    y0 = y0 + sy
                 }
             }
         }
