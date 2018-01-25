@@ -56,7 +56,7 @@
         let err = dx - dy
         let e2;
         let done = 0;
-        let failsafe = 50;
+        let failsafe = 200;
         while (!done) {
             failsafe -= 1
             // console.log('x0=', x0, 'y0=', y0, 'x1=', x1, 'y1=', y1, 'err=', err, 'e2', e2, 'done?', (x0 == x1) && (y0 == y1), )
@@ -107,6 +107,7 @@
         radiusError = 1 - x;
 
         while (x >= y) {
+            console.log('x= ', x, ' y= ', y, ' ', radiusError, ' ', x >= y)
             // top left
             pixel(-y + x0, -x + y0);
             // top right
@@ -186,6 +187,11 @@
         draw_rect(70, 4, 5.1, 5)
     }
 
+    function draw4() {
+        // draw circle debugging
+        draw_circle(96, 8, 5)
+    }
+
 
 
     function draw2()
@@ -220,8 +226,9 @@
 
     setup()
     // draw()
-    draw2()
+    // draw2()
     // draw3()
+    draw4()
 
 
 </script>

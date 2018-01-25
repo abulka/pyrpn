@@ -291,9 +291,11 @@ class RpnTemplates:
 
     p3Param = dedent("""
         LBL "p3Param"  // reverse params (a,b,c) -> (c,b,a)
-        RCL ST Z
-        RCL ST Z
-        RCL ST Z
+        X<>Y
+        RDN
+        RDN
+        X<>Y
+        RDN
         RTN    
         """)
 
