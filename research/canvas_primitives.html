@@ -208,9 +208,10 @@
             pixel(x, vinfo.yres / 2);
 
         // some lines (note the quite likely 'Moire pattern')
-        for (x = 1; x <= vinfo.xres / 4 ; x += 2)
-            console.log('Moire', 0, 0, x, vinfo.yres)
-            draw_line(0, 0, x, vinfo.yres);
+        for (x = 1; x <= vinfo.xres / 4 ; x += 2) {
+          console.log('Moire', 0, 0, x, vinfo.yres)
+          draw_line(0, 0, x, vinfo.yres);
+        }
 
 
         // some rectangles
