@@ -320,6 +320,67 @@ class RpnCodeGenTests(BaseTest):
             """)
         self.compare(de_comment(expected), lines, trace=False, dump=True)
 
+    def test_for_range_nested_x_y(self):
+        lines = self.parse(dedent("""
+            for x in range(1, 20):
+                for y in range(5, 10):
+                    pass
+            """))
+        expected = dedent("""
+            // setup
+            0.019
+            STO 00
+
+            LBL 00  // for x
+            ISG 00  // test
+            GTO 01  // for body
+            GTO 02  // resume
+            LBL 01  // for body
+            
+            4.009
+            STO 01
+
+            LBL 03  // for y
+            ISG 01  // test
+            GTO 04  // for body
+            GTO 05  // resume
+            LBL 04  // for body
+            
+            GTO 03  // for y
+            LBL 05  // resume
+            
+            GTO 00  // for x
+            LBL 02  // resume
+            """)
+        self.compare(de_comment(expected), lines, trace=False, dump=True)
+
+    def test_for_range_not_using_i(self):
+        lines = self.parse(dedent("""
+            for x in range(1, 20):
+                PRA(x)
+            """))
+        expected = dedent("""
+            // setup
+            0.019
+            STO 00
+
+            LBL 00  // for x
+            ISG 00  // test
+            GTO 01  // for body
+            GTO 02  // resume
+            LBL 01  // for body
+            
+            CLA
+            RCL 00
+            IP
+            ARCL ST X
+            PRA
+            
+            GTO 00  // for x
+            LBL 02  // resume
+            """)
+        self.compare(de_comment(expected), lines, trace=False, dump=True)
+
     # for continues ....
 
     def test_for_range_with_body_accessing_i(self):

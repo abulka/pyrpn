@@ -7,9 +7,9 @@ config_log(log)
 
 """
 Scope is a dictionary and can contain name value pairs which map variables to register values
-Whenever we go nested, we create another scope which gets added to a scope stack, perhaps.
+Whenever we go nested, we create another scope which gets added to a scope stack.
 
-The stack can be empty.
+The stack cannot be empty, there is always one permanent scope which is our global scope.
 """
 
 
@@ -39,7 +39,7 @@ class Scopes(object):
         if len(self.stack) > 1:  # always leave first permanent scope
             self.stack.pop()
 
-    def var_to_reg(self, var_name, force_reg_name=None):
+    def var_to_reg(self, var_name, force_reg_name=None, is_range_index=False):
         """
         Figure out the register to use to store/recall 'var_name' e.g. "x" via our scope system
 
@@ -55,6 +55,10 @@ class Scopes(object):
         def map_it(var_name, register=None):
             if not self._has_mapping(var_name):
                 self._add_mapping(var_name, register=register)
+
+                # Track variables which are used in range() for loops
+                if is_range_index and var_name not in self.current.range_vars:
+                    self.current.range_vars.append(var_name)
 
         if force_reg_name:
             register = force_reg_name
@@ -82,6 +86,9 @@ class Scopes(object):
     def get_register(self, var):
         return self.current.data[var]
 
+    def is_range_index(self, var_name):
+        return var_name in self.current.range_vars
+
     # Util
 
     def dump(self):
@@ -91,6 +98,7 @@ class Scopes(object):
 @attrs
 class Scope(object):
     data = attrib(default=Factory(dict))  # var name to register name
+    range_vars = attrib(default=Factory(list))  # keep track of var names which are used in for loop ranges
 
     @property
     def empty(self):

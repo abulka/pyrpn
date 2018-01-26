@@ -113,7 +113,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.log_state(f'{type(node).__name__} children complete')
 
     def var_name_is_loop_counter(self, var_name):
-        return var_name == 'i'  # hack!  TODO - record this info in scope entry
+        return self.scopes.is_range_index(var_name)
 
     def find_comment(self, node):
         # Finds comment in the original python source code associated with this token.
@@ -1038,7 +1038,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         log.debug(f'{self.indent} for')
         self.visit(node.target)
         varname = node.target.id
-        register = self.scopes.var_to_reg(varname)
+        register = self.scopes.var_to_reg(varname, is_range_index=True)
         self.for_loop_info.append(ForLoopItem(varname, register, label_for))
 
         log.debug(f'{self.indent} in')

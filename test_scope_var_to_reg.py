@@ -78,3 +78,18 @@ class VarnameUpperTests(BaseTest):
         scopes.push()
         self.assertEqual('"X"', scopes.var_to_reg('X'))
 
+class RangeVarNames(BaseTest):
+    # Track that certain variables have been used in for loop range expressions
+
+    def test_not_range_index(self):
+        scopes = Scopes()
+        var_name = 'i'
+        register = scopes.var_to_reg(var_name, is_range_index=False)
+        self.assertEqual('00', register)
+        self.assertFalse(scopes.is_range_index(var_name))
+
+    def test_i(self):
+        scopes = Scopes()
+        var_name = 'i'
+        register = scopes.var_to_reg(var_name, is_range_index=True)
+        self.assertTrue(scopes.is_range_index(var_name))
