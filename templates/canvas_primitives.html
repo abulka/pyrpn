@@ -7,7 +7,7 @@
 {% block content %}
 <ul>
     <li><a href="/">Converter</a></li>
-        <li><a href="/examples">Examples</a></li>
+    <li><a href="/examples">Examples</a></li>
     <li><a href="/help">Help</a></li>
     <li><a href="/subscribe">Subscribe to new feature announcements</a></li>
 </ul>
@@ -20,19 +20,21 @@
         like the one the HP42S has.
     </p>
     <p>
-        The graphic drawing functions:
-        <ul>
-            <li><b>draw_line</b>(x0, y0, x1, y1)</li>
-            <li><b>draw_rect</b>(x0, y0, w, h)</li>
-            <li><b>fill_rect</b>(x0, y0, w, h)</li>
-            <li><b>draw_circle</b>(x0, y0, r)</li>
-            <li><b>fill_circle</b>(x0, y0, r)</li>
-        </ul>
-        have been written in Python and then auto-converted to RPN (using the Python to RPN converter).
+        The graphic drawing functions:</p>
+    <ul>
+        <li><b>draw_line</b>(x0, y0, x1, y1)</li>
+        <li><b>draw_rect</b>(x0, y0, w, h)</li>
+        <li><b>fill_rect</b>(x0, y0, w, h)</li>
+        <li><b>draw_circle</b>(x0, y0, r)</li>
+        <li><b>fill_circle</b>(x0, y0, r)</li>
+    </ul>
+    <p>
+        have been written in Python and then auto-converted to RPN, using the Python to RPN <a href="/">Converter</a>.
     </p>
     <p>
-    They will run on your HP42S/Free42/DM42 calculator/simulator.
-    See the <a href="/examples">Examples</a> section for the full code.
+        These demos and underlying graphic drawing primitive functions
+        will therefore <i>run on your calculator</i>.   At least, its been tested in Free42.
+        See the <a href="/examples">Examples</a> section for the full code.
     </p>
 
 
@@ -62,7 +64,7 @@
     // Based on http://raspberrycompote.blogspot.com.au/2014/04/low-level-graphics-on-raspberry-pi.html
 
     let ctx
-    let vinfo = {xres:131, yres:16}
+    let vinfo = {xres: 131, yres: 16}
     // let vinfo = {xres:200, yres:120}
     // let vinfo = {xres:400, yres:240}
 
@@ -71,7 +73,7 @@
         if (canvas.getContext) {
             ctx = canvas.getContext('2d');
         }
-        vinfo = {xres:canvas.width, yres:canvas.height}
+        vinfo = {xres: canvas.width, yres: canvas.height}
         console.log('canvas switched', vinfo)
     }
 
@@ -245,9 +247,7 @@
     }
 
 
-
-    function draw2()
-    {
+    function draw2() {
         let x;
 
         // some pixels
@@ -255,16 +255,16 @@
             pixel(x, vinfo.yres / 2);
 
         // some lines (note the quite likely 'Moire pattern')
-        for (x = 1; x <= vinfo.xres / 4 ; x += 2) {
-          // console.log('Moire', 0, 0, x, vinfo.yres)
-          draw_line(0, 0, x, vinfo.yres);
+        for (x = 1; x <= vinfo.xres / 4; x += 2) {
+            // console.log('Moire', 0, 0, x, vinfo.yres)
+            draw_line(0, 0, x, vinfo.yres);
         }
 
 
         // some rectangles
         draw_rect(vinfo.xres / 4, vinfo.yres / 2, vinfo.xres / 4, vinfo.yres / 4);
-        draw_rect(vinfo.xres / 4 + 10, vinfo.yres / 2 +4, vinfo.xres / 4 - 20, vinfo.yres / 4);
-        fill_rect(vinfo.xres / 8, 1, vinfo.xres / 4 , vinfo.yres / 4);
+        draw_rect(vinfo.xres / 4 + 10, vinfo.yres / 2 + 4, vinfo.xres / 4 - 20, vinfo.yres / 4);
+        fill_rect(vinfo.xres / 8, 1, vinfo.xres / 4, vinfo.yres / 4);
 
         // some circles
         let d;
