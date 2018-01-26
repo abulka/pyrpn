@@ -35,7 +35,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.inside_alpha = False
         self.alpha_append_mode = False
         self.alpha_already_cleared = False
-        self.alpha_separator = ''
+        self.alpha_separator = ' '
         self.inside_binop = False
         self.disallow_string_args = False
         self.inside_list_access = False
@@ -494,15 +494,16 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 self.alpha_append_mode = False
                 self.alpha_already_cleared = False
 
-                if node.keywords and node.keywords[0].arg == 'sep':
-                    if not isinstance(node.keywords[0].value, ast.Str):
-                        raise RpnError(f'sep= must be a string separator')
-                    self.alpha_separator = node.keywords[0].value.s
-                elif node.keywords and node.keywords[0].arg == 'append':
-                    if not isinstance(node.keywords[0].value, ast.NameConstant):
-                        raise RpnError(f'append= must be set to True or False')
-                    named_constant_t_f = node.keywords[0].value
-                    self.alpha_append_mode = named_constant_t_f.value
+                for keyword in node.keywords:
+                    if keyword.arg == 'sep':
+                        if not isinstance(keyword.value, ast.Str):
+                            raise RpnError(f'sep= must be a string separator')
+                        self.alpha_separator = keyword.value.s
+                    elif keyword.arg == 'append':
+                        if not isinstance(keyword.value, ast.NameConstant):
+                            raise RpnError(f'append= must be set to True or False')
+                        named_constant_t_f = keyword.value
+                        self.alpha_append_mode = named_constant_t_f.value
 
                 for index,arg in enumerate(node.args):
                     self.visit(arg)  # usual insertion of a literal number, string or variable
@@ -530,7 +531,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 self.inside_alpha = False
                 self.alpha_append_mode = False
                 self.alpha_already_cleared = False
-                self.alpha_separator = ''
+                self.alpha_separator = ' '
 
             if func_name in ('print', 'AVIEW'):
                 self.program.insert('AVIEW')

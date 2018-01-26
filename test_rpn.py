@@ -2204,6 +2204,22 @@ class RpnCodeGenTests(BaseTest):
 
     def test_text_separator_default(self):
         src = """
+            alpha("a", 1, 2)
+        """
+        expected = dedent("""
+            "a"
+            ├" "
+            1
+            ARCL ST X
+            ├" "
+            2
+            ARCL ST X
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines)
+
+    def test_text_separator_default(self):
+        src = """
             alpha("hi", "there", 55, sep=' ')
         """
         expected = dedent("""
@@ -2211,6 +2227,27 @@ class RpnCodeGenTests(BaseTest):
             ├" "
             ├"there"
             ├" "
+            55
+            ARCL ST X
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines)
+
+    def test_text_both_append_and_separator(self):
+        src = """
+            alpha("a", 1, 2)
+            alpha(" ans", 55, sep=': ', append=True)
+        """
+        expected = dedent("""
+            "a"
+            ├" "
+            1
+            ARCL ST X
+            ├" "
+            2
+            ARCL ST X
+            ├" ans"
+            ├": "
             55
             ARCL ST X
         """)
@@ -2234,7 +2271,7 @@ class RpnCodeGenTests(BaseTest):
         """
         expected = dedent("""
             "Hello"
-            // ├" "
+            ├" "
             ├"there"
             PROMPT
         """)
