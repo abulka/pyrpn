@@ -2,6 +2,14 @@
 <html>
 <head>
     <link rel="stylesheet" href="../static/main.css">
+    <script src="../static/js/lib/jquery-3.2.1.min.js"></script>
+    {% block additional_js %}
+    {% endblock additional_js %}
+    <script src="../static/js/lib/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="../static/js/lib/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/main_last.css">
+</head>
+<body>
     {% block heading %}
         <title>Python to RPN - {{title}}</title>
 
@@ -10,16 +18,6 @@
             <i class="header">A new way to program HP calculators like the HP42S, DM42 and Free42</i>
         </div>
     {% endblock %}
-
-    <script src="../static/js/lib/jquery-3.2.1.min.js"></script>
-    {% block additional_js %}
-    {% endblock additional_js %}
-    <script src="../static/js/lib/bootstrap.min.js"></script>
-    <link rel="stylesheet" href=../static/js/lib/bootstrap.min.css>
-    <link rel="stylesheet" href="../static/main_last.css">
-
-</head>
-<body>
     <div>
         <!--<h2>This is part of my base template</h2>-->
         <!--<hr>-->
