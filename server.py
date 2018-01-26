@@ -238,6 +238,10 @@ def py_rpn_lib():
 def help():
     return render_template('help.html', title='Help & User Guide')
 
+@app.route('/canvas')
+def canvas():
+    return render_template('canvas_primitives.html', title='Canvas for 42S Simulator')
+
 @app.route('/subscribe')
 def subscribe():
     return render_template('subscribe.html', title='Subscribe to Mailing List')
