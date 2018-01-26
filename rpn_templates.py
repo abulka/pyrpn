@@ -46,11 +46,14 @@ class RpnTemplates:
         CF 99   // neg_case = False 
         CF 98   // have_step = False (other than 1)
         1
+        IP      // ensure step is an int
         X=Y?
         SF 98   // have_step = True
         RDN
         RCL ST Z
+        IP      // ensure from is an int
         RCL ST Z // stack now: z:step y:from x:to
+        IP      // ensure to is an int
         1
         -
         
