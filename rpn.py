@@ -348,7 +348,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         for target in node.targets:
             self.assign_assert_target_ok(target)
             if isinstance(target, ast.Subscript):
-                self.assign_subscript_is_on_lhs(target)
+                self.subscript_is_on_lhs_thus_assign(target)
             else:
                 self.assign_normal_lhs(node, target)
         self.pending_stack_args = []  # must have, cos could just be assigning single values, not BinOp and not Expr
@@ -368,13 +368,13 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                                    is_dict_var=isinstance(node.value, ast.Dict)),
             comment=f'{target.id} {type_}')
 
-    def assign_subscript_is_on_lhs(self, target):
-        var_name = target.value.id  # drill into subscript to get it
+    def subscript_is_on_lhs_thus_assign(self, target):
+        # handles both lists and dictionaries
+        var_name = target.value.id  # drill into subscript nodes to get list or dict name
         log.debug(f'{self.indent_during}subscript detected {var_name}')
         assert isinstance(target.ctx, ast.Store)
         if var_name.islower():
-            raise RpnError(
-                f'Can only assign dictionaries to uppercase variables not "{var_name}".  Please change the variable name to uppercase e.g. "{var_name.upper()}".')
+            raise RpnError(f'Can only assign dictionaries to uppercase variables not "{var_name}".  Please change the variable name to uppercase e.g. "{var_name.upper()}".')
         if self.scopes.is_dictionary(var_name):
             self.process_dict_access(target)
         else:
@@ -384,8 +384,22 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             STOEL
             """
         self.program.insert_raw_lines(code)
-        # if self.scopes.is_dictionary(var_name):
-        self.program.insert_sto(self.scopes.var_to_reg(var_name), comment=f'{var_name}')  # needed for any dict or list
+        self.program.insert_sto(self.scopes.var_to_reg(var_name), comment=f'{var_name}')
+
+    def subscript_is_on_rhs_thus_read(self, node):
+        # Recall the list onto the stack
+        assert isinstance(node.ctx, ast.Load)
+        # DUPLICATE CODE - see visit_Assign line 369
+        target = node
+        var_name = target.value.id  # drill into subscript to get it
+        if self.scopes.is_dictionary(var_name):
+            self.process_dict_access(target)
+        else:
+            self.process_list_access(target)
+        code = f"""
+            RCLEL
+        """
+        self.program.insert_raw_lines(code)
 
     def assert_assign_ensure_uppercase_for_matrices(self, target):
         # THIS SHOULD BE REMOVED
@@ -936,28 +950,14 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def visit_Subscript(self,node):
         """
+        Only gets called if are reading from a list or dict on rhs e.g. x = a[n]
         Children nodes are:
             - value (the Name of the list we are accessing)
             - slice - with subchild Index.value which is a Num of the list index
             - ctx - Load or Store
         """
         self.begin(node)
-
-        # Recall the list onto the stack
-        assert isinstance(node.ctx, ast.Load)
-
-        # DUPLICATE CODE - see visit_Assign line 369
-        target = node
-        var_name = target.value.id  # drill into subscript to get it
-        if self.scopes.is_dictionary(var_name):
-            self.process_dict_access(target)
-        else:
-            self.process_list_access(target)
-
-        code = f"""
-            RCLEL
-        """
-        self.program.insert_raw_lines(code)
+        self.subscript_is_on_rhs_thus_read(node)
         self.end(node)
 
     @recursive
