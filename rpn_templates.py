@@ -357,16 +357,104 @@ class RpnTemplates:
         RTN
         """)
 
-    p1DLen = dedent("""
-        LBL "p1DLen"  // () -> length, please INDEX the list first
+    pMxPrep = dedent("""
+        // Prepare matrix for access by storing in ZLIST var
+        // ** You must set flag 01 yourself to indicate
+        // 1D (list) vs 2D (dictionaries) operation
+        //  
+        LBL "pMxPrep"  // (matrix) -> ()
+        MAT?        // if is a matrix
+        GTO 99      // yes
+        XEQ "CLIST" // else empty matrix
+        RDN
+        RTN
+        LBL 99  // yes is a matrix
+        STO "ZLIST"
+        RDN
+        INDEX "ZLIST"        
+        RTN
+        """)
+
+    p1mIJ = dedent("""
+        // Sets IJ for list access to 'index'.  
+        // Assumes ZLIST is indexed.
+        //
+        LBL "p1mIJ"  // (index) -> () & sets IJ for list access
+        1
+        +       // adjust row from 0 based (python) to 1 based (RPN matrix)
+        1       // col (always, in lists)
+        STOIJ
+        RDN
+        RDN
+        RTN
+        """)
+
+    p2mIJfi = dedent("""
+        // Sets IJ for dict access for 'key' (search required)  
+        // Assumes ZLIST is indexed.
+        //
+        LBL "p2mIJfi"  // (key) -> () & finds key and sets IJ accordingly
+        XEQ "pSaveSt"  // save the stack
         1
         1
         STOIJ
         RDN
         RDN
-        I-
-        RCLIJ
+        CF99  // not found flag
+        1  // from
+        XEQ "p1DLen"  // to
+        1  // step
+        XEQ "pISG"
+        STO 99
         RDN
+        LBL 73
+        ISG 99
+        GTO LBL 74 // resume
+        // see if el matches
+        RCLEL
+        x=Y?
+        GTO 98  // found
+        RDN // else
+        I+
+        GTO 73  // keep looking
+        LBL 98 // found
+        SF 99
+        LBL 74 // resume
+        FC? 99 // was it found?
+        GTO "pErrMxN"  // error not found
+        RCL 99
+        IP // index where found
+        2  // value col
+        X<>Y
+        STOIJ  // all set to store something
+        XEQ "pRclSt"  // recall stack
+        RDN  // drop key we were looking for
+        RTN
+        """)
+
+    pSaveStack = dedent("""
+        // Saves the stack  
+        //
+        LBL "pSaveSt"  // (t,z,y,x) -> (t,z,y,x) & saves to regs pT, pZ, pY, pX
+        STO "pX"
+        RDN
+        STO "pY"
+        RDN
+        STO "pZ"
+        RDN
+        STO "pT"
+        RDN
+        RTN
+        """)
+
+    pRclStack = dedent("""
+        // Recalls the stack  
+        //
+        LBL "pRclSt"  // (?,?,?,?) -> (t,z,y,x) & recalls from regs pT, pZ, pY, pX
+        RCL "pT"
+        RCL "pZ"
+        RCL "pY"
+        RCL "pX"
         RTN
         """)
 
