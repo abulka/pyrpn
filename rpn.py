@@ -125,7 +125,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             return t.string if t.type == tokenize.COMMENT else ''
         return find_line_comment(node.first_token)
 
-    # For visit support
+    # Visit support methods
 
     def body(self, statements):
         for stmt in statements:
@@ -190,6 +190,15 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         # otherwise its a cmd_st_x_situation situation where we visit recurse normally and then do a ST X as arg to the built in command
         return func_name in settings.CMDS_WHO_NEED_LITERAL_NUM_ON_STACK_X and \
                not isinstance(node.args[0], ast.Name)
+
+    def friendly_type(self, node):
+        if isinstance(node, ast.Dict):
+            type_ = '(matrix type Dictionary)'
+        elif isinstance(node, ast.List):
+            type_ = '(matrix type List)'
+        else:
+            type_ = ''
+        return type_
 
     # Finishing up
 
@@ -367,15 +376,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         self.pending_stack_args = []  # must have, cos could just be assigning single values, not BinOp and not Expr
         self.end(node)
-
-    def friendly_type(self, node):
-        if isinstance(node, ast.Dict):
-            type_ = '(matrix type Dictionary)'
-        elif isinstance(node, ast.List):
-            type_ = '(matrix type List)'
-        else:
-            type_ = ''
-        return type_
 
     def visit_AugAssign(self,node):
         """ visit a AugAssign e.g. += node and visits it recursively"""
