@@ -375,15 +375,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         log.debug(f'{self.indent_during}lhs subscript detected {var_name}')
         if var_name.islower():
             raise RpnError(f'Can only assign dictionaries to uppercase variables not "{var_name}".  Please change the variable name to uppercase e.g. "{var_name.upper()}".')
-        if self.scopes.is_dictionary(var_name):
-            self.process_dict_access(target)
-        else:
-            self.process_list_access(target)
-        code = """
-            RCL ST T
-            STOEL
-            """
-        self.program.insert_raw_lines(code)
+        self.process_matrix_access(target)
         self.program.insert_sto(self.scopes.var_to_reg(var_name), comment=f'{var_name}')
 
     def subscript_is_on_rhs_thus_read(self, node):
@@ -392,14 +384,33 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         var_name = target.value.id  # drill into subscript to get it
         assert isinstance(node.ctx, ast.Load)
         log.debug(f'{self.indent_during}rhs subscript detected {var_name}')
-        # DUPLICATE CODE - see visit_Assign line 369
-        if self.scopes.is_dictionary(var_name):
-            self.process_dict_access(target)
-        else:
-            self.process_list_access(target)
-        code = f"""
-            RCLEL
+        self.process_matrix_access(node)
+
+    def process_matrix_access(self, subscript_node):
         """
+        Generate RPN code to get the matrix onto stack, and read from it or write to it.
+
+        Recipe:
+            - Note 'var_name' is the name of the list/dict
+            - We recall the matrix, store it into ZLIST and activate ZLIST using the INDEX rpn command etc.
+            - Then either
+                - Load the indexed value (or key for hashes) or
+                - Store the value (found at ST T) into that matrix element
+        """
+        var_name = subscript_node.value.id  # drill into subscript to get it
+        if self.scopes.is_dictionary(var_name):
+            self.process_dict_access(subscript_node)
+        else:
+            self.process_list_access(subscript_node)
+        if isinstance(subscript_node.ctx, ast.Load):
+            code = f"""
+                RCLEL
+                """
+        elif isinstance(subscript_node.ctx, ast.Store):
+            code = """
+                RCL ST T  // get the value we are storing YUK - too high up on stack!!
+                STOEL
+                """
         self.program.insert_raw_lines(code)
 
     def assert_assign_ensure_uppercase_for_matrices(self, target):
