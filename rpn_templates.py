@@ -171,7 +171,7 @@ class RpnTemplates:
         CF 00
         X<Y?
         SF 00  // true
-        XEQ "p__0Bool"  // get bool of flag 00
+        XEQ "p0Bool"  // get bool of flag 00
         RTN    
         """)
 
@@ -180,7 +180,7 @@ class RpnTemplates:
         CF 00
         X>Y?
         SF 00  // true
-        XEQ "p__0Bool"  // get bool of flag 00
+        XEQ "p0Bool"  // get bool of flag 00
         RTN    
         """)
 
@@ -189,7 +189,7 @@ class RpnTemplates:
         CF 00
         X=Y?
         SF 00  // true
-        XEQ "p__0Bool"  // get bool of flag 00
+        XEQ "p0Bool"  // get bool of flag 00
         RTN    
         """)
 
@@ -198,7 +198,7 @@ class RpnTemplates:
         CF 00
         X≤Y?
         SF 00  // true
-        XEQ "p__0Bool"  // get bool of flag 00
+        XEQ "p0Bool"  // get bool of flag 00
         RTN    
         """)
 
@@ -207,7 +207,7 @@ class RpnTemplates:
         CF 00
         X≥Y?
         SF 00  // true
-        XEQ "p__0Bool"  // get bool of flag 00
+        XEQ "p0Bool"  // get bool of flag 00
         RTN    
         """)
 
@@ -216,7 +216,7 @@ class RpnTemplates:
         CF 00
         X≠Y?
         SF 00  // true
-        XEQ "p__0Bool"  // get bool of flag 00
+        XEQ "p0Bool"  // get bool of flag 00
         RTN    
         """)
 
@@ -313,8 +313,8 @@ class RpnTemplates:
 
     # Util
 
-    p__0Bool = dedent("""
-        LBL "p__0Bool"  // (a,b) -> (boolean) of whether flag 00 is set
+    p0Bool = dedent("""
+        LBL "p0Bool"  // (a,b) -> (boolean) of whether flag 00 is set
         RDN
         RDN    // params dropped 
         FS? 00

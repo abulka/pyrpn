@@ -122,7 +122,7 @@ class Program(BaseRpnProgram):
         if templates_who_need_PyBool & templates_needed:
             templates_needed.add('pBool')
         if templates_who_need_PyDFTB & templates_needed:
-            templates_needed.add('p__0Bool')
+            templates_needed.add('p0Bool')
         if templates_who_need_pErrRange & templates_needed:
             templates_needed.add('p__1ErR')
         if templates_who_need_pList & templates_needed:
