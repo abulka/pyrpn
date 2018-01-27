@@ -357,6 +357,29 @@ class RpnTemplates:
         RTN
         """)
 
+    pMlen = dedent(f"""
+        LBL "pMlen"  // () -> length of ZLIST
+        // please INDEX the ZLIST list first
+        // or delete the ZLIST to get an empty list of 0
+
+        SF 25       // try: (ignore error) 
+        INDEX "ZLIST"      
+        FC?C 25     // if was error (flag cleared)
+        GTO {settings.SKIP_LABEL1}      //   error, list is empty
+        1
+        1
+        STOIJ
+        RDN
+        RDN
+        I-
+        RCLIJ
+        RDN
+        RTN
+        LBL {settings.SKIP_LABEL1}      // list is empty
+        0
+        RTN
+        """)
+
     pMxPrep = dedent("""
         // Prepare matrix for access by storing in ZLIST var
         // ** You must set flag 01 yourself to indicate
@@ -402,7 +425,7 @@ class RpnTemplates:
         RDN
         CF99  // not found flag
         1  // from
-        XEQ "p1DLen"  // to
+        XEQ "pMlen"  // to
         1  // step
         XEQ "pISG"
         STO 99

@@ -30,6 +30,8 @@ Labels ABCDEFGHIJabcde - allocated for user python functions as needed
 
 Rpn template library labels as follows:
 """
+SKIP_LABEL1 = 68        # skip labels are resuable, just ensure they will be found in a forward search
+SKIP_LABEL2 = 69
 LOCAL_LABEL_FOR_PyLIB = 70
 LOCAL_LABEL1_FOR_ISG_PREP = 71
 LOCAL_LABEL2_FOR_ISG_PREP = 72
