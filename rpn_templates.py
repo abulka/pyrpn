@@ -380,18 +380,18 @@ class RpnTemplates:
         RTN
         """)
 
-    pMxPrep = dedent("""
+    pMxPrep = dedent(f"""
         // Prepare matrix for access by storing in ZLIST var
         // ** You must set flag 01 yourself to indicate
         // 1D (list) vs 2D (dictionaries) operation
         //  
         LBL "pMxPrep"  // (matrix) -> ()
         MAT?        // if is a matrix
-        GTO 99      // yes
+        GTO {settings.SKIP_LABEL1}      // yes
         XEQ "CLIST" // else empty matrix
         RDN
         RTN
-        LBL 99  // yes is a matrix
+        LBL {settings.SKIP_LABEL1}  // yes is a matrix
         STO "ZLIST"
         RDN
         INDEX "ZLIST"        
@@ -412,7 +412,7 @@ class RpnTemplates:
         RTN
         """)
 
-    p2mIJfi = dedent("""
+    p2mIJfi = dedent(f"""
         // Sets IJ for dict access for 'key' (search required)  
         // Assumes ZLIST is indexed.
         //
@@ -423,29 +423,29 @@ class RpnTemplates:
         STOIJ
         RDN
         RDN
-        CF99  // not found flag
+        CF {settings.FLAG_2D_MATRIX_FIND}  // not found flag
         1  // from
         XEQ "pMlen"  // to
         1  // step
         XEQ "pISG"
-        STO 99
+        STO "p2mISG"
         RDN
-        LBL 73
-        ISG 99
-        GTO LBL 74 // resume
+        LBL {settings.LOCAL_LABEL_FOR_2D_MATRIX_FIND}
+        ISG "p2mISG"
+        GTO LBL {settings.SKIP_LABEL1} // resume
         // see if el matches
         RCLEL
         x=Y?
-        GTO 98  // found
+        GTO {settings.SKIP_LABEL2}  // found
         RDN // else
         I+
-        GTO 73  // keep looking
-        LBL 98 // found
-        SF 99
-        LBL 74 // resume
-        FC? 99 // was it found?
-        GTO "pErrMxN"  // error not found
-        RCL 99
+        GTO {settings.LOCAL_LABEL_FOR_2D_MATRIX_FIND}  // keep looking
+        LBL {settings.SKIP_LABEL2} // found
+        SF {settings.FLAG_2D_MATRIX_FIND}
+        LBL {settings.SKIP_LABEL1} // resume
+        FC? {settings.FLAG_2D_MATRIX_FIND} // was it found?
+        GTO "NO_KEY?"  // error not found, do not define this label :-)
+        RCL "p2mISG"
         IP // index where found
         2  // value col
         X<>Y
