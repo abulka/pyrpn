@@ -369,10 +369,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             comment=f'{target.id} {type_}')
 
     def subscript_is_on_lhs_thus_assign(self, target):
-        # handles both lists and dictionaries
+        # Assign to the list/dictionary
         var_name = target.value.id  # drill into subscript nodes to get list or dict name
-        log.debug(f'{self.indent_during}subscript detected {var_name}')
         assert isinstance(target.ctx, ast.Store)
+        log.debug(f'{self.indent_during}lhs subscript detected {var_name}')
         if var_name.islower():
             raise RpnError(f'Can only assign dictionaries to uppercase variables not "{var_name}".  Please change the variable name to uppercase e.g. "{var_name.upper()}".')
         if self.scopes.is_dictionary(var_name):
@@ -387,11 +387,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.program.insert_sto(self.scopes.var_to_reg(var_name), comment=f'{var_name}')
 
     def subscript_is_on_rhs_thus_read(self, node):
-        # Recall the list onto the stack
-        assert isinstance(node.ctx, ast.Load)
-        # DUPLICATE CODE - see visit_Assign line 369
+        # Recall the list/dictionary onto the stack
         target = node
         var_name = target.value.id  # drill into subscript to get it
+        assert isinstance(node.ctx, ast.Load)
+        log.debug(f'{self.indent_during}rhs subscript detected {var_name}')
+        # DUPLICATE CODE - see visit_Assign line 369
         if self.scopes.is_dictionary(var_name):
             self.process_dict_access(target)
         else:
