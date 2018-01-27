@@ -86,7 +86,10 @@ class Program(BaseRpnProgram):
         return 'DMtx' in self.last_line.text or 'ZLIST' in self.last_line.text  # hack - list/dict/matrix related
 
     def is_previous_line_matrix_list_related(self):
-        return 'LIST' in self.last_line.text or 'list' in self.last_line.comment  # hack - need to intelligently figure out type of prev line incl when + operation was acting on lists/matrixes
+        # hack - need to intelligently figure out type of prev line incl when + operation was acting on lists/matrixes
+        return 'LIST' in self.last_line.text or \
+               'list' in self.last_line.comment or \
+               'STOEL' in self.last_line.text
 
     def insert_sto(self, register, comment=''):
         if self.is_previous_line_matrix_list_related():

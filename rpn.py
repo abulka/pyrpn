@@ -342,19 +342,40 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 raise RpnError(f'Can only assign lists to uppercase variables not "{target.id}".  Please change the variable name to uppercase e.g. "{target.id.upper()}".')  #  This is because lists are implemented as RPN matrices which need to be stored in a named register.')
 
             if isinstance(target, ast.Subscript):
+                var_name = target.value.id  # drill into subscript to get it
                 assert isinstance(target.ctx, ast.Store)
-                # self.process_list_access(target)
-                self.process_dict_access(target)
+
+                if self.scopes.is_dictionary(var_name):
+                    self.process_dict_access(target)
+                else:
+                    self.process_list_access(target)
+
                 code = """
                     RCL ST T
                     STOEL
                 """
                 self.program.insert_raw_lines(code)
+                if self.scopes.is_dictionary(var_name):
+                    self.program.insert_sto(self.scopes.var_to_reg(var_name), comment=f'{var_name}')
             else:
-                self.program.insert_sto(self.scopes.var_to_reg(target.id), comment=f'{target.id}')
+                # Create the variable and mark its type
+                type_ = self.friendly_type(node.value)
+                self.program.insert_sto(
+                    self.scopes.var_to_reg(target.id,
+                                           is_dict_var=isinstance(node.value, ast.Dict)),
+                    comment=f'{target.id} {type_}')
 
         self.pending_stack_args = []  # must have, cos could just be assigning single values, not BinOp and not Expr
         self.end(node)
+
+    def friendly_type(self, node):
+        if isinstance(node, ast.Dict):
+            type_ = '(matrix type Dictionary)'
+        elif isinstance(node, ast.List):
+            type_ = '(matrix type List)'
+        else:
+            type_ = ''
+        return type_
 
     def visit_AugAssign(self,node):
         """ visit a AugAssign e.g. += node and visits it recursively"""
