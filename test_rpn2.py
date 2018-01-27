@@ -658,6 +658,34 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+    def test_dict_access_el(self):
+        self.parse(dedent("""
+            A = {1: 2}
+            x = A[1]
+            """))
+        expected = dedent("""
+            0             // not a matrix (empty)
+            XEQ "p2DMtx"  // prepare ZLIST
+            1
+            2
+            XEQ "LIST+"
+            RCL "ZLIST"
+            STO "A"
+
+            RCL "A"
+            XEQ "p2DMtx"
+            INDEX "ZLIST"
+            1
+            XEQ "p2DFindKey"  // convert "a" key to I the row
+            2           // J always col 2 which holds the value (key in col 1)
+            X<>Y
+            STOIJ
+
+            RCLEL
+            STO 00
+            """)
+        self.compare(de_comment(expected))
+
     def test_dict_var_must_be_uppercase(self):
         src = """
             a = {}

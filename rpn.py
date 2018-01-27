@@ -931,7 +931,15 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         # Recall the list onto the stack
         assert isinstance(node.ctx, ast.Load)
-        self.process_list_access(node)
+
+        # DUPLICATE CODE - see visit_Assign line 369
+        target = node
+        var_name = target.value.id  # drill into subscript to get it
+        if self.scopes.is_dictionary(var_name):
+            self.process_dict_access(target)
+        else:
+            self.process_list_access(target)
+
         code = f"""
             RCLEL
         """
