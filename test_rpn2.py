@@ -625,7 +625,6 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    @unittest.skip('hard')
     def test_dict_set_key(self):
         self.parse(dedent("""
             A = {}
@@ -636,16 +635,18 @@ class RpnTests2(BaseTest):
             XEQ "p2DMtx"  // prepare ZLIST
             STO "A"
 
-            0             // not a matrix (empty)
-            XEQ "p2DMtx"  // prepare ZLIST
-            "a"
-            ASTO ST X
             2
-            XEQ "LIST+"
-            "b"
-            ASTO ST X
-            3
-            XEQ "LIST+"
+            RCL "A"
+            XEQ "p2DMtx"
+            INDEX "ZLIST"
+            "a"
+            XEQ "p2DFindKey"  // convert "a" key to I the row
+            2           // J always col 2 which holds the value (key in col 1)
+            X<>Y
+            STOIJ
+            RCL ST T
+            STOEL
+
             RCL "ZLIST"
             STO "A"
             """)

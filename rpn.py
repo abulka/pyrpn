@@ -292,6 +292,38 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.program.insert_raw_lines(code)
         self.inside_list_access = False
 
+    def process_dict_access(self, subscript_node):
+        # at this point the value we are assigning has already been emitted
+
+        self.inside_list_access = True
+        self.visit(subscript_node.value)  # RCL list name
+
+        prepare_for_access = """
+            XEQ "p2DMtx"
+            //RDN  // get rid of matrix on stack **NEW
+            INDEX "ZLIST"  // cos now all access via ZLIST matrix
+        """
+        self.program.insert_raw_lines(prepare_for_access)
+
+        # Get the y:row onto the stack
+        assert isinstance(subscript_node.slice, ast.Index)
+        self.visit(subscript_node.slice.value)  # the key value
+
+        # Need to translate the key into an index value by searching
+        # ideally a hash function, but that's too complex re dealing with clashes etc.
+        # j_col_value = 2  # always
+        # i_row_key = 1  # hack for now, pending a lookup search
+        code = f"""
+            XEQ "p2DFindKey" // convert key on stack to i_row_key
+            2                // j_col_value (always 2)
+            X<>Y 
+            STOIJ
+            //RDN            // drop I,J off stack
+            //RDN
+        """
+        self.program.insert_raw_lines(code)
+        self.inside_list_access = False
+
     def visit_Assign(self,node):
         """ visit a Assign node and visits it recursively
             - targets
@@ -311,7 +343,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
             if isinstance(target, ast.Subscript):
                 assert isinstance(target.ctx, ast.Store)
-                self.process_list_access(target)
+                # self.process_list_access(target)
+                self.process_dict_access(target)
                 code = """
                     RCL ST T
                     STOEL
