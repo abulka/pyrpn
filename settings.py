@@ -32,15 +32,15 @@ Rpn template library labels as follows:
 """
 SKIP_LABEL1 = 68        # skip labels are resuable, just ensure they will be found in a forward search
 SKIP_LABEL2 = 69
-LOCAL_LABEL_FOR_PyLIB = 70
-LOCAL_LABEL1_FOR_ISG_PREP = 71
-LOCAL_LABEL2_FOR_ISG_PREP = 72
-LOCAL_LABEL_FOR_2D_MATRIX_FIND = 73
+# LOCAL_LABEL_FOR_PyLIB = 70
+# LOCAL_LABEL1_FOR_ISG_PREP = 71
+# LOCAL_LABEL2_FOR_ISG_PREP = 72
+LOCAL_LABEL_FOR_2D_MATRIX_FIND = 73  # unique cos needs to go backwards in loop jump
 LOCAL_LABEL_START_FOR_Py = 74  # .. 99
 # Flags
-FLAG_PISG_1 = 99
-FLAG_PISG_2 = 98
-FLAG_2D_MATRIX_FIND = 97
+FLAG_PYTHON_USE_1 = 99
+FLAG_PYTHON_USE_2 = 98
+# FLAG_2D_MATRIX_FIND = 97
 
 # Parsing related
 CMDS_WHO_NEED_LITERAL_NUM_ON_STACK_X = ('VIEW',)

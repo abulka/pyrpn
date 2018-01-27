@@ -41,14 +41,14 @@ class RpnTemplates:
         self.template_names = self._get_class_attrs()
         self._create_local_labels()
 
-    pISG = dedent("""
+    pISG = dedent(f"""
         LBL "pISG"  // (z:from, y:to, x:step) -> (ccccccc.fffii)
-        CF 99   // neg_case = False 
-        CF 98   // have_step = False (other than 1)
+        CF {settings.FLAG_PYTHON_USE_1}   // neg_case = False 
+        CF {settings.FLAG_PYTHON_USE_2}   // have_step = False (other than 1)
         1
         IP      // ensure step is an int
         X=Y?
-        SF 98   // have_step = True
+        SF {settings.FLAG_PYTHON_USE_2}   // have_step = True
         RDN
         RCL ST Z
         IP      // ensure from is an int
@@ -56,36 +56,36 @@ class RpnTemplates:
         IP      // ensure to is an int
         1
         -
-        
+
         999      // check don't exceed max 'to' value of 999 (ISG ccccccc.fffii)
         X<Y?
         XEQ "p__1ErR"
         RDN
-        
+
         X<>Y     // stack now: z:step y:to-1 x:from 
         RCL ST Z // step
         -        // stack now: z:step y:to-1 x:from-step 
         X>=0?    // if from > 0
-        GTO {0}   //      easy (non negative)
+        GTO {settings.SKIP_LABEL1}   //      easy (non negative)
         ABS      // else from = abs(from)
-        SF 99    //      neg_case = True 
-        LBL {0}
+        SF {settings.FLAG_PYTHON_USE_1}    //      neg_case = True 
+        LBL {settings.SKIP_LABEL1}
         X<>Y     // stack now: z:step y:from x:to
         1000
         /
         +        // stack now: y:step x:a.bbb
-        FS?C 98  // if not have_step
-        GTO {1}
+        FS?C {settings.FLAG_PYTHON_USE_2}  // if not have_step
+        GTO {settings.SKIP_LABEL2}
         RCL ST Z // else step
         100000   //      step = step / 100,000
         /
         +        // stack now: a.bbbnn
-        LBL {1}
-        FS?C 99  // if neg_case
+        LBL {settings.SKIP_LABEL2}
+        FS?C {settings.FLAG_PYTHON_USE_1}  // if neg_case
         +/-
         RTN 
         // returns ISG number in form a.bbbnn
-        """.format(settings.LOCAL_LABEL1_FOR_ISG_PREP, settings.LOCAL_LABEL2_FOR_ISG_PREP))
+        """)
 
     pList = dedent("""
         // p 176. HP42S programming manual
@@ -423,13 +423,13 @@ class RpnTemplates:
         STOIJ
         RDN
         RDN
-        CF {settings.FLAG_2D_MATRIX_FIND}  // not found flag
         1  // from
         XEQ "pMlen"  // to
         1  // step
         XEQ "pISG"
         STO "p2mISG"
         RDN
+        CF {settings.FLAG_PYTHON_USE_1}  // not found flag
         LBL {settings.LOCAL_LABEL_FOR_2D_MATRIX_FIND}
         ISG "p2mISG"
         GTO LBL {settings.SKIP_LABEL1} // resume
@@ -441,9 +441,9 @@ class RpnTemplates:
         I+
         GTO {settings.LOCAL_LABEL_FOR_2D_MATRIX_FIND}  // keep looking
         LBL {settings.SKIP_LABEL2} // found
-        SF {settings.FLAG_2D_MATRIX_FIND}
+        SF {settings.FLAG_PYTHON_USE_1}
         LBL {settings.SKIP_LABEL1} // resume
-        FC? {settings.FLAG_2D_MATRIX_FIND} // was it found?
+        FC? {settings.FLAG_PYTHON_USE_1} // was it found?
         GTO "NO_KEY?"  // error not found, do not define this label :-)
         RCL "p2mISG"
         IP // index where found
