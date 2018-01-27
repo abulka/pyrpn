@@ -347,8 +347,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         for target in node.targets:
             assert '.Store' in str(target.ctx)
             assert isinstance(target.ctx, ast.Store)
+
+            # This is because lists are implemented as RPN matrices which need to be stored in a named register.
+            # And can only specify named registers in my Python RPN converter by specifying uppercase variable name.
+            # Arguably could allow lower case variables to be assigned to, and simply automatically map them to lowercase named registers BINGO!!!! YES!!!
             if self.program.is_previous_line_matrix_related() and target.id.islower():
-                raise RpnError(f'Can only assign lists to uppercase variables not "{target.id}".  Please change the variable name to uppercase e.g. "{target.id.upper()}".')  #  This is because lists are implemented as RPN matrices which need to be stored in a named register.')
+                raise RpnError(f'Can only assign lists to uppercase variables not "{target.id}".  Please change the variable name to uppercase e.g. "{target.id.upper()}".')
 
             if isinstance(target, ast.Subscript):
                 var_name = target.value.id  # drill into subscript to get it
