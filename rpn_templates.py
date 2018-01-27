@@ -45,8 +45,8 @@ class RpnTemplates:
         LBL "pISG"  // (z:from, y:to, x:step) -> (ccccccc.fffii)
         CF {settings.FLAG_PYTHON_USE_1}   // neg_case = False 
         CF {settings.FLAG_PYTHON_USE_2}   // have_step = False (other than 1)
-        1
         IP      // ensure step is an int
+        1
         X=Y?
         SF {settings.FLAG_PYTHON_USE_2}   // have_step = True
         RDN
@@ -347,7 +347,7 @@ class RpnTemplates:
         """)
 
     p2DMtx = dedent("""
-        LBL "p1DMtx"  // (x) -> stores x in ZLIST if matrix else deletes ZLIST to signify empty matrix
+        LBL "p2DMtx"  // (x) -> stores x in ZLIST if matrix else deletes ZLIST to signify empty matrix
         CF 01   // 2D matrix for dictionaries  <-- ONLY LINE THAT IS DIFFERENT TO p1DMtx hmmm
         MAT?    // if is a matrix
         STO "ZLIST"
