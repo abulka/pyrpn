@@ -364,12 +364,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.inside_matrix_access = False
 
     def process_list_access(self, subscript_node):
-
-        prepare_for_access = """
-            XEQ "p1DMtx"
-            INDEX "ZLIST"
-        """
-        self.program.insert_raw_lines(prepare_for_access)
+        self.program.insert_xeq('p1DMtx')
+        self.program.insert('INDEX "ZLIST"')
 
         # Get the y:row onto the stack
         assert isinstance(subscript_node.slice, ast.Index)
@@ -385,13 +381,15 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def process_dict_access(self, subscript_node):
         # at this point the value we are assigning has already been emitted
+        self.program.insert_xeq('p2DMtx')
+        self.program.insert('INDEX "ZLIST"')
 
-        prepare_for_access = """
-            XEQ "p2DMtx"
-            //RDN  // get rid of matrix on stack **NEW
-            INDEX "ZLIST"  // cos now all access via ZLIST matrix
-        """
-        self.program.insert_raw_lines(prepare_for_access)
+        # prepare_for_access = """
+        #     XEQ "p2DMtx"
+        #     //RDN  // get rid of matrix on stack **NEW
+        #     INDEX "ZLIST"  // cos now all access via ZLIST matrix
+        # """
+        # self.program.insert_raw_lines(prepare_for_access)
 
         # Get the y:row onto the stack
         assert isinstance(subscript_node.slice, ast.Index)
