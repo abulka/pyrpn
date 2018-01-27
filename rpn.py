@@ -353,6 +353,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             if isinstance(target, ast.Subscript):
                 var_name = target.value.id  # drill into subscript to get it
                 assert isinstance(target.ctx, ast.Store)
+                if var_name.islower():
+                    raise RpnError(f'Can only assign dictionaries to uppercase variables not "{var_name}".  Please change the variable name to uppercase e.g. "{var_name.upper()}".')
 
                 if self.scopes.is_dictionary(var_name):
                     self.process_dict_access(target)

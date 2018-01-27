@@ -658,8 +658,7 @@ class RpnTests2(BaseTest):
         """
         self.assertRaises(RpnError, self.parse, dedent(src))
 
-    @unittest.skip('hard')
-    def test_dict_append_var_must_be_uppercase(self):
+    def test_dict_set_must_be_uppercase(self):
         src = """
             a['a'] = 5
         """
