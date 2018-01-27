@@ -356,7 +356,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             # This is because lists are implemented as RPN matrices which need to be stored in a named register.
             # And can only specify named registers in my Python RPN converter by specifying uppercase variable name.
             # Arguably could allow lower case variables to be assigned to, and simply automatically map them to lowercase named registers BINGO!!!! YES!!!
+
+            # This code happens when a = [] or a = {} because there is no subscript on l.h.s
             if self.program.is_previous_line_matrix_related() and target.id.islower():
+                log.debug(f'previous line is {self.program.last_line}')
                 raise RpnError(f'Can only assign lists to uppercase variables not "{target.id}".  Please change the variable name to uppercase e.g. "{target.id.upper()}".')
 
             if isinstance(target, ast.Subscript):

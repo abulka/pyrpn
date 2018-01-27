@@ -83,7 +83,7 @@ class Program(BaseRpnProgram):
         return self.last_line.type_ == type_
 
     def is_previous_line_matrix_related(self):
-        return 'DMtx' in self.last_line.text or 'ZLIST' in self.last_line.text  # hack - list/dict/matrix related
+        return 'DMtx' in self.last_line.text # or 'ZLIST' in self.last_line.text  # hack - list/dict/matrix related
 
     def is_previous_line_matrix_list_related(self):
         # hack - need to intelligently figure out type of prev line incl when + operation was acting on lists/matrixes
