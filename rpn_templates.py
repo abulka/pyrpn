@@ -43,6 +43,9 @@ class RpnTemplates:
 
     pISG = dedent(f"""
         LBL "pISG"  // (z:from, y:to, x:step) -> (ccccccc.fffii)
+        RCL T
+        STO "pSaveT"
+        RDN
         CF {settings.FLAG_PYTHON_USE_1}   // neg_case = False 
         CF {settings.FLAG_PYTHON_USE_2}   // have_step = False (other than 1)
         IP      // ensure step is an int
@@ -83,6 +86,9 @@ class RpnTemplates:
         LBL {settings.SKIP_LABEL2}
         FS?C {settings.FLAG_PYTHON_USE_1}  // if neg_case
         +/-
+        // restore T which is now in Y because original params are dropped and are returning the ISG number in X
+        RCL "pSaveT" 
+        X<>Y
         RTN 
         // returns ISG number in form a.bbbnn
         """)
@@ -361,6 +367,7 @@ class RpnTemplates:
         LBL "pMlen"  // () -> length of ZLIST
         // please INDEX the ZLIST list first
         // or delete the ZLIST to get an empty list of 0
+        // WARNING - will mess with I J
 
         SF 25       // try: (ignore error) 
         INDEX "ZLIST"      
@@ -416,26 +423,30 @@ class RpnTemplates:
         // Sets IJ for dict access for 'key' (search required)  
         // Assumes ZLIST is indexed.
         //
-        LBL "p2mIJfi"  // (key) -> () & finds key and sets IJ accordingly
-        XEQ "pSaveSt"  // save the stack
+        LBL "p2mIJfi"  // (key) -> (value) - finds key's value and sets IJ accordingly
+        XEQ "pStoStk"  // save the stack
+        1              // from
+        XEQ "pMlen"    // to
+        1
+        +              // add 1 cos want 'to' to include last row
+        1              // step
+        XEQ "pISG"
+        STO "pISGvar"
+        RDN
+        // Start the search from row 1
         1
         1
         STOIJ
         RDN
         RDN
-        1  // from
-        XEQ "pMlen"  // to
-        1  // step
-        XEQ "pISG"
-        STO "p2mISG"
-        RDN
         CF {settings.FLAG_PYTHON_USE_1}  // not found flag
         LBL {settings.LOCAL_LABEL_FOR_2D_MATRIX_FIND}
-        ISG "p2mISG"
+        ISG "pISGvar"
+        STOP
         GTO LBL {settings.SKIP_LABEL1} // resume
         // see if el matches
         RCLEL
-        x=Y?
+        X=Y?
         GTO {settings.SKIP_LABEL2}  // found
         RDN // else
         I+
@@ -445,20 +456,21 @@ class RpnTemplates:
         LBL {settings.SKIP_LABEL1} // resume
         FC? {settings.FLAG_PYTHON_USE_1} // was it found?
         GTO "NO_KEY?"  // error not found, do not define this label :-)
-        RCL "p2mISG"
+        RCL "pISGvar"
         IP // index where found
         2  // value col
         X<>Y
         STOIJ  // all set to store something
-        XEQ "pRclSt"  // recall stack
+        XEQ "pRclStk"  // recall stack
         RDN  // drop key we were looking for
+        RCLEL  // recall the value - might as well, I J also set properly to it
         RTN
         """)
 
-    pSaveStack = dedent("""
+    pStoStk = dedent("""
         // Saves the stack  
         //
-        LBL "pSaveSt"  // (t,z,y,x) -> (t,z,y,x) & saves to regs pT, pZ, pY, pX
+        LBL "pStoStk"  // (t,z,y,x) -> (t,z,y,x) & saves to regs pT, pZ, pY, pX
         STO "pX"
         RDN
         STO "pY"
@@ -470,16 +482,42 @@ class RpnTemplates:
         RTN
         """)
 
-    pRclStack = dedent("""
+    pRclStk = dedent("""
         // Recalls the stack  
         //
-        LBL "pRclSt"  // (?,?,?,?) -> (t,z,y,x) & recalls from regs pT, pZ, pY, pX
+        LBL "pRclStk"  // (?,?,?,?) -> (t,z,y,x) & recalls from regs pT, pZ, pY, pX
         RCL "pT"
         RCL "pZ"
         RCL "pY"
         RCL "pX"
         RTN
         """)
+
+    # pStoSt2 = dedent("""
+    #     // Saves the stack into location 2
+    #     //
+    #     LBL "pStoSt2"  // (t,z,y,x) -> (t,z,y,x) & saves to regs pT, pZ, pY, pX
+    #     STO "pX2"
+    #     RDN
+    #     STO "pY2"
+    #     RDN
+    #     STO "pZ2"
+    #     RDN
+    #     STO "pT2"
+    #     RDN
+    #     RTN
+    #     """)
+    #
+    # pRclSt2 = dedent("""
+    #     // Recalls the stack from location 2
+    #     //
+    #     LBL "pRclSt2"  // (?,?,?,?) -> (t,z,y,x) & recalls from regs pT, pZ, pY, pX
+    #     RCL "pT2"
+    #     RCL "pZ2"
+    #     RCL "pY2"
+    #     RCL "pX2"
+    #     RTN
+    #     """)
 
     # Code
 

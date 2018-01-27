@@ -23,6 +23,9 @@ Registers 00-NN - allocated as variables as needed
 Uppercase Named Registers e.g. "FRED" - created when python code has uppercase variable names
 Lowercase Named Registers - not used
 
+pSaveT          - used by pISG
+pISGvar         - used by p2mIJfi 
+
 Flags 00, 01    - used in pyrpn template code library
 Flags 99, 98    - used in pyrpn template code library ISG
 
