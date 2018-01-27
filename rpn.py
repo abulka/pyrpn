@@ -284,8 +284,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.end(node)
 
     def process_list_access(self, subscript_node):
-        self.inside_list_access = True
-        self.visit(subscript_node.value)  # RCL list name
 
         prepare_for_access = """
             XEQ "p1DMtx"
@@ -304,13 +302,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             STOIJ
         """
         self.program.insert_raw_lines(code)
-        self.inside_list_access = False
 
     def process_dict_access(self, subscript_node):
         # at this point the value we are assigning has already been emitted
-
-        self.inside_list_access = True
-        self.visit(subscript_node.value)  # RCL list name
 
         prepare_for_access = """
             XEQ "p2DMtx"
@@ -336,7 +330,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             //RDN
         """
         self.program.insert_raw_lines(code)
-        self.inside_list_access = False
 
     def visit_Assign(self,node):
         """ visit a Assign node and visits it recursively
@@ -386,14 +379,17 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         Generate RPN code to get the matrix onto stack, and read from it or write to it.
 
         Recipe:
-            - Note 'var_name' is the name of the list/dict
+            - Note 'var_name_mtx' is the name of the list/dict
             - We recall the matrix, store it into ZLIST and activate ZLIST using the INDEX rpn command etc.
             - Then either
                 - Load the indexed value (or key for hashes) or
                 - Store the value (found at ST T) into that matrix element
         """
-        var_name = subscript_node.value.id  # drill into subscript to get it
-        if self.scopes.is_dictionary(var_name):
+        self.inside_list_access = True
+        self.visit(subscript_node.value)  # RCL list or dict onto stack
+
+        var_name_mtx = subscript_node.value.id
+        if self.scopes.is_dictionary(var_name_mtx):
             self.process_dict_access(subscript_node)
         else:
             self.process_list_access(subscript_node)
@@ -409,7 +405,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.program.insert_raw_lines(code)
 
         if isinstance(subscript_node.ctx, ast.Store):
-            self.program.insert_sto(self.scopes.var_to_reg(var_name), comment=f'{var_name}')
+            self.program.insert_sto(self.scopes.var_to_reg(var_name_mtx), comment=f'{var_name_mtx}')
+
+        self.inside_list_access = False
 
     # THESE ASSERT METHODS SHOULD BE REMOVED
     def assert_assign_ensure_uppercase_for_matrices2(self, target):
