@@ -625,3 +625,42 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+    @unittest.skip('hard')
+    def test_dict_set_key(self):
+        self.parse(dedent("""
+            A = {}
+            A['a'] = 2
+            """))
+        expected = dedent("""
+            0             // not a matrix (empty)
+            XEQ "p2DMtx"  // prepare ZLIST
+            STO "A"
+
+            0             // not a matrix (empty)
+            XEQ "p2DMtx"  // prepare ZLIST
+            "a"
+            ASTO ST X
+            2
+            XEQ "LIST+"
+            "b"
+            ASTO ST X
+            3
+            XEQ "LIST+"
+            RCL "ZLIST"
+            STO "A"
+            """)
+        self.compare(de_comment(expected))
+
+    def test_dict_var_must_be_uppercase(self):
+        src = """
+            a = {}
+        """
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    @unittest.skip('hard')
+    def test_dict_append_var_must_be_uppercase(self):
+        src = """
+            a['a'] = 5
+        """
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
