@@ -62,6 +62,11 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def indent(self):
         return " " * self.log_indent * 4
 
+    @property
+    def indent_during(self):
+        # if want to output messages inside a begin..end log pair
+        return " " * (self.log_indent + 1) * 4
+
     def get_node_name_id_or_n(self, child):
         if hasattr(child, 'name'):
             return child.name
@@ -356,6 +361,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
             if isinstance(target, ast.Subscript):
                 var_name = target.value.id  # drill into subscript to get it
+                log.debug(f'{self.indent_during}subscript detected {var_name}')
                 assert isinstance(target.ctx, ast.Store)
                 if var_name.islower():
                     raise RpnError(f'Can only assign dictionaries to uppercase variables not "{var_name}".  Please change the variable name to uppercase e.g. "{var_name.upper()}".')
@@ -370,11 +376,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                     STOEL
                 """
                 self.program.insert_raw_lines(code)
-                if self.scopes.is_dictionary(var_name):
-                    self.program.insert_sto(self.scopes.var_to_reg(var_name), comment=f'{var_name}')
+                # if self.scopes.is_dictionary(var_name):
+                self.program.insert_sto(self.scopes.var_to_reg(var_name), comment=f'{var_name}')  # needed for any dict or list
             else:
                 # Create the variable and mark its type
                 type_ = self.friendly_type(node.value)
+                log.info(f'{self.indent_during}variable "{target.id}" created {type_}')
                 self.program.insert_sto(
                     self.scopes.var_to_reg(target.id,
                                            is_dict_var=isinstance(node.value, ast.Dict)),

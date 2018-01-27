@@ -392,6 +392,9 @@ class RpnTests2(BaseTest):
             STOIJ
             RCL ST T
             STOEL
+            
+            RCL "ZLIST"
+            STO "A"            
             """)
         self.compare(de_comment(expected))
 
@@ -424,6 +427,9 @@ class RpnTests2(BaseTest):
             STOIJ
             RCL ST T
             STOEL
+            
+            RCL "ZLIST"
+            STO "A"            
             """)
         self.compare(de_comment(expected))
 
