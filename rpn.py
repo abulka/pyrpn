@@ -344,54 +344,65 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             - value
         """
         self.begin(node)
-
-        self.visit(node.value)  # a single Num or Str or Name or List (of elements)
-        if isinstance(node.targets[0], ast.Subscript) and self.program.is_previous_line('string'):  # hack (looking ahead at first target to see if we are assigning to a list element)
-            self.program.insert('ASTO ST X')
-
+        self.assign_push_rhs(node)
         for target in node.targets:
-            assert '.Store' in str(target.ctx)
-            assert isinstance(target.ctx, ast.Store)
-
-            # This is because lists are implemented as RPN matrices which need to be stored in a named register.
-            # And can only specify named registers in my Python RPN converter by specifying uppercase variable name.
-            # Arguably could allow lower case variables to be assigned to, and simply automatically map them to lowercase named registers BINGO!!!! YES!!!
-
-            # This code happens when a = [] or a = {} because there is no subscript on l.h.s
-            if self.program.is_previous_line_matrix_related() and target.id.islower():
-                log.debug(f'previous line is {self.program.last_line}')
-                raise RpnError(f'Can only assign lists to uppercase variables not "{target.id}".  Please change the variable name to uppercase e.g. "{target.id.upper()}".')
-
+            self.assign_assert_target_ok(target)
             if isinstance(target, ast.Subscript):
-                var_name = target.value.id  # drill into subscript to get it
-                log.debug(f'{self.indent_during}subscript detected {var_name}')
-                assert isinstance(target.ctx, ast.Store)
-                if var_name.islower():
-                    raise RpnError(f'Can only assign dictionaries to uppercase variables not "{var_name}".  Please change the variable name to uppercase e.g. "{var_name.upper()}".')
-
-                if self.scopes.is_dictionary(var_name):
-                    self.process_dict_access(target)
-                else:
-                    self.process_list_access(target)
-
-                code = """
-                    RCL ST T
-                    STOEL
-                """
-                self.program.insert_raw_lines(code)
-                # if self.scopes.is_dictionary(var_name):
-                self.program.insert_sto(self.scopes.var_to_reg(var_name), comment=f'{var_name}')  # needed for any dict or list
+                self.assign_subscript_is_on_lhs(target)
             else:
-                # Create the variable and mark its type
-                type_ = self.friendly_type(node.value)
-                log.info(f'{self.indent_during}variable "{target.id}" created {type_}')
-                self.program.insert_sto(
-                    self.scopes.var_to_reg(target.id,
-                                           is_dict_var=isinstance(node.value, ast.Dict)),
-                    comment=f'{target.id} {type_}')
-
+                self.assign_normal_lhs(node, target)
         self.pending_stack_args = []  # must have, cos could just be assigning single values, not BinOp and not Expr
         self.end(node)
+
+    def assign_assert_target_ok(self, target):
+        assert '.Store' in str(target.ctx)
+        assert isinstance(target.ctx, ast.Store)
+        self.assert_assign_ensure_uppercase_for_matrices(target)
+
+    def assign_normal_lhs(self, node, target):
+        # Create the variable and mark its type
+        type_ = self.friendly_type(node.value)
+        log.info(f'{self.indent_during}variable "{target.id}" created {type_}')
+        self.program.insert_sto(
+            self.scopes.var_to_reg(target.id,
+                                   is_dict_var=isinstance(node.value, ast.Dict)),
+            comment=f'{target.id} {type_}')
+
+    def assign_subscript_is_on_lhs(self, target):
+        var_name = target.value.id  # drill into subscript to get it
+        log.debug(f'{self.indent_during}subscript detected {var_name}')
+        assert isinstance(target.ctx, ast.Store)
+        if var_name.islower():
+            raise RpnError(
+                f'Can only assign dictionaries to uppercase variables not "{var_name}".  Please change the variable name to uppercase e.g. "{var_name.upper()}".')
+        if self.scopes.is_dictionary(var_name):
+            self.process_dict_access(target)
+        else:
+            self.process_list_access(target)
+        code = """
+            RCL ST T
+            STOEL
+            """
+        self.program.insert_raw_lines(code)
+        # if self.scopes.is_dictionary(var_name):
+        self.program.insert_sto(self.scopes.var_to_reg(var_name), comment=f'{var_name}')  # needed for any dict or list
+
+    def assert_assign_ensure_uppercase_for_matrices(self, target):
+        # THIS SHOULD BE REMOVED
+        # This is because lists are implemented as RPN matrices which need to be stored in a named register.
+        # And can only specify named registers in my Python RPN converter by specifying uppercase variable name.
+        # Arguably could allow lower case variables to be assigned to, and simply automatically map them to lowercase named registers BINGO!!!! YES!!!
+        # This code happens when a = [] or a = {} because there is no subscript on l.h.s
+        if self.program.is_previous_line_matrix_related() and target.id.islower():
+            log.debug(f'previous line is {self.program.last_line}')
+            raise RpnError(
+                f'Can only assign lists to uppercase variables not "{target.id}".  Please change the variable name to uppercase e.g. "{target.id.upper()}".')
+
+    def assign_push_rhs(self, node):
+        self.visit(node.value)  # a single Num or Str or Name or List (of elements)
+        if isinstance(node.targets[0], ast.Subscript) and self.program.is_previous_line(
+                'string'):  # hack (looking ahead at first target to see if we are assigning to a list element)
+            self.program.insert('ASTO ST X')
 
     def visit_AugAssign(self,node):
         """ visit a AugAssign e.g. += node and visits it recursively"""
