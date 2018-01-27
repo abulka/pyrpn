@@ -576,3 +576,52 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+
+    # dictionaries
+
+    def test_dict_basic_empty(self):
+        self.parse(dedent("""
+            A = {}
+          """))
+        expected = dedent("""
+            0             // not a matrix (empty)
+            XEQ "p2DMtx"  // prepare ZLIST
+            STO "A"
+            """)
+        self.compare(de_comment(expected))
+
+    def test_dict_basic_one(self):
+        self.parse(dedent("""
+            A = {1: 2}
+            """))
+        expected = dedent("""
+            0             // not a matrix (empty)
+            XEQ "p2DMtx"  // prepare ZLIST
+            1
+            2
+            XEQ "LIST+"
+            RCL "ZLIST"
+            STO "A"
+            """)
+        self.compare(de_comment(expected))
+
+    def test_dict_basic_two(self):
+        self.parse(dedent("""
+            A = {'a': 2, 'b':3}
+            """))
+        expected = dedent("""
+            0             // not a matrix (empty)
+            XEQ "p2DMtx"  // prepare ZLIST
+            "a"
+            ASTO ST X
+            2
+            XEQ "LIST+"
+            "b"
+            ASTO ST X
+            3
+            XEQ "LIST+"
+            RCL "ZLIST"
+            STO "A"
+            """)
+        self.compare(de_comment(expected))
+

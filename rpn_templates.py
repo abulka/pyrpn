@@ -346,6 +346,17 @@ class RpnTemplates:
         RTN
         """)
 
+    p2DMtx = dedent("""
+        LBL "p1DMtx"  // (x) -> stores x in ZLIST if matrix else deletes ZLIST to signify empty matrix
+        CF 01   // 2D matrix for dictionaries  <-- ONLY LINE THAT IS DIFFERENT TO p1DMtx hmmm
+        MAT?    // if is a matrix
+        STO "ZLIST"
+        MAT?
+        RTN
+        XEQ "CLIST" // else empty matrix
+        RTN
+        """)
+
     p1DLen = dedent("""
         LBL "p1DLen"  // () -> length, please INDEX the list first
         1

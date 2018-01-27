@@ -834,6 +834,25 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.program.insert_xeq('LIST+')
         self.end(node)
 
+    def visit_Dict(self,node):
+        """
+        Child nodes are:
+            - keys
+            - values
+        """
+        self.begin(node)
+        self.program.insert('0', comment='not a matrix (empty)')
+        self.program.insert_xeq('p2DMtx')
+        for index, key in enumerate(node.keys):
+            self.visit(key)
+            if self.program.is_previous_line('string'):
+                self.program.insert('ASTO ST X')
+            self.visit(node.values[index])  # corresponding value
+            if self.program.is_previous_line('string'):
+                self.program.insert('ASTO ST X')
+            self.program.insert_xeq('LIST+')
+        self.end(node)
+
     def visit_Subscript(self,node):
         """
         Children nodes are:
