@@ -370,20 +370,15 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def subscript_is_on_lhs_thus_assign(self, target):
         # Assign to the list/dictionary
-        var_name = target.value.id  # drill into subscript nodes to get list or dict name
         assert isinstance(target.ctx, ast.Store)
-        log.debug(f'{self.indent_during}lhs subscript detected {var_name}')
-        if var_name.islower():
-            raise RpnError(f'Can only assign dictionaries to uppercase variables not "{var_name}".  Please change the variable name to uppercase e.g. "{var_name.upper()}".')
+        self.assert_assign_ensure_uppercase_for_matrices2(target)
+        log.debug(f'{self.indent_during}lhs subscript "{target.value.id}" detected')
         self.process_matrix_access(target)
-        self.program.insert_sto(self.scopes.var_to_reg(var_name), comment=f'{var_name}')
 
     def subscript_is_on_rhs_thus_read(self, node):
         # Recall the list/dictionary onto the stack
-        target = node
-        var_name = target.value.id  # drill into subscript to get it
         assert isinstance(node.ctx, ast.Load)
-        log.debug(f'{self.indent_during}rhs subscript detected {var_name}')
+        log.debug(f'{self.indent_during}rhs subscript "{node.value.id}" detected')
         self.process_matrix_access(node)
 
     def process_matrix_access(self, subscript_node):
@@ -413,8 +408,15 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 """
         self.program.insert_raw_lines(code)
 
+        if isinstance(subscript_node.ctx, ast.Store):
+            self.program.insert_sto(self.scopes.var_to_reg(var_name), comment=f'{var_name}')
+
+    # THESE ASSERT METHODS SHOULD BE REMOVED
+    def assert_assign_ensure_uppercase_for_matrices2(self, target):
+        var_name = target.value.id  # drill into subscript nodes to get list or dict name
+        if var_name.islower():
+            raise RpnError(f'Can only assign dictionaries to uppercase variables not "{var_name}".  Please change the variable name to uppercase e.g. "{var_name.upper()}".')
     def assert_assign_ensure_uppercase_for_matrices(self, target):
-        # THIS SHOULD BE REMOVED
         # This is because lists are implemented as RPN matrices which need to be stored in a named register.
         # And can only specify named registers in my Python RPN converter by specifying uppercase variable name.
         # Arguably could allow lower case variables to be assigned to, and simply automatically map them to lowercase named registers BINGO!!!! YES!!!
