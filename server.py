@@ -227,7 +227,7 @@ def vote_via_email(example):
 @app.route('/py-rpn-lib', methods=['GET'])
 def py_rpn_lib():
     program = Program()
-    program.rpn_templates.need_all_templates()
+    program.rpn_templates.need_all_templates = True
     program.emit_needed_rpn_templates(as_local_labels=False)
     rpn = program.lines_to_str(comments=True, linenos=True)
     rpn_free42 = program.lines_to_str(comments=False, linenos=True)

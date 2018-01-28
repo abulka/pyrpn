@@ -101,26 +101,16 @@ class Program(BaseRpnProgram):
         self.insert(f'{cmd} {register}', comment=comment)
 
     def insert_xeq(self, func_name, comment=''):
-        # insert global function call
-        # if func_name in self.rpn_templates.template_names:
-        #     self.rpn_templates.need_template(func_name)
         if func_name in self.user_insertable_pyrpn_cmds:
-            # YUK
-            comment = self.rpn_templates.get_user_insertable_pyrpn_cmds()[func_name]['description']
-        # if func_name in ('LIST+', 'LIST-', 'CLIST'):
-        #     self.rpn_templates.need_template('pList')
+            comment = self.rpn_templates.get_user_insertable_pyrpn_cmds()[func_name]['description']  # YUK
         self.insert(f'XEQ "{func_name}"', comment=comment)
 
     def emit_needed_rpn_templates(self, as_local_labels=True):
-        # self.rpn_templates.need_all_templates()  # hack to include everything !
-        # if not self.rpn_templates.needed_templates:
-        #     return
-
-        self.rpn_templates.embedded = as_local_labels
-
         self.insert('LBL "PyLIB"', comment='PyRPN Support Library of')
         self.insert('"-Utility Funcs-"')
         self.insert('RTN', comment='---------------------------')
+
+        self.rpn_templates.embedded = as_local_labels
 
         if self.rpn_templates.need_all_templates:
             self.inject_dependencies(sorted(self.rpn_templates.template_names))
@@ -146,25 +136,6 @@ class Program(BaseRpnProgram):
             dependencies4 = self.find_dependencies() - dependencies
             print('extra dependencies4', dependencies4)
             assert not dependencies4
-
-        # templates_needed = set(self.rpn_templates.needed_templates)
-        # templates_who_need_PyBool = {'p2Bool'}
-        # templates_who_need_pErrRange = {'pISG'}
-        # templates_who_need_PyDFTB = {'pEQ', 'pGT', 'pGTE', 'pLT', 'pLTE', 'pNEQ'}
-        # templates_who_need_pList = {'p1DMtx'}  # TODO deprecated
-        # # TODO need to cater for p2mIJfi dependencies - can we do all this automatically?
-        #
-        # # Add any dependent templates, using set technology
-        # if templates_who_need_PyBool & templates_needed:
-        #     templates_needed.add('pBool')
-        # if templates_who_need_PyDFTB & templates_needed:
-        #     templates_needed.add('p0Bool')
-        # if templates_who_need_pErrRange & templates_needed:
-        #     templates_needed.add('p__1ErR')
-        # if templates_who_need_pList & templates_needed:
-        #     templates_needed.add('pList')
-
-        # self.inject_dependencies(templates_needed)
 
         if as_local_labels:
             self.convert_to_local_labels()
