@@ -2054,8 +2054,8 @@ class RpnCodeGenTests(BaseTest):
             AVIEW()
         """
         expected = dedent("""
-            "this is my str"
-            ├"ing"
+            "this is my stri"
+            ├"ng"
             AVIEW
         """)
         lines = self.parse(dedent(src))
@@ -2066,9 +2066,9 @@ class RpnCodeGenTests(BaseTest):
             AVIEW("Hello there all is well in London!!")
         """
         expected = dedent("""
-            "Hello there al"
-            ├"l is well in L"
-            ├"ondon!!"
+            "Hello there all"
+            ├" is well in Lon"
+            ├"don!!"
             AVIEW
         """)
         lines = self.parse(dedent(src))
@@ -2146,9 +2146,9 @@ class RpnCodeGenTests(BaseTest):
             alpha("Hello there all is well in London!!")
         """
         expected = dedent("""
-            "Hello there al"
-            ├"l is well in L"
-            ├"ondon!!"
+            "Hello there all"
+            ├" is well in Lon"
+            ├"don!!"
         """)
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
@@ -2168,9 +2168,9 @@ class RpnCodeGenTests(BaseTest):
             alpha("Hello there all is well in London!!", 3, sep='')
         """
         expected = dedent("""
-            "Hello there al"
-            ├"l is well in L"
-            ├"ondon!!"
+            "Hello there all"
+            ├" is well in Lon"
+            ├"don!!"
             3
             ARCL ST X
         """)
@@ -2182,11 +2182,11 @@ class RpnCodeGenTests(BaseTest):
             alpha("hello there this is a test of things", "fred is a very big man", sep='')
         """
         expected = dedent("""
-            "hello there th"
-            ├"is is a test o"
-            ├"f things"
-            ├"fred is a very"
-            ├" big man"
+            "hello there thi"
+            ├"s is a test of "
+            ├"things"
+            ├"fred is a very "
+            ├"big man"
         """)
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
@@ -2408,12 +2408,12 @@ class RpnCodeGenTests(BaseTest):
 
     def test_text_ASTO(self):
         src = """
-        alpha("this is my string")
-        ASTO(s)
+            alpha("this is my string")
+            ASTO(s)
         """
         expected = dedent("""
-            "this is my str"
-            ├"ing"
+            "this is my stri"
+            ├"ng"
             ASTO(s)
         """)
         lines = self.parse(dedent(src))
@@ -2425,9 +2425,9 @@ class RpnCodeGenTests(BaseTest):
             ASTO(s)  # Copy the first six characters into a register or variable
         """
         expected = dedent("""
-            "Hello there al"
-            ├"l is well in L"
-            ├"ondon!!"
+            "Hello there all"
+            ├" is well in Lon"
+            ├"don!!"
             ASTO 00
         """)
         lines = self.parse(dedent(src))
