@@ -55,55 +55,57 @@ class RpnTemplates:
     no_step = settings.SKIP_LABEL2
 
     pISG = dedent(f"""
-        LBL "pISG"  // (z:from, y:to, x:step) -> (ccccccc.fffii)
+        LBL "pISG"  // Prepare ISG (z:from, y:to, x:step) -> (ccccccc.fffii)
         RCL T
         STO "pSaveT"
         RDN
-        CF {neg_case}   // neg_case = False 
+        CF {neg_case}    // neg_case = False 
         CF {have_step}   // have_step = False (other than 1)
-        IP      // ensure step is an int
+        IP               // ensure step is an int
         1
         X=Y?
-        SF {settings.FLAG_PYTHON_USE_2}   // have_step = True
+        SF {have_step}   // have_step = True
         RDN
         RCL ST Z
-        IP      // ensure from is an int
-        RCL ST Z // stack now: z:step y:from x:to
-        IP      // ensure to is an int
+        IP               // ensure from is an int
+        RCL ST Z         // stack now: z:step y:from x:to
+        IP               // ensure to is an int
         1
         -
 
-        999      // check don't exceed max 'to' value of 999 (ISG ccccccc.fffii)
+        999              // check don't exceed max 'to' value of 999 (ISG ccccccc.fffii)
         X<Y?
         XEQ "p__1ErR"
         RDN
 
-        X<>Y     // stack now: z:step y:to-1 x:from 
-        RCL ST Z // step
-        -        // stack now: z:step y:to-1 x:from-step 
-        X>=0?    // if from > 0
-        GTO {easy}   //      easy (non negative)
-        ABS      // else from = abs(from)
+        X<>Y             // stack now: z:step y:to-1 x:from 
+        RCL ST Z         // step
+        -                // stack now: z:step y:to-1 x:from-step 
+        X>=0?            // if from > 0
+        GTO {easy}       //      easy (non negative)
+        ABS              // else from = abs(from)
         SF {neg_case}    //      neg_case = True 
         LBL {easy}
-        X<>Y     // stack now: z:step y:from x:to
+        X<>Y             // stack now: z:step y:from x:to
         1000
         /
-        +        // stack now: y:step x:a.bbb
-        FS?C {have_step}  // if not have_step
-        GTO {no_step}
-        RCL ST Z // else step
-        100000   //      step = step / 100,000
+        +                // stack now: y:step x:a.bbb
+        FS?C {have_step} // if not have_step
+        GTO {no_step}    //      skip ahead
+        RCL ST Z         // else calculate step for ISG
+        100000           //      step = step / 100,000
         /
-        +        // stack now: a.bbbnn
+        +                // stack now: a.bbbnn
         LBL {no_step}
         FS?C {neg_case}  // if neg_case
         +/-
-        // restore T which is now in Y because original params are dropped and are returning the ISG number in X
+        
+        // Restore T which is now in Y because original params 
+        // are dropped and are returning the ISG number in X
+        
         RCL "pSaveT" 
         X<>Y
-        RTN 
-        // returns ISG number in form a.bbbnn
+        RTN              // returns ISG number in form a.bbbnn 
         """)
 
     pList = dedent("""
