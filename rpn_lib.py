@@ -8,8 +8,11 @@ import settings
 log = logging.getLogger(__name__)
 config_log(log)
 
-fred = 100
-mary = 200
+# more meaningful labels
+neg_case = ''
+no_step = ''
+easy = ''
+have_step = ''
 
 class RpnTemplates:
     """
@@ -38,6 +41,7 @@ class RpnTemplates:
         FS?     - use isFS(flag) instead
         FC?     - use isFC(flag) instead
     """
+    global neg_case, no_step, easy, have_step
 
     def __init__(self):
         self.needed_templates = []  # extra fragments that need to be emitted at the end
@@ -45,17 +49,18 @@ class RpnTemplates:
         self.template_names = self._get_class_attrs()
         self._create_local_labels()
 
-    global fred, mary
-    fred = 1001
-    mary = 2001
+    neg_case = settings.FLAG_PYTHON_USE_1
+    have_step = settings.FLAG_PYTHON_USE_2
+    easy = settings.SKIP_LABEL1
+    no_step = settings.SKIP_LABEL2
 
     pISG = dedent(f"""
         LBL "pISG"  // (z:from, y:to, x:step) -> (ccccccc.fffii)
         RCL T
         STO "pSaveT"
         RDN
-        CF {settings.FLAG_PYTHON_USE_1}   // neg_case = False 
-        CF {settings.FLAG_PYTHON_USE_2}   // have_step = False (other than 1)
+        CF {neg_case}   // neg_case = False 
+        CF {have_step}   // have_step = False (other than 1)
         IP      // ensure step is an int
         1
         X=Y?
@@ -77,22 +82,22 @@ class RpnTemplates:
         RCL ST Z // step
         -        // stack now: z:step y:to-1 x:from-step 
         X>=0?    // if from > 0
-        GTO {settings.SKIP_LABEL1}   //      easy (non negative)
+        GTO {easy}   //      easy (non negative)
         ABS      // else from = abs(from)
-        SF {settings.FLAG_PYTHON_USE_1}    //      neg_case = True 
-        LBL {settings.SKIP_LABEL1}
+        SF {neg_case}    //      neg_case = True 
+        LBL {easy}
         X<>Y     // stack now: z:step y:from x:to
         1000
         /
         +        // stack now: y:step x:a.bbb
-        FS?C {settings.FLAG_PYTHON_USE_2}  // if not have_step
-        GTO {settings.SKIP_LABEL2}
+        FS?C {have_step}  // if not have_step
+        GTO {no_step}
         RCL ST Z // else step
         100000   //      step = step / 100,000
         /
         +        // stack now: a.bbbnn
-        LBL {settings.SKIP_LABEL2}
-        FS?C {settings.FLAG_PYTHON_USE_1}  // if neg_case
+        LBL {no_step}
+        FS?C {neg_case}  // if neg_case
         +/-
         // restore T which is now in Y because original params are dropped and are returning the ISG number in X
         RCL "pSaveT" 
