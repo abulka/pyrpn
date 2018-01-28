@@ -23,6 +23,11 @@ auto_create = ''
 done = ''
 have_found = ''
 was_found = ''
+push = ''
+finish = ''
+init = ''
+delete = ''
+prepare = ''
 
 class RpnTemplates:
     """
@@ -53,6 +58,7 @@ class RpnTemplates:
     """
     global neg_case, no_step, easy, have_step, error, yes, found
     global loop, ok, exit_loop, auto_create, done, have_found, was_found
+    global push, finish, init, delete, prepare
 
     def __init__(self):
         self.needed_templates = []  # extra fragments that need to be emitted at the end
@@ -119,11 +125,15 @@ class RpnTemplates:
         RTN              // returns ISG number in form a.bbbnn 
         """)
 
-    pList = dedent("""
-        // p 176. HP42S programming manual
-        
-        LBL "LIST"
-        
+    push = settings.LOCAL_LABEL_FOR_LIST_BACK_JUMP
+    finish = settings.LOCAL_LABEL_FOR_LIST_BACK_JUMP2
+    init = settings.SKIP_LABEL1
+    delete = settings.SKIP_LABEL2
+    prepare = settings.SKIP_LABEL3
+
+    pList = dedent(f"""
+        LBL "LIST"  // 1D and 2D List Operations. p 176. HP42S programming manual
+
         CLMENU
         "LIST+"
         KEY 1 XEQ "LIST+"
@@ -134,66 +144,66 @@ class RpnTemplates:
         MENU
         STOP
         GTO "LIST"
-        
-        LBL "LIST+" // (x:val) when 1D, (y:val, x:key) when 2D 
-                    // I.e. (y:value to go into r:2, x:value to go into r:1) where r is the new row 
-                    // This is OPPOSITE way to STOIJ (y:I, x:J) viz. (y:row, x:col) 
-        SF 25       // try: (ignore error) 
-        XEQ I       
-        FC?C 25     // if was error (flag cleared)
-        GTO 02      //   init list then push
-        GROW        // else
-        J-          //   grow, j-, j+ wrap, push()
+
+        LBL "LIST+"   // (x:val) when 1D, (y:val, x:key) when 2D 
+                      // I.e. (y:value to go into r:2, x:value to go into r:1) where r is the new row 
+                      // This is OPPOSITE way to STOIJ (y:I, x:J) viz. (y:row, x:col) 
+        SF 25         // try: (ignore error) 
+        XEQ {prepare}       
+        FC?C 25       // if was error (flag cleared)
+        GTO {init}    //   init list then push
+        GROW          // else
+        J-            //   grow, j-, j+ wrap, push()
         J+
         WRAP
-        
-        LBL 00      // push (x[,y]) -> (x[,y])
-        STOEL       // zlist[j] = x
-        FS? 01      // if list
-        GTO 01      //   finished
-        J+          // else
-        X<>Y        //   zlist[j+1] = y
+
+        LBL {push}    // push (x[,y]) -> (x[,y])
+        STOEL         // zlist[j] = x
+        FS? 01        // if list
+        GTO {finish}  //   finished
+        J+            // else
+        X<>Y          //   zlist[j+1] = y
         STOEL
         X<>Y
-        
-        LBL 01      // finished (), view zlist
+
+        LBL {finish}  // finished (), view zlist
         VIEW "ZLIST"
         RTN
-        
-        LBL 02      // Init list
+
+        LBL {init}    // Init list
         1
         FS? 01
         1
         FC? 01
-        2           // stack is (y:1,x:1) if flag 1 
-        DIM "ZLIST" // else stack is (y:1,x:2)
-        XEQ I       // prepare list for access
+        2             // stack is (y:1,x:1) if flag 1 
+        DIM "ZLIST"   // else stack is (y:1,x:2)
+        XEQ {prepare} // prepare list for access
         RDN
-        RDN         // drop rubbish off the stack
-        GTO 00      // push()
-        
-        LBL "LIST-" // pop () -> () 
+        RDN           // drop rubbish off the stack
+        GTO {push}    // push()
+
+        LBL "LIST-"   // pop () -> () 
         SF 25
-        XEQ I
+        XEQ {prepare}
         FC? 25
         RTN
         J-
         RCLEL
         FS? 01
-        GTO 03
+        GTO {delete}
         J-
         RCLEL
-        
-        LBL 03
+
+        LBL {delete}
         DELR
         FS?C 25
-        GTO 01
-        
-        LBL "CLIST" // () -> ()
-        CLV "ZLIST" // clear ZLIST from memory
+        GTO {finish}
+
+        LBL "CLIST"   // () -> ()
+        CLV "ZLIST"   // clear ZLIST from memory
         RTN
-        
-        LBL I       // prepare list "ZLIST" for access
+
+        LBL {prepare} // prepare list "ZLIST" for access
         INDEX "ZLIST"
         RTN
         """)

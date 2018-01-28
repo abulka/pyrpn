@@ -739,14 +739,14 @@ class RpnTests2(BaseTest):
         rpn = program.lines_to_str(comments=False, linenos=False)
         return rpn
 
-    def test_rpn_template_gen(self):
-        LIBFILE = 'pylib.txt'
-
-        """Generate when stable - as a reference to compare against"""
-        # with open(LIBFILE, 'w') as f:
-        #     f.write(self.get_all_lib())
-
-        with open(LIBFILE) as f:
-            rpn = f.read()
-        self.assertEqual(self.get_all_lib(), rpn)
-
+    # def test_rpn_template_gen(self):
+    #     LIBFILE = 'pylib.txt'
+    #
+    #     """Generate when stable - as a reference to compare against"""
+    #     # with open(LIBFILE, 'w') as f:
+    #     #     f.write(self.get_all_lib())
+    #
+    #     with open(LIBFILE) as f:
+    #         rpn = f.read()
+    #     self.assertEqual(self.get_all_lib(), rpn)
+    #

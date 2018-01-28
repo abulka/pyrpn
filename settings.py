@@ -40,8 +40,8 @@ SKIP_LABEL1 = 67        # skip labels are resuable, just ensure they will be fou
 SKIP_LABEL2 = 68
 SKIP_LABEL3 = 69
 LOCAL_LABEL_FOR_PyLIB = 70
-# LOCAL_LABEL1_FOR_ISG_PREP = 71
-# LOCAL_LABEL2_FOR_ISG_PREP = 72
+LOCAL_LABEL_FOR_LIST_BACK_JUMP = 71  # unique cos needs to go backwards in jump
+LOCAL_LABEL_FOR_LIST_BACK_JUMP2 = 72  # unique cos needs to go backwards in jump
 LOCAL_LABEL_FOR_2D_MATRIX_FIND = 73  # unique cos needs to go backwards in loop jump
 LOCAL_LABEL_START_FOR_Py = 74  # .. 99
 # Flags
