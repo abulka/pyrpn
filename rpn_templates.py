@@ -1,3 +1,4 @@
+from builtins import sorted
 from textwrap import dedent
 import inspect
 import logging
@@ -6,6 +7,9 @@ import settings
 
 log = logging.getLogger(__name__)
 config_log(log)
+
+fred = 100
+mary = 200
 
 class RpnTemplates:
     """
@@ -40,6 +44,10 @@ class RpnTemplates:
         self.local_alpha_labels = {}
         self.template_names = self._get_class_attrs()
         self._create_local_labels()
+
+    global fred, mary
+    fred = 1001
+    mary = 2001
 
     pISG = dedent(f"""
         LBL "pISG"  // (z:from, y:to, x:step) -> (ccccccc.fffii)

@@ -136,7 +136,7 @@ class Program(BaseRpnProgram):
         self.insert('"-Utility Funcs-"')
         self.insert('RTN', comment='---------------------------')
 
-        for template in templates_needed:
+        for template in sorted(templates_needed):
             text = getattr(self.rpn_templates, template)  # look up the field dynamically
             self.insert_raw_lines(text)
             log.debug(f'inserting rpn template {template}')
