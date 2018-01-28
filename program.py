@@ -20,7 +20,7 @@ class Line:
 @attrs
 class BaseRpnProgram:
     lines = attrib(default=Factory(list))  # cannot just have [] because same [] gets re-used in new instances of 'Program'
-    next_lineno = attrib(default=0)
+    next_lineno = attrib(default=1)
 
     def _add_line(self, line):
         self._incr_line(line)
@@ -116,7 +116,8 @@ class Program(BaseRpnProgram):
         templates_who_need_PyBool = {'p2Bool'}
         templates_who_need_pErrRange = {'pISG'}
         templates_who_need_PyDFTB = {'pEQ', 'pGT', 'pGTE', 'pLT', 'pLTE', 'pNEQ'}
-        templates_who_need_pList = {'p1DMtx'}
+        templates_who_need_pList = {'p1DMtx'}  # TODO deprecated
+        # TODO need to cater for p2mIJfi dependencies - can we do all this automatically?
 
         # Add any dependent templates, using set technology
         if templates_who_need_PyBool & templates_needed:

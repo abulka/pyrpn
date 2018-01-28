@@ -299,6 +299,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.pending_stack_args = []  # must have, cos could just be assigning single values, not BinOp and not Expr
         self.end(node)
 
+    def assign_push_rhs(self, node):
+        self.visit(node.value)  # a single Num or Str or Name or List (of elements)
+        if isinstance(node.targets[0], ast.Subscript) and self.program.is_previous_line(
+                'string'):  # hack (looking ahead at first target to see if we are assigning to a list element)
+            self.program.insert('ASTO ST X')
+
     def assign_assert_target_ok(self, target):
         assert '.Store' in str(target.ctx)
         assert isinstance(target.ctx, ast.Store)
@@ -334,8 +340,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             - Note 'var_name_mtx' is the name of the list/dict
             - We recall the matrix, store it into ZLIST and activate ZLIST using the INDEX rpn command etc.
             - Then either
-                - Load the indexed value (or key for hashes) or
-                - Store the value (found at ST T) into that matrix element
+                - Recall the list element, or the dict value for the key
+                - Store the value on stack (found at ST X) into that matrix element (if we are assigning, the value we are assigning has already been emitted and is on the stack)
         """
         self.inside_matrix_access = True
 
@@ -353,7 +359,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 """
         elif isinstance(subscript_node.ctx, ast.Store):
             code = """
-                RCL ST T  // get the value we are storing YUK - too high up on stack!!
                 STOEL
                 """
         self.program.insert_raw_lines(code)
@@ -364,25 +369,34 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.inside_matrix_access = False
 
     def process_list_access(self, subscript_node):
-        self.program.insert_xeq('p1DMtx')
-        self.program.insert('INDEX "ZLIST"')
+        self.program.insert_xeq('pMxPrep')  # (matrix or 0) -> () - Prepares ZLIST
+        self.program.insert('SF 01')        # 1D operation mode
 
-        # Get the y:row onto the stack
+        # Get Index position onto stack X
         assert isinstance(subscript_node.slice, ast.Index)
-        self.visit(subscript_node.slice.value)  # the index value
+        self.visit(subscript_node.slice.value)
 
-        code = f"""
-            1        // y:row (adjust from 0 based to 1)
-            +
-            1        // x:column
-            STOIJ
-        """
-        self.program.insert_raw_lines(code)
+        # Sets IJ accordingly so that a subsequent RCLEL will give the value or STOEL will store something.
+        self.program.insert_xeq('p1mIJ')  # (index) -> () -  X is dropped.
+
+        # code = f"""
+        #     1        // y:row (adjust from 0 based to 1)
+        #     +
+        #     1        // x:column
+        #     STOIJ
+        # """
+        # self.program.insert_raw_lines(code)
 
     def process_dict_access(self, subscript_node):
-        # at this point the value we are assigning has already been emitted
-        self.program.insert_xeq('p2DMtx')
-        self.program.insert('INDEX "ZLIST"')
+        self.program.insert_xeq('pMxPrep')  # (matrix or 0) -> () - Prepares ZLIST
+        self.program.insert('CF 01')        # 2D operation mode
+
+        # Get Key onto stack X
+        assert isinstance(subscript_node.slice, ast.Index)
+        self.visit(subscript_node.slice.value)
+
+        # Sets IJ accordingly so that a subsequent RCLEL will give the value or STOEL will store something.
+        self.program.insert_xeq('p2mIJfi')  # (key) -> () -  Finds the key, X is dropped.
 
         # prepare_for_access = """
         #     XEQ "p2DMtx"
@@ -392,22 +406,20 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         # self.program.insert_raw_lines(prepare_for_access)
 
         # Get the y:row onto the stack
-        assert isinstance(subscript_node.slice, ast.Index)
-        self.visit(subscript_node.slice.value)  # the key value
 
         # Need to translate the key into an index value by searching
         # ideally a hash function, but that's too complex re dealing with clashes etc.
         # j_col_value = 2  # always
         # i_row_key = 1  # hack for now, pending a lookup search
-        code = f"""
-            XEQ "p2DFindKey" // convert key on stack to i_row_key
-            2                // j_col_value (always 2)
-            X<>Y 
-            STOIJ
-            //RDN            // drop I,J off stack
-            //RDN
-        """
-        self.program.insert_raw_lines(code)
+        # code = f"""
+        #     XEQ "p2mIJfi" // convert key on stack to i_row_key
+        #     2                // j_col_value (always 2)
+        #     X<>Y
+        #     STOIJ
+        #     //RDN            // drop I,J off stack
+        #     //RDN
+        # """
+        # self.program.insert_raw_lines(code)
 
     # THESE ASSERT METHODS SHOULD BE REMOVED
     def assert_assign_ensure_uppercase_for_matrices2(self, target):
@@ -423,12 +435,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             log.debug(f'previous line is {self.program.last_line}')
             raise RpnError(
                 f'Can only assign lists to uppercase variables not "{target.id}".  Please change the variable name to uppercase e.g. "{target.id.upper()}".')
-
-    def assign_push_rhs(self, node):
-        self.visit(node.value)  # a single Num or Str or Name or List (of elements)
-        if isinstance(node.targets[0], ast.Subscript) and self.program.is_previous_line(
-                'string'):  # hack (looking ahead at first target to see if we are assigning to a list element)
-            self.program.insert('ASTO ST X')
 
     def visit_AugAssign(self,node):
         """ visit a AugAssign e.g. += node and visits it recursively"""
@@ -933,7 +939,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         """
         self.begin(node)
         self.program.insert('0', comment='not a matrix (empty)')
-        self.program.insert_xeq('p1DMtx')
+        self.program.insert_xeq('pMxPrep')
+        self.program.insert('SF 01')        # 1D operation mode
         for child in node.elts:
             self.visit(child)
             if self.program.is_previous_line('string'):
@@ -949,15 +956,17 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         """
         self.begin(node)
         self.program.insert('0', comment='not a matrix (empty)')
-        self.program.insert_xeq('p2DMtx')
+        self.program.insert_xeq('pMxPrep')
+        self.program.insert('CF 01')        # 2D operation mode
         for index, key in enumerate(node.keys):
-            self.visit(key)
-            if self.program.is_previous_line('string'):
-                self.program.insert('ASTO ST X')
             self.visit(node.values[index])  # corresponding value
             if self.program.is_previous_line('string'):
                 self.program.insert('ASTO ST X')
-            self.program.insert_xeq('LIST+')
+
+            self.visit(key)  # key
+            if self.program.is_previous_line('string'):
+                self.program.insert('ASTO ST X')
+            self.program.insert_xeq('LIST+')  # push value then key (y:value x:key)
         self.end(node)
 
     def visit_Subscript(self,node):

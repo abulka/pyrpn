@@ -341,27 +341,27 @@ class RpnTemplates:
         RTN    
         """)
 
-    p1DMtx = dedent("""
-        LBL "p1DMtx"  // (x) -> stores x in ZLIST if matrix else deletes ZLIST to signify empty matrix
-        SF 01   // 1D matrix for lists
-        MAT?    // if is a matrix
-        STO "ZLIST"
-        MAT?
-        RTN
-        XEQ "CLIST" // else empty matrix
-        RTN
-        """)
-
-    p2DMtx = dedent("""
-        LBL "p2DMtx"  // (x) -> stores x in ZLIST if matrix else deletes ZLIST to signify empty matrix
-        CF 01   // 2D matrix for dictionaries  <-- ONLY LINE THAT IS DIFFERENT TO p1DMtx hmmm
-        MAT?    // if is a matrix
-        STO "ZLIST"
-        MAT?
-        RTN
-        XEQ "CLIST" // else empty matrix
-        RTN
-        """)
+    # p1DMtx = dedent("""
+    #     LBL "p1DMtx"  // (x) -> stores x in ZLIST if matrix else deletes ZLIST to signify empty matrix
+    #     SF 01   // 1D matrix for lists
+    #     MAT?    // if is a matrix
+    #     STO "ZLIST"
+    #     MAT?
+    #     RTN
+    #     XEQ "CLIST" // else empty matrix
+    #     RTN
+    #     """)
+    #
+    # p2DMtx = dedent("""
+    #     LBL "p2DMtx"  // (x) -> stores x in ZLIST if matrix else deletes ZLIST to signify empty matrix
+    #     CF 01   // 2D matrix for dictionaries  <-- ONLY LINE THAT IS DIFFERENT TO p1DMtx hmmm
+    #     MAT?    // if is a matrix
+    #     STO "ZLIST"
+    #     MAT?
+    #     RTN
+    #     XEQ "CLIST" // else empty matrix
+    #     RTN
+    #     """)
 
     pMlen = dedent(f"""
         LBL "pMlen"  // () -> length of ZLIST
@@ -389,8 +389,9 @@ class RpnTemplates:
 
     pMxPrep = dedent(f"""
         // Prepare matrix for access by storing in ZLIST var
-        // ** You must set flag 01 yourself to indicate
-        // 1D (list) vs 2D (dictionaries) operation
+        // ** You must later set flag 01 yourself to indicate
+        //    1D (list) vs 2D (dict) operation mode.
+        //    The flag should match the type of matrix you are passing in
         //  
         LBL "pMxPrep"  // (matrix) -> ()
         MAT?        // if is a matrix
@@ -423,7 +424,7 @@ class RpnTemplates:
         // Sets IJ for dict access for 'key' (search required)  
         // Assumes ZLIST is indexed.
         //
-        LBL "p2mIJfi"  // (key) -> (value) - finds key's value and sets IJ accordingly
+        LBL "p2mIJfi"  // (key) -> () - finds key's value and sets IJ accordingly
         XEQ "pStoStk"  // save the stack
         1              // from
         XEQ "pMlen"    // to
@@ -442,8 +443,9 @@ class RpnTemplates:
         CF {settings.FLAG_PYTHON_USE_1}  // not found flag
         LBL {settings.LOCAL_LABEL_FOR_2D_MATRIX_FIND}
         ISG "pISGvar"
-        STOP
-        GTO LBL {settings.SKIP_LABEL1} // resume
+        GTO {settings.SKIP_LABEL3} // ok, keep searching
+        GTO {settings.SKIP_LABEL1} // finished search
+        LBL {settings.SKIP_LABEL3} // keep searching
         // see if el matches
         RCLEL
         X=Y?
@@ -453,7 +455,7 @@ class RpnTemplates:
         GTO {settings.LOCAL_LABEL_FOR_2D_MATRIX_FIND}  // keep looking
         LBL {settings.SKIP_LABEL2} // found
         SF {settings.FLAG_PYTHON_USE_1}
-        LBL {settings.SKIP_LABEL1} // resume
+        LBL {settings.SKIP_LABEL1} // finished search
         FC? {settings.FLAG_PYTHON_USE_1} // was it found?
         GTO "NO_KEY?"  // error not found, do not define this label :-)
         RCL "pISGvar"
@@ -463,7 +465,7 @@ class RpnTemplates:
         STOIJ  // all set to store something
         XEQ "pRclStk"  // recall stack
         RDN  // drop key we were looking for
-        RCLEL  // recall the value - might as well, I J also set properly to it
+        // RCLEL  // recall the value - might as well, I J also set properly to it
         RTN
         """)
 
