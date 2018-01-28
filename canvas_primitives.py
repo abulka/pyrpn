@@ -164,3 +164,29 @@ def fill_circle(x0, y0, r):
 
 
 """
+
+
+"""
+# Test code for arrays and dictionaries
+def t1():
+  A = {1:11,5:22}
+  passert(A[5] == 22)
+  passert(A[1] == 11)
+  A[1] = 88
+  passert(A[1] == 88)
+  A[6] = 66
+  passert(A[6] == 66)
+  passert(A[5] == 22)
+  passert(A[1] == 88)
+  #PROMPT(A[1])
+  #PROMPT(A[222])
+  B = [1,2,3]
+  B.append(4)
+  passert(B[0] == 1)
+  passert(B[1] == 2)
+  passert(B[2] == 3)
+  passert(B[3] == 4)
+  B[2] = 333
+  passert(B[2] == 333)
+  
+"""
