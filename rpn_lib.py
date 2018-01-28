@@ -15,6 +15,10 @@ easy = ''
 have_step = ''
 error = ''
 yes = ''
+not_found = ''
+loop = ''
+keep_searching = ''
+finished_search = ''
 
 class RpnTemplates:
     """
@@ -43,7 +47,8 @@ class RpnTemplates:
         FS?     - use isFS(flag) instead
         FC?     - use isFC(flag) instead
     """
-    global neg_case, no_step, easy, have_step, error, yes
+    global neg_case, no_step, easy, have_step, error, yes, not_found
+    global loop, keep_searching, finished_search
 
     def __init__(self):
         self.needed_templates = []  # extra fragments that need to be emitted at the end
@@ -446,6 +451,11 @@ class RpnTemplates:
         RTN
         """)
 
+    not_found = settings.FLAG_PYTHON_USE_1
+    loop = settings.LOCAL_LABEL_FOR_2D_MATRIX_FIND
+    keep_searching = settings.SKIP_LABEL3
+    finished_search = settings.SKIP_LABEL1
+
     p2mIJfi = dedent(f"""
         // Sets IJ for dict access for 'key' (search required)  
         // Assumes ZLIST is indexed.
@@ -466,23 +476,23 @@ class RpnTemplates:
         STOIJ
         RDN
         RDN
-        CF {settings.FLAG_PYTHON_USE_1}  // not found flag
-        LBL {settings.LOCAL_LABEL_FOR_2D_MATRIX_FIND}
+        CF {not_found}  // not found flag
+        LBL {loop}
         ISG "pISGvar"
-        GTO {settings.SKIP_LABEL3} // ok, keep searching
-        GTO {settings.SKIP_LABEL1} // finished search
-        LBL {settings.SKIP_LABEL3} // keep searching
+        GTO {keep_searching} // ok, keep searching
+        GTO {finished_search} // finished search
+        LBL {keep_searching} // keep searching
         // see if el matches
         RCLEL
         X=Y?
         GTO {settings.SKIP_LABEL2}  // found
         RDN // else
         I+
-        GTO {settings.LOCAL_LABEL_FOR_2D_MATRIX_FIND}  // keep looking
+        GTO {loop}  // keep looking
         LBL {settings.SKIP_LABEL2} // found
-        SF {settings.FLAG_PYTHON_USE_1}
-        LBL {settings.SKIP_LABEL1} // finished search
-        FS? {settings.FLAG_PYTHON_USE_1} // was it found?
+        SF {not_found}
+        LBL {finished_search} // finished search
+        FS? {not_found} // was it found?
         GTO {settings.SKIP_LABEL1} // ok found, nice
          
         // decide if auto create on err
