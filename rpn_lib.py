@@ -61,11 +61,12 @@ class RpnTemplates:
     global push, finish, init, delete, prepare
 
     def __init__(self):
-        self.needed_templates = []  # extra fragments that need to be emitted at the end
+        # self.needed_templates = []  # extra fragments that need to be emitted at the end
         self.local_alpha_labels = {}
         self.template_names = self._get_class_attrs()
         self._create_local_labels()
         self.embedded = False
+        self.need_all_templates = False
 
     neg_case = settings.FLAG_PYTHON_USE_1
     have_step = settings.FLAG_PYTHON_USE_2
@@ -600,14 +601,14 @@ class RpnTemplates:
         names = [tup[0] for tup in _attrs_public]  # we just want the names not the tuples of (name, value)
         return names
 
-    def need_template(self, template):
-        assert template in self.template_names, f'template "{template}" missing from {self.template_names}'
-        if template not in self.needed_templates:
-            self.needed_templates.append(template)
+    # def need_template(self, template):
+    #     assert template in self.template_names, f'template "{template}" missing from {self.template_names}'
+    #     if template not in self.needed_templates:
+    #         self.needed_templates.append(template)
 
-    def need_all_templates(self):
-        self.needed_templates = self.template_names[:]  # copy
-        # self.needed_templates.remove('pList')
+    # def need_all_templates(self):
+    #     self.needed_templates = self.template_names[:]  # copy
+    #     # self.needed_templates.remove('pList')
 
     def get_user_insertable_pyrpn_cmds(self):
         """

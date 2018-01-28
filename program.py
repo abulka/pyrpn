@@ -102,67 +102,107 @@ class Program(BaseRpnProgram):
 
     def insert_xeq(self, func_name, comment=''):
         # insert global function call
-        if func_name in self.rpn_templates.template_names:
-            self.rpn_templates.need_template(func_name)
+        # if func_name in self.rpn_templates.template_names:
+        #     self.rpn_templates.need_template(func_name)
         if func_name in self.user_insertable_pyrpn_cmds:
             # YUK
             comment = self.rpn_templates.get_user_insertable_pyrpn_cmds()[func_name]['description']
-        if func_name in ('LIST+', 'LIST-', 'CLIST'):
-            self.rpn_templates.need_template('pList')
+        # if func_name in ('LIST+', 'LIST-', 'CLIST'):
+        #     self.rpn_templates.need_template('pList')
         self.insert(f'XEQ "{func_name}"', comment=comment)
 
     def emit_needed_rpn_templates(self, as_local_labels=True):
-        self.rpn_templates.need_all_templates()  # hack to include everything !
-        if not self.rpn_templates.needed_templates:
-            return
+        # self.rpn_templates.need_all_templates()  # hack to include everything !
+        # if not self.rpn_templates.needed_templates:
+        #     return
 
-        templates_needed = set(self.rpn_templates.needed_templates)
-        templates_who_need_PyBool = {'p2Bool'}
-        templates_who_need_pErrRange = {'pISG'}
-        templates_who_need_PyDFTB = {'pEQ', 'pGT', 'pGTE', 'pLT', 'pLTE', 'pNEQ'}
-        templates_who_need_pList = {'p1DMtx'}  # TODO deprecated
-        # TODO need to cater for p2mIJfi dependencies - can we do all this automatically?
-
-        # Add any dependent templates, using set technology
-        if templates_who_need_PyBool & templates_needed:
-            templates_needed.add('pBool')
-        if templates_who_need_PyDFTB & templates_needed:
-            templates_needed.add('p0Bool')
-        if templates_who_need_pErrRange & templates_needed:
-            templates_needed.add('p__1ErR')
-        if templates_who_need_pList & templates_needed:
-            templates_needed.add('pList')
+        self.rpn_templates.embedded = as_local_labels
 
         self.insert('LBL "PyLIB"', comment='PyRPN Support Library of')
         self.insert('"-Utility Funcs-"')
         self.insert('RTN', comment='---------------------------')
 
-        self.rpn_templates.embedded = as_local_labels
+        if self.rpn_templates.need_all_templates:
+            self.inject_dependencies(sorted(self.rpn_templates.template_names))
+        else:
+            # Supercedes any tracking - we just scan the lines...
+            dependencies = self.find_dependencies()
+            print('dependencies', dependencies)
+            # Hmmm but those dependencies might have dependencies!
+            # Add the dependencies to lines
+            self.inject_dependencies(dependencies)
+
+            # need to cater for the fact that referecnces to LIST+, LIST- and CLIST are references to just pList
+            dependencies2 = self.find_dependencies() - dependencies
+            print('extra dependencies2', dependencies2)
+            self.inject_dependencies(dependencies2)
+            dependencies = dependencies | dependencies2
+
+            dependencies3 = self.find_dependencies() - dependencies
+            print('extra dependencies3', dependencies3)
+            self.inject_dependencies(dependencies3)
+            dependencies = dependencies | dependencies3
+
+            dependencies4 = self.find_dependencies() - dependencies
+            print('extra dependencies4', dependencies4)
+            assert not dependencies4
+
+        # templates_needed = set(self.rpn_templates.needed_templates)
+        # templates_who_need_PyBool = {'p2Bool'}
+        # templates_who_need_pErrRange = {'pISG'}
+        # templates_who_need_PyDFTB = {'pEQ', 'pGT', 'pGTE', 'pLT', 'pLTE', 'pNEQ'}
+        # templates_who_need_pList = {'p1DMtx'}  # TODO deprecated
+        # # TODO need to cater for p2mIJfi dependencies - can we do all this automatically?
+        #
+        # # Add any dependent templates, using set technology
+        # if templates_who_need_PyBool & templates_needed:
+        #     templates_needed.add('pBool')
+        # if templates_who_need_PyDFTB & templates_needed:
+        #     templates_needed.add('p0Bool')
+        # if templates_who_need_pErrRange & templates_needed:
+        #     templates_needed.add('p__1ErR')
+        # if templates_who_need_pList & templates_needed:
+        #     templates_needed.add('pList')
+
+        # self.inject_dependencies(templates_needed)
+
+        if as_local_labels:
+            self.convert_to_local_labels()
+
+    def inject_dependencies(self, templates_needed):
         for template in sorted(templates_needed):
             text = getattr(self.rpn_templates, template)  # look up the field dynamically
             self.insert_raw_lines(text)
             log.debug(f'inserting rpn template {template}')
 
-        if as_local_labels:
-            self.convert_to_local_labels()
+    def find_dependencies(self):
+        # Scan all the needed library functions for their dependencies - all XEQ calls need to be recorded into a set
+        labels_called = set()
+        for line in self.lines:
+            if 'XEQ "' in line.text:
+                func_name = self.extract_func_name(line.text)
+                if func_name in ('LIST+', 'LIST-', 'CLIST'):
+                    func_name = 'pList'
+                labels_called.add(func_name)
+        return labels_called
+
+    def extract_func_name(self, s):
+        i = s.find('"')
+        s = s[i + 1:]
+        i = s.find('"')
+        s = s[:i]
+        return s
 
     def convert_to_local_labels(self):
         """
         Scan lines for labels and calls to Py Rpn Library and replace them with local labels
         """
-        def extract_func_name(s):
-            i = s.find('"')
-            s = s[i+1:]
-            i = s.find('"')
-            s = s[:i]
-            return s
-
         def replace_with_local_label(line, cmd):
             if line.text == 'LBL "PyLIB"':  # special case
                 line.text = f'LBL {settings.LOCAL_LABEL_FOR_PyLIB}'
             else:
                 text = line.text
-                func_name = extract_func_name(text)
+                func_name = self.extract_func_name(text)
                 if func_name in self.rpn_templates.template_names:
                     label = self.rpn_templates.local_alpha_labels[func_name]
                 elif func_name == 'LIST+':
