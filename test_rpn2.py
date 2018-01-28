@@ -460,7 +460,7 @@ class RpnTests2(BaseTest):
 
             CLA
             RCL "A"
-            XEQ "p1DMtx"
+            XEQ "pMxPrep"
             SF 01
             
             0

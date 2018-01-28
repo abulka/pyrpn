@@ -370,7 +370,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def process_list_access(self, subscript_node):
         self.program.insert_xeq('pMxPrep', comment='(matrix or 0) -> () - Prepares ZLIST')
-        self.program.insert('SF 01', comment='1D operation mode')
+        self.program.insert('SF 01', comment='1D matrix operation mode')
 
         # Get Index position onto stack X
         assert isinstance(subscript_node.slice, ast.Index)
@@ -379,17 +379,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         # Sets IJ accordingly so that a subsequent RCLEL will give the value or STOEL will store something.
         self.program.insert_xeq('p1mIJ')  # (index) -> () -  X is dropped.
 
-        # code = f"""
-        #     1        // y:row (adjust from 0 based to 1)
-        #     +
-        #     1        // x:column
-        #     STOIJ
-        # """
-        # self.program.insert_raw_lines(code)
-
     def process_dict_access(self, subscript_node):
         self.program.insert_xeq('pMxPrep', comment='(matrix or 0) -> () - Prepares ZLIST')
-        self.program.insert('CF 01', comment='2D operation mode')
+        self.program.insert('CF 01', comment='2D matrix operation mode')
 
         # Get Key onto stack X
         assert isinstance(subscript_node.slice, ast.Index)
@@ -400,29 +392,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         # Sets IJ accordingly so that a subsequent RCLEL will give the value or STOEL will store something.
         self.program.insert_xeq('p2mIJfi')  # (key) -> () -  Finds the key, X is dropped.
-
-        # prepare_for_access = """
-        #     XEQ "p2DMtx"
-        #     //RDN  // get rid of matrix on stack **NEW
-        #     INDEX "ZLIST"  // cos now all access via ZLIST matrix
-        # """
-        # self.program.insert_raw_lines(prepare_for_access)
-
-        # Get the y:row onto the stack
-
-        # Need to translate the key into an index value by searching
-        # ideally a hash function, but that's too complex re dealing with clashes etc.
-        # j_col_value = 2  # always
-        # i_row_key = 1  # hack for now, pending a lookup search
-        # code = f"""
-        #     XEQ "p2mIJfi" // convert key on stack to i_row_key
-        #     2                // j_col_value (always 2)
-        #     X<>Y
-        #     STOIJ
-        #     //RDN            // drop I,J off stack
-        #     //RDN
-        # """
-        # self.program.insert_raw_lines(code)
 
     # THESE ASSERT METHODS SHOULD BE REMOVED
     def assert_assign_ensure_uppercase_for_matrices2(self, target):
@@ -547,7 +516,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 raise RpnError(f'Lists must be stored in uppercase variables not "{var_name}".  Please change the variable name to uppercase e.g. "{var_name.upper()}".')
             self.visit(node.func.value)
             self.program.insert_xeq('pMxPrep', comment=f'{node.first_token.line.strip()}')
-            self.program.insert('SF 01', comment='1D operation mode')
+            self.program.insert('SF 01', comment='1D matrix operation mode')
             for arg in node.args:
                 self.visit(arg)
                 self.program.insert_xeq('LIST+')
@@ -947,7 +916,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.begin(node)
         self.program.insert('0', comment='not a matrix (empty)')
         self.program.insert_xeq('pMxPrep')
-        self.program.insert('SF 01')        # 1D operation mode
+        self.program.insert('SF 01', comment='1D matrix operation mode')
         for child in node.elts:
             self.visit(child)
             if self.program.is_previous_line('string'):
@@ -964,7 +933,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.begin(node)
         self.program.insert('0', comment='not a matrix (empty)')
         self.program.insert_xeq('pMxPrep')
-        self.program.insert('CF 01')        # 2D operation mode
+        self.program.insert('CF 01', comment='2D matrix operation mode')
         for index, key in enumerate(node.keys):
             self.visit(node.values[index])  # corresponding value
             if self.program.is_previous_line('string'):
