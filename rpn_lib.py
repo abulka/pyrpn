@@ -248,7 +248,7 @@ class RpnTemplates:
     # Logic
 
     pBool = dedent("""
-        LBL "pBool"  // Convert to boolean (a) -> (bool)
+        LBL "pBool"  // Convert to boolean. (a) -> (bool)
         CF 00
         X≠0?
         SF 00        // is non zero, thus true
@@ -261,7 +261,7 @@ class RpnTemplates:
         """)
 
     p2Bool = dedent("""
-        LBL "p2Bool"  // Convert to booleans (a,b) -> (bool, bool)
+        LBL "p2Bool"  // Convert to booleans. (a,b) -> (bool, bool)
         XEQ "pBool"    
         X<>Y
         XEQ "pBool"    
@@ -312,13 +312,13 @@ class RpnTemplates:
     # Param reordering - needed cos users push args from left to right, which puts early params in the wrong order when parsing params for RDN, STO nn
 
     p2Param = dedent("""
-        LBL "p2Param"  // Reverse params (a,b) -> (b,a)
+        LBL "p2Param"  // Reverse params. (a,b) -> (b,a)
         X<>Y
         RTN    
         """)
 
     p3Param = dedent("""
-        LBL "p3Param"  // Reverse params (a,b,c) -> (c,b,a)
+        LBL "p3Param"  // Reverse params. (a,b,c) -> (c,b,a)
         X<>Y
         RDN
         RDN
@@ -328,7 +328,7 @@ class RpnTemplates:
         """)
 
     p4Param = dedent("""
-        LBL "p4Param"  // Reverse params (a,b,c,d) -> (d,c,b,a)
+        LBL "p4Param"  // Reverse params. (a,b,c,d) -> (d,c,b,a)
         X<>Y
         RDN
         RDN
@@ -339,7 +339,7 @@ class RpnTemplates:
     # Util
 
     p0Bool = dedent("""
-        LBL "p0Bool"  // Util used by comparison ops (a,b) -> (boolean) - whether flag 00 is set, plus RDNs 
+        LBL "p0Bool"  // Util used by comparison ops. (a,b) -> (boolean) - whether flag 00 is set, plus RDNs 
         RDN
         RDN    // params dropped 
         FS? 00
@@ -350,7 +350,7 @@ class RpnTemplates:
         """)
 
     p__1ErR = dedent("""
-        LBL "p__1ErR"  // Out of Range error (to,999) -> display error & stop.
+        LBL "p__1ErR"  // Out of Range error. (to,999) -> display error & stop.
         RDN
         "range() limited"
         ├" to 999: got "
@@ -361,7 +361,7 @@ class RpnTemplates:
         """)
 
     PErNkey = dedent("""
-        LBL "PErNkey"  // Dictionary key not found error () -> display error & stop.
+        LBL "PErNkey"  // Dictionary key not found error. () -> display error & stop.
         "Dictionary key "
         ARCL ST X
         ├" not found"
@@ -370,7 +370,7 @@ class RpnTemplates:
         """)
 
     pAssert = dedent("""
-        LBL "pAssert"  // Assert (bool) -> if true, keep going, else stop & display error
+        LBL "pAssert"  // Assert. (bool) -> if true, keep going, else stop & display error
         X≠0?
         RTN
         "Assertion Err "
@@ -383,7 +383,7 @@ class RpnTemplates:
     error = settings.SKIP_LABEL1
 
     pMlen = dedent(f"""
-        LBL "pMlen"    // Matrix row length () -> length of ZLIST
+        LBL "pMlen"    // Get matrix row length. () -> length of ZLIST
         
         // Please INDEX the ZLIST list first
         //  or delete the ZLIST to get an empty list of 0
@@ -411,7 +411,7 @@ class RpnTemplates:
     yes = settings.SKIP_LABEL1
 
     pMxPrep = dedent(f"""
-        LBL "pMxPrep"   // Prepare Matrix (matrix) -> ()
+        LBL "pMxPrep"   // Prepare Matrix. (matrix) -> ()
         
         // Stores matrix in ZLIST var and indexes it, or clears ZLIST var
          
@@ -432,13 +432,14 @@ class RpnTemplates:
         """)
 
     p1mIJ = dedent("""
+        LBL "p1mIJ"     // Set IJ for List. (index) -> () & sets IJ for list access
+
         // Sets IJ for list access to 'index'.  
         // Assumes ZLIST is indexed.
-        //
-        LBL "p1mIJ"  // (index) -> () & sets IJ for list access
+
         1
-        +       // adjust row from 0 based (python) to 1 based (RPN matrix)
-        1       // col (always, in lists)
+        +               // adjust row from 0 based (python) to 1 based (RPN matrix)
+        1               // col (always, in lists)
         STOIJ
         RDN
         RDN
