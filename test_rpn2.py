@@ -577,16 +577,16 @@ class RpnTests2(BaseTest):
 
     # boolean expessions inside expressions inside parameters
 
-    @unittest.skip('hard')
+    # @unittest.skip('hard')
     def test_bool_inside_param(self):
         self.parse(dedent("""
             print(x < y)
           """))
         expected = dedent("""
+            CLA
             RCL 00
             RCL 01
             XEQ "pLT"
-            CLA
             ARCL ST X
             AVIEW
             """)

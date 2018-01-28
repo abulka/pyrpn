@@ -606,10 +606,13 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                         pass
                     elif isinstance(arg, ast.BinOp):   # other types?
                         self.program.insert('ARCL ST X')
+                    elif isinstance(arg, ast.Compare):   # other types?
+                        self.program.insert('ARCL ST X')
                     elif isinstance(arg, ast.Subscript):
                         self.program.insert('ARCL ST X')
-                    # else:
-                    #     raise RpnError(f'Do not know how to alpha {arg} with value {self.get_node_name_id_or_n(arg)}')
+                    else:
+                        # Solution is to add to the ARCL ST X cases, above.  But ensure the visit method has turned on the am_calculating flag to prevent numbers to be ARCLd rather than RCLd
+                        raise RpnError(f'Do not know how to alpha {arg} with value {self.get_node_name_id_or_n(arg)}')
 
                     if not self.alpha_append_mode:
                         self.alpha_append_mode = True
@@ -1060,6 +1063,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             - comparators
         """
         self.begin(node)
+        self.inside_binop = True  # TODO rename inside_binop_or_compare
 
         self.visit(node.left)
         for o, e in zip(node.ops, node.comparators):
@@ -1067,6 +1071,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             subf = self.cmpops[o.__class__.__name__]
             self.program.insert_xeq(subf, comment='compare, return bool')
 
+        self.inside_binop = False
         self.end(node)
 
     def visit_UnaryOp(self, node):
