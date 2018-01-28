@@ -115,27 +115,15 @@ class Program(BaseRpnProgram):
         if self.rpn_templates.need_all_templates:
             self.inject_dependencies(sorted(self.rpn_templates.template_names))
         else:
-            # Supercedes any tracking - we just scan the lines...
-            dependencies = self.find_dependencies()
-            print('dependencies', dependencies)
-            # Hmmm but those dependencies might have dependencies!
-            # Add the dependencies to lines
-            self.inject_dependencies(dependencies)
-
-            # need to cater for the fact that referecnces to LIST+, LIST- and CLIST are references to just pList
-            dependencies2 = self.find_dependencies() - dependencies
-            print('extra dependencies2', dependencies2)
-            self.inject_dependencies(dependencies2)
-            dependencies = dependencies | dependencies2
-
-            dependencies3 = self.find_dependencies() - dependencies
-            print('extra dependencies3', dependencies3)
-            self.inject_dependencies(dependencies3)
-            dependencies = dependencies | dependencies3
-
-            dependencies4 = self.find_dependencies() - dependencies
-            print('extra dependencies4', dependencies4)
-            assert not dependencies4
+            # Supercedes any tracking - we just scan the lines repeatedly...
+            dependencies = set()
+            while True:
+                new_dependencies = self.find_dependencies() - dependencies
+                log.debug('new dependencies', new_dependencies)
+                self.inject_dependencies(new_dependencies)
+                dependencies = dependencies | new_dependencies  # combine
+                if not new_dependencies:
+                    break
 
         if as_local_labels:
             self.convert_to_local_labels()
