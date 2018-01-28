@@ -1,0 +1,7 @@
+{
+    "description": "<p>Test code for arrays and dictionaries - runs a suite of tests on your calculator.</p>",
+    "public": "yes",
+    "sortnum": 0,
+    "source": "# Test code for arrays and dictionaries\r\ndef t1():\r\n  A = {1:11,5:22}\r\n  passert(A[5] == 22)\r\n  passert(A[1] == 11)\r\n  A[1] = 88\r\n  passert(A[1] == 88)\r\n  A[6] = 66\r\n  passert(A[6] == 66)\r\n  passert(A[5] == 22)\r\n  passert(A[1] == 88)\r\n  #PROMPT(A[1])\r\n  #PROMPT(A[222])\r\n  B = [1,2,3]\r\n  B.append(4)\r\n  passert(B[0] == 1)\r\n  passert(B[1] == 2)\r\n  passert(B[2] == 3)\r\n  passert(B[3] == 4)\r\n  B[2] = 333\r\n  passert(B[2] == 333)\r\n  print(\"all tests pass\")",
+    "title": "Test code for arrays and dictionaries"
+}
