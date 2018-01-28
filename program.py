@@ -119,7 +119,7 @@ class Program(BaseRpnProgram):
             dependencies = set()
             while True:
                 new_dependencies = self.find_dependencies() - dependencies
-                log.debug('new dependencies', new_dependencies)
+                log.debug(f'new rpnlib function dependencies {new_dependencies}' if new_dependencies else 'no more dependencies')
                 self.inject_dependencies(new_dependencies)
                 dependencies = dependencies | new_dependencies  # combine
                 if not new_dependencies:
@@ -131,8 +131,8 @@ class Program(BaseRpnProgram):
     def inject_dependencies(self, templates_needed):
         for template in sorted(templates_needed):
             text = getattr(self.rpn_templates, template)  # look up the field dynamically
-            self.insert_raw_lines(text)
             log.debug(f'inserting rpn template {template}')
+            self.insert_raw_lines(text)
 
     def find_dependencies(self):
         # Scan all the needed library functions for their dependencies - all XEQ calls need to be recorded into a set
