@@ -109,7 +109,9 @@ class RpnTemplates:
         STOP
         GTO "LIST"
         
-        LBL "LIST+"
+        LBL "LIST+" // (x:val) when 1D, (y:val, x:key) when 2D 
+                    // I.e. (y:value to go into r:2, x:value to go into r:1) where r is the new row 
+                    // This is OPPOSITE way to STOIJ (y:I, x:J) viz. (y:row, x:col) 
         SF 25       // try: (ignore error) 
         XEQ I       
         FC?C 25     // if was error (flag cleared)
@@ -476,16 +478,25 @@ class RpnTemplates:
         LBL {settings.SKIP_LABEL2} // found
         SF {settings.FLAG_PYTHON_USE_1}
         LBL {settings.SKIP_LABEL1} // finished search
-        FC? {settings.FLAG_PYTHON_USE_1} // was it found?
-        GTO "PErNkey"  // error key not found
+        FS? {settings.FLAG_PYTHON_USE_1} // was it found?
+        GTO {settings.SKIP_LABEL1} // ok found, nice
+         
+        // decide if auto create on err
+        FC? {settings.FLAG_LIST_AUTO_CREATE_IF_KEY_NOT_FOUND}  // if not auto create new row
+        GTO "PErNkey"  // error key not found, auto create is off
+        0     // temp value 
+        X<>Y  // key (y:temp value, x:key)
+        XEQ "LIST+"  // this will incidentally set IJ nicely to the 'value' element
+        GTO {settings.SKIP_LABEL2} // done
+        
+        LBL {settings.SKIP_LABEL1} // ok found, nice
         RCL "pISGvar"
-        IP // index where found
-        2  // value col
-        X<>Y
-        STOIJ  // all set to store something
+        IP // index where found y:(row / I)
+        2  // position of value x:(col / J)
+        STOIJ  // all set to store or recall something
+        LBL {settings.SKIP_LABEL2} // done
         XEQ "pRclStk"  // recall stack
         RDN  // drop key we were looking for
-        // RCLEL  // recall the value - might as well, I J also set properly to it
         RTN
         """)
 

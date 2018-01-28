@@ -188,5 +188,6 @@ def t1():
   passert(B[3] == 4)
   B[2] = 333
   passert(B[2] == 333)
+  print("all tests pass")
   
 """

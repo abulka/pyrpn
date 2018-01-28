@@ -369,8 +369,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.inside_matrix_access = False
 
     def process_list_access(self, subscript_node):
-        self.program.insert_xeq('pMxPrep')  # (matrix or 0) -> () - Prepares ZLIST
-        self.program.insert('SF 01')        # 1D operation mode
+        self.program.insert_xeq('pMxPrep', comment='(matrix or 0) -> () - Prepares ZLIST')
+        self.program.insert('SF 01', comment='1D operation mode')
 
         # Get Index position onto stack X
         assert isinstance(subscript_node.slice, ast.Index)
@@ -388,12 +388,15 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         # self.program.insert_raw_lines(code)
 
     def process_dict_access(self, subscript_node):
-        self.program.insert_xeq('pMxPrep')  # (matrix or 0) -> () - Prepares ZLIST
-        self.program.insert('CF 01')        # 2D operation mode
+        self.program.insert_xeq('pMxPrep', comment='(matrix or 0) -> () - Prepares ZLIST')
+        self.program.insert('CF 01', comment='2D operation mode')
 
         # Get Key onto stack X
         assert isinstance(subscript_node.slice, ast.Index)
         self.visit(subscript_node.slice.value)
+
+        auto_create = 'SF' if isinstance(subscript_node.ctx, ast.Store) else 'CF'
+        self.program.insert(f'{auto_create} {settings.FLAG_LIST_AUTO_CREATE_IF_KEY_NOT_FOUND}', comment='if set, auto create if key not found, else error')
 
         # Sets IJ accordingly so that a subsequent RCLEL will give the value or STOEL will store something.
         self.program.insert_xeq('p2mIJfi')  # (key) -> () -  Finds the key, X is dropped.
@@ -543,7 +546,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             if var_name.islower():
                 raise RpnError(f'Lists must be stored in uppercase variables not "{var_name}".  Please change the variable name to uppercase e.g. "{var_name.upper()}".')
             self.visit(node.func.value)
-            self.program.insert_xeq('p1DMtx', comment=f'{node.first_token.line.strip()}')
+            self.program.insert_xeq('pMxPrep', comment=f'{node.first_token.line.strip()}')
+            self.program.insert('SF 01', comment='1D operation mode')
             for arg in node.args:
                 self.visit(arg)
                 self.program.insert_xeq('LIST+')
