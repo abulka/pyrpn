@@ -507,7 +507,7 @@ class RpnTemplates:
         FS? {found}             // was it found?
         GTO {was_found}         // perfectly found, nice
          
-        // Decide if auto create on err
+        // Else decide if we auto create a new row
         
         FC? {auto_create}       // if not auto create new row
         GTO "PErNkey"           // error key not found, auto create is off
@@ -528,9 +528,7 @@ class RpnTemplates:
         """)
 
     pStoStk = dedent("""
-        // Saves the stack  
-        //
-        LBL "pStoStk"  // (t,z,y,x) -> (t,z,y,x) & saves to regs pT, pZ, pY, pX
+        LBL "pStoStk"           // Saves the stack. (t,z,y,x) -> (t,z,y,x) & saves to regs pT, pZ, pY, pX
         STO "pX"
         RDN
         STO "pY"
@@ -543,41 +541,13 @@ class RpnTemplates:
         """)
 
     pRclStk = dedent("""
-        // Recalls the stack  
-        //
-        LBL "pRclStk"  // (?,?,?,?) -> (t,z,y,x) & recalls from regs pT, pZ, pY, pX
+        LBL "pRclStk"           // Recalls the stack. (?,?,?,?) -> (t,z,y,x) & recalls from regs pT, pZ, pY, pX
         RCL "pT"
         RCL "pZ"
         RCL "pY"
         RCL "pX"
         RTN
         """)
-
-    # pStoSt2 = dedent("""
-    #     // Saves the stack into location 2
-    #     //
-    #     LBL "pStoSt2"  // (t,z,y,x) -> (t,z,y,x) & saves to regs pT, pZ, pY, pX
-    #     STO "pX2"
-    #     RDN
-    #     STO "pY2"
-    #     RDN
-    #     STO "pZ2"
-    #     RDN
-    #     STO "pT2"
-    #     RDN
-    #     RTN
-    #     """)
-    #
-    # pRclSt2 = dedent("""
-    #     // Recalls the stack from location 2
-    #     //
-    #     LBL "pRclSt2"  // (?,?,?,?) -> (t,z,y,x) & recalls from regs pT, pZ, pY, pX
-    #     RCL "pT2"
-    #     RCL "pZ2"
-    #     RCL "pY2"
-    #     RCL "pX2"
-    #     RTN
-    #     """)
 
     # Code
 
