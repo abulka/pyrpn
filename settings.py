@@ -16,6 +16,9 @@ ADMIN = LOCAL
 # ADMIN = False
 # ADMIN = True
 
+MAX_RPN_LABEL_LENGTH = 7
+MAX_RPN_ALPHA_STRING_LENGTH = 15
+
 """
 A note on how I'm using flags and registers
 

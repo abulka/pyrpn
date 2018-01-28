@@ -341,6 +341,15 @@ class RpnTemplates:
         RTN    
         """)
 
+    PErNkey = dedent("""
+        LBL "PErNkey"  // () -> display error & stop.
+        "Dictionary key "
+        ARCL ST X
+        ├" not found"
+        PROMPT
+        RTN    
+        """)
+
     # p1DMtx = dedent("""
     #     LBL "p1DMtx"  // (x) -> stores x in ZLIST if matrix else deletes ZLIST to signify empty matrix
     #     SF 01   // 1D matrix for lists
@@ -457,7 +466,7 @@ class RpnTemplates:
         SF {settings.FLAG_PYTHON_USE_1}
         LBL {settings.SKIP_LABEL1} // finished search
         FC? {settings.FLAG_PYTHON_USE_1} // was it found?
-        GTO "NO_KEY?"  // error not found, do not define this label :-)
+        GTO "PErNkey"  // error key not found
         RCL "pISGvar"
         IP // index where found
         2  // value col
