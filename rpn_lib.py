@@ -13,6 +13,8 @@ neg_case = ''
 no_step = ''
 easy = ''
 have_step = ''
+error = ''
+yes = ''
 
 class RpnTemplates:
     """
@@ -41,7 +43,7 @@ class RpnTemplates:
         FS?     - use isFS(flag) instead
         FC?     - use isFC(flag) instead
     """
-    global neg_case, no_step, easy, have_step
+    global neg_case, no_step, easy, have_step, error, yes
 
     def __init__(self):
         self.needed_templates = []  # extra fragments that need to be emitted at the end
@@ -190,67 +192,67 @@ class RpnTemplates:
     # Comparison expressions
 
     pGT = dedent("""
-        LBL "pGT"  // (y:a, x:b) -> (boolean) of a > b
+        LBL "pGT"     // > (y:a, x:b) -> (boolean) of a > b
         CF 00
         X<Y?
-        SF 00  // true
+        SF 00         // true
         XEQ "p0Bool"  // get bool of flag 00
         RTN    
         """)
 
     pLT = dedent("""
-        LBL "pLT"  // (y:a, x:b) -> (boolean) of a < b
+        LBL "pLT"     // < (y:a, x:b) -> (boolean) of a < b
         CF 00
         X>Y?
-        SF 00  // true
-        XEQ "p0Bool"  // get bool of flag 00
+        SF 00
+        XEQ "p0Bool"
         RTN    
         """)
 
     pEQ = dedent("""
-        LBL "pEQ"  // (y:a, x:b) -> boolean of a == b
+        LBL "pEQ"     // == (y:a, x:b) -> boolean of a == b
         CF 00
         X=Y?
-        SF 00  // true
-        XEQ "p0Bool"  // get bool of flag 00
+        SF 00
+        XEQ "p0Bool"
         RTN    
         """)
 
     pGTE = dedent("""
-        LBL "pGTE"  // (y:a, x:b) -> (boolean) of a >= b
+        LBL "pGTE"    // >= (y:a, x:b) -> (boolean) of a >= b
         CF 00
         X≤Y?
-        SF 00  // true
-        XEQ "p0Bool"  // get bool of flag 00
+        SF 00
+        XEQ "p0Bool"
         RTN    
         """)
 
     pLTE = dedent("""
-        LBL "pLT"  // (y:a, x:b) -> (boolean) of a <= b
+        LBL "pLT"     // <= (y:a, x:b) -> (boolean) of a <= b
         CF 00
         X≥Y?
-        SF 00  // true
-        XEQ "p0Bool"  // get bool of flag 00
+        SF 00
+        XEQ "p0Bool"
         RTN    
         """)
 
     pNEQ = dedent("""
-        LBL "pNEQ"  // (y:a, x:b) -> boolean of a != b
+        LBL "pNEQ"    // != (y:a, x:b) -> boolean of a != b
         CF 00
         X≠Y?
-        SF 00  // true
-        XEQ "p0Bool"  // get bool of flag 00
+        SF 00
+        XEQ "p0Bool"
         RTN    
         """)
 
     # Logic
 
     pBool = dedent("""
-        LBL "pBool"  // (a) -> (bool)
+        LBL "pBool"  // Convert to boolean (a) -> (bool)
         CF 00
         X≠0?
-        SF 00  // is non zero, thus true
-        RDN    // drop parameter
+        SF 00        // is non zero, thus true
+        RDN          // drop parameter
         FS? 00
         1
         FC? 00
@@ -259,7 +261,7 @@ class RpnTemplates:
         """)
 
     p2Bool = dedent("""
-        LBL "p2Bool"  // (a,b) -> (bool, bool)
+        LBL "p2Bool"  // Convert to booleans (a,b) -> (bool, bool)
         XEQ "pBool"    
         X<>Y
         XEQ "pBool"    
@@ -268,21 +270,21 @@ class RpnTemplates:
         """)
 
     pNot = dedent("""
-        LBL "pNot"  // (a) -> boolean of not a
+        LBL "pNot"   // not (a) -> boolean of not a
         X≠0?
-        SF 00  // is a true value
+        SF 00        // is a true value
         RDN
         FS? 00
-        0      // false
+        0            // False
         FC? 00
-        1      // true
+        1            // True
         RTN    
         """)
 
     # Flags
 
     pFS = dedent("""
-        LBL "pFS"  // (flag) -> boolean of flag
+        LBL "pFS"    // Is Flag set? (flag) -> boolean of flag
         CF 00
         FS? IND X
         SF 00
@@ -295,7 +297,7 @@ class RpnTemplates:
         """)
 
     pFC = dedent("""
-        LBL "pFS"  // (flag) -> boolean of flag
+        LBL "pFS"    // Is Flag clear? (flag) -> boolean of flag
         CF 00
         FC? IND X
         SF 00
@@ -310,13 +312,13 @@ class RpnTemplates:
     # Param reordering - needed cos users push args from left to right, which puts early params in the wrong order when parsing params for RDN, STO nn
 
     p2Param = dedent("""
-        LBL "p2Param"  // reverse params (a,b) -> (b,a)
+        LBL "p2Param"  // Reverse params (a,b) -> (b,a)
         X<>Y
         RTN    
         """)
 
     p3Param = dedent("""
-        LBL "p3Param"  // reverse params (a,b,c) -> (c,b,a)
+        LBL "p3Param"  // Reverse params (a,b,c) -> (c,b,a)
         X<>Y
         RDN
         RDN
@@ -326,7 +328,7 @@ class RpnTemplates:
         """)
 
     p4Param = dedent("""
-        LBL "p4Param"  // reverse params (a,b,c,d) -> (d,c,b,a)
+        LBL "p4Param"  // Reverse params (a,b,c,d) -> (d,c,b,a)
         X<>Y
         RDN
         RDN
@@ -337,7 +339,7 @@ class RpnTemplates:
     # Util
 
     p0Bool = dedent("""
-        LBL "p0Bool"  // (a,b) -> (boolean) of whether flag 00 is set
+        LBL "p0Bool"  // Util used by comparison ops (a,b) -> (boolean) - whether flag 00 is set, plus RDNs 
         RDN
         RDN    // params dropped 
         FS? 00
@@ -348,7 +350,7 @@ class RpnTemplates:
         """)
 
     p__1ErR = dedent("""
-        LBL "p__1ErR"  // (to,999) -> display error & stop.
+        LBL "p__1ErR"  // Out of Range error (to,999) -> display error & stop.
         RDN
         "range() limited"
         ├" to 999: got "
@@ -359,7 +361,7 @@ class RpnTemplates:
         """)
 
     PErNkey = dedent("""
-        LBL "PErNkey"  // () -> display error & stop.
+        LBL "PErNkey"  // Dictionary key not found error () -> display error & stop.
         "Dictionary key "
         ARCL ST X
         ├" not found"
@@ -368,7 +370,7 @@ class RpnTemplates:
         """)
 
     pAssert = dedent("""
-        LBL "pAssert"  // (bool) -> if true, keep going, else stop & display error
+        LBL "pAssert"  // Assert (bool) -> if true, keep going, else stop & display error
         X≠0?
         RTN
         "Assertion Err "
@@ -378,16 +380,20 @@ class RpnTemplates:
         RTN    
         """)
 
+    error = settings.SKIP_LABEL1
+
     pMlen = dedent(f"""
-        LBL "pMlen"  // () -> length of ZLIST
-        // please INDEX the ZLIST list first
-        // or delete the ZLIST to get an empty list of 0
+        LBL "pMlen"    // Matrix row length () -> length of ZLIST
+        
+        // Please INDEX the ZLIST list first
+        //  or delete the ZLIST to get an empty list of 0
+        
         // WARNING - will mess with I J
 
-        SF 25       // try: (ignore error) 
+        SF 25         // try: (ignore error) 
         INDEX "ZLIST"      
-        FC?C 25     // if was error (flag cleared)
-        GTO {settings.SKIP_LABEL1}      //   error, list is empty
+        FC?C 25       // if was error (flag cleared)
+        GTO {error}      //   error, list is empty
         1
         1
         STOIJ
@@ -397,24 +403,28 @@ class RpnTemplates:
         RCLIJ
         RDN
         RTN
-        LBL {settings.SKIP_LABEL1}      // list is empty
+        LBL {error}      // list is empty
         0
         RTN
         """)
 
+    yes = settings.SKIP_LABEL1
+
     pMxPrep = dedent(f"""
-        // Prepare matrix for access by storing in ZLIST var
-        // ** You must later set flag 01 yourself to indicate
-        //    1D (list) vs 2D (dict) operation mode.
-        //    The flag should match the type of matrix you are passing in
+        LBL "pMxPrep"   // Prepare Matrix (matrix) -> ()
+        
+        // Stores matrix in ZLIST var and indexes it, or clears ZLIST var
+         
+        // You must later set flag 01 yourself to indicate 1D (list) vs 2D (dict) operation mode.
+        // The setting of this flag should match the type of matrix you are passing in.
         //  
-        LBL "pMxPrep"  // (matrix) -> ()
-        MAT?        // if is a matrix
-        GTO {settings.SKIP_LABEL1}      // yes
-        XEQ "CLIST" // else empty matrix
+
+        MAT?            // if is a matrix
+        GTO {yes}       // yes
+        XEQ "CLIST"     // else empty matrix
         RDN
         RTN
-        LBL {settings.SKIP_LABEL1}  // yes is a matrix
+        LBL {yes}       // yes is a matrix
         STO "ZLIST"
         RDN
         INDEX "ZLIST"        
