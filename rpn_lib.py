@@ -15,10 +15,14 @@ easy = ''
 have_step = ''
 error = ''
 yes = ''
-not_found = ''
+found = ''
 loop = ''
-keep_searching = ''
-finished_search = ''
+ok = ''
+exit_loop = ''
+auto_create = ''
+done = ''
+have_found = ''
+was_found = ''
 
 class RpnTemplates:
     """
@@ -47,8 +51,8 @@ class RpnTemplates:
         FS?     - use isFS(flag) instead
         FC?     - use isFC(flag) instead
     """
-    global neg_case, no_step, easy, have_step, error, yes, not_found
-    global loop, keep_searching, finished_search
+    global neg_case, no_step, easy, have_step, error, yes, found
+    global loop, ok, exit_loop, auto_create, done, have_found, was_found
 
     def __init__(self):
         self.needed_templates = []  # extra fragments that need to be emitted at the end
@@ -451,66 +455,75 @@ class RpnTemplates:
         RTN
         """)
 
-    not_found = settings.FLAG_PYTHON_USE_1
+    auto_create = settings.FLAG_LIST_AUTO_CREATE_IF_KEY_NOT_FOUND
+    found = settings.FLAG_PYTHON_USE_1
+    exit_loop = settings.SKIP_LABEL1
+    was_found = settings.SKIP_LABEL1
+    have_found = settings.SKIP_LABEL2
+    done = settings.SKIP_LABEL2
+    ok = settings.SKIP_LABEL3
     loop = settings.LOCAL_LABEL_FOR_2D_MATRIX_FIND
-    keep_searching = settings.SKIP_LABEL3
-    finished_search = settings.SKIP_LABEL1
 
     p2mIJfi = dedent(f"""
-        // Sets IJ for dict access for 'key' (search required)  
+        LBL "p2mIJfi"  // Set IJ for Dict. (key) -> () - finds key's value and sets IJ accordingly.
+        XEQ "pStoStk"  // If flag {settings.FLAG_LIST_AUTO_CREATE_IF_KEY_NOT_FOUND} then auto creates new row.
+
         // Assumes ZLIST is indexed.
-        //
-        LBL "p2mIJfi"  // (key) -> () - finds key's value and sets IJ accordingly
-        XEQ "pStoStk"  // save the stack
-        1              // from
-        XEQ "pMlen"    // to
+ 
+        1              // 'from' (search from row 1)
+        XEQ "pMlen"    // 'to' (get num rows in matrix)
         1
         +              // add 1 cos want 'to' to include last row
-        1              // step
+        1              // 'step'
         XEQ "pISG"
         STO "pISGvar"
         RDN
+        
         // Start the search from row 1
+        
         1
         1
         STOIJ
         RDN
         RDN
-        CF {not_found}  // not found flag
+        CF {found}              // found = False
+        
         LBL {loop}
         ISG "pISGvar"
-        GTO {keep_searching} // ok, keep searching
-        GTO {finished_search} // finished search
-        LBL {keep_searching} // keep searching
-        // see if el matches
+        GTO {ok}                // ok, compare next element
+        GTO {exit_loop}         // finished ISG search through the matrix row 'keys' (in col 1)
+        LBL {ok}
         RCLEL
-        X=Y?
-        GTO {settings.SKIP_LABEL2}  // found
-        RDN // else
-        I+
-        GTO {loop}  // keep looking
-        LBL {settings.SKIP_LABEL2} // found
-        SF {not_found}
-        LBL {finished_search} // finished search
-        FS? {not_found} // was it found?
-        GTO {settings.SKIP_LABEL1} // ok found, nice
-         
-        // decide if auto create on err
-        FC? {settings.FLAG_LIST_AUTO_CREATE_IF_KEY_NOT_FOUND}  // if not auto create new row
-        GTO "PErNkey"  // error key not found, auto create is off
-        0     // temp value 
-        X<>Y  // key (y:temp value, x:key)
-        XEQ "LIST+"  // this will incidentally set IJ nicely to the 'value' element
-        GTO {settings.SKIP_LABEL2} // done
+        X=Y?                    // see if element matches
+        GTO {have_found}        //   found
+        RDN                     // else
+        I+                      //   increment row
+        GTO {loop}              // keep looking
         
-        LBL {settings.SKIP_LABEL1} // ok found, nice
+        LBL {have_found}        // have found
+        SF {found}
+        
+        LBL {exit_loop}         // finished search
+        FS? {found}             // was it found?
+        GTO {was_found}         // perfectly found, nice
+         
+        // Decide if auto create on err
+        
+        FC? {auto_create}       // if not auto create new row
+        GTO "PErNkey"           // error key not found, auto create is off
+        0                       // temp value 
+        X<>Y                    // key (y:temp value, x:key)
+        XEQ "LIST+"             // this will incidentally set IJ nicely to the 'value' element
+        GTO {done}              // done
+        
+        LBL {was_found}         // ok found, nice
         RCL "pISGvar"
-        IP // index where found y:(row / I)
-        2  // position of value x:(col / J)
-        STOIJ  // all set to store or recall something
-        LBL {settings.SKIP_LABEL2} // done
-        XEQ "pRclStk"  // recall stack
-        RDN  // drop key we were looking for
+        IP                      // index where found y:(row / I)
+        2                       // position of value x:(col / J)
+        STOIJ                   // all set to store or recall something
+        LBL {done}              // done
+        XEQ "pRclStk"           // recall stack
+        RDN                     // drop key we were looking for
         RTN
         """)
 
