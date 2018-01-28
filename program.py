@@ -1,7 +1,7 @@
 from attr import attrs, attrib, Factory
 from logger import config_log
 import logging
-from rpn_templates import RpnTemplates
+from rpn_lib import RpnTemplates
 from rpn_exceptions import RpnError
 import settings
 
