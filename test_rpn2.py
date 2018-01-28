@@ -698,3 +698,16 @@ class RpnTests2(BaseTest):
         """
         self.assertRaises(RpnError, self.parse, dedent(src))
 
+    # assert
+
+    def test_assert(self):
+        self.parse(dedent("""
+            passert(2 == 2)
+            """))
+        expected = dedent("""
+            2
+            2
+            XEQ "pEQ"
+            XEQ "pAssert"
+            """)
+        self.compare(de_comment(expected))

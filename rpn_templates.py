@@ -350,6 +350,17 @@ class RpnTemplates:
         RTN    
         """)
 
+    pAssert = dedent("""
+        LBL "pAssert"  // (bool) -> if true, keep going, else stop & display error
+        X≠0?
+        RTN
+        "Assertion Err "
+        ARCL ST X
+        ├" is not True"
+        PROMPT
+        RTN    
+        """)
+
     # p1DMtx = dedent("""
     #     LBL "p1DMtx"  // (x) -> stores x in ZLIST if matrix else deletes ZLIST to signify empty matrix
     #     SF 01   // 1D matrix for lists
@@ -555,6 +566,7 @@ class RpnTemplates:
         return {
             'pFS': {'description': 'is flag set?'},
             'pFC': {'description': 'is flag clear?'},
+            'pAssert': {'description': 'is param True?'},
         }
 
     def _create_local_labels(self):

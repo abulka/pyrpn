@@ -562,6 +562,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         if func_name == 'isFC':
             func_name = 'pFC'
 
+        if func_name == 'passert':
+            func_name = 'pAssert'
+
 
         if func_name in cmd_list and len(node.args) == 0:
 
