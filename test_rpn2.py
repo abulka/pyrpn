@@ -213,8 +213,9 @@ class RpnTests2(BaseTest):
             A = []
             """))
         expected = dedent("""
-            0             // not a matrix (empty)
-            XEQ "p1DMtx"  // prepare ZLIST
+            0              // not a matrix (empty)
+            XEQ "pMxPrep"  // prepare ZLIST
+            SF 01          // 1D mode
             STO "A"
             """)
         self.compare(de_comment(expected))
@@ -224,8 +225,9 @@ class RpnTests2(BaseTest):
             A = [1,2]
             """))
         expected = dedent("""
-            0             // not a matrix (empty)
-            XEQ "p1DMtx"  // prepare ZLIST
+            0              // not a matrix (empty)
+            XEQ "pMxPrep"  // prepare ZLIST
+            SF 01          // 1D mode
             1
             XEQ "LIST+"
             2
@@ -242,12 +244,14 @@ class RpnTests2(BaseTest):
             VIEW(A)
             """))
         expected = dedent("""
-            0             // not a matrix (empty)
-            XEQ "p1DMtx"  // prepare ZLIST
+            0              // not a matrix (empty)
+            XEQ "pMxPrep"  // prepare ZLIST
+            SF 01          // 1D mode
             STO "A"
 
-            0             // not a matrix (empty)
-            XEQ "p1DMtx"  // prepare ZLIST
+            0              // not a matrix (empty)
+            XEQ "pMxPrep"  // prepare ZLIST
+            SF 01          // 1D mode
             STO "B"
 
             VIEW "A"
@@ -260,12 +264,14 @@ class RpnTests2(BaseTest):
             A.append(5)
             """))
         expected = dedent("""
-            0             // not a matrix (empty)
-            XEQ "p1DMtx"  // prepare ZLIST
+            0              // not a matrix (empty)
+            XEQ "pMxPrep"  // prepare ZLIST
+            SF 01          // 1D mode
             STO "A"
 
             RCL "A"
-            XEQ "p1DMtx"  // prepare ZLIST
+            XEQ "pMxPrep"  // prepare ZLIST
+            SF 01          // 1D mode
             5
             XEQ "LIST+"
 
@@ -281,13 +287,15 @@ class RpnTests2(BaseTest):
             """))
         expected = dedent("""
             0
-            XEQ "p1DMtx"
+            XEQ "pMxPrep"
+            SF 01
             200
             XEQ "LIST+"
             RCL "ZLIST"
             STO "A"
             RCL "A"
-            XEQ "p1DMtx"
+            XEQ "pMxPrep"
+            SF 01
             5
             XEQ "LIST+"
             RCL "ZLIST"
@@ -306,7 +314,8 @@ class RpnTests2(BaseTest):
         expected = dedent("""
             LBL "a10"
             0
-            XEQ "p1DMtx"
+            XEQ "pMxPrep"
+            SF 01
             STO "A"
             -1.009
             STO 00
@@ -316,7 +325,8 @@ class RpnTests2(BaseTest):
             GTO 02
             LBL 01
             RCL "A"
-            XEQ "p1DMtx"
+            XEQ "pMxPrep"
+            SF 01
             RCL 00
             IP
             XEQ "LIST+"
@@ -347,20 +357,19 @@ class RpnTests2(BaseTest):
             """))
         expected = dedent("""
             0
-            XEQ "p1DMtx"
+            XEQ "pMxPrep"
+            SF 01
             200
             XEQ "LIST+"
             RCL "ZLIST"
             STO "A"
             
             RCL "A"
-            XEQ "p1DMtx"
-            INDEX "ZLIST"
+            XEQ "pMxPrep"
+            SF 01
+            
             0
-            1
-            +
-            1
-            STOIJ
+            XEQ "p1mIJ"  // set IJ to index 0 (which is ZLIST row 1)            
             RCLEL
             
             STO 00
@@ -374,27 +383,24 @@ class RpnTests2(BaseTest):
             """))
         expected = dedent("""
             0
-            XEQ "p1DMtx"
+            XEQ "pMxPrep"
+            SF 01
             200
             XEQ "LIST+"
             RCL "ZLIST"
             STO "A"
 
             300
-                        
+               
             RCL "A"
-            XEQ "p1DMtx"
-            INDEX "ZLIST"
+            XEQ "pMxPrep"
+            SF 01
             0
-            1
-            +
-            1
-            STOIJ
-            RCL ST T
+            XEQ "p1mIJ"
             STOEL
-            
+
             RCL "ZLIST"
-            STO "A"            
+            STO "A"
             """)
         self.compare(de_comment(expected))
 
@@ -406,26 +412,28 @@ class RpnTests2(BaseTest):
           """))
         expected = dedent("""
             0
-            XEQ "p1DMtx"
+            XEQ "pMxPrep"
+            SF 01
+            
             "hi"
             ASTO ST X
             XEQ "LIST+"
+            
             "there"
             ASTO ST X
             XEQ "LIST+"
+            
             RCL "ZLIST"
             STO "A"
+            
             "hello"
             ASTO ST X
             RCL "A"
-            XEQ "p1DMtx"
-            INDEX "ZLIST"
+            XEQ "pMxPrep"
+            SF 01
+            
             0
-            1
-            +
-            1
-            STOIJ
-            RCL ST T
+            XEQ "p1mIJ"
             STOEL
             
             RCL "ZLIST"
@@ -441,22 +449,24 @@ class RpnTests2(BaseTest):
           """))
         expected = dedent("""
             0
-            XEQ "p1DMtx"
+            XEQ "pMxPrep"
+            SF 01
+
             "hi"
             ASTO ST X
             XEQ "LIST+"
             RCL "ZLIST"
             STO "A"
+
             CLA
             RCL "A"
             XEQ "p1DMtx"
-            INDEX "ZLIST"
+            SF 01
+            
             0
-            1
-            +
-            1
-            STOIJ
+            XEQ "p1mIJ"
             RCLEL
+            
             ARCL ST X
             AVIEW
             """)
@@ -591,7 +601,8 @@ class RpnTests2(BaseTest):
           """))
         expected = dedent("""
             0             // not a matrix (empty)
-            XEQ "p2DMtx"  // prepare ZLIST
+            XEQ "pMxPrep" // prepare ZLIST
+            CF 01
             STO "A"
             """)
         self.compare(de_comment(expected))
@@ -601,10 +612,11 @@ class RpnTests2(BaseTest):
             A = {1: 2}
             """))
         expected = dedent("""
-            0             // not a matrix (empty)
-            XEQ "p2DMtx"  // prepare ZLIST
-            1
-            2
+            0
+            XEQ "pMxPrep"
+            CF 01
+            2            // value
+            1            // key
             XEQ "LIST+"
             RCL "ZLIST"
             STO "A"
@@ -616,16 +628,20 @@ class RpnTests2(BaseTest):
             A = {'a': 2, 'b':3}
             """))
         expected = dedent("""
-            0             // not a matrix (empty)
-            XEQ "p2DMtx"  // prepare ZLIST
-            "a"
+            0
+            XEQ "pMxPrep"
+            CF 01
+            
+            2           // value
+            "a"         // key
             ASTO ST X
-            2
             XEQ "LIST+"
-            "b"
+            
+            3           // value
+            "b"         // key
             ASTO ST X
-            3
             XEQ "LIST+"
+            
             RCL "ZLIST"
             STO "A"
             """)
@@ -637,22 +653,23 @@ class RpnTests2(BaseTest):
             A['a'] = 2
             """))
         expected = dedent("""
-            0             // not a matrix (empty)
-            XEQ "p2DMtx"  // prepare ZLIST
+            0
+            XEQ "pMxPrep"
+            CF 01
             STO "A"
-
+            
             2
+            
             RCL "A"
-            XEQ "p2DMtx"
-            INDEX "ZLIST"
-            "a"
-            XEQ "p2DFindKey"  // convert "a" key to I the row
-            2           // J always col 2 which holds the value (key in col 1)
-            X<>Y
-            STOIJ
-            RCL ST T
+            XEQ "pMxPrep"
+            CF 01
+            
+            "a"         // search for this key
+            SF 02       // auto create if necessary
+            XEQ "p2mIJfi"
+            
             STOEL
-
+            
             RCL "ZLIST"
             STO "A"
             """)
@@ -664,25 +681,27 @@ class RpnTests2(BaseTest):
             x = A[1]
             """))
         expected = dedent("""
-            0             // not a matrix (empty)
-            XEQ "p2DMtx"  // prepare ZLIST
-            1
+            0
+            XEQ "pMxPrep"
+            CF 01
+            
             2
+            1
             XEQ "LIST+"
+            
             RCL "ZLIST"
             STO "A"
-
+            
             RCL "A"
-            XEQ "p2DMtx"
-            INDEX "ZLIST"
-            1
-            XEQ "p2DFindKey"  // convert "a" key to I the row
-            2           // J always col 2 which holds the value (key in col 1)
-            X<>Y
-            STOIJ
+            XEQ "pMxPrep"
+            CF 01
+            
+            1             // search for this key  
+            CF 02         // auto create if necessary  
+            XEQ "p2mIJfi" // IJ is set nicely for us...
 
-            RCLEL
-            STO 00
+            RCLEL         // access A[1]
+            STO 00        // x = 
             """)
         self.compare(de_comment(expected))
 
