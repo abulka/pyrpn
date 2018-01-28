@@ -163,16 +163,22 @@ class RpnTemplates:
 
         if self.embedded:
             list_menu = ''
+            list_plus = settings.LIST_PLUS
+            list_minus = settings.LIST_MINUS
+            list_clist = settings.LIST_CLIST
         else:
             list_menu = LIST_MENU_CODE
+            list_plus = '"LIST+"'
+            list_minus = '"LIST-"'
+            list_clist = '"CLIST"'
 
         LIST_BODY = dedent(f"""
             {list_menu}
 
-            LBL "LIST+"   // (x:val) when 1D, (y:val, x:key) when 2D 
-                          // I.e. (y:value to go into r:2, x:value to go into r:1) where r is the new row 
-                          // This is OPPOSITE way to STOIJ (y:I, x:J) viz. (y:row, x:col) 
-            SF 25         // try: (ignore error) 
+            LBL {list_plus} // LIST+ (x:val) when 1D, (y:val, x:key) when 2D 
+                            // I.e. (y:value to go into r:2, x:value to go into r:1) where r is the new row 
+                            // This is OPPOSITE way to STOIJ (y:I, x:J) viz. (y:row, x:col) 
+            SF 25           // try: (ignore error) 
             XEQ {prepare}       
             FC?C 25       // if was error (flag cleared)
             GTO {init}    //   init list then push
@@ -206,7 +212,7 @@ class RpnTemplates:
             RDN           // drop rubbish off the stack
             GTO {push}    // push()
 
-            LBL "LIST-"   // pop () -> () 
+            LBL {list_minus}  // LIST- pop () -> () 
             SF 25
             XEQ {prepare}
             FC? 25
@@ -223,8 +229,8 @@ class RpnTemplates:
             FS?C 25
             GTO {finish}
 
-            LBL "CLIST"   // () -> ()
-            CLV "ZLIST"   // clear ZLIST from memory
+            LBL {list_clist} // CLIST () -> ()
+            CLV "ZLIST"      // clear ZLIST from memory
             RTN
 
             LBL {prepare} // prepare list "ZLIST" for access
@@ -628,5 +634,5 @@ class RpnTemplates:
             next_label += 1
         # print(self.local_alpha_labels)
 
-print(RpnTemplates._get_class_attrs())
+# print(RpnTemplates._get_class_attrs())
 

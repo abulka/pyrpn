@@ -44,21 +44,26 @@ Labels ABCDEFGHIJabcde - allocated for user python functions as needed
 Rpn Support Function library labels and flags as follows:
 """
 
-# skip labels are resuable, just ensure they will be found in a forward search
-SKIP_LABEL1 = 67
-SKIP_LABEL2 = 68
-SKIP_LABEL3 = 69
-
 # for niceness
-LOCAL_LABEL_FOR_PyLIB = 70
+LOCAL_LABEL_FOR_PyLIB = 50
+
+# skip labels are resuable, just ensure they will be found in a forward search
+SKIP_LABEL1 = 51
+SKIP_LABEL2 = 52
+SKIP_LABEL3 = 53
 
 # unique cos needs to go backwards in jump
-LOCAL_LABEL_FOR_LIST_BACK_JUMP = 71
-LOCAL_LABEL_FOR_LIST_BACK_JUMP2 = 72
-LOCAL_LABEL_FOR_2D_MATRIX_FIND = 73
+LOCAL_LABEL_FOR_LIST_BACK_JUMP = 54
+LOCAL_LABEL_FOR_LIST_BACK_JUMP2 = 55
+LOCAL_LABEL_FOR_2D_MATRIX_FIND = 56
+
+# Could be allocated but just easier to set these because they are within a larger code chunk
+LIST_PLUS = 57
+LIST_MINUS = 58
+LIST_CLIST = 59
 
 # all remaining p* functions get allocated from here, via _create_local_labels()
-LOCAL_LABEL_START_FOR_Py = 74  # .. 99
+LOCAL_LABEL_START_FOR_Py = 60  # .. 99
 
 # Flags
 FLAG_PYTHON_USE_1 = 99
