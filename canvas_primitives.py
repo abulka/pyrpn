@@ -27,6 +27,7 @@ def dd2_draw_demo():  # rpn: export
     # some lines (note the quite likely 'Moire pattern')
     for i in range(1, XRES / 4, 2):
         x = i
+        #PRA('moire', 0, 0, x, YRES)
         draw_line(0, 0, x, YRES)
 
     # some rectangles
@@ -69,11 +70,9 @@ def draw_line(x0, y0, x1, y1):  # rpn: int
     err = dx - dy
     done = 0
     while not done:
-        #alpha('pixel ', x0, ' ', y0)
-        #PRA()
+        #PRA('pixel', x0, y0)
         PIXEL(x0, y0)
-        #alpha('if ', x0, ' ', x1, ' ', y0, ' ', y1)
-        #PRA()
+        #PRA('if', x0, x1, y0, y1)
         if (x0 == x1) and (y0 == y1):
             done = 1
         else:
@@ -88,7 +87,7 @@ def draw_line(x0, y0, x1, y1):  # rpn: int
 # (x0, y0) = left top corner coordinates
 # w = width and h = height
 def draw_rect(x0, y0, w, h):  # rpn: int
-  #PRA('draw_rect', x0, y0, w, h);
+  #PRA('draw_rect', x0, y0, w, h)
   y1 = y0 + h
   draw_line(x0, y0, x0 + w, y0)  # top
   draw_line(x0, y0, x0, y1)  # left
@@ -108,7 +107,7 @@ def draw_circle(x0, y0, r):  # rpn: int
     radiusError = 1 - x;
 
     while (x >= y):
-        PRA('x= ', x, ' y= ', y, ' ', radiusError)
+        #PRA('x= ', x, ' y= ', y, ' ', radiusError)
         PIXEL(-y + x0, -x + y0)  # top left
         PIXEL(y + x0, -x + y0)  # top right
         PIXEL(-x + x0, -y + y0)  # upper middle left
@@ -125,7 +124,7 @@ def draw_circle(x0, y0, r):  # rpn: int
             x -= 1
             radiusError += 2 * (y - x + 1)
 
-def fill_circle(x0, y0, r):
+def fill_circle(x0, y0, r):  # rpn: int
     x = r
     y = 0
     radiusError = 1 - x
@@ -161,7 +160,6 @@ def fill_circle(x0, y0, r):
         else:
             x -= 1
             radiusError += 2 * (y - x + 1)
-
 
 """
 
