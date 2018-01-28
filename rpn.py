@@ -36,7 +36,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.alpha_append_mode = False
         self.alpha_already_cleared = False
         self.alpha_separator = ' '
-        self.inside_binop = False
+        self.inside_calculation = False
         self.disallow_string_args = False
         self.inside_matrix_access = False
         self.def_params_as_ints = False
@@ -463,7 +463,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         before being resolved, so we do need a stack of operators, and we risk blowing the rpn stack.
         """
         self.begin(node)
-        self.inside_binop = True  # TODO probably should be a stack
+        self.inside_calculation = True  # TODO probably should be a stack
 
         self.visit(node.left)
         # self.log_pending_args()
@@ -493,7 +493,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.pending_stack_args.append('_result_')  # to account for the two args to this binop) and then push a 'result'
             self.log_pending_args()
 
-        self.inside_binop = False
+        self.inside_calculation = False
         self.end(node)
 
     def visit_Call(self,node):
@@ -597,21 +597,16 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 for index,arg in enumerate(node.args):
                     self.visit(arg)  # usual insertion of a literal number, string or variable
 
-                    if isinstance(arg, ast.Num):
+                    if isinstance(arg, (ast.Num, ast.BinOp, ast.Compare, ast.Subscript)):  # others?
                         self.program.insert('ARCL ST X')
                     elif isinstance(arg, ast.Name):
                         if self.var_name_is_loop_counter(arg.id):
                             self.program.insert('ARCL ST X')
                     elif isinstance(arg, ast.Str):
                         pass
-                    elif isinstance(arg, ast.BinOp):   # other types?
-                        self.program.insert('ARCL ST X')
-                    elif isinstance(arg, ast.Compare):   # other types?
-                        self.program.insert('ARCL ST X')
-                    elif isinstance(arg, ast.Subscript):
-                        self.program.insert('ARCL ST X')
                     else:
-                        # Solution is to add to the ARCL ST X cases, above.  But ensure the visit method has turned on the am_calculating flag to prevent numbers to be ARCLd rather than RCLd
+                        # Solution is to add to the ARCL ST X cases, above.  But ensure the visit method has turned on
+                        # the 'inside_calculation' flag to prevent numbers being ARCLd rather than RCLd.
                         raise RpnError(f'Do not know how to alpha {arg} with value {self.get_node_name_id_or_n(arg)}')
 
                     if not self.alpha_append_mode:
@@ -1001,7 +996,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 self.alpha_already_cleared = True
 
             cmd = 'ARCL' if self.inside_alpha and \
-                            not self.inside_binop and \
+                            not self.inside_calculation and \
                             not self.var_name_is_loop_counter(node.id) and \
                             not self.inside_matrix_access else 'RCL'
 
@@ -1063,7 +1058,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             - comparators
         """
         self.begin(node)
-        self.inside_binop = True  # TODO rename inside_binop_or_compare
+        self.inside_calculation = True
 
         self.visit(node.left)
         for o, e in zip(node.ops, node.comparators):
@@ -1071,7 +1066,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             subf = self.cmpops[o.__class__.__name__]
             self.program.insert_xeq(subf, comment='compare, return bool')
 
-        self.inside_binop = False
+        self.inside_calculation = False
         self.end(node)
 
     def visit_UnaryOp(self, node):
