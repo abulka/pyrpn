@@ -577,7 +577,6 @@ class RpnTests2(BaseTest):
 
     # boolean expessions inside expressions inside parameters
 
-    # @unittest.skip('hard')
     def test_bool_inside_param(self):
         self.parse(dedent("""
             print(x < y)
@@ -717,6 +716,61 @@ class RpnTests2(BaseTest):
         """
         self.assertRaises(RpnError, self.parse, dedent(src))
 
+    # List and Dict len
+
+    def test_list_len(self):
+        self.parse(dedent("""
+            A = [1, 2]
+            x = len(A)
+            """))
+        expected = dedent("""
+            0
+            XEQ "pMxPrep"
+            SF 01
+            1
+            XEQ "LIST+"
+            2
+            XEQ "LIST+"
+            RCL "ZLIST"
+            STO "A"
+            
+            RCL "A"
+            XEQ "pMxPrep"
+            SF 01
+            XEQ "pMlen"  // Get matrix row length. () -> length of ZLIST
+            """)
+        self.compare(de_comment(expected))
+
+    def test_dict_len(self):
+        self.parse(dedent("""
+            A = {'a': 2, 'b':3}
+            x = len(A)
+            """))
+        expected = dedent("""
+            0
+            XEQ "pMxPrep"
+            CF 01
+            
+            2           // value
+            "a"         // key
+            ASTO ST X
+            XEQ "LIST+"
+
+            3           // value
+            "b"         // key
+            ASTO ST X
+            XEQ "LIST+"
+
+            RCL "ZLIST"
+            STO "A"
+
+            RCL "A"
+            XEQ "pMxPrep"
+            SF 02
+            XEQ "pMlen"  // Get matrix row length. () -> length of ZLIST
+            """)
+        self.compare(de_comment(expected))
+
     # assert
 
     def test_assert(self):
@@ -750,3 +804,4 @@ class RpnTests2(BaseTest):
     #         rpn = f.read()
     #     self.assertEqual(self.get_all_lib(), rpn)
     #
+

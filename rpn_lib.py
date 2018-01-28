@@ -601,15 +601,6 @@ class RpnTemplates:
         names = [tup[0] for tup in _attrs_public]  # we just want the names not the tuples of (name, value)
         return names
 
-    # def need_template(self, template):
-    #     assert template in self.template_names, f'template "{template}" missing from {self.template_names}'
-    #     if template not in self.needed_templates:
-    #         self.needed_templates.append(template)
-
-    # def need_all_templates(self):
-    #     self.needed_templates = self.template_names[:]  # copy
-    #     # self.needed_templates.remove('pList')
-
     def get_user_insertable_pyrpn_cmds(self):
         """
         These are the commands that are exposed to the user and which can be inserted into.
@@ -618,6 +609,7 @@ class RpnTemplates:
             'pFS': {'description': 'is flag set?'},
             'pFC': {'description': 'is flag clear?'},
             'pAssert': {'description': 'is param True?'},
+            'pMlen': {'description': 'length of list or dict'},
         }
 
     def _create_local_labels(self):
