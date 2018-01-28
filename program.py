@@ -165,8 +165,17 @@ class Program(BaseRpnProgram):
                 func_name = extract_func_name(text)
                 if func_name in self.rpn_templates.template_names:
                     label = self.rpn_templates.local_alpha_labels[func_name]
-                    line.text = f'{cmd} {label}'
-                    log.debug(f'replaced global label "{func_name}" with local label {label}')
+                elif func_name == 'LIST+':
+                    label = settings.LIST_PLUS
+                elif func_name == 'LIST-':
+                    label = settings.LIST_MINUS
+                elif func_name == 'CLIST':
+                    label = settings.LIST_CLIST
+                else:
+                    log.debug(f'skipped global label "{func_name}"?')
+                    return
+                line.text = f'{cmd} {label}'
+                log.debug(f'replaced global label "{func_name}" with local label {label}')
 
         for line in self.lines:
             if 'XEQ "' in line.text:

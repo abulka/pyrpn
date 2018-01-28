@@ -168,7 +168,7 @@ class RpnTemplates:
             list_clist = settings.LIST_CLIST
         else:
             list_menu = LIST_MENU_CODE
-            list_plus = '"LIST+"'
+            list_plus =  '"LIST+"'
             list_minus = '"LIST-"'
             list_clist = '"CLIST"'
 
