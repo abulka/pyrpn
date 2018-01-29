@@ -212,6 +212,25 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     # Visit functions
 
+    def generic_visit(self,node):
+        log.debug(f'skipping {node}')
+        if getattr(node, 'name', ''):
+            log.debug(f'name {node.name}')
+
+    @recursive
+    def visit_Pass(self, node):
+        pass
+
+    @recursive
+    def visit_Module(self,node):
+        """ visit a Module node and the visits recursively"""
+        pass
+
+    @recursive
+    def visit_Lambda(self,node):
+        """ visit a Function node """
+        pass
+
     def visit_FunctionDef(self,node):
         """ visit a Function node and visits it recursively"""
         self.begin(node)
@@ -281,6 +300,108 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         if self.program.is_previous_line('string'):
             self.program.insert('ASTO ST X')
         self.program.insert(f'RTN', comment='return')
+        self.end(node)
+
+    def visit_NameConstant(self, node):
+        # True or False constants - node.value is either True or False (booleans). Are there any other NameConstants?
+        if node.value:
+            self.program.insert('1', comment='True')
+        else:
+            self.program.insert('0', comment='False')
+
+    def visit_Name(self, node):
+        self.begin(node)
+        self.check_supported(node.id, node)
+        if '.Load' in str(node.ctx):
+            assert isinstance(node.ctx, ast.Load)
+            if self.inside_alpha and not self.alpha_append_mode and not self.alpha_already_cleared:
+                self.program.insert('CLA')
+                self.alpha_already_cleared = True
+
+            cmd = 'ARCL' if self.inside_alpha and \
+                            not self.inside_calculation and \
+                            not self.var_name_is_loop_counter(node.id) and \
+                            not self.inside_matrix_access else 'RCL'
+
+            self.program.insert(f'{cmd} {self.scopes.var_to_reg(node.id)}', comment=node.id)
+            self.pending_stack_args.append(node.id)
+            if self.scopes.is_list(node.id):
+                self.prepare_matrix(node, 'SF 01')
+            if self.scopes.is_dictionary(node.id):
+                self.prepare_matrix(node, 'CF 01')
+            if self.var_name_is_loop_counter(node.id):
+                self.program.insert('IP')  # just get the integer portion of isg counter
+            if self.pending_unary_op:
+                self.program.insert('CHS')
+                self.pending_unary_op = ''
+        self.end(node)
+
+    def visit_Num(self, node):
+        self.begin(node)
+        if self.inside_alpha and not self.alpha_append_mode and not self.alpha_already_cleared:
+            self.program.insert('CLA')
+            self.alpha_already_cleared = True
+        self.program.insert(f'{self.pending_unary_op}{node.n}')
+        self.pending_stack_args.append(node.n)
+        self.pending_unary_op = ''
+        self.end(node)
+
+    def visit_Str(self, node):
+        self.begin(node)
+        if self.disallow_string_args:
+            raise RpnError(f'Error: function disallows parameters of type string, line: {node.lineno}\n{node.first_token.line.strip()}')
+        if self.inside_alpha:
+            # self.program.insert(f'├"{node.s[0:15]}"')
+            self.split_alpha_text(node.s, append=self.alpha_append_mode)
+        else:
+            self.program.insert(f'"{node.s[0:15]}"', type_='string')
+        self.end(node)
+
+    def visit_List(self,node):
+        """
+        Children nodes are:
+            - elts (list of elements)
+        """
+        self.begin(node)
+        self.program.insert('0', comment='not a matrix (empty)')
+        self.prepare_matrix(node, 'SF 01')
+        for child in node.elts:
+            self.visit(child)
+            if self.program.is_previous_line('string'):
+                self.program.insert('ASTO ST X')
+            self.program.insert_xeq('LIST+')
+        self.end(node)
+
+    def visit_Dict(self,node):
+        """
+        Child nodes are:
+            - keys
+            - values
+        """
+        self.begin(node)
+        self.program.insert('0', comment='not a matrix (empty)')
+        self.prepare_matrix(node, 'CF 01')
+        for index, key in enumerate(node.keys):
+            self.visit(node.values[index])  # corresponding value
+            if self.program.is_previous_line('string'):
+                self.program.insert('ASTO ST X')
+
+            self.visit(key)  # key
+            if self.program.is_previous_line('string'):
+                self.program.insert('ASTO ST X')
+            self.program.insert_xeq('LIST+')  # push value then key (y:value x:key)
+        self.end(node)
+
+    def visit_Subscript(self,node):
+        """
+        Only gets called if are reading from a list or dict on rhs e.g. x = a[n]
+        Children nodes are:
+            - value (the Name of the list we are accessing)
+            - slice - with subchild Index.value which is a Num of the list index
+            - ctx - Load or Store
+        """
+        self.begin(node)
+        self.subscript_is_on_rhs_thus_read(node)
         self.end(node)
 
     def visit_Assign(self,node):
@@ -402,7 +523,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         assert '.Store' in str(target.ctx)
         assert isinstance(target.ctx, ast.Store)
         self.assert_uppercase(target)
-
     # THESE ASSERT METHODS SHOULD BE REMOVED - allow lower case variables to be assigned to,
     # and simply automatically map them to lowercase named registers BINGO!!!! YES!!!
     def assert_uppcase_lhs(self, target):
@@ -454,6 +574,59 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.pending_ops.append('Y↑X')
         self.end(node)
 
+    def visit_BoolOp(self, node):
+        """
+        BoolOp(
+          op=Or(),
+          values=[
+            Num(n=1),
+            Num(n=0),
+            Num(n=1)]))])
+
+        Push each pair and apply OP on-goingly, so as not to blow the stack.
+        Probably don't need to track pending_stack_args here cos of this smart strategy.
+        """
+        self.begin(node)
+        two_count = 0
+        for child in node.values:
+            self.visit(child)
+            two_count += 1
+            if two_count >= 2:
+                self.visit(node.op)
+        self.end(node)
+
+    def visit_Or(self, node):
+        self.program.insert_xeq('p2Bool')
+        self.program.insert('OR')
+
+    def visit_And(self, node):
+        self.program.insert_xeq('p2Bool')
+        self.program.insert('AND')
+
+    def visit_Not(self, node):
+        self.program.insert_xeq('pBool')
+        self.program.insert_xeq('pNot')
+
+    @recursive
+    def visit_Expr(self, node):
+        self.pending_stack_args = []
+
+    @recursive
+    def visit_USub(self, node):
+        self.pending_unary_op = '-'
+
+    def visit_UnaryOp(self, node):
+        """
+        op=USub(),
+        operand=Num(n=1))],
+        """
+        if isinstance(node.op, ast.Not):
+            self.visit(node.operand)
+            self.visit(node.op)
+        else:
+            # for parsing e.g. -1
+            self.visit(node.op)
+            self.visit(node.operand)
 
     def visit_BinOp(self, node):
         """
@@ -503,6 +676,221 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.log_pending_args()
 
         self.inside_calculation = False
+        self.end(node)
+    # Most of these operators map to rpn in the opposite way, because of the stack order etc.
+    # There are 12 RPN operators, p332
+    cmpops = {
+        "Eq":     "pEQ",
+        "NotEq":  "pNEQ",
+        "Lt":     "pLT",
+        "LtE":    "pLTE",
+        "Gt":     "pGT",
+        "GtE":    "pGTE",
+        # TODO
+        "Is":     "PyIs",
+        "IsNot":  "PyIsNot",
+        "In":     "PyIn",
+        "NotIn":  "PyNotIn",
+        }
+
+    def visit_Compare(self, node):
+        """
+        A comparison of two or more values. left is the first value in the comparison, ops the list of operators,
+        and comparators the list of values after the first. If that sounds awkward, that’s because it is:
+            - left
+            - ops
+            - comparators
+        """
+        self.begin(node)
+        self.inside_calculation = True
+
+        self.visit(node.left)
+        for o, e in zip(node.ops, node.comparators):
+            self.visit(e)
+            subf = self.cmpops[o.__class__.__name__]
+            self.program.insert_xeq(subf, comment='compare, return bool')
+
+        self.inside_calculation = False
+        self.end(node)
+
+    def visit_If(self, node):
+        """
+        If's sub-nodes are:
+            - test
+            - body
+            - orelse
+        where orelse[0] might be another if node (elif situation) otherwise might be a body (else situation)
+        or the orelse list might be empty (no else situation).
+        """
+        self.begin(node)
+        log.debug(f'{self.indent} if')
+
+        f = LabelFactory(local_label_allocator=self.local_labels, descriptive=self.debug_gen_descriptive_labels)
+        insert = self.insert
+
+        label_if_body = f.new('if body')
+        label_resume = f.new('resume')
+        label_else = f.new('else') if len(node.orelse) > 0 else None
+        label_elif = f.new('elif') if len(node.orelse) == 1 and isinstance(node.orelse[0], ast.If) else None
+
+        # Begin here
+
+        self.visit(node.test)
+        log.debug(f'{self.indent} :')
+        self.pending_stack_args = []
+
+        """
+        At this point, the last line in our rpn program is a boolean value.
+        We now add the test for truth and a couple of gotos...
+        """
+        self.program.insert('X≠0?', comment='if true?')
+
+        insert('GTO', label_if_body)                # true
+
+        if label_elif: insert('GTO', label_elif)    # false/else/elif
+        elif label_else: insert('GTO', label_else)
+        else: insert('GTO', label_resume)
+
+        insert('LBL', label_if_body)
+        self.body(node.body)
+
+        if label_else:
+            insert('GTO', label_resume)
+
+        more_elifs_coming = lambda node : len(node.orelse) == 1 and isinstance(node.orelse[0], ast.If)
+        while True:
+            else_ = node.orelse
+            if len(else_) == 1 and isinstance(else_[0], ast.If):
+                node = else_[0]
+                log.debug(f'{self.indent} elif')
+                insert('LBL', label_elif)
+                self.visit(node.test)
+                log.debug(f'{self.indent} :')
+                self.program.insert('X≠0?', comment='if true?')
+
+                label_elif_body = f.new('elif body')
+
+                insert('GTO', label_elif_body)
+
+                if more_elifs_coming(node):
+                    label_elif = f.new('elif')
+                    insert('GTO', label_elif)
+                else:
+                    insert('GTO', label_else)
+
+                insert('LBL', label_elif_body)
+                self.body(node.body)
+                insert('GTO', label_resume)
+            else:
+                if len(else_) > 0:
+                    log.debug(f'{self.indent} else')
+                    insert('LBL', label_else)
+                    self.body(else_)
+                break
+
+        insert('LBL', label_resume)
+        self.pending_stack_args = []
+        self.end(node)
+
+    def visit_While(self,node):
+        """
+        visit a While node.  Children nodes are:
+            - test
+            - body
+            - orelse
+        """
+        self.begin(node)
+
+        f = LabelFactory(local_label_allocator=self.local_labels, descriptive=self.debug_gen_descriptive_labels)
+        insert = self.insert
+
+        label_while = f.new('while')
+        insert('LBL', label_while)
+        log.debug(f'{self.indent} while')
+        self.visit(node.test)
+        log.debug(f'{self.indent} :')
+        self.pending_stack_args = []
+
+        label_while_body = f.new('while body')
+        label_resume = f.new('resume')
+        label_else = f.new('else') if len(node.orelse) > 0 else None
+
+        self.resume_labels.append(label_resume)  # just in case we hit a break
+        self.continue_labels.append(label_while)  # just in case we hit a continue
+
+        """
+        At this point, the last line in our rpn program is a boolean value.
+        We now add the test for truth and a couple of gotos...
+        """
+        self.program.insert('X≠0?', comment='while true?')
+
+        insert('GTO', label_while_body)
+        if label_else: insert('GTO', label_else)
+        else: insert('GTO', label_resume)
+
+        insert('LBL', label_while_body)
+        self.body(node.body)
+        insert('GTO', label_while)
+
+        if label_else:
+            insert('LBL', label_else)
+            self.body(node.orelse)
+
+        insert('LBL', label_resume)
+        self.pending_stack_args = []
+        self.end(node)
+
+    @recursive
+    def visit_Break(self,node):
+        """ visit a Break node """
+        if self.resume_labels:
+            label = self.resume_labels.pop()
+            self.insert('GTO', label)
+        # self.pending_stack_args = []
+
+    @recursive
+    def visit_Continue(self,node):
+        """ visit a Continue node """
+        if self.continue_labels:
+            label = self.continue_labels.pop()
+            self.insert('GTO', label)
+        # self.pending_stack_args = []
+
+    def visit_For(self, node):
+        self.begin(node)
+
+        f = LabelFactory(local_label_allocator=self.local_labels, descriptive=self.debug_gen_descriptive_labels)
+        insert = self.insert
+
+        label_for = f.new('for')
+        label_for_body = f.new('for body')
+        label_resume = f.new('resume')
+
+        log.debug(f'{self.indent} for')
+        self.visit(node.target)
+        varname = node.target.id
+        register = self.scopes.var_to_reg(varname, is_range_index=True)
+        self.for_loop_info.append(ForLoopItem(varname, register, label_for))
+
+        log.debug(f'{self.indent} in')
+        self.visit(node.iter)
+
+        log.debug(f'{self.indent} :')
+
+        self.resume_labels.append(label_resume)  # just in case we hit a break
+        self.continue_labels.append(label_for)  # just in case we hit a continue
+
+        self.insert('LBL', label_for)
+        self.program.insert(f'ISG {register}', comment=f'{varname}')
+        self.for_loop_info.pop()
+        self.insert('GTO', label_for_body)
+        self.insert('GTO', label_resume)
+
+        self.insert('LBL', label_for_body)
+        self.body_or_else(node)
+
+        self.insert('GTO', label_for)
+        insert('LBL', label_resume)
         self.end(node)
 
     def visit_Call(self,node):
@@ -785,396 +1173,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.program.insert(f'XEQ {label}', comment=comment)
             self.log_state('scope after XEQ')
         self.pending_stack_args = []  # TODO though if the call is part of an long expression, we could be prematurely clearing
-        self.end(node)
-
-    def visit_If(self, node):
-        """
-        If's sub-nodes are:
-            - test
-            - body
-            - orelse
-        where orelse[0] might be another if node (elif situation) otherwise might be a body (else situation)
-        or the orelse list might be empty (no else situation).
-        """
-        self.begin(node)
-        log.debug(f'{self.indent} if')
-
-        f = LabelFactory(local_label_allocator=self.local_labels, descriptive=self.debug_gen_descriptive_labels)
-        insert = self.insert
-
-        label_if_body = f.new('if body')
-        label_resume = f.new('resume')
-        label_else = f.new('else') if len(node.orelse) > 0 else None
-        label_elif = f.new('elif') if len(node.orelse) == 1 and isinstance(node.orelse[0], ast.If) else None
-
-        # Begin here
-
-        self.visit(node.test)
-        log.debug(f'{self.indent} :')
-        self.pending_stack_args = []
-
-        """
-        At this point, the last line in our rpn program is a boolean value.
-        We now add the test for truth and a couple of gotos...
-        """
-        self.program.insert('X≠0?', comment='if true?')
-
-        insert('GTO', label_if_body)                # true
-
-        if label_elif: insert('GTO', label_elif)    # false/else/elif
-        elif label_else: insert('GTO', label_else)
-        else: insert('GTO', label_resume)
-
-        insert('LBL', label_if_body)
-        self.body(node.body)
-
-        if label_else:
-            insert('GTO', label_resume)
-
-        more_elifs_coming = lambda node : len(node.orelse) == 1 and isinstance(node.orelse[0], ast.If)
-        while True:
-            else_ = node.orelse
-            if len(else_) == 1 and isinstance(else_[0], ast.If):
-                node = else_[0]
-                log.debug(f'{self.indent} elif')
-                insert('LBL', label_elif)
-                self.visit(node.test)
-                log.debug(f'{self.indent} :')
-                self.program.insert('X≠0?', comment='if true?')
-
-                label_elif_body = f.new('elif body')
-
-                insert('GTO', label_elif_body)
-
-                if more_elifs_coming(node):
-                    label_elif = f.new('elif')
-                    insert('GTO', label_elif)
-                else:
-                    insert('GTO', label_else)
-
-                insert('LBL', label_elif_body)
-                self.body(node.body)
-                insert('GTO', label_resume)
-            else:
-                if len(else_) > 0:
-                    log.debug(f'{self.indent} else')
-                    insert('LBL', label_else)
-                    self.body(else_)
-                break
-
-        insert('LBL', label_resume)
-        self.pending_stack_args = []
-        self.end(node)
-
-    def visit_While(self,node):
-        """
-        visit a While node.  Children nodes are:
-            - test
-            - body
-            - orelse
-        """
-        self.begin(node)
-
-        f = LabelFactory(local_label_allocator=self.local_labels, descriptive=self.debug_gen_descriptive_labels)
-        insert = self.insert
-
-        label_while = f.new('while')
-        insert('LBL', label_while)
-        log.debug(f'{self.indent} while')
-        self.visit(node.test)
-        log.debug(f'{self.indent} :')
-        self.pending_stack_args = []
-
-        label_while_body = f.new('while body')
-        label_resume = f.new('resume')
-        label_else = f.new('else') if len(node.orelse) > 0 else None
-
-        self.resume_labels.append(label_resume)  # just in case we hit a break
-        self.continue_labels.append(label_while)  # just in case we hit a continue
-
-        """
-        At this point, the last line in our rpn program is a boolean value.
-        We now add the test for truth and a couple of gotos...
-        """
-        self.program.insert('X≠0?', comment='while true?')
-
-        insert('GTO', label_while_body)
-        if label_else: insert('GTO', label_else)
-        else: insert('GTO', label_resume)
-
-        insert('LBL', label_while_body)
-        self.body(node.body)
-        insert('GTO', label_while)
-
-        if label_else:
-            insert('LBL', label_else)
-            self.body(node.orelse)
-
-        insert('LBL', label_resume)
-        self.pending_stack_args = []
-        self.end(node)
-
-    def visit_List(self,node):
-        """
-        Children nodes are:
-            - elts (list of elements)
-        """
-        self.begin(node)
-        self.program.insert('0', comment='not a matrix (empty)')
-        self.prepare_matrix(node, 'SF 01')
-        for child in node.elts:
-            self.visit(child)
-            if self.program.is_previous_line('string'):
-                self.program.insert('ASTO ST X')
-            self.program.insert_xeq('LIST+')
-        self.end(node)
-
-    def visit_Dict(self,node):
-        """
-        Child nodes are:
-            - keys
-            - values
-        """
-        self.begin(node)
-        self.program.insert('0', comment='not a matrix (empty)')
-        self.prepare_matrix(node, 'CF 01')
-        for index, key in enumerate(node.keys):
-            self.visit(node.values[index])  # corresponding value
-            if self.program.is_previous_line('string'):
-                self.program.insert('ASTO ST X')
-
-            self.visit(key)  # key
-            if self.program.is_previous_line('string'):
-                self.program.insert('ASTO ST X')
-            self.program.insert_xeq('LIST+')  # push value then key (y:value x:key)
-        self.end(node)
-
-    def visit_Subscript(self,node):
-        """
-        Only gets called if are reading from a list or dict on rhs e.g. x = a[n]
-        Children nodes are:
-            - value (the Name of the list we are accessing)
-            - slice - with subchild Index.value which is a Num of the list index
-            - ctx - Load or Store
-        """
-        self.begin(node)
-        self.subscript_is_on_rhs_thus_read(node)
-        self.end(node)
-
-    @recursive
-    def visit_Break(self,node):
-        """ visit a Break node """
-        if self.resume_labels:
-            label = self.resume_labels.pop()
-            self.insert('GTO', label)
-        # self.pending_stack_args = []
-
-    @recursive
-    def visit_Continue(self,node):
-        """ visit a Continue node """
-        if self.continue_labels:
-            label = self.continue_labels.pop()
-            self.insert('GTO', label)
-        # self.pending_stack_args = []
-
-    @recursive
-    def visit_Lambda(self,node):
-        """ visit a Function node """
-        pass
-
-    @recursive
-    def visit_Module(self,node):
-        """ visit a Module node and the visits recursively"""
-        pass
-
-    def generic_visit(self,node):
-        log.debug(f'skipping {node}')
-        if getattr(node, 'name', ''):
-            log.debug(f'name {node.name}')
-
-    def visit_Name(self, node):
-        self.begin(node)
-        self.check_supported(node.id, node)
-        if '.Load' in str(node.ctx):
-            assert isinstance(node.ctx, ast.Load)
-            if self.inside_alpha and not self.alpha_append_mode and not self.alpha_already_cleared:
-                self.program.insert('CLA')
-                self.alpha_already_cleared = True
-
-            cmd = 'ARCL' if self.inside_alpha and \
-                            not self.inside_calculation and \
-                            not self.var_name_is_loop_counter(node.id) and \
-                            not self.inside_matrix_access else 'RCL'
-
-            self.program.insert(f'{cmd} {self.scopes.var_to_reg(node.id)}', comment=node.id)
-            self.pending_stack_args.append(node.id)
-            if self.scopes.is_list(node.id):
-                self.prepare_matrix(node, 'SF 01')
-            if self.scopes.is_dictionary(node.id):
-                self.prepare_matrix(node, 'CF 01')
-            if self.var_name_is_loop_counter(node.id):
-                self.program.insert('IP')  # just get the integer portion of isg counter
-            if self.pending_unary_op:
-                self.program.insert('CHS')
-                self.pending_unary_op = ''
-        self.end(node)
-
-    def visit_Num(self, node):
-        self.begin(node)
-        if self.inside_alpha and not self.alpha_append_mode and not self.alpha_already_cleared:
-            self.program.insert('CLA')
-            self.alpha_already_cleared = True
-        self.program.insert(f'{self.pending_unary_op}{node.n}')
-        self.pending_stack_args.append(node.n)
-        self.pending_unary_op = ''
-        self.end(node)
-
-    def visit_Str(self, node):
-        self.begin(node)
-        if self.disallow_string_args:
-            raise RpnError(f'Error: function disallows parameters of type string, line: {node.lineno}\n{node.first_token.line.strip()}')
-        if self.inside_alpha:
-            # self.program.insert(f'├"{node.s[0:15]}"')
-            self.split_alpha_text(node.s, append=self.alpha_append_mode)
-        else:
-            self.program.insert(f'"{node.s[0:15]}"', type_='string')
-        self.end(node)
-
-    @recursive
-    def visit_Expr(self, node):
-        self.pending_stack_args = []
-
-    # Most of these operators map to rpn in the opposite way, because of the stack order etc.
-    # There are 12 RPN operators, p332
-    cmpops = {
-        "Eq":     "pEQ",
-        "NotEq":  "pNEQ",
-        "Lt":     "pLT",
-        "LtE":    "pLTE",
-        "Gt":     "pGT",
-        "GtE":    "pGTE",
-        # TODO
-        "Is":     "PyIs",
-        "IsNot":  "PyIsNot",
-        "In":     "PyIn",
-        "NotIn":  "PyNotIn",
-        }
-    def visit_Compare(self, node):
-        """
-        A comparison of two or more values. left is the first value in the comparison, ops the list of operators,
-        and comparators the list of values after the first. If that sounds awkward, that’s because it is:
-            - left
-            - ops
-            - comparators
-        """
-        self.begin(node)
-        self.inside_calculation = True
-
-        self.visit(node.left)
-        for o, e in zip(node.ops, node.comparators):
-            self.visit(e)
-            subf = self.cmpops[o.__class__.__name__]
-            self.program.insert_xeq(subf, comment='compare, return bool')
-
-        self.inside_calculation = False
-        self.end(node)
-
-    def visit_UnaryOp(self, node):
-        """
-        op=USub(),
-        operand=Num(n=1))],
-        """
-        if isinstance(node.op, ast.Not):
-            self.visit(node.operand)
-            self.visit(node.op)
-        else:
-            # for parsing e.g. -1
-            self.visit(node.op)
-            self.visit(node.operand)
-
-    def visit_Or(self, node):
-        self.program.insert_xeq('p2Bool')
-        self.program.insert('OR')
-
-    def visit_And(self, node):
-        self.program.insert_xeq('p2Bool')
-        self.program.insert('AND')
-
-    def visit_Not(self, node):
-        self.program.insert_xeq('pBool')
-        self.program.insert_xeq('pNot')
-
-    def visit_NameConstant(self, node):
-        # True or False constants - node.value is either True or False (booleans). Are there any other NameConstants?
-        if node.value:
-            self.program.insert('1', comment='True')
-        else:
-            self.program.insert('0', comment='False')
-
-    def visit_BoolOp(self, node):
-        """
-        BoolOp(
-          op=Or(),
-          values=[
-            Num(n=1),
-            Num(n=0),
-            Num(n=1)]))])
-
-        Push each pair and apply OP on-goingly, so as not to blow the stack.
-        Probably don't need to track pending_stack_args here cos of this smart strategy.
-        """
-        self.begin(node)
-        two_count = 0
-        for child in node.values:
-            self.visit(child)
-            two_count += 1
-            if two_count >= 2:
-                self.visit(node.op)
-        self.end(node)
-
-    @recursive
-    def visit_Pass(self, node):
-        pass
-
-    @recursive
-    def visit_USub(self, node):
-        self.pending_unary_op = '-'
-
-    def visit_For(self, node):
-        self.begin(node)
-
-        f = LabelFactory(local_label_allocator=self.local_labels, descriptive=self.debug_gen_descriptive_labels)
-        insert = self.insert
-
-        label_for = f.new('for')
-        label_for_body = f.new('for body')
-        label_resume = f.new('resume')
-
-        log.debug(f'{self.indent} for')
-        self.visit(node.target)
-        varname = node.target.id
-        register = self.scopes.var_to_reg(varname, is_range_index=True)
-        self.for_loop_info.append(ForLoopItem(varname, register, label_for))
-
-        log.debug(f'{self.indent} in')
-        self.visit(node.iter)
-
-        log.debug(f'{self.indent} :')
-
-        self.resume_labels.append(label_resume)  # just in case we hit a break
-        self.continue_labels.append(label_for)  # just in case we hit a continue
-
-        self.insert('LBL', label_for)
-        self.program.insert(f'ISG {register}', comment=f'{varname}')
-        self.for_loop_info.pop()
-        self.insert('GTO', label_for_body)
-        self.insert('GTO', label_resume)
-
-        self.insert('LBL', label_for_body)
-        self.body_or_else(node)
-
-        self.insert('GTO', label_for)
-        insert('LBL', label_resume)
         self.end(node)
 
 
