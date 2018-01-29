@@ -294,12 +294,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         for target in node.targets:
             lhs_is_matrix = isinstance(target, ast.Subscript)
-
-            if rhs_is_matrix:
-                self.assert_matrix_var_lhs(target)
-            elif lhs_is_matrix:
-                self.assert_uppcase_lhs(target)
-
+            self.assert_var_ok_for_matrix(lhs_is_matrix, rhs_is_matrix, target)
             if lhs_is_matrix:
                 self.subscript_is_on_lhs_thus_assign(target)
             else:
@@ -309,14 +304,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def assign_push_rhs(self, node):
         self.visit(node.value)  # a single Num or Str or Name or List (of elements)
-        if isinstance(node.targets[0], ast.Subscript) and self.program.is_previous_line(
-                'string'):  # hack (looking ahead at first target to see if we are assigning to a list element)
+        if isinstance(node.targets[0], ast.Subscript) and self.program.is_previous_line('string'):  # hack (looking ahead at first target to see if we are assigning to a list element)
             self.program.insert('ASTO ST X')
-
-    def assert_matrix_var_lhs(self, target):
-        assert '.Store' in str(target.ctx)
-        assert isinstance(target.ctx, ast.Store)
-        self.assert_uppercase(target)
 
     def assign_normal_lhs(self, node, target):
         # Create the variable and mark its type
@@ -385,11 +374,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.program.insert(flag_list_or_dict, comment=f'1D or 2D {matrix} operation mode')  # the word 'matrix' will trigger matrix related detection
 
     def process_list_access(self, subscript_node):
-        # self.prepare_matrix(subscript_node, 'SF 01')# but also happens in visit_Name - don't need - doubling up !!!
-        # comment = '' if self.program.last_line.text == '0' else 'matrix'  # prevent 0 triggering matrix related detection
-        # self.program.insert_xeq('pMxPrep', comment='(matrix or 0) -> () - Prepares ZLIST')
-        # self.program.insert('SF 01', comment='1D {comment} operation mode')
-
         # Get Index position onto stack X
         assert isinstance(subscript_node.slice, ast.Index)
         self.visit(subscript_node.slice.value)
@@ -398,11 +382,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.program.insert_xeq('p1mIJ')  # (index) -> () -  X is dropped.
 
     def process_dict_access(self, subscript_node):
-        ########self.prepare_matrix(subscript_node, 'CF 01')  # but also happens in visit_Name - don't need - doubling up !!!
-        # comment = '' if self.program.last_line.text == '0' else 'matrix'  # prevent 0 triggering matrix related detection
-        # self.program.insert_xeq('pMxPrep', comment='(matrix or 0) -> () - Prepares ZLIST')
-        # self.program.insert('CF 01', comment=f'2D {comment} operation mode')
-
         # Get Key onto stack X
         assert isinstance(subscript_node.slice, ast.Index)
         self.visit(subscript_node.slice.value)
@@ -413,7 +392,19 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         # Sets IJ accordingly so that a subsequent RCLEL will give the value or STOEL will store something.
         self.program.insert_xeq('p2mIJfi')  # (key) -> () -  Finds the key, X is dropped.
 
-    # THESE ASSERT METHODS SHOULD BE REMOVED
+    def assert_var_ok_for_matrix(self, lhs_is_matrix, rhs_is_matrix, target):
+        if rhs_is_matrix:
+            self.assert_matrix_var_lhs(target)
+        elif lhs_is_matrix:
+            self.assert_uppcase_lhs(target)
+
+    def assert_matrix_var_lhs(self, target):
+        assert '.Store' in str(target.ctx)
+        assert isinstance(target.ctx, ast.Store)
+        self.assert_uppercase(target)
+
+    # THESE ASSERT METHODS SHOULD BE REMOVED - allow lower case variables to be assigned to,
+    # and simply automatically map them to lowercase named registers BINGO!!!! YES!!!
     def assert_uppcase_lhs(self, target):
         var_name = target.value.id  # drill into subscript nodes to get list or dict name
         if var_name.islower():
@@ -421,10 +412,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def assert_uppercase(self, target):
         # This is because lists are implemented as RPN matrices which need to be stored in a named register.
         # And can only specify named registers in my Python RPN converter by specifying uppercase variable name.
-        # Arguably could allow lower case variables to be assigned to, and simply automatically map them to lowercase named registers BINGO!!!! YES!!!
-        # This code happens when a = [] or a = {} because there is no subscript on l.h.s
-
-        # if self.program.is_previous_line_matrix_related() and target.id.islower():
         if target.id.islower():
             log.debug(f'previous line is {self.program.last_line}')
             raise RpnError(
@@ -529,17 +516,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 Manually looped through and visited.  Each visit emits a register rcl or literal onto the stack.
         """
         self.begin(node)
-        # log.debug(list(cmd_list.keys()))
-        # log.debug(node.func.id in cmd_list)
 
         if isinstance(node.func, ast.Attribute) and node.func.attr == 'append':
             var_name = self.get_node_name_id_or_n(node.func.value)  # the name 'a' of the a.append()
             if var_name.islower():
                 raise RpnError(f'Lists must be stored in uppercase variables not "{var_name}".  Please change the variable name to uppercase e.g. "{var_name.upper()}".')
             self.visit(node.func.value)
-            # self.prepare_matrix(node, 'SF 01')  DONE IN visit_NAME
-            # self.program.insert_xeq('pMxPrep', comment=f'{node.first_token.line.strip()}')
-            # self.program.insert('SF 01', comment='1D matrix operation mode')
             for arg in node.args:
                 self.visit(arg)
                 self.program.insert_xeq('LIST+')
@@ -940,8 +922,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.begin(node)
         self.program.insert('0', comment='not a matrix (empty)')
         self.prepare_matrix(node, 'SF 01')
-        # self.program.insert_xeq('pMxPrep')
-        # self.program.insert('SF 01', comment='1D matrix operation mode')
         for child in node.elts:
             self.visit(child)
             if self.program.is_previous_line('string'):
@@ -958,8 +938,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.begin(node)
         self.program.insert('0', comment='not a matrix (empty)')
         self.prepare_matrix(node, 'CF 01')
-        # self.program.insert_xeq('pMxPrep')
-        # self.program.insert('CF 01', comment='2D matrix operation mode')
         for index, key in enumerate(node.keys):
             self.visit(node.values[index])  # corresponding value
             if self.program.is_previous_line('string'):
