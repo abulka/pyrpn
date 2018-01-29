@@ -718,7 +718,6 @@ class RpnTests2(BaseTest):
 
     # List and Dict len
 
-    @unittest.skip('need to record lists in scope variables too!')
     def test_list_len(self):
         self.parse(dedent("""
             A = [1, 2]
@@ -795,16 +794,3 @@ class RpnTests2(BaseTest):
         program.emit_needed_rpn_templates(as_local_labels=False)
         rpn = program.lines_to_str(comments=False, linenos=False)
         return rpn
-
-    # def test_rpn_template_gen(self):
-    #     LIBFILE = 'pylib.txt'
-    #
-    #     """Generate when stable - as a reference to compare against"""
-    #     # with open(LIBFILE, 'w') as f:
-    #     #     f.write(self.get_all_lib())
-    #
-    #     with open(LIBFILE) as f:
-    #         rpn = f.read()
-    #     self.assertEqual(self.get_all_lib(), rpn)
-    #
-
