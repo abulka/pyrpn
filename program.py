@@ -82,31 +82,22 @@ class Program(BaseRpnProgram):
     def is_previous_line(self, type_='string'):
         return self.last_line.type_ == type_
 
-    def need_matrix_rcl_empty(self):
-        return
-
-    def need_matrix_rcl_zlist(self):
-        # A bit hacky - list/dict/matrix related
-
-        # special cases, its a matrix command that returns a normal number, or a RCLEL which returns normal number/string
-        if 'pMlen' in self.last_line.text or \
-           'RCLEL' in self.last_line.text:
-            return False
-
-        return \
-            'need_rcl_zlist' in self.last_line.type_ or \
-            'pM' in self.last_line.text or \
-            'mIJ' in self.last_line.text or \
-            'LIST' in self.last_line.text or \
-            'list' in self.last_line.comment or \
-            'STOEL' in self.last_line.text
-        # 'matrix' in self.last_line.comment or \
-
     def insert_sto(self, register, comment='', type_=''):
-        if 'need_rcl_empty' in self.last_line.type_:
-            self.insert('0')  # signifies an empty list in a register
-        elif self.need_matrix_rcl_zlist():
+        def need_rcl_zlist():
+            # Special cases, its a matrix command that returns a normal number, or a RCLEL which returns normal number/string
+            if 'pMlen' in self.last_line.text or \
+               'RCLEL' in self.last_line.text:
+                return False
+            # A bit of a guess - list/dict/matrix related
+            return \
+                'LIST' in self.last_line.text or \
+                'STOEL' in self.last_line.text
+
+        if 'empty' in self.last_line.type_:
+            self.insert('0')  # signifies an empty list, since empty matrixes are not possible
+        elif need_rcl_zlist():
             self.insert('RCL "ZLIST"')
+
         cmd = 'ASTO' if self.is_previous_line('string') else 'STO'
         self.insert(f'{cmd} {register}', comment=comment, type_=type_)
 

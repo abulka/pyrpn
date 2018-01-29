@@ -490,12 +490,11 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def prepare_matrix(self, node, flag_list_or_dict, empty=False):
         assert flag_list_or_dict in ('SF 01', 'CF 01')  # represent the flag to set for LIST rpn operations
-        type_ = 'need_rcl_empty' if empty else 'need_rcl_zlist'
         line = node.first_token.line.strip()
         self.program.insert(flag_list_or_dict, comment=f'1D or 2D matrix operation mode')
         self.program.insert_xeq('pMxPrep',
                                 comment=f'Prepares ZLIST (matrix or 0) -> () {line}',
-                                type_=type_)
+                                type_='empty' if empty else '')
 
     def process_list_access(self, subscript_node):
         # Get Index position onto stack X
