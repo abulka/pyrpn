@@ -411,7 +411,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         """
         self.begin(node)
         self.assign_push_rhs(node)
-        rhs_is_matrix = self.program.is_previous_line_matrix_related()
+        rhs_is_matrix = 'pMxPrep' in self.program.last_line.text
 
         for target in node.targets:
             lhs_is_matrix = isinstance(target, ast.Subscript)
@@ -492,11 +492,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         assert flag_list_or_dict in ('SF 01', 'CF 01')  # represent the flag to set for LIST rpn operations
         type_ = 'need_rcl_empty' if empty else 'need_rcl_zlist'
         line = node.first_token.line.strip()
-        #
-        # # prevent 0 triggering matrix related detection
-        # if empty:
-        # else:
-        #     type_ = '' if self.program.last_line.text == '0' else 'need_rcl_zlist'
         self.program.insert(flag_list_or_dict, comment=f'1D or 2D matrix operation mode')
         self.program.insert_xeq('pMxPrep',
                                 comment=f'Prepares ZLIST (matrix or 0) -> () {line}',

@@ -102,13 +102,6 @@ class Program(BaseRpnProgram):
             'STOEL' in self.last_line.text
         # 'matrix' in self.last_line.comment or \
 
-    def is_previous_line_matrix_related(self):
-        return 'pMxPrep' in self.last_line.text
-        # # hack - need to intelligently figure out type of prev line incl when + operation was acting on lists/matrixes
-        # return '1D or 2D' in self.last_line.comment  # wish the flag operation was before the Mxprep actually
-        #                     # then could check the call to MxPrep - maybe in its line.type_ rather than the hack
-        #                     # of checking the comment of the CF or SF - YUK!
-
     def insert_sto(self, register, comment='', type_=''):
         if 'need_rcl_empty' in self.last_line.type_:
             self.insert('0')  # signifies an empty list in a register
