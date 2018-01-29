@@ -290,9 +290,17 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         """
         self.begin(node)
         self.assign_push_rhs(node)
+        rhs_is_matrix = self.program.is_previous_line_matrix_related()
+
         for target in node.targets:
-            self.assign_assert_target_ok(target)
-            if isinstance(target, ast.Subscript):
+            lhs_is_matrix = isinstance(target, ast.Subscript)
+
+            if rhs_is_matrix:
+                self.assert_matrix_var_lhs(target)
+            elif lhs_is_matrix:
+                self.assert_uppcase_lhs(target)
+
+            if lhs_is_matrix:
                 self.subscript_is_on_lhs_thus_assign(target)
             else:
                 self.assign_normal_lhs(node, target)
@@ -305,10 +313,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 'string'):  # hack (looking ahead at first target to see if we are assigning to a list element)
             self.program.insert('ASTO ST X')
 
-    def assign_assert_target_ok(self, target):
+    def assert_matrix_var_lhs(self, target):
         assert '.Store' in str(target.ctx)
         assert isinstance(target.ctx, ast.Store)
-        self.assert_assign_ensure_uppercase_for_matrices(target)
+        self.assert_uppercase(target)
 
     def assign_normal_lhs(self, node, target):
         # Create the variable and mark its type
@@ -322,7 +330,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def subscript_is_on_lhs_thus_assign(self, target):
         # Assign to the list/dictionary
         assert isinstance(target.ctx, ast.Store)
-        self.assert_assign_ensure_uppercase_for_matrices2(target)
         log.debug(f'{self.indent_during}lhs subscript "{target.value.id}" detected')
         self.process_matrix_access(target)
 
@@ -368,9 +375,17 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         self.inside_matrix_access = False
 
+    def prepare_matrix(self, node, flag_list_or_dict):
+        assert flag_list_or_dict in ('SF 01', 'CF 01')  # represent the flag to set for LIST rpn operations
+        matrix = '' if self.program.last_line.text == '0' else 'matrix'  # prevent 0 triggering matrix related detection
+        self.program.insert_xeq('pMxPrep', comment=f'(matrix or 0) -> () - Prepares ZLIST, {node.first_token.line.strip()}')
+        self.program.insert(flag_list_or_dict, comment=f'1D or 2D {matrix} operation mode')  # the word 'matrix' will trigger matrix related detection
+
     def process_list_access(self, subscript_node):
-        self.program.insert_xeq('pMxPrep', comment='(matrix or 0) -> () - Prepares ZLIST')
-        self.program.insert('SF 01', comment='1D matrix operation mode')
+        self.prepare_matrix(subscript_node, 'SF 01')
+        # comment = '' if self.program.last_line.text == '0' else 'matrix'  # prevent 0 triggering matrix related detection
+        # self.program.insert_xeq('pMxPrep', comment='(matrix or 0) -> () - Prepares ZLIST')
+        # self.program.insert('SF 01', comment='1D {comment} operation mode')
 
         # Get Index position onto stack X
         assert isinstance(subscript_node.slice, ast.Index)
@@ -380,8 +395,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.program.insert_xeq('p1mIJ')  # (index) -> () -  X is dropped.
 
     def process_dict_access(self, subscript_node):
-        self.program.insert_xeq('pMxPrep', comment='(matrix or 0) -> () - Prepares ZLIST')
-        self.program.insert('CF 01', comment='2D matrix operation mode')
+        ########self.prepare_matrix(subscript_node, 'CF 01')  # but also happens in visit_Name - don't need - doubling up !!!
+        # comment = '' if self.program.last_line.text == '0' else 'matrix'  # prevent 0 triggering matrix related detection
+        # self.program.insert_xeq('pMxPrep', comment='(matrix or 0) -> () - Prepares ZLIST')
+        # self.program.insert('CF 01', comment=f'2D {comment} operation mode')
 
         # Get Key onto stack X
         assert isinstance(subscript_node.slice, ast.Index)
@@ -394,16 +411,18 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.program.insert_xeq('p2mIJfi')  # (key) -> () -  Finds the key, X is dropped.
 
     # THESE ASSERT METHODS SHOULD BE REMOVED
-    def assert_assign_ensure_uppercase_for_matrices2(self, target):
+    def assert_uppcase_lhs(self, target):
         var_name = target.value.id  # drill into subscript nodes to get list or dict name
         if var_name.islower():
             raise RpnError(f'Can only assign dictionaries to uppercase variables not "{var_name}".  Please change the variable name to uppercase e.g. "{var_name.upper()}".')
-    def assert_assign_ensure_uppercase_for_matrices(self, target):
+    def assert_uppercase(self, target):
         # This is because lists are implemented as RPN matrices which need to be stored in a named register.
         # And can only specify named registers in my Python RPN converter by specifying uppercase variable name.
         # Arguably could allow lower case variables to be assigned to, and simply automatically map them to lowercase named registers BINGO!!!! YES!!!
         # This code happens when a = [] or a = {} because there is no subscript on l.h.s
-        if self.program.is_previous_line_matrix_related() and target.id.islower():
+
+        # if self.program.is_previous_line_matrix_related() and target.id.islower():
+        if target.id.islower():
             log.debug(f'previous line is {self.program.last_line}')
             raise RpnError(
                 f'Can only assign lists to uppercase variables not "{target.id}".  Please change the variable name to uppercase e.g. "{target.id.upper()}".')
@@ -515,8 +534,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             if var_name.islower():
                 raise RpnError(f'Lists must be stored in uppercase variables not "{var_name}".  Please change the variable name to uppercase e.g. "{var_name.upper()}".')
             self.visit(node.func.value)
-            self.program.insert_xeq('pMxPrep', comment=f'{node.first_token.line.strip()}')
-            self.program.insert('SF 01', comment='1D matrix operation mode')
+            self.prepare_matrix(node, 'SF 01')
+            # self.program.insert_xeq('pMxPrep', comment=f'{node.first_token.line.strip()}')
+            # self.program.insert('SF 01', comment='1D matrix operation mode')
             for arg in node.args:
                 self.visit(arg)
                 self.program.insert_xeq('LIST+')
@@ -916,8 +936,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         """
         self.begin(node)
         self.program.insert('0', comment='not a matrix (empty)')
-        self.program.insert_xeq('pMxPrep')
-        self.program.insert('SF 01', comment='1D matrix operation mode')
+        self.prepare_matrix(node, 'SF 01')
+        # self.program.insert_xeq('pMxPrep')
+        # self.program.insert('SF 01', comment='1D matrix operation mode')
         for child in node.elts:
             self.visit(child)
             if self.program.is_previous_line('string'):
@@ -933,8 +954,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         """
         self.begin(node)
         self.program.insert('0', comment='not a matrix (empty)')
-        self.program.insert_xeq('pMxPrep')
-        self.program.insert('CF 01', comment='2D matrix operation mode')
+        self.prepare_matrix(node, 'CF 01')
+        # self.program.insert_xeq('pMxPrep')
+        # self.program.insert('CF 01', comment='2D matrix operation mode')
         for index, key in enumerate(node.keys):
             self.visit(node.values[index])  # corresponding value
             if self.program.is_previous_line('string'):
@@ -1005,6 +1027,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
             self.program.insert(f'{cmd} {self.scopes.var_to_reg(node.id)}', comment=node.id)
             self.pending_stack_args.append(node.id)
+            # if self.scopes.is_list(node.id):  # TODO or list
+            #     self.prepare_matrix(node, 'SF 01')
+            if self.scopes.is_dictionary(node.id):
+                self.prepare_matrix(node, 'CF 01')
             if self.var_name_is_loop_counter(node.id):
                 self.program.insert('IP')  # just get the integer portion of isg counter
             if self.pending_unary_op:

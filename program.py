@@ -82,20 +82,29 @@ class Program(BaseRpnProgram):
     def is_previous_line(self, type_='string'):
         return self.last_line.type_ == type_
 
-    def is_previous_line_matrix_related(self):
+    def need_matrix_rcl_zlist(self):
+        # A bit hacky - list/dict/matrix related
+
+        # special cases, its a matrix command that returns a normal number, or a RCLEL which returns normal number/string
+        if 'pMlen' in self.last_line.text or \
+           'RCLEL' in self.last_line.text:
+            return False
+
         return 'pM' in self.last_line.text or \
                'mIJ' in self.last_line.text or \
-               'matrix' in self.last_line.comment
-                # or 'ZLIST' in self.last_line.text  # hack - list/dict/matrix related
-
-    def is_previous_line_matrix_list_related(self):
-        # hack - need to intelligently figure out type of prev line incl when + operation was acting on lists/matrixes
-        return 'LIST' in self.last_line.text or \
+               'LIST' in self.last_line.text or \
                'list' in self.last_line.comment or \
+               'matrix' in self.last_line.comment or \
                'STOEL' in self.last_line.text
 
+    def is_previous_line_matrix_related(self):
+        # hack - need to intelligently figure out type of prev line incl when + operation was acting on lists/matrixes
+        return '1D or 2D' in self.last_line.comment  # wish the flag operation was before the Mxprep actually
+                            # then could check the call to MxPrep - maybe in its line.type_ rather than the hack
+                            # of checking the comment of the CF or SF - YUK!
+
     def insert_sto(self, register, comment=''):
-        if self.is_previous_line_matrix_list_related():
+        if self.need_matrix_rcl_zlist():
             self.insert('RCL "ZLIST"')
         cmd = 'ASTO' if self.is_previous_line('string') else 'STO'
         self.insert(f'{cmd} {register}', comment=comment)

@@ -718,6 +718,7 @@ class RpnTests2(BaseTest):
 
     # List and Dict len
 
+    @unittest.skip('need to record lists in scope variables too!')
     def test_list_len(self):
         self.parse(dedent("""
             A = [1, 2]
@@ -738,6 +739,7 @@ class RpnTests2(BaseTest):
             XEQ "pMxPrep"
             SF 01
             XEQ "pMlen"  // Get matrix row length. () -> length of ZLIST
+            STO 00
             """)
         self.compare(de_comment(expected))
 
@@ -766,8 +768,9 @@ class RpnTests2(BaseTest):
 
             RCL "A"
             XEQ "pMxPrep"
-            SF 02
+            CF 01
             XEQ "pMlen"  // Get matrix row length. () -> length of ZLIST
+            STO 00
             """)
         self.compare(de_comment(expected))
 
