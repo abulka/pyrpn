@@ -465,10 +465,12 @@ class RpnTemplates:
     pMxPrep = dedent(f"""
         LBL "pMxPrep"   // Prepare Matrix. (matrix) -> ()
         
-        // Stores matrix in ZLIST var and indexes it, or clears ZLIST var
+        // Stores matrix in ZLIST var and indexes it, or clears ZLIST var if 0 is passed in.
+        // Yes, its awkward, but a matrix that is an integer 0 means an empty matrix, and ZLIST is cleared from memory.
          
-        // You must later set flag 01 yourself to indicate 1D (list) vs 2D (dict) operation mode.
-        // The setting of this flag should match the type of matrix you are passing in.
+        // You must set flag 01 yourself to indicate 1D (list) vs 2D (dict) operation mode.
+        // Do this setting either before or after the call to this subroutine - doesn't matter.
+        // Of course, the setting/clearing of flag 01 should match the type of matrix you are passing in.
         //  
 
         MAT?            // if is a matrix
