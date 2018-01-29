@@ -82,6 +82,9 @@ class Program(BaseRpnProgram):
     def is_previous_line(self, type_='string'):
         return self.last_line.type_ == type_
 
+    def need_matrix_rcl_empty(self):
+        return
+
     def need_matrix_rcl_zlist(self):
         # A bit hacky - list/dict/matrix related
 
@@ -90,29 +93,34 @@ class Program(BaseRpnProgram):
            'RCLEL' in self.last_line.text:
             return False
 
-        return 'pM' in self.last_line.text or \
-               'mIJ' in self.last_line.text or \
-               'LIST' in self.last_line.text or \
-               'list' in self.last_line.comment or \
-               'matrix' in self.last_line.comment or \
-               'STOEL' in self.last_line.text
+        return \
+            'need_rcl_zlist' in self.last_line.type_ or \
+            'pM' in self.last_line.text or \
+            'mIJ' in self.last_line.text or \
+            'LIST' in self.last_line.text or \
+            'list' in self.last_line.comment or \
+            'STOEL' in self.last_line.text
+        # 'matrix' in self.last_line.comment or \
 
     def is_previous_line_matrix_related(self):
-        # hack - need to intelligently figure out type of prev line incl when + operation was acting on lists/matrixes
-        return '1D or 2D' in self.last_line.comment  # wish the flag operation was before the Mxprep actually
-                            # then could check the call to MxPrep - maybe in its line.type_ rather than the hack
-                            # of checking the comment of the CF or SF - YUK!
+        return 'pMxPrep' in self.last_line.text
+        # # hack - need to intelligently figure out type of prev line incl when + operation was acting on lists/matrixes
+        # return '1D or 2D' in self.last_line.comment  # wish the flag operation was before the Mxprep actually
+        #                     # then could check the call to MxPrep - maybe in its line.type_ rather than the hack
+        #                     # of checking the comment of the CF or SF - YUK!
 
-    def insert_sto(self, register, comment=''):
-        if self.need_matrix_rcl_zlist():
+    def insert_sto(self, register, comment='', type_=''):
+        if 'need_rcl_empty' in self.last_line.type_:
+            self.insert('0')  # signifies an empty list in a register
+        elif self.need_matrix_rcl_zlist():
             self.insert('RCL "ZLIST"')
         cmd = 'ASTO' if self.is_previous_line('string') else 'STO'
-        self.insert(f'{cmd} {register}', comment=comment)
+        self.insert(f'{cmd} {register}', comment=comment, type_=type_)
 
-    def insert_xeq(self, func_name, comment=''):
+    def insert_xeq(self, func_name, comment='', type_=''):
         if func_name in self.user_insertable_pyrpn_cmds:
             comment = self.rpn_templates.get_user_insertable_pyrpn_cmds()[func_name]['description']  # YUK
-        self.insert(f'XEQ "{func_name}"', comment=comment)
+        self.insert(f'XEQ "{func_name}"', comment=comment, type_=type_)
 
     def emit_needed_rpn_templates(self, as_local_labels=True):
         self.insert('LBL "PyLIB"', comment='PyRPN Support Library of')

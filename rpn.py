@@ -364,7 +364,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         """
         self.begin(node)
         self.program.insert('0', comment='not a matrix (empty)')
-        self.prepare_matrix(node, 'SF 01')
+        self.prepare_matrix(node, 'SF 01', empty=True)
         for child in node.elts:
             self.visit(child)
             if self.program.is_previous_line('string'):
@@ -380,7 +380,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         """
         self.begin(node)
         self.program.insert('0', comment='not a matrix (empty)')
-        self.prepare_matrix(node, 'CF 01')
+        self.prepare_matrix(node, 'CF 01', empty=True)
         for index, key in enumerate(node.keys):
             self.visit(node.values[index])  # corresponding value
             if self.program.is_previous_line('string'):
@@ -488,11 +488,19 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         self.inside_matrix_access = False
 
-    def prepare_matrix(self, node, flag_list_or_dict):
+    def prepare_matrix(self, node, flag_list_or_dict, empty=False):
         assert flag_list_or_dict in ('SF 01', 'CF 01')  # represent the flag to set for LIST rpn operations
-        matrix = '' if self.program.last_line.text == '0' else 'matrix'  # prevent 0 triggering matrix related detection
-        self.program.insert_xeq('pMxPrep', comment=f'(matrix or 0) -> () - Prepares ZLIST, {node.first_token.line.strip()}')
-        self.program.insert(flag_list_or_dict, comment=f'1D or 2D {matrix} operation mode')  # the word 'matrix' will trigger matrix related detection
+        type_ = 'need_rcl_empty' if empty else 'need_rcl_zlist'
+        line = node.first_token.line.strip()
+        #
+        # # prevent 0 triggering matrix related detection
+        # if empty:
+        # else:
+        #     type_ = '' if self.program.last_line.text == '0' else 'need_rcl_zlist'
+        self.program.insert(flag_list_or_dict, comment=f'1D or 2D matrix operation mode')
+        self.program.insert_xeq('pMxPrep',
+                                comment=f'Prepares ZLIST (matrix or 0) -> () {line}',
+                                type_=type_)
 
     def process_list_access(self, subscript_node):
         # Get Index position onto stack X
