@@ -324,8 +324,11 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         log.info(f'{self.indent_during}variable "{target.id}" created {type_}')
         self.program.insert_sto(
             self.scopes.var_to_reg(target.id,
-                                   is_dict_var=isinstance(node.value, ast.Dict)),
-            comment=f'{target.id} {type_}')
+                                   is_dict_var=isinstance(node.value, ast.Dict),
+                                   is_list_var=isinstance(node.value, ast.List)
+                                   ),
+            comment=f'{target.id} {type_}'
+        )
 
     def subscript_is_on_lhs_thus_assign(self, target):
         # Assign to the list/dictionary
@@ -382,7 +385,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.program.insert(flag_list_or_dict, comment=f'1D or 2D {matrix} operation mode')  # the word 'matrix' will trigger matrix related detection
 
     def process_list_access(self, subscript_node):
-        self.prepare_matrix(subscript_node, 'SF 01')
+        # self.prepare_matrix(subscript_node, 'SF 01')# but also happens in visit_Name - don't need - doubling up !!!
         # comment = '' if self.program.last_line.text == '0' else 'matrix'  # prevent 0 triggering matrix related detection
         # self.program.insert_xeq('pMxPrep', comment='(matrix or 0) -> () - Prepares ZLIST')
         # self.program.insert('SF 01', comment='1D {comment} operation mode')
@@ -534,7 +537,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             if var_name.islower():
                 raise RpnError(f'Lists must be stored in uppercase variables not "{var_name}".  Please change the variable name to uppercase e.g. "{var_name.upper()}".')
             self.visit(node.func.value)
-            self.prepare_matrix(node, 'SF 01')
+            # self.prepare_matrix(node, 'SF 01')  DONE IN visit_NAME
             # self.program.insert_xeq('pMxPrep', comment=f'{node.first_token.line.strip()}')
             # self.program.insert('SF 01', comment='1D matrix operation mode')
             for arg in node.args:
@@ -1027,8 +1030,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
             self.program.insert(f'{cmd} {self.scopes.var_to_reg(node.id)}', comment=node.id)
             self.pending_stack_args.append(node.id)
-            # if self.scopes.is_list(node.id):  # TODO or list
-            #     self.prepare_matrix(node, 'SF 01')
+            if self.scopes.is_list(node.id):
+                self.prepare_matrix(node, 'SF 01')
             if self.scopes.is_dictionary(node.id):
                 self.prepare_matrix(node, 'CF 01')
             if self.var_name_is_loop_counter(node.id):

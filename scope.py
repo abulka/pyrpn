@@ -39,7 +39,7 @@ class Scopes(object):
         if len(self.stack) > 1:  # always leave first permanent scope
             self.stack.pop()
 
-    def var_to_reg(self, var_name, force_reg_name=None, is_range_index=False, is_dict_var=False):
+    def var_to_reg(self, var_name, force_reg_name=None, is_range_index=False, is_dict_var=False, is_list_var=False):
         """
         Figure out the register to use to store/recall 'var_name' e.g. "x" via our scope system
 
@@ -63,6 +63,10 @@ class Scopes(object):
                 # Track dictionary vars
                 if is_dict_var and var_name not in self.current.dict_vars:
                     self.current.dict_vars.append(var_name)
+
+                # Track list vars
+                if is_list_var and var_name not in self.current.list_vars:
+                    self.current.list_vars.append(var_name)
 
         if force_reg_name:
             register = force_reg_name
@@ -96,6 +100,9 @@ class Scopes(object):
     def is_dictionary(self, var_name):
         return var_name in self.current.dict_vars
 
+    def is_list(self, var_name):
+        return var_name in self.current.list_vars
+
     # Util
 
     def dump(self):
@@ -107,6 +114,7 @@ class Scope(object):
     data = attrib(default=Factory(dict))  # var name to register name
     range_vars = attrib(default=Factory(list))  # keep track of var names which are used in for loop ranges
     dict_vars = attrib(default=Factory(list))  # keep track of var names which are dictionaries
+    list_vars = attrib(default=Factory(list))  # keep track of var names which are lists
 
     @property
     def empty(self):
