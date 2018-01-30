@@ -919,6 +919,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.end(node)
             return
 
+        self.inside_calculation = True
 
         func_name = node.func.id
 
@@ -958,6 +959,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             for arg in node.args:
                 self.scopes.var_to_reg(arg.s, force_reg_name=f'"{arg.s}"')
             self.end(node)
+            self.inside_calculation = False
             return
         elif func_name in ('MVAR', 'VARMENU', 'STOP', 'EXITALL'):
             arg = f' "{node.args[0].s}"' if node.args else ''
@@ -967,12 +969,14 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 arg = node.args[0].s
                 self.scopes.var_to_reg(arg, force_reg_name=f'"{arg}"')
             self.end(node)
+            self.inside_calculation = False
             return
 
         elif func_name in ('aview',):
             raise RpnError('The command "aview" is deprecated - use print or AVIEW.')
 
         elif func_name in ('alpha', 'AVIEW', 'print', 'PROMPT', 'PRA'):
+            self.inside_calculation = False  # HACK?
             if len(node.args) == 0:
                 if func_name != 'AVIEW':
                     self.program.insert('CLA', comment='empty string', type_='string')
@@ -995,7 +999,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 for index,arg in enumerate(node.args):
                     self.visit(arg)  # usual insertion of a literal number, string or variable
 
-                    if isinstance(arg, (ast.Num, ast.BinOp, ast.Compare, ast.Subscript)):  # others?
+                    if isinstance(arg, (ast.Num, ast.BinOp, ast.Compare, ast.Subscript, ast.Call)):  # others?
                         self.program.insert('ARCL ST X')
                     elif isinstance(arg, ast.Name):
                         if self.var_name_is_loop_counter(arg.id):
@@ -1005,7 +1009,11 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                     else:
                         # Solution is to add to the ARCL ST X cases, above.  But ensure the visit method has turned on
                         # the 'inside_calculation' flag to prevent numbers being ARCLd rather than RCLd.
-                        raise RpnError(f'Do not know how to alpha {arg} with value {self.get_node_name_id_or_n(arg)}')
+                        value = self.get_node_name_id_or_n(arg)
+                        line = node.first_token.line.strip()
+                        msg = f' with value "{value}"' if value else ''
+                        msg += f' in "{line}"'
+                        raise RpnError(f'Do not know how to alpha {arg}{msg}')
 
                     if not self.alpha_append_mode:
                         self.alpha_append_mode = True
@@ -1028,6 +1036,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             if len(self.pending_stack_args):
                 self.pending_stack_args.pop()
             self.end(node)
+            self.inside_calculation = False
             return
 
         # # DEBUG
@@ -1038,6 +1047,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         elif func_name == 'PyLibAll':
             self.program.rpn_templates.need_all_templates()
+            self.inside_calculation = False
             return
 
         elif self.is_built_in_cmd_with_param_fragments(func_name, node) and not self.cmd_st_x_situation(func_name, node):
@@ -1075,6 +1085,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
             self.program.insert(f'{func_name}{args}', comment=comment)
             self.end(node)
+            self.inside_calculation = False
             return
 
         if self.for_loop_info and func_name == 'range':
@@ -1175,6 +1186,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.program.insert(f'XEQ {label}', comment=comment)
             self.log_state('scope after XEQ')
         self.pending_stack_args = []  # TODO though if the call is part of an long expression, we could be prematurely clearing
+        self.inside_calculation = False
         self.end(node)
 
 

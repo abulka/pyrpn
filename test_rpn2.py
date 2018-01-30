@@ -780,6 +780,31 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+    def test_list_len_print(self):
+        self.parse(dedent("""
+            A = []
+            print(len(A))
+            """))
+        expected = dedent("""
+            0              // not a matrix (empty)
+            SF 01          // 1D mode
+            XEQ "pMxPrep"  // prepare ZLIST
+            0
+            STO "A"
+
+            CLA
+            
+            RCL "A"
+            SF 01
+            XEQ "pMxPrep"
+            XEQ "pMlen"  // Get matrix row length. () -> length of ZLIST
+            
+            ARCL ST X
+            AVIEW
+            """)
+        self.compare(de_comment(expected))
+
+
     # assert
 
     def test_assert(self):

@@ -167,11 +167,13 @@ class RpnTemplates:
             list_plus = settings.LIST_PLUS
             list_minus = settings.LIST_MINUS
             list_clist = settings.LIST_CLIST
+            view_list = ''
         else:
             list_menu = LIST_MENU_CODE
             list_plus =  '"LIST+"'
             list_minus = '"LIST-"'
             list_clist = '"CLIST"'
+            view_list = 'VIEW "ZLIST"'
 
         LIST_BODY = dedent(f"""
             {list_menu}
@@ -198,7 +200,7 @@ class RpnTemplates:
             X<>Y
 
             LBL {finish}  // finished (), view zlist
-            VIEW "ZLIST"
+            {view_list}
             RTN
 
             LBL {init}    // Init list
