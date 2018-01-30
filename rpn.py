@@ -952,6 +952,39 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.inside_calculation = False
             return
 
+        self.calling_process_args(func_name, node)
+
+        if func_name in cmd_list:
+            self.calling_builtin_cmd(func_name, node)
+
+        elif func_name in self.program.rpn_templates.get_user_insertable_pyrpn_cmds().keys():
+            # Call to a rpn template function - not usually allowed, but some are exposed
+            self.program.insert_xeq(func_name)
+        else:
+            self.calling_user_def(func_name)
+            
+        self.pending_stack_args = []  # TODO though if the call is part of an long expression, we could be prematurely clearing
+        self.inside_calculation = False
+        self.end(node)
+
+    def calling_user_def(self, func_name):
+        # Local subroutine call to a local user python def - map these to a local label A..e (15 max)
+        label = self.labels.func_to_lbl(func_name)
+        comment = f'{func_name}()' if not self.labels.is_global_def(
+            func_name) else ''  # only emit comment if local label
+        self.program.insert(f'XEQ {label}', comment=comment)
+        self.log_state('scope after XEQ')
+
+    def calling_builtin_cmd(self, func_name, node):
+        # The built-in command is a simple one without command arg fragment "parameter" parts - yes it may take
+        # actual parameters but these are generated through normal visit parsing and available on the stack.
+        # Though we do handle an exception where the command needs to use ST X as its 'parameter' e.g. VIEW
+        if func_name in settings.CMDS_WHO_NEED_PARAM_SWAPPING:
+            self.program.insert('X<>Y', comment='change order of params to be more algebraic friendly')
+        arg_val = ' ST X' if self.cmd_st_x_situation(func_name, node) else ''  # e.g. VIEW
+        self.program.insert(f'{func_name}{arg_val}', comment=cmd_list[func_name]['description'])
+
+    def calling_process_args(self, func_name, node):
         # Common arg parsing for all functions
         # Note: we don't visit self.visit(node.func) cos we emit the function name ourselves below, RPN style
         if func_name in settings.CMDS_WHO_DISALLOW_STRINGS:
@@ -959,28 +992,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         for item in node.args:
             self.visit(item)
         self.disallow_string_args = False
-
-        if func_name in cmd_list:
-            # The built-in command is a simple one without command arg fragment "parameter" parts - yes it may take
-            # actual parameters but these are generated through normal visit parsing and available on the stack.
-            # Though we do handle an exception where the command needs to use ST X as its 'parameter' e.g. VIEW
-            if func_name in settings.CMDS_WHO_NEED_PARAM_SWAPPING:
-                self.program.insert('X<>Y', comment='change order of params to be more algebraic friendly')
-            arg_val = ' ST X' if self.cmd_st_x_situation(func_name, node) else ''  # e.g. VIEW
-            self.program.insert(f'{func_name}{arg_val}', comment=cmd_list[func_name]['description'])
-
-        elif func_name in self.program.rpn_templates.get_user_insertable_pyrpn_cmds().keys():
-            # Call to a rpn template function - not usually allowed, but some are exposed
-            self.program.insert_xeq(func_name)
-        else:
-            # Local subroutine call to a local user python def - map these to a local label A..e (15 max)
-            label = self.labels.func_to_lbl(func_name)
-            comment = f'{func_name}()' if not self.labels.is_global_def(func_name) else ''  # only emit comment if local label
-            self.program.insert(f'XEQ {label}', comment=comment)
-            self.log_state('scope after XEQ')
-        self.pending_stack_args = []  # TODO though if the call is part of an long expression, we could be prematurely clearing
-        self.inside_calculation = False
-        self.end(node)
 
     def calling_for_range(self, node):
         def all_literals(nodes):
