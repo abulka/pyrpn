@@ -939,140 +939,28 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.calling_alpha_family(func_name, node)
             done = True
 
+        elif self.is_built_in_cmd_with_param_fragments(func_name, node) and not self.cmd_st_x_situation(func_name, node):
+            self.calling_builtin_with_fragment_params(func_name, node)
+            done = True
+
+        elif self.for_loop_info and func_name == 'range':
+            self.calling_for_range(node)
+            done = True
+
         if done:
             self.end(node)
             self.inside_calculation = False
             return
 
-        # # DEBUG
-        # elif func_name in self.program.rpn_templates.template_names:
-        #     # insert any rpn template by name - use for debugging
-        #     self.program.rpn_templates.need_template(func_name)
-        #     return
+        # Common arg parsing for all functions
+        # Note: we don't visit self.visit(node.func) cos we emit the function name ourselves below, RPN style
+        if func_name in settings.CMDS_WHO_DISALLOW_STRINGS:
+            self.disallow_string_args = True
+        for item in node.args:
+            self.visit(item)
+        self.disallow_string_args = False
 
-        elif func_name == 'PyLibAll':
-            self.program.rpn_templates.need_all_templates()
-            self.inside_calculation = False
-            return
-
-        elif self.is_built_in_cmd_with_param_fragments(func_name, node) and not self.cmd_st_x_situation(func_name, node):
-            # The built-in command has arg fragment "parameter" parts which must be emitted immediately as part of the
-            # command, thus we cannot rely on normal visit parsing but must look ahead and extract needed info.
-
-            cmd_info = cmd_list[func_name]
-            args = ''
-            comment = cmd_info['description']
-            for i in range(cmd_info['num_arg_fragments']):
-                arg = node.args[i]
-                arg_val = self.get_node_name_id_or_n(arg)
-
-                if isinstance(arg, ast.Str):
-                    arg_val = f'"{arg_val}"'
-
-                if isinstance(arg, ast.Name):  # reference to a variable, thus pull out a register name
-                    comment = arg_val
-                    # hack if trying to access i
-                    if self.var_name_is_loop_counter(arg_val):
-                        comment = arg_val + ' (loop var)'
-                        register = arg_val = self.scopes.var_to_reg(arg_val)
-                        self.program.insert(f'RCL {register}', comment=comment)
-                        self.program.insert('IP')  # just get the integer portion of isg counter
-                        arg_val = 'ST X'  # access the value in stack x rather than in the register
-                        assert cmd_info['indirect_allowed']
-                    else:
-                        arg_val = self.scopes.var_to_reg(arg_val)
-
-                elif isinstance(arg, ast.Num):
-                    arg_val = f'{arg_val:02d}'  # TODO probably need more formats e.g. nnnn
-
-                args += ' ' if arg_val else ''
-                args += arg_val
-
-            self.program.insert(f'{func_name}{args}', comment=comment)
-            self.end(node)
-            self.inside_calculation = False
-            return
-
-        if self.for_loop_info and func_name == 'range':
-
-            def all_literals(nodes):
-                """
-                Look ahead optimisation for ranges with simple number literals as parameters (no expressions or vars)
-                But we do cater for Unary operators (e.g. -4) with a tiny little extra lookahead - tricky!
-                :return: the list of arguments as numbers, incl all negative signs etc. already applied e.g. [-2, 200, 2]
-                """
-                arg_vals = []
-                for arg in nodes:
-                    if not isinstance(arg, ast.Num):
-                        if isinstance(arg, ast.UnaryOp):
-                            # still could be a literal number if we drill down past the Unary stuff
-                            children = [arg.operand, arg.op]  # must do operand first to get the number onto the arg_vals list - not simply list(ast.iter_child_nodes(arg))
-                            result = all_literals(children)  # recursive
-                            if result:
-                                arg_vals.extend(result)
-                            else:
-                                return []
-                        elif isinstance(arg, (ast.UAdd, ast.USub)):
-                            if isinstance(arg, ast.USub):
-                                arg_vals[-1] = - arg_vals[-1]
-                        else:
-                            return []
-                    else:
-                        arg_vals.append(int(self.get_node_name_id_or_n(arg)))
-                return arg_vals
-
-            def num_after_point(x):
-                # returns the frac digits, excluding the .
-                s = str(x)
-                if '.' not in s: raise RpnError(f'cannot construct range ISG value based on to of {x}')
-                return s[s.index('.') + 1:]
-
-            args = all_literals(node.args)
-            if args:
-                step_ = args[2] if len(args) == 3 else None
-                if len(args) == 1:
-                    from_ = 0
-                    to_ = args[0]
-                elif len(args) in (2, 3):
-                    from_ = args[0]
-                    to_ = args[1]
-                from_ -= step_ if step_ else 1
-                to_ -= 1
-                if to_ > 1000:
-                    raise RpnError(f'for range() loops are limited to max to value of 999 (ISG ccccccc.fffii limitation of fff')
-                # Calculate the .nnnss
-                rhs = to_ / 1000
-                if step_:
-                    rhs += step_ / 100000
-                self.program.insert(f'{from_}.{num_after_point(rhs)}')
-            else:
-                # range call involves complexity (expressions or variables)
-                if len(node.args) == 1:
-                    # if only one param to range, add implicit 0, which adjusted for ISG means -1
-                    # self.program.insert(-1)
-                    self.program.insert(0)  # no longer adjusted cos isg routine will do that
-                for item in node.args:
-                    self.visit(item)
-                if len(node.args) in (1, 2):
-                    # if step not specified, specify it, because the rpn lib isg subroutine needs it - takes 3 params.
-                    self.program.insert(1)
-                self.program.insert_xeq('pISG')
-            register = self.for_loop_info[-1].register
-            var_name = self.for_loop_info[-1].var_name
-            self.program.insert(f'STO {register}', comment=f'range {var_name}')
-        else:
-            # Common arg parsing for all functions
-            # Note: we don't visit self.visit(node.func) cos we emit the function name ourselves below, RPN style
-            if func_name in settings.CMDS_WHO_DISALLOW_STRINGS:
-                self.disallow_string_args = True
-            for item in node.args:
-                self.visit(item)
-            self.disallow_string_args = False
-
-        if self.for_loop_info and func_name == 'range':
-            pass  # already done our work, above
-
-        elif func_name in cmd_list:
+        if func_name in cmd_list:
             # The built-in command is a simple one without command arg fragment "parameter" parts - yes it may take
             # actual parameters but these are generated through normal visit parsing and available on the stack.
             # Though we do handle an exception where the command needs to use ST X as its 'parameter' e.g. VIEW
@@ -1093,6 +981,108 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.pending_stack_args = []  # TODO though if the call is part of an long expression, we could be prematurely clearing
         self.inside_calculation = False
         self.end(node)
+
+    def calling_for_range(self, node):
+        def all_literals(nodes):
+            """
+            Look ahead optimisation for ranges with simple number literals as parameters (no expressions or vars)
+            But we do cater for Unary operators (e.g. -4) with a tiny little extra lookahead - tricky!
+            :return: the list of arguments as numbers, incl all negative signs etc. already applied e.g. [-2, 200, 2]
+            """
+            arg_vals = []
+            for arg in nodes:
+                if not isinstance(arg, ast.Num):
+                    if isinstance(arg, ast.UnaryOp):
+                        # still could be a literal number if we drill down past the Unary stuff
+                        children = [arg.operand,
+                                    arg.op]  # must do operand first to get the number onto the arg_vals list - not simply list(ast.iter_child_nodes(arg))
+                        result = all_literals(children)  # recursive
+                        if result:
+                            arg_vals.extend(result)
+                        else:
+                            return []
+                    elif isinstance(arg, (ast.UAdd, ast.USub)):
+                        if isinstance(arg, ast.USub):
+                            arg_vals[-1] = - arg_vals[-1]
+                    else:
+                        return []
+                else:
+                    arg_vals.append(int(self.get_node_name_id_or_n(arg)))
+            return arg_vals
+
+        def num_after_point(x):
+            # returns the frac digits, excluding the .
+            s = str(x)
+            if '.' not in s: raise RpnError(f'cannot construct range ISG value based on to of {x}')
+            return s[s.index('.') + 1:]
+
+        args = all_literals(node.args)
+        if args:
+            step_ = args[2] if len(args) == 3 else None
+            if len(args) == 1:
+                from_ = 0
+                to_ = args[0]
+            elif len(args) in (2, 3):
+                from_ = args[0]
+                to_ = args[1]
+            from_ -= step_ if step_ else 1
+            to_ -= 1
+            if to_ > 1000:
+                raise RpnError(
+                    f'for range() loops are limited to max to value of 999 (ISG ccccccc.fffii limitation of fff')
+            # Calculate the .nnnss
+            rhs = to_ / 1000
+            if step_:
+                rhs += step_ / 100000
+            self.program.insert(f'{from_}.{num_after_point(rhs)}')
+        else:
+            # range call involves complexity (expressions or variables)
+            if len(node.args) == 1:
+                # if only one param to range, add implicit 0, which adjusted for ISG means -1
+                # self.program.insert(-1)
+                self.program.insert(0)  # no longer adjusted cos isg routine will do that
+            for item in node.args:
+                self.visit(item)
+            if len(node.args) in (1, 2):
+                # if step not specified, specify it, because the rpn lib isg subroutine needs it - takes 3 params.
+                self.program.insert(1)
+            self.program.insert_xeq('pISG')
+        register = self.for_loop_info[-1].register
+        var_name = self.for_loop_info[-1].var_name
+        self.program.insert(f'STO {register}', comment=f'range {var_name}')
+
+    def calling_builtin_with_fragment_params(self, func_name, node):
+        # The built-in command has arg fragment "parameter" parts which must be emitted immediately as part of the
+        # command, thus we cannot rely on normal visit parsing but must look ahead and extract needed info.
+        cmd_info = cmd_list[func_name]
+        args = ''
+        comment = cmd_info['description']
+        for i in range(cmd_info['num_arg_fragments']):
+            arg = node.args[i]
+            arg_val = self.get_node_name_id_or_n(arg)
+
+            if isinstance(arg, ast.Str):
+                arg_val = f'"{arg_val}"'
+
+            if isinstance(arg, ast.Name):  # reference to a variable, thus pull out a register name
+                comment = arg_val
+                # hack if trying to access i
+                if self.var_name_is_loop_counter(arg_val):
+                    comment = arg_val + ' (loop var)'
+                    register = arg_val = self.scopes.var_to_reg(arg_val)
+                    self.program.insert(f'RCL {register}', comment=comment)
+                    self.program.insert('IP')  # just get the integer portion of isg counter
+                    arg_val = 'ST X'  # access the value in stack x rather than in the register
+                    assert cmd_info['indirect_allowed']
+                else:
+                    arg_val = self.scopes.var_to_reg(arg_val)
+
+            elif isinstance(arg, ast.Num):
+                arg_val = f'{arg_val:02d}'  # TODO probably need more formats e.g. nnnn
+
+            args += ' ' if arg_val else ''
+            args += arg_val
+        self.program.insert(f'{func_name}{args}', comment=comment)
 
     def calling_alpha_family(self, func_name, node):
         self.inside_calculation = False  # HACK?
