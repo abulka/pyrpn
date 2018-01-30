@@ -922,7 +922,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 self.calling_varmenu(node)
             elif func_name in ('MVAR', 'VARMENU', 'STOP', 'EXITALL'):
                 self.calling_varmenu_mvar(func_name, node)
-            elif func_name in ('alpha', 'AVIEW', 'print', 'PROMPT', 'PRA'):
+            elif func_name in ('alpha', 'AVIEW', 'PROMPT', 'PRA'):
                 self.calling_alpha_family(func_name, node)
             elif self.is_built_in_cmd_with_param_fragments(func_name, node) and not self.cmd_st_x_situation(func_name, node):
                 self.calling_builtin_with_fragment_params(func_name, node)
@@ -1152,12 +1152,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def check_cmd_enough_args(self, func_name, node):
         if func_name in cmd_list and len(node.args) == 0:
-
             # Check that built in command has been given enough parameters
             if cmd_list[func_name]['num_arg_fragments'] > 0:
                 raise RpnError(
                     f'{func_name} requires {cmd_list[func_name]["num_arg_fragments"]} parameters to be supplied')
-
             # Check that built in command has been given parameters (anti stack philosophy), even though HP41S spec actually allows params
             elif func_name in settings.CMDS_WHO_OPERATE_ON_STACK_SO_DISALLOW_NO_ARGS:
                 raise RpnError(
