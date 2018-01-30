@@ -45,7 +45,7 @@ class VarnameLowerTests(BaseTest):
         self.assertEqual('00', register_x)
 
 
-class VarnameUpperTests(BaseTest):
+class ListDictMatrixTests(BaseTest):
 
     def test_uppercase_varname(self):
         scopes = Scopes()
@@ -97,6 +97,15 @@ class VarnameUpperTests(BaseTest):
 
     def test_matrix_dict_lowercase(self):
         scopes = Scopes()
+        scopes.var_to_reg('a', is_dict_var=True)
+        self.assertEqual('"a"', scopes.var_to_reg('a'))
+
+    def test_matrix_upgrade_numeric_to_named_register(self):
+        scopes = Scopes()
+        # cheap numeric register mapping
+        register = scopes.var_to_reg('a', is_dict_var=False)
+        self.assertEqual('00', register)
+        # cause the upgrade
         scopes.var_to_reg('a', is_dict_var=True)
         self.assertEqual('"a"', scopes.var_to_reg('a'))
 

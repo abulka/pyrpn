@@ -343,20 +343,6 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    def test_list_var_must_be_named_register(self):
-        src = """
-            a = 1       # mapping will occur to numeric register
-            a = []      # error, array needs named register
-        """
-        self.assertRaises(RpnError, self.parse, dedent(src))
-
-    def test_list_append_var_must_be_named_register(self):
-        src = """
-            a = 1       # mapping will occur to numeric register
-            a.append(5) # error, array needs named register
-        """
-        self.assertRaises(RpnError, self.parse, dedent(src))
-
     def test_list_access_el(self):
         self.parse(dedent("""
             A = [200]
@@ -713,12 +699,70 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    def test_dict_var_must_be_named_register(self):
+    # list and dict variable type enforcement
+
+    # def test_list_var_must_be_named_register(self):
+    #     src = """
+    #         a = 1       # mapping will occur to numeric register
+    #         a = []      # error, array needs named register
+    #     """
+    #     self.assertRaises(RpnError, self.parse, dedent(src))
+
+    def test_list_var_causes_remapping_to_named_register(self):
+        self.parse(dedent("""
+            a = 1       # mapping will occur to numeric register
+            a = []      # SHOULD ALLOW THIS - old.... error, array needs named register
+            a = 2       # mapping is now to the named register "a"
+            """))
+        expected = dedent("""
+            1
+            STO 00
+            
+            0
+            SF 01
+            XEQ "pMxPrep"
+            0
+            STO "a"
+
+            2
+            STO "a"
+            """)
+        self.compare(de_comment(expected))
+
+    def test_list_append_var_must_be_named_register(self):
         src = """
             a = 1       # mapping will occur to numeric register
-            a = {}      # error, dict needs named register
+            a.append(5) # error, array needs named register
         """
         self.assertRaises(RpnError, self.parse, dedent(src))
+
+    # def test_dict_var_must_be_named_register(self):
+    #     src = """
+    #         a = 1       # mapping will occur to numeric register
+    #         a = {}      # error, dict needs named register
+    #     """
+    #     self.assertRaises(RpnError, self.parse, dedent(src))
+
+    def test_dict_var_causes_remapping_to_named_register(self):
+        self.parse(dedent("""
+            a = 1       # mapping will occur to numeric register
+            a = {}      # mapping upgraded to named register
+            a = 2       # mapping is now to the named register "a"
+            """))
+        expected = dedent("""
+            1
+            STO 00
+            
+            0
+            CF 01
+            XEQ "pMxPrep"
+            0
+            STO "a"
+
+            2
+            STO "a"
+            """)
+        self.compare(de_comment(expected))
 
     def test_dict_set_must_be_named_register(self):
         src = """

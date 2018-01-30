@@ -52,6 +52,8 @@ class Scopes(object):
         If a named register name is already used in a previous scope, append __n to the register
         name e.g. X__2, starting at n=2)
 
+        Will upgrade a mapping from numeric to named if necessary, if is_dict_var / is_list_var is true
+
         :param var_name: python identifier e.g. 'x'
         :param force_reg_name: force the mapping to be to this
         :param is_range_index: record that this is a range loop related var
@@ -60,7 +62,17 @@ class Scopes(object):
         :return: register name as a string
         """
         def map_it(var_name, register=None):
-            if not self._has_mapping(var_name):
+            if self._has_mapping(var_name):
+                # Do nothing - mapping already exists
+
+                # Upgrade a mapping from numeric to named
+                if (is_list_var and var_name not in self.current.list_vars) or \
+                        (is_dict_var and var_name not in self.current.dict_vars): # register exists but is not named
+                    del self.current.data[var_name]  # delete the mapping
+                    register = f'"{var_name[-7:]}"'
+                    map_it(var_name, register)  # call myself!
+            else:
+                # Create new mapping
                 self._add_mapping(var_name, register=register)
 
                 # Track variables which are used in range() for loops
