@@ -1119,12 +1119,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.alpha_append_mode = False
             self.alpha_already_cleared = False
             self.alpha_separator = ' '
-        if func_name in ('print', 'AVIEW'):
-            self.program.insert('AVIEW')
-        elif func_name in ('PROMPT'):
-            self.program.insert('PROMPT')
-        elif func_name in ('PRA'):
-            self.program.insert('PRA')
+
+        if func_name in ('AVIEW', 'PROMPT', 'PRA'):
+            self.program.insert(func_name)
         if len(self.pending_stack_args):
             self.pending_stack_args.pop()
 
@@ -1163,14 +1160,11 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                     f'{func_name} requires parameters (variable or literal number) to be supplied - referring to stack x not allowed')
 
     def adjust_function_name(self, func_name):
-        if func_name == 'isFS':
-            func_name = 'pFS'
-        if func_name == 'isFC':
-            func_name = 'pFC'
-        if func_name == 'passert':
-            func_name = 'pAssert'
-        if func_name == 'len':
-            func_name = 'pMlen'
+        if func_name == 'isFS':     func_name = 'pFS'
+        if func_name == 'isFC':     func_name = 'pFC'
+        if func_name == 'passert':  func_name = 'pAssert'
+        if func_name == 'len':      func_name = 'pMlen'
+        if func_name == 'print':    func_name = 'AVIEW'
         return func_name
 
     def calling_append(self, node):
