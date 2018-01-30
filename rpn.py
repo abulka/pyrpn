@@ -1070,7 +1070,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.program.insert(f'{func_name}{args}', comment=comment)
 
     def calling_alpha_family(self, func_name, node):
-        self.inside_calculation = False  # HACK?
+        old_inside_calculation = self.inside_calculation
+        self.inside_calculation = False
+
         if len(node.args) == 0:
             if func_name != 'AVIEW':
                 self.program.insert('CLA', comment='empty string', type_='string')
@@ -1122,6 +1124,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         if func_name in ('AVIEW', 'PROMPT', 'PRA'):
             self.program.insert(func_name)
+
+        self.inside_calculation = old_inside_calculation
         if len(self.pending_stack_args):
             self.pending_stack_args.pop()
 
