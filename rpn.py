@@ -913,7 +913,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         if isinstance(node.func, ast.Attribute) and node.func.attr == 'append':
             self.calling_append(node)
-            done = True
         else:
             func_name = node.func.id
             func_name = self.adjust_function_name(func_name)
@@ -921,29 +920,22 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.check_cmd_enough_args(func_name, node)
             if func_name == 'varmenu':
                 self.calling_varmenu(node)
-                done = True
             elif func_name in ('MVAR', 'VARMENU', 'STOP', 'EXITALL'):
                 self.calling_varmenu_mvar(func_name, node)
-                done = True
             elif func_name in ('alpha', 'AVIEW', 'print', 'PROMPT', 'PRA'):
                 self.calling_alpha_family(func_name, node)
-                done = True
             elif self.is_built_in_cmd_with_param_fragments(func_name, node) and not self.cmd_st_x_situation(func_name, node):
                 self.calling_builtin_with_fragment_params(func_name, node)
-                done = True
             elif self.for_loop_info and func_name == 'range':
                 self.calling_for_range(node)
-                done = True
-
-        if not done:
-            self.calling_process_args(func_name, node)
-
-            if func_name in cmd_list:
-                self.calling_builtin_cmd(func_name, node)
-            elif func_name in self.program.rpn_templates.get_user_insertable_pyrpn_cmds().keys():
-                self.program.insert_xeq(func_name)  # Call to a rpn template function - not usually allowed, but some are exposed
             else:
-                self.calling_user_def(func_name)
+                self.calling_process_args(func_name, node)
+                if func_name in cmd_list:
+                    self.calling_builtin_cmd(func_name, node)
+                elif func_name in self.program.rpn_templates.get_user_insertable_pyrpn_cmds().keys():
+                    self.program.insert_xeq(func_name)  # Call to a rpn template function - not usually allowed, but some are exposed
+                else:
+                    self.calling_user_def(func_name)
 
         self.pending_stack_args = []  # TODO though if the call is part of an long expression, we could be prematurely clearing
         self.inside_calculation = False
