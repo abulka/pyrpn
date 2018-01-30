@@ -200,12 +200,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def friendly_type(self, node):
         if isinstance(node, ast.Dict):
-            type_ = '(matrix type Dictionary)'
+            result = '(matrix type Dictionary)'
         elif isinstance(node, ast.List):
-            type_ = '(matrix type List)'
+            result = '(matrix type List)'
         else:
-            type_ = ''
-        return type_
+            result = ''
+        return result
 
     # Finishing up
 
@@ -421,7 +421,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             if lhs_is_matrix:
                 self.subscript_is_on_lhs_thus_assign(target)
             else:
-                self.assign_normal_lhs(node, target)
+                self.assign_normal_lhs(node, target)  # var is normal (lower=local, upper=named) or matrix (lower=named, upper=named)
         self.pending_stack_args = []  # must have, cos could just be assigning single values, not BinOp and not Expr
         self.end(node)
 
@@ -432,14 +432,14 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def assign_normal_lhs(self, node, target):
         # Create the variable and mark its type
-        type_ = self.friendly_type(node.value)
-        log.info(f'{self.indent_during}variable "{target.id}" created {type_}')
+        friendly_type = self.friendly_type(node.value)
+        log.info(f'{self.indent_during}variable "{target.id}" created {friendly_type}')
         self.program.insert_sto(
             self.scopes.var_to_reg(target.id,
                                    is_dict_var=isinstance(node.value, ast.Dict),
                                    is_list_var=isinstance(node.value, ast.List)
                                    ),
-            comment=f'{target.id} {type_}'
+            comment=f'{target.id} {friendly_type}'
         )
 
     def subscript_is_on_lhs_thus_assign(self, target):
