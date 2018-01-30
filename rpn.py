@@ -930,10 +930,11 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 self.calling_for_range(node)
             else:
                 self.calling_process_args(func_name, node)
+
                 if func_name in cmd_list:
                     self.calling_builtin_cmd(func_name, node)
-                elif func_name in self.program.rpn_templates.get_user_insertable_pyrpn_cmds().keys():
-                    self.program.insert_xeq(func_name)  # Call to a rpn template function - not usually allowed, but some are exposed
+                elif func_name in self.program.user_insertable_rpn_functions:
+                    self.program.insert_xeq(func_name)
                 else:
                     self.calling_user_def(func_name)
 

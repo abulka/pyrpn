@@ -106,6 +106,10 @@ class Program(BaseRpnProgram):
             comment = self.rpn_templates.get_user_insertable_pyrpn_cmds()[func_name]['description']  # YUK
         self.insert(f'XEQ "{func_name}"', comment=comment, type_=type_)
 
+    @property
+    def user_insertable_rpn_functions(self):
+        return self.rpn_templates.get_user_insertable_pyrpn_cmds().keys()
+
     def emit_needed_rpn_templates(self, as_local_labels=True):
         self.insert('LBL "PyLIB"', comment='PyRPN Support Library of')
         self.insert('"-Utility Funcs-"')
