@@ -42,16 +42,22 @@ class Scopes(object):
 
     def var_to_reg(self, var_name, force_reg_name=None, is_range_index=False, is_dict_var=False, is_list_var=False):
         """
-        Figure out the register to use to store/recall 'var_name' e.g. "x" via our scope system
+        Figure out the register to use to store/recall 'var_name' e.g. 00 or "x" - also taking into account our scope system.
 
         Rules:
-            if its uppercase - assign to named uppercase register of the same name e.g. "X"
-                (if that name is already used in a previous scope, append __n to the register name e.g. X__2, starting at n=2)
-            Otherwise if its a lowercase var name, map to a numbered register e.g. 00
+            if variable is lowercase - map to a numbered register e.g. 00
+            if variable is uppercase - map to named uppercase register of the same name e.g. "X"
+            if variable is_dict_var or is_list_var - map to named register of the same name e.g. "aa" - case unimportant.
+
+        If a named register name is already used in a previous scope, append __n to the register
+        name e.g. X__2, starting at n=2)
 
         :param var_name: python identifier e.g. 'x'
-        :param use_stack_register: don't use named registers, use the stack. 1 means map to ST X, 2 means map to ST Y etc.
-        :return: register name as a string e.g. "X" or 00 - depending on rules
+        :param force_reg_name: force the mapping to be to this
+        :param is_range_index: record that this is a range loop related var
+        :param is_dict_var: record that this var is matrix related
+        :param is_list_var: record that this var is matrix related
+        :return: register name as a string
         """
         def map_it(var_name, register=None):
             if not self._has_mapping(var_name):
@@ -102,7 +108,7 @@ class Scopes(object):
         assert self._has_mapping(var_name)
         register_name = self.current.data[var_name]
         if not '"' in register_name:  # presence of " means its a named register - good
-            raise RpnError(f'Can only assign lists and dictionaries to variable mapped to RPN named variables/register - perhaps "{var_name}" has been previously used to store a normal number/string so has a previous mapping to a numbered register.  Consider using a unique variable name for this list/dict and never store anything into it except lists or dictionaries.')
+            raise RpnError(f'Variable "{var_name}" has been previously used to store a number/string and now needs to store a matrix. Cannot switch variable uses. Consider using a different variable name for this list/dict.')
 
     def is_range_index(self, var_name):
         return var_name in self.current.range_vars
