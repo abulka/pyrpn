@@ -46,10 +46,12 @@ h3 {
     float: right;
 }
 
-.parse_errors {
+pre.parse_errors {
     font-size: large;
     padding: 10px 10px 0px 10px;  /* top right bottom left */
     color: #c53f23;
+    white-space: pre-wrap;
+    word-break: keep-all; /*this stops the word breaking*/
 }
 
 /* Edit Example Page */
