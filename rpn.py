@@ -185,6 +185,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def check_supported(self, name, node):
         if name in ['NOT', 'OR', 'AND']:
             raise RpnError(f'The RPN command "{name}" is not supported - use native Python instead, line: {node.lineno}\n{node.first_token.line.strip()}')
+        elif name in ('aview',):
+            raise RpnError(f'The command "{name}" is no longer supported')
 
     def is_built_in_cmd_with_param_fragments(self, func_name, node):
         return func_name in cmd_list and \
@@ -906,135 +908,38 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 Manually looped through and visited.  Each visit emits a register rcl or literal onto the stack.
         """
         self.begin(node)
+        done = False
 
         if isinstance(node.func, ast.Attribute) and node.func.attr == 'append':
-            var_name = self.get_node_name_id_or_n(node.func.value)  # the name 'a' of the a.append()
-            if var_name.islower():
-                raise RpnError(f'Lists must be stored in uppercase variables not "{var_name}".  Please change the variable name to uppercase e.g. "{var_name.upper()}".')
-            self.visit(node.func.value)
-            for arg in node.args:
-                self.visit(arg)
-                self.program.insert_xeq('LIST+')
-            self.program.insert_sto(self.scopes.var_to_reg(node.func.value.id), comment=f'{node.func.value.id}')
+            self.calling_append(node)
+            done = True
+
+        if done:
             self.end(node)
+            self.inside_calculation = False
             return
 
         self.inside_calculation = True
 
         func_name = node.func.id
+        func_name = self.adjust_function_name(func_name)
 
         self.check_supported(func_name, node)
-
-        if func_name == 'isFS':
-            func_name = 'pFS'
-
-        if func_name == 'isFC':
-            func_name = 'pFC'
-
-        if func_name == 'passert':
-            func_name = 'pAssert'
-
-        if func_name == 'len':
-            func_name = 'pMlen'
-
-
-        if func_name in cmd_list and len(node.args) == 0:
-
-            # Check that built in command has been given enough parameters
-            if cmd_list[func_name]['num_arg_fragments'] > 0:
-                raise RpnError(f'{func_name} requires {cmd_list[func_name]["num_arg_fragments"]} parameters to be supplied')
-
-            # Check that built in command has been given parameters (anti stack philosophy), even though HP41S spec actually allows params
-            elif func_name in settings.CMDS_WHO_OPERATE_ON_STACK_SO_DISALLOW_NO_ARGS:
-                raise RpnError(f'{func_name} requires parameters (variable or literal number) to be supplied - referring to stack x not allowed')
-
+        self.check_cmd_enough_args(func_name, node)
 
         if func_name == 'varmenu':
-            for arg in node.args:
-                self.program.insert(f'MVAR "{arg.s}"')
-                self.scopes.var_to_reg(arg.s, force_reg_name=f'"{arg.s}"')
-            self.program.insert(f'VARMENU {self.first_def_label}')
-            self.program.insert('STOP')
-            self.program.insert('EXITALL')
-            for arg in node.args:
-                self.scopes.var_to_reg(arg.s, force_reg_name=f'"{arg.s}"')
-            self.end(node)
-            self.inside_calculation = False
-            return
+            self.calling_varmenu(node)
+            done = True
+
         elif func_name in ('MVAR', 'VARMENU', 'STOP', 'EXITALL'):
-            arg = f' "{node.args[0].s}"' if node.args else ''
-            self.program.insert(f'{func_name}{arg}')
-
-            if func_name in ('MVAR',):
-                arg = node.args[0].s
-                self.scopes.var_to_reg(arg, force_reg_name=f'"{arg}"')
-            self.end(node)
-            self.inside_calculation = False
-            return
-
-        elif func_name in ('aview',):
-            raise RpnError('The command "aview" is deprecated - use print or AVIEW.')
+            self.calling_varmenu_mvar(func_name, node)
+            done = True
 
         elif func_name in ('alpha', 'AVIEW', 'print', 'PROMPT', 'PRA'):
-            self.inside_calculation = False  # HACK?
-            if len(node.args) == 0:
-                if func_name != 'AVIEW':
-                    self.program.insert('CLA', comment='empty string', type_='string')
-            else:
-                self.inside_alpha = True
-                self.alpha_append_mode = False
-                self.alpha_already_cleared = False
+            self.calling_alpha_family(func_name, node)
+            done = True
 
-                for keyword in node.keywords:
-                    if keyword.arg == 'sep':
-                        if not isinstance(keyword.value, ast.Str):
-                            raise RpnError(f'sep= must be a string separator')
-                        self.alpha_separator = keyword.value.s
-                    elif keyword.arg == 'append':
-                        if not isinstance(keyword.value, ast.NameConstant):
-                            raise RpnError(f'append= must be set to True or False')
-                        named_constant_t_f = keyword.value
-                        self.alpha_append_mode = named_constant_t_f.value
-
-                for index,arg in enumerate(node.args):
-                    self.visit(arg)  # usual insertion of a literal number, string or variable
-
-                    if isinstance(arg, (ast.Num, ast.BinOp, ast.Compare, ast.Subscript, ast.Call)):  # others?
-                        self.program.insert('ARCL ST X')
-                    elif isinstance(arg, ast.Name):
-                        if self.var_name_is_loop_counter(arg.id):
-                            self.program.insert('ARCL ST X')
-                    elif isinstance(arg, ast.Str):
-                        pass
-                    else:
-                        # Solution is to add to the ARCL ST X cases, above.  But ensure the visit method has turned on
-                        # the 'inside_calculation' flag to prevent numbers being ARCLd rather than RCLd.
-                        value = self.get_node_name_id_or_n(arg)
-                        line = node.first_token.line.strip()
-                        msg = f' with value "{value}"' if value else ''
-                        msg += f' in "{line}"'
-                        raise RpnError(f'Do not know how to alpha {arg}{msg}')
-
-                    if not self.alpha_append_mode:
-                        self.alpha_append_mode = True
-
-                    if self.alpha_separator and index + 1 < len(node.args):  # don't emit separator on last item
-                        self.program.insert(f'├"{self.alpha_separator}"')
-
-                self.inside_alpha = False
-                self.alpha_append_mode = False
-                self.alpha_already_cleared = False
-                self.alpha_separator = ' '
-
-            if func_name in ('print', 'AVIEW'):
-                self.program.insert('AVIEW')
-            elif func_name in ('PROMPT'):
-                self.program.insert('PROMPT')
-            elif func_name in ('PRA'):
-                self.program.insert('PRA')
-
-            if len(self.pending_stack_args):
-                self.pending_stack_args.pop()
+        if done:
             self.end(node)
             self.inside_calculation = False
             return
@@ -1187,6 +1092,122 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.log_state('scope after XEQ')
         self.pending_stack_args = []  # TODO though if the call is part of an long expression, we could be prematurely clearing
         self.inside_calculation = False
+        self.end(node)
+
+    def calling_alpha_family(self, func_name, node):
+        self.inside_calculation = False  # HACK?
+        if len(node.args) == 0:
+            if func_name != 'AVIEW':
+                self.program.insert('CLA', comment='empty string', type_='string')
+        else:
+            self.inside_alpha = True
+            self.alpha_append_mode = False
+            self.alpha_already_cleared = False
+
+            for keyword in node.keywords:
+                if keyword.arg == 'sep':
+                    if not isinstance(keyword.value, ast.Str):
+                        raise RpnError(f'sep= must be a string separator')
+                    self.alpha_separator = keyword.value.s
+                elif keyword.arg == 'append':
+                    if not isinstance(keyword.value, ast.NameConstant):
+                        raise RpnError(f'append= must be set to True or False')
+                    named_constant_t_f = keyword.value
+                    self.alpha_append_mode = named_constant_t_f.value
+
+            for index, arg in enumerate(node.args):
+                self.visit(arg)  # usual insertion of a literal number, string or variable
+
+                if isinstance(arg, (ast.Num, ast.BinOp, ast.Compare, ast.Subscript, ast.Call)):  # others?
+                    self.program.insert('ARCL ST X')
+                elif isinstance(arg, ast.Name):
+                    if self.var_name_is_loop_counter(arg.id):
+                        self.program.insert('ARCL ST X')
+                elif isinstance(arg, ast.Str):
+                    pass
+                else:
+                    # Solution is to add to the ARCL ST X cases, above.  But ensure the visit method has turned on
+                    # the 'inside_calculation' flag to prevent numbers being ARCLd rather than RCLd.
+                    value = self.get_node_name_id_or_n(arg)
+                    line = node.first_token.line.strip()
+                    msg = f' with value "{value}"' if value else ''
+                    msg += f' in "{line}"'
+                    raise RpnError(f'Do not know how to alpha {arg}{msg}')
+
+                if not self.alpha_append_mode:
+                    self.alpha_append_mode = True
+
+                if self.alpha_separator and index + 1 < len(node.args):  # don't emit separator on last item
+                    self.program.insert(f'├"{self.alpha_separator}"')
+
+            self.inside_alpha = False
+            self.alpha_append_mode = False
+            self.alpha_already_cleared = False
+            self.alpha_separator = ' '
+        if func_name in ('print', 'AVIEW'):
+            self.program.insert('AVIEW')
+        elif func_name in ('PROMPT'):
+            self.program.insert('PROMPT')
+        elif func_name in ('PRA'):
+            self.program.insert('PRA')
+        if len(self.pending_stack_args):
+            self.pending_stack_args.pop()
+
+    def calling_varmenu_mvar(self, func_name, node):
+        arg = f' "{node.args[0].s}"' if node.args else ''
+        self.program.insert(f'{func_name}{arg}')
+        if func_name in ('MVAR',):
+            arg = node.args[0].s
+            self.scopes.var_to_reg(arg, force_reg_name=f'"{arg}"')
+        self.end(node)
+        self.inside_calculation = False
+
+    def calling_varmenu(self, node):
+        for arg in node.args:
+            self.program.insert(f'MVAR "{arg.s}"')
+            self.scopes.var_to_reg(arg.s, force_reg_name=f'"{arg.s}"')
+        self.program.insert(f'VARMENU {self.first_def_label}')
+        self.program.insert('STOP')
+        self.program.insert('EXITALL')
+        for arg in node.args:
+            self.scopes.var_to_reg(arg.s, force_reg_name=f'"{arg.s}"')
+        self.end(node)
+        self.inside_calculation = False
+
+    def check_cmd_enough_args(self, func_name, node):
+        if func_name in cmd_list and len(node.args) == 0:
+
+            # Check that built in command has been given enough parameters
+            if cmd_list[func_name]['num_arg_fragments'] > 0:
+                raise RpnError(
+                    f'{func_name} requires {cmd_list[func_name]["num_arg_fragments"]} parameters to be supplied')
+
+            # Check that built in command has been given parameters (anti stack philosophy), even though HP41S spec actually allows params
+            elif func_name in settings.CMDS_WHO_OPERATE_ON_STACK_SO_DISALLOW_NO_ARGS:
+                raise RpnError(
+                    f'{func_name} requires parameters (variable or literal number) to be supplied - referring to stack x not allowed')
+
+    def adjust_function_name(self, func_name):
+        if func_name == 'isFS':
+            func_name = 'pFS'
+        if func_name == 'isFC':
+            func_name = 'pFC'
+        if func_name == 'passert':
+            func_name = 'pAssert'
+        if func_name == 'len':
+            func_name = 'pMlen'
+        return func_name
+
+    def calling_append(self, node):
+        var_name = self.get_node_name_id_or_n(node.func.value)  # the name 'a' of the a.append()
+        if var_name.islower():
+            raise RpnError(
+                f'Lists must be stored in uppercase variables not "{var_name}".  Please change the variable name to uppercase e.g. "{var_name.upper()}".')
+        self.visit(node.func.value)
+        for arg in node.args:
+            self.visit(arg)
+            self.program.insert_xeq('LIST+')
+        self.program.insert_sto(self.scopes.var_to_reg(node.func.value.id), comment=f'{node.func.value.id}')
         self.end(node)
 
 
