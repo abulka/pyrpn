@@ -78,6 +78,29 @@ class VarnameUpperTests(BaseTest):
         scopes.push()
         self.assertEqual('"X"', scopes.var_to_reg('X'))
 
+    # matrix related
+    
+    def test_matrix_list_uppercase(self):
+        scopes = Scopes()
+        scopes.var_to_reg('A', is_list_var=True)
+        self.assertEqual('"A"', scopes.var_to_reg('A'))
+
+    def test_matrix_list_lowercase(self):
+        scopes = Scopes()
+        scopes.var_to_reg('a', is_list_var=True)
+        self.assertEqual('"a"', scopes.var_to_reg('a'))
+
+    def test_matrix_dict_uppercase(self):
+        scopes = Scopes()
+        scopes.var_to_reg('A', is_dict_var=True)
+        self.assertEqual('"A"', scopes.var_to_reg('A'))
+
+    def test_matrix_dict_lowercase(self):
+        scopes = Scopes()
+        scopes.var_to_reg('a', is_dict_var=True)
+        self.assertEqual('"a"', scopes.var_to_reg('a'))
+
+
 class RangeVarNames(BaseTest):
     # Track that certain variables have been used in for loop range expressions
 

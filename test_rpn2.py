@@ -210,20 +210,20 @@ class RpnTests2(BaseTest):
 
     def test_list_basic_empty(self):
         self.parse(dedent("""
-            A = []
+            a = []
             """))
         expected = dedent("""
             0              // not a matrix (empty)
             SF 01          // 1D mode
             XEQ "pMxPrep"  // prepare ZLIST
             0
-            STO "A"
+            STO "a"
             """)
         self.compare(de_comment(expected))
 
     def test_list_basic_two(self):
         self.parse(dedent("""
-            A = [1,2]
+            aa = [1,2]
             """))
         expected = dedent("""
             0              // not a matrix (empty)
@@ -234,22 +234,22 @@ class RpnTests2(BaseTest):
             2
             XEQ "LIST+"
             RCL "ZLIST"
-            STO "A"
+            STO "aa"
             """)
         self.compare(de_comment(expected))
 
     def test_list_basic_two_vars(self):
         self.parse(dedent("""
-            A = []
+            a = []
             B = []
-            VIEW(A)
+            VIEW(a)
             """))
         expected = dedent("""
             0              // not a matrix (empty)
             SF 01          // 1D mode
             XEQ "pMxPrep"  // prepare ZLIST
             0
-            STO "A"
+            STO "a"
 
             0              // not a matrix (empty)
             SF 01          // 1D mode
@@ -257,7 +257,7 @@ class RpnTests2(BaseTest):
             0
             STO "B"
 
-            VIEW "A"
+            VIEW "a"
             """)
         self.compare(de_comment(expected))
 
@@ -343,15 +343,17 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    def test_list_var_must_be_uppercase(self):
+    def test_list_var_must_be_named_register(self):
         src = """
-            a = []
+            a = 1       # mapping will occur to numeric register
+            a = []      # error, array needs named register
         """
         self.assertRaises(RpnError, self.parse, dedent(src))
 
-    def test_list_append_var_must_be_uppercase(self):
+    def test_list_append_var_must_be_named_register(self):
         src = """
-            a.append(5)
+            a = 1       # mapping will occur to numeric register
+            a.append(5) # error, array needs named register
         """
         self.assertRaises(RpnError, self.parse, dedent(src))
 
@@ -711,14 +713,16 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    def test_dict_var_must_be_uppercase(self):
+    def test_dict_var_must_be_named_register(self):
         src = """
-            a = {}
+            a = 1       # mapping will occur to numeric register
+            a = {}      # error, dict needs named register
         """
         self.assertRaises(RpnError, self.parse, dedent(src))
 
-    def test_dict_set_must_be_uppercase(self):
+    def test_dict_set_must_be_named_register(self):
         src = """
+            a = 1       # mapping will occur to numeric register
             a['a'] = 5
         """
         self.assertRaises(RpnError, self.parse, dedent(src))
@@ -727,8 +731,8 @@ class RpnTests2(BaseTest):
 
     def test_list_len(self):
         self.parse(dedent("""
-            A = [1, 2]
-            x = len(A)
+            a = [1, 2]
+            x = len(a)
             """))
         expected = dedent("""
             0
@@ -739,9 +743,9 @@ class RpnTests2(BaseTest):
             2
             XEQ "LIST+"
             RCL "ZLIST"
-            STO "A"
+            STO "a"
             
-            RCL "A"
+            RCL "a"
             SF 01
             XEQ "pMxPrep"
             XEQ "pMxLen"  // Get matrix row length. () -> length of ZLIST

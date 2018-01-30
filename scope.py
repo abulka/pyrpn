@@ -1,6 +1,7 @@
 from attr import attrs, attrib, Factory
 import logging
 from logger import config_log
+from rpn_exceptions import RpnError
 
 log = logging.getLogger(__name__)
 config_log(log)
@@ -74,6 +75,9 @@ class Scopes(object):
         elif var_name.isupper():
             register = f'"{var_name.upper()[-7:]}"'
             map_it(var_name, register)
+        elif is_list_var or is_dict_var:  # must be a named register, case doesn't matter
+            register = f'"{var_name[-7:]}"'
+            map_it(var_name, register)
         else:
             map_it(var_name)
             register = self.get_register(var_name)  # look up what register was allocated e.g. "00"
@@ -93,6 +97,12 @@ class Scopes(object):
 
     def get_register(self, var):
         return self.current.data[var]
+
+    def ensure_is_named_matrix_register(self, var_name):
+        assert self._has_mapping(var_name)
+        register_name = self.current.data[var_name]
+        if not '"' in register_name:  # presence of " means its a named register - good
+            raise RpnError(f'Can only assign lists and dictionaries to variable mapped to RPN named variables/register - perhaps "{var_name}" has been previously used to store a normal number/string so has a previous mapping to a numbered register.  Consider using a unique variable name for this list/dict and never store anything into it except lists or dictionaries.')
 
     def is_range_index(self, var_name):
         return var_name in self.current.range_vars

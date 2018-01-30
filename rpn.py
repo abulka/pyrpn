@@ -417,11 +417,11 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         for target in node.targets:
             lhs_is_matrix = isinstance(target, ast.Subscript)
-            self.assert_var_ok_for_matrix(lhs_is_matrix, rhs_is_matrix, target)
             if lhs_is_matrix:
                 self.subscript_is_on_lhs_thus_assign(target)
             else:
-                self.assign_normal_lhs(node, target)  # var is normal (lower=local, upper=named) or matrix (lower=named, upper=named)
+                self.assign_lhs(node, target)  # var is normal (lower=local, upper=named) or matrix (lower=named, upper=named)
+            self.assert_var_ok_for_matrix(lhs_is_matrix, rhs_is_matrix, target)
         self.pending_stack_args = []  # must have, cos could just be assigning single values, not BinOp and not Expr
         self.end(node)
 
@@ -430,10 +430,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         if isinstance(node.targets[0], ast.Subscript) and self.program.is_previous_line('string'):  # hack (looking ahead at first target to see if we are assigning to a list element)
             self.program.insert('ASTO ST X')
 
-    def assign_normal_lhs(self, node, target):
+    def assign_lhs(self, node, target):
         # Create the variable and mark its type
         friendly_type = self.friendly_type(node.value)
-        log.info(f'{self.indent_during}variable "{target.id}" created {friendly_type}')
+        log.info(f'{self.indent_during}created variable "{target.id}" {friendly_type}')
         self.program.insert_sto(
             self.scopes.var_to_reg(target.id,
                                    is_dict_var=isinstance(node.value, ast.Dict),
@@ -521,25 +521,31 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         if rhs_is_matrix:
             self.assert_matrix_var_lhs(target)
         elif lhs_is_matrix:
-            self.assert_uppcase_lhs(target)
+            self.assert_matrix_lhs(target)
 
     def assert_matrix_var_lhs(self, target):
         assert '.Store' in str(target.ctx)
         assert isinstance(target.ctx, ast.Store)
-        self.assert_uppercase(target)
+        var_name = target.id
+        self.scopes.ensure_is_named_matrix_register(var_name)
+        # self.assert_uppercase(target)
+    def assert_matrix_lhs(self, target):
+        var_name = target.value.id  # drill into subscript nodes to get list or dict name
+        self.scopes.ensure_is_named_matrix_register(var_name)
+
     # THESE ASSERT METHODS SHOULD BE REMOVED - allow lower case variables to be assigned to,
     # and simply automatically map them to lowercase named registers BINGO!!!! YES!!!
-    def assert_uppcase_lhs(self, target):
-        var_name = target.value.id  # drill into subscript nodes to get list or dict name
-        if var_name.islower():
-            raise RpnError(f'Can only assign dictionaries to uppercase variables not "{var_name}".  Please change the variable name to uppercase e.g. "{var_name.upper()}".')
-    def assert_uppercase(self, target):
-        # This is because lists are implemented as RPN matrices which need to be stored in a named register.
-        # And can only specify named registers in my Python RPN converter by specifying uppercase variable name.
-        if target.id.islower():
-            log.debug(f'previous line is {self.program.last_line}')
-            raise RpnError(
-                f'Can only assign lists to uppercase variables not "{target.id}".  Please change the variable name to uppercase e.g. "{target.id.upper()}".')
+    # def assert_uppcase_lhs(self, target):
+    #     var_name = target.value.id  # drill into subscript nodes to get list or dict name
+    #     if var_name.islower():
+    #         raise RpnError(f'Can only assign dictionaries to uppercase variables not "{var_name}".  Please change the variable name to uppercase e.g. "{var_name.upper()}".')
+    # def assert_uppercase(self, target):
+    #     # This is because lists are implemented as RPN matrices which need to be stored in a named register.
+    #     # And can only specify named registers in my Python RPN converter by specifying uppercase variable name.
+    #     if target.id.islower():
+    #         log.debug(f'previous line is {self.program.last_line}')
+    #         raise RpnError(
+    #             f'Can only assign lists to uppercase variables not "{target.id}".  Please change the variable name to uppercase e.g. "{target.id.upper()}".')
 
     def visit_AugAssign(self,node):
         """ visit a AugAssign e.g. += node and visits it recursively"""
