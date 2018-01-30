@@ -504,7 +504,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.visit(subscript_node.slice.value)
 
         # Sets IJ accordingly so that a subsequent RCLEL will give the value or STOEL will store something.
-        self.program.insert_xeq('p1mIJ')  # (index) -> () -  X is dropped.
+        self.program.insert_xeq('p1MxIJ')  # (index) -> () -  X is dropped.
 
     def process_dict_access(self, subscript_node):
         # Get Key onto stack X
@@ -515,7 +515,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.program.insert(f'{auto_create} {settings.FLAG_LIST_AUTO_CREATE_IF_KEY_NOT_FOUND}', comment='if set, auto create if key not found, else error')
 
         # Sets IJ accordingly so that a subsequent RCLEL will give the value or STOEL will store something.
-        self.program.insert_xeq('p2mIJfi')  # (key) -> () -  Finds the key, X is dropped.
+        self.program.insert_xeq('p2MxIJ')  # (key) -> () -  Finds the key, X is dropped.
 
     def assert_var_ok_for_matrix(self, lhs_is_matrix, rhs_is_matrix, target):
         if rhs_is_matrix:
@@ -1165,7 +1165,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         if func_name == 'isFS':     func_name = 'pFS'
         if func_name == 'isFC':     func_name = 'pFC'
         if func_name == 'passert':  func_name = 'pAssert'
-        if func_name == 'len':      func_name = 'pMlen'
+        if func_name == 'len':      func_name = 'pMxLen'
         if func_name == 'print':    func_name = 'AVIEW'
         return func_name
 

@@ -436,8 +436,8 @@ class RpnTemplates:
 
     error = settings.SKIP_LABEL1
 
-    pMlen = dedent(f"""
-        LBL "pMlen"    // Get matrix row length. () -> length of ZLIST
+    pMxLen = dedent(f"""
+        LBL "pMxLen"    // Get matrix row length. () -> length of ZLIST
         
         // Please INDEX the ZLIST list first
         //  or delete the ZLIST to get an empty list of 0
@@ -487,8 +487,8 @@ class RpnTemplates:
         RTN
         """)
 
-    p1mIJ = dedent("""
-        LBL "p1mIJ"     // Set IJ for List. (index) -> () & sets IJ for list access
+    p1MxIJ = dedent("""
+        LBL "p1MxIJ"     // Set IJ for List. (index) -> () & sets IJ for list access
 
         // Sets IJ for list access to 'index'.  
         // Assumes ZLIST is indexed.
@@ -511,14 +511,14 @@ class RpnTemplates:
     ok = settings.SKIP_LABEL3
     loop = settings.LOCAL_LABEL_FOR_2D_MATRIX_FIND
 
-    p2mIJfi = dedent(f"""
-        LBL "p2mIJfi"  // Set IJ for Dict. (key) -> () - finds key's value and sets IJ accordingly.
+    p2MxIJ = dedent(f"""
+        LBL "p2MxIJ"  // Set IJ for Dict. (key) -> () - finds key's value and sets IJ accordingly.
         XEQ "pStoStk"  // If flag {settings.FLAG_LIST_AUTO_CREATE_IF_KEY_NOT_FOUND} then auto creates new row.
 
         // Assumes ZLIST is indexed.
  
         1              // 'from' (search from row 1)
-        XEQ "pMlen"    // 'to' (get num rows in matrix)
+        XEQ "pMxLen"    // 'to' (get num rows in matrix)
         1
         +              // add 1 cos want 'to' to include last row
         1              // 'step'
@@ -613,7 +613,7 @@ class RpnTemplates:
             'pFS': {'description': 'is flag set?'},
             'pFC': {'description': 'is flag clear?'},
             'pAssert': {'description': 'is param True?'},
-            'pMlen': {'description': 'length of list or dict'},
+            'pMxLen': {'description': 'length of list or dict'},
         }
 
     def _create_local_labels(self):

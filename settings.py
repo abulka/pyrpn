@@ -36,7 +36,7 @@ Uppercase Named Registers e.g. "FRED" - created when python code has uppercase v
 Lowercase Named Registers - not used
 
 Named register pSaveT          - used by pISG
-Named register pISGvar         - used by p2mIJfi 
+Named register pISGvar         - used by p2MxIJ 
 Named registers pX, Py, PZ, pT - used to store stack
 
 Labels ABCDEFGHIJabcde - allocated for user python functions as needed

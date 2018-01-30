@@ -85,7 +85,7 @@ class Program(BaseRpnProgram):
     def insert_sto(self, register, comment='', type_=''):
         def need_rcl_zlist():
             # Special cases, its a matrix command that returns a normal number, or a RCLEL which returns normal number/string
-            if 'pMlen' in self.last_line.text or \
+            if 'pMxLen' in self.last_line.text or \
                'RCLEL' in self.last_line.text:
                 return False
             # A bit of a guess - list/dict/matrix related

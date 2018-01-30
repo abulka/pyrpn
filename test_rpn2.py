@@ -374,7 +374,7 @@ class RpnTests2(BaseTest):
             XEQ "pMxPrep"
             
             0
-            XEQ "p1mIJ"  // set IJ to index 0 (which is ZLIST row 1)            
+            XEQ "p1MxIJ"  // set IJ to index 0 (which is ZLIST row 1)            
             RCLEL
             
             STO 00
@@ -401,7 +401,7 @@ class RpnTests2(BaseTest):
             SF 01
             XEQ "pMxPrep"
             0
-            XEQ "p1mIJ"
+            XEQ "p1MxIJ"
             STOEL
 
             RCL "ZLIST"
@@ -438,7 +438,7 @@ class RpnTests2(BaseTest):
             XEQ "pMxPrep"
             
             0
-            XEQ "p1mIJ"
+            XEQ "p1MxIJ"
             STOEL
             
             RCL "ZLIST"
@@ -469,7 +469,7 @@ class RpnTests2(BaseTest):
             XEQ "pMxPrep"
             
             0
-            XEQ "p1mIJ"
+            XEQ "p1MxIJ"
             RCLEL
             
             ARCL ST X
@@ -672,7 +672,7 @@ class RpnTests2(BaseTest):
             
             "a"         // search for this key
             SF 02       // auto create if necessary
-            XEQ "p2mIJfi"
+            XEQ "p2MxIJ"
             
             STOEL
             
@@ -704,7 +704,7 @@ class RpnTests2(BaseTest):
             
             1             // search for this key  
             CF 02         // auto create if necessary  
-            XEQ "p2mIJfi" // IJ is set nicely for us...
+            XEQ "p2MxIJ" // IJ is set nicely for us...
 
             RCLEL         // access A[1]
             STO 00        // x = 
@@ -744,7 +744,7 @@ class RpnTests2(BaseTest):
             RCL "A"
             SF 01
             XEQ "pMxPrep"
-            XEQ "pMlen"  // Get matrix row length. () -> length of ZLIST
+            XEQ "pMxLen"  // Get matrix row length. () -> length of ZLIST
             STO 00
             """)
         self.compare(de_comment(expected))
@@ -775,7 +775,7 @@ class RpnTests2(BaseTest):
             RCL "A"
             CF 01
             XEQ "pMxPrep"
-            XEQ "pMlen"  // Get matrix row length. () -> length of ZLIST
+            XEQ "pMxLen"  // Get matrix row length. () -> length of ZLIST
             STO 00
             """)
         self.compare(de_comment(expected))
@@ -797,7 +797,7 @@ class RpnTests2(BaseTest):
             RCL "A"
             SF 01
             XEQ "pMxPrep"
-            XEQ "pMlen"  // Get matrix row length. () -> length of ZLIST
+            XEQ "pMxLen"  // Get matrix row length. () -> length of ZLIST
             
             ARCL ST X
             AVIEW
