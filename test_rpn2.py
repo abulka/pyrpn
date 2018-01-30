@@ -701,17 +701,10 @@ class RpnTests2(BaseTest):
 
     # list and dict variable type enforcement
 
-    # def test_list_var_must_be_named_register(self):
-    #     src = """
-    #         a = 1       # mapping will occur to numeric register
-    #         a = []      # error, array needs named register
-    #     """
-    #     self.assertRaises(RpnError, self.parse, dedent(src))
-
     def test_list_var_causes_remapping_to_named_register(self):
         self.parse(dedent("""
             a = 1       # mapping will occur to numeric register
-            a = []      # SHOULD ALLOW THIS - old.... error, array needs named register
+            a = []      # upgrade mapping to named register to accomodate matrix usage
             a = 2       # mapping is now to the named register "a"
             """))
         expected = dedent("""
@@ -735,13 +728,6 @@ class RpnTests2(BaseTest):
             a.append(5) # error, array needs named register
         """
         self.assertRaises(RpnError, self.parse, dedent(src))
-
-    # def test_dict_var_must_be_named_register(self):
-    #     src = """
-    #         a = 1       # mapping will occur to numeric register
-    #         a = {}      # error, dict needs named register
-    #     """
-    #     self.assertRaises(RpnError, self.parse, dedent(src))
 
     def test_dict_var_causes_remapping_to_named_register(self):
         self.parse(dedent("""
@@ -768,6 +754,12 @@ class RpnTests2(BaseTest):
         src = """
             a = 1       # mapping will occur to numeric register
             a['a'] = 5
+        """
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    def test_dict_access_before_assign(self):
+        src = """
+            b = a[3]    # hmmm - never created a as a matrix or as any type before - error
         """
         self.assertRaises(RpnError, self.parse, dedent(src))
 

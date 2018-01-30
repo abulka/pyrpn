@@ -412,6 +412,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             - value
         """
         self.begin(node)
+
         self.assign_push_rhs(node)
         rhs_is_matrix = 'pMxPrep' in self.program.last_line.text
 
@@ -470,6 +471,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.visit(subscript_node.value)  # RCL list or dict onto stack
 
         var_name_mtx = subscript_node.value.id
+        self.scopes.ensure_is_named_matrix_register(var_name_mtx)
 
         if self.scopes.is_dictionary(var_name_mtx):
             self.process_dict_access(subscript_node)
@@ -528,24 +530,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         assert isinstance(target.ctx, ast.Store)
         var_name = target.id
         self.scopes.ensure_is_named_matrix_register(var_name)
-        # self.assert_uppercase(target)
+
     def assert_matrix_lhs(self, target):
         var_name = target.value.id  # drill into subscript nodes to get list or dict name
         self.scopes.ensure_is_named_matrix_register(var_name)
-
-    # THESE ASSERT METHODS SHOULD BE REMOVED - allow lower case variables to be assigned to,
-    # and simply automatically map them to lowercase named registers BINGO!!!! YES!!!
-    # def assert_uppcase_lhs(self, target):
-    #     var_name = target.value.id  # drill into subscript nodes to get list or dict name
-    #     if var_name.islower():
-    #         raise RpnError(f'Can only assign dictionaries to uppercase variables not "{var_name}".  Please change the variable name to uppercase e.g. "{var_name.upper()}".')
-    # def assert_uppercase(self, target):
-    #     # This is because lists are implemented as RPN matrices which need to be stored in a named register.
-    #     # And can only specify named registers in my Python RPN converter by specifying uppercase variable name.
-    #     if target.id.islower():
-    #         log.debug(f'previous line is {self.program.last_line}')
-    #         raise RpnError(
-    #             f'Can only assign lists to uppercase variables not "{target.id}".  Please change the variable name to uppercase e.g. "{target.id.upper()}".')
 
     def visit_AugAssign(self,node):
         """ visit a AugAssign e.g. += node and visits it recursively"""
@@ -1179,7 +1167,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         var_name = self.get_node_name_id_or_n(node.func.value)  # the name 'a' of the a.append()
         if var_name.islower():
             raise RpnError(
-                f'Lists must be stored in uppercase variables not "{var_name}".  Please change the variable name to uppercase e.g. "{var_name.upper()}".')
+                f'Variable "{var_name}" is not a list or dict type.')
         self.visit(node.func.value)
         for arg in node.args:
             self.visit(arg)

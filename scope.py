@@ -120,7 +120,7 @@ class Scopes(object):
         assert self._has_mapping(var_name)
         register_name = self.current.data[var_name]
         if not '"' in register_name:  # presence of " means its a named register - good
-            raise RpnError(f'Variable "{var_name}" has been previously used to store a number/string and now needs to store a matrix. Cannot switch variable uses. Consider using a different variable name for this list/dict.')
+            raise RpnError(f'Variable "{var_name}" is not a list or dict type.')
 
     def is_range_index(self, var_name):
         return var_name in self.current.range_vars
