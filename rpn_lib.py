@@ -94,7 +94,7 @@ class RpnTemplates:
 
         999              // check don't exceed max 'to' value of 999 (ISG ccccccc.fffii)
         X<Y?
-        XEQ "p__1ErR"
+        XEQ "pErOutR"
         RDN
 
         X<>Y             // stack now: z:step y:to-1 x:from 
@@ -403,8 +403,8 @@ class RpnTemplates:
         RTN    
         """)
 
-    p__1ErR = dedent("""
-        LBL "p__1ErR"  // Out of Range error. (to,999) -> display error & stop.
+    pErOutR = dedent("""
+        LBL "pErOutR"  // Out of Range error. (to,999) -> display error & stop.
         RDN
         "range() limited"
         ├" to 999: got "
