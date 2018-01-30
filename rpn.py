@@ -935,19 +935,15 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 self.calling_for_range(node)
                 done = True
 
-        if done:
-            self.end(node)
-            self.inside_calculation = False
-            return
+        if not done:
+            self.calling_process_args(func_name, node)
 
-        self.calling_process_args(func_name, node)
-
-        if func_name in cmd_list:
-            self.calling_builtin_cmd(func_name, node)
-        elif func_name in self.program.rpn_templates.get_user_insertable_pyrpn_cmds().keys():
-            self.program.insert_xeq(func_name)  # Call to a rpn template function - not usually allowed, but some are exposed
-        else:
-            self.calling_user_def(func_name)
+            if func_name in cmd_list:
+                self.calling_builtin_cmd(func_name, node)
+            elif func_name in self.program.rpn_templates.get_user_insertable_pyrpn_cmds().keys():
+                self.program.insert_xeq(func_name)  # Call to a rpn template function - not usually allowed, but some are exposed
+            else:
+                self.calling_user_def(func_name)
 
         self.pending_stack_args = []  # TODO though if the call is part of an long expression, we could be prematurely clearing
         self.inside_calculation = False
