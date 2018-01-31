@@ -887,7 +887,6 @@ class RpnTests2(BaseTest):
         """
         self.assertRaises(RpnError, self.parse, dedent(src))
 
-    @unittest.skip('hard')
     def test_list_minus_one_indexing(self):
         self.parse(dedent("""
             a = [1]
@@ -907,7 +906,9 @@ class RpnTests2(BaseTest):
             XEQ "pMxPrep"
             
             XEQ "pMxLen"  // Get matrix row length. () -> length of ZLIST
-            XEQ "p1MxIJ"  // set IJ to index 0 (which is ZLIST row 1)            
+            1
+            -
+            XEQ "p1MxIJ"  // set IJ to zero based index, which will be converted to ZLIST one based row index            
             RCLEL
             """)
         self.compare(de_comment(expected))

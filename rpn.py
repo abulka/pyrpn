@@ -514,6 +514,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         assert isinstance(subscript_node.slice, ast.Index)
         self.visit(subscript_node.slice.value)
 
+        if self.program.last_line.text == '-1':
+            self.program.lines.pop()
+            self.program.insert_xeq('pMxLen', comment='get length of list, to figure out last index pos')
+            self.program.insert('1')
+            self.program.insert('-')
+
         # Sets IJ accordingly so that a subsequent RCLEL will give the value or STOEL will store something.
         self.program.insert_xeq('p1MxIJ')  # (index) -> () -  X is dropped.
 
