@@ -987,7 +987,7 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    @unittest.skip('hard')
+    # @unittest.skip('hard')
     def test_list_for_in(self):
         self.parse(dedent("""
             a = [1, 2]

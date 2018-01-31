@@ -27,6 +27,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.resume_labels = []  # created by the current while or for loop so that break and continue know where to go
         self.continue_labels = []  # created by the current while or for loop so that break and continue know where to go
         self.for_loop_info = []
+        self.in_range = False
         self.log_indent = 0
         self.first_def_label = None
         self.debug_gen_descriptive_labels = False
@@ -320,9 +321,14 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 self.program.insert('CLA')
                 self.alpha_already_cleared = True
 
+            if self.for_loop_info and not self.in_range:
+                log.debug(f'{self.indent_during}ITERATING THROUGH LIST VAR')
+                self.program.insert('0', comment='from')
+
             cmd = 'ARCL' if self.inside_alpha and \
                             not self.inside_calculation and \
                             not self.var_name_is_loop_counter(node.id) and \
+                            not (self.for_loop_info and not self.in_range) and \
                             not self.inside_matrix_access else 'RCL'
 
             self.program.insert(f'{cmd} {self.scopes.var_to_reg(node.id)}', comment=node.id)
@@ -332,6 +338,17 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                     self.prepare_matrix(node, 'SF 01')
                 if self.scopes.is_dictionary(node.id):
                     self.prepare_matrix(node, 'CF 01')
+
+            if self.for_loop_info and not self.in_range:
+                code = f"""
+                    XEQ "pMxLen"  
+                    1       // step
+                    XEQ "pISG"
+                    STO {self.for_loop_info[-1].register}  // the for looping var      
+                """
+                self.program.insert_raw_lines(code)
+
+
             if self.var_name_is_loop_counter(node.id):
                 self.program.insert('IP')  # just get the integer portion of isg counter
             if self.pending_unary_op:
@@ -366,6 +383,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             - elts (list of elements)
         """
         self.begin(node)
+
+        if self.for_loop_info:
+            log.debug('SHOULD BE ITERATING THROUGH literal [] [] [] [] [] [] []')
+
         self.program.insert('0', comment='not a matrix (empty)')
         self.prepare_matrix(node, 'SF 01', empty=True)
         for child in node.elts:
@@ -997,6 +1018,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             return s[s.index('.') + 1:]
 
         args = all_literals(node.args)
+        self.in_range = True
         if args:
             step_ = args[2] if len(args) == 3 else None
             if len(args) == 1:
@@ -1029,6 +1051,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         register = self.for_loop_info[-1].register
         var_name = self.for_loop_info[-1].var_name
         self.program.insert(f'STO {register}', comment=f'range {var_name}')
+        self.in_range = False
 
     def calling_builtin_with_fragment_params(self, func_name, node):
         # The built-in command has arg fragment "parameter" parts which must be emitted immediately as part of the
