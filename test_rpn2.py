@@ -844,6 +844,163 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+    # more advanced list operations
+
+    @unittest.skip('hard')
+    def test_list_pop(self):
+        self.parse(dedent("""
+            a = [1]
+            a.pop()
+            """))
+        expected = dedent("""
+            0
+            SF 01
+            XEQ "pMxPrep"
+            1
+            XEQ "LIST+"
+            RCL "ZLIST"
+            STO "a"
+
+            RCL "a"
+            SF 01
+            XEQ "pMxPrep"
+            XEQ "LIST-"
+
+            RCL "ZLIST"
+            STO "a"
+            """)
+        self.compare(de_comment(expected))
+
+    @unittest.skip('hard')
+    def test_list_del(self):
+        src = """
+            a = [1]
+            del a[1]  # del not supported
+        """
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    @unittest.skip('hard')
+    def test_list_slicing(self):
+        src = """
+            a = [1,2,3]
+            a[0:1]  # slicing not supported
+        """
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    @unittest.skip('hard')
+    def test_list_minus_one_indexing(self):
+        self.parse(dedent("""
+            a = [1]
+            a[-1]
+            """))
+        expected = dedent("""
+            0
+            SF 01
+            XEQ "pMxPrep"
+            1
+            XEQ "LIST+"
+            RCL "ZLIST"
+            STO "a"
+
+            RCL "a"
+            SF 01
+            XEQ "pMxPrep"
+            
+            XEQ "pMxLen"  // Get matrix row length. () -> length of ZLIST
+            XEQ "p1MxIJ"  // set IJ to index 0 (which is ZLIST row 1)            
+            RCLEL
+            """)
+        self.compare(de_comment(expected))
+
+    @unittest.skip('hard')
+    def test_list_assign_between_vars(self):
+        self.parse(dedent("""
+            a = [1]
+            b = a
+            b[0]
+            """))
+        expected = dedent("""
+            0
+            SF 01
+            XEQ "pMxPrep"
+            1
+            XEQ "LIST+"
+            RCL "ZLIST"
+            STO "a"
+
+            RCL "a"
+            STO "b"
+            
+            RCL "b"
+            SF 01
+            XEQ "pMxPrep"
+            0
+            XEQ "p1MxIJ"  // set IJ to index 0 (which is ZLIST row 1)            
+            RCLEL
+            """)
+        self.compare(de_comment(expected))
+
+    def test_list_print(self):
+        self.parse(dedent("""
+            a = [1, 2]
+            print(a)
+            """))
+        expected = dedent("""
+            0
+            SF 01
+            XEQ "pMxPrep"
+            1
+            XEQ "LIST+"
+            2
+            XEQ "LIST+"
+            RCL "ZLIST"
+            STO "a"
+
+            CLA
+            ARCL "a"    // in future loop and print the elements? 
+            AVIEW
+            """)
+        self.compare(de_comment(expected))
+
+    @unittest.skip('hard')
+    def test_list_for_in(self):
+        self.parse(dedent("""
+            a = [1, 2]
+            for el in a:
+                pass
+            """))
+        expected = dedent("""
+            0
+            SF 01
+            XEQ "pMxPrep"
+            1
+            XEQ "LIST+"
+            2
+            XEQ "LIST+"
+            RCL "ZLIST"
+            STO "a"
+
+            // for loop
+            
+            // setup
+            0       // from
+            RCL "a" // to
+            SF 01
+            XEQ "pMxPrep"
+            XEQ "pMxLen"  
+            1       // step
+            XEQ "pISG"
+            STO 00  // range i
+                        
+            LBL 00  // for
+            ISG 00  // test
+            GTO 01  // for body
+            GTO 02  // resume
+            LBL 01  // for body
+            GTO 00  // for
+            LBL 02  // resume            """)
+        self.compare(de_comment(expected))
+
 
     # assert
 

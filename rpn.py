@@ -327,10 +327,11 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
             self.program.insert(f'{cmd} {self.scopes.var_to_reg(node.id)}', comment=node.id)
             self.pending_stack_args.append(node.id)
-            if self.scopes.is_list(node.id):
-                self.prepare_matrix(node, 'SF 01')
-            if self.scopes.is_dictionary(node.id):
-                self.prepare_matrix(node, 'CF 01')
+            if cmd == 'RCL':
+                if self.scopes.is_list(node.id):
+                    self.prepare_matrix(node, 'SF 01')
+                if self.scopes.is_dictionary(node.id):
+                    self.prepare_matrix(node, 'CF 01')
             if self.var_name_is_loop_counter(node.id):
                 self.program.insert('IP')  # just get the integer portion of isg counter
             if self.pending_unary_op:
