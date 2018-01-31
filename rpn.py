@@ -408,25 +408,29 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.end(node)
 
     def visit_Assign(self,node):
-        """ visit a Assign node and visits it recursively
+        """ Visit a Assign node and visits it recursively
             - targets
             - value
         """
         self.begin(node)
 
         self.assign_push_rhs(node)
-        rhs_is_matrix = 'pMxPrep' in self.program.last_line.text
-        # rhs_var_name_is_named = isinstance(node.value, ast.Name) and self.scopes.is_named_matrix_register(node.value)
-        rhs_is_list = isinstance(node.value, ast.Name) and self.scopes.is_list(node.value.id)
-        rhs_is_dict = isinstance(node.value, ast.Name) and self.scopes.is_dictionary(node.value.id)
+        rhs_is_matrix_rpn_op = 'pMxPrep' in self.program.last_line.text
+        rhs_var_is_list = isinstance(node.value, ast.Name) and self.scopes.is_list(node.value.id)
+        rhs_var_is_dict = isinstance(node.value, ast.Name) and self.scopes.is_dictionary(node.value.id)
 
         for target in node.targets:
             lhs_is_subscript = isinstance(target, ast.Subscript)
             if lhs_is_subscript:
                 self.subscript_is_on_lhs_thus_assign(target)
             else:
-                self.assign_lhs(node, target, rhs_is_list, rhs_is_dict)  # var is normal (lower=local, upper=named) or matrix (lower=named, upper=named)
-            self.assert_var_ok_for_matrix(lhs_is_subscript, rhs_is_matrix, target, rhs_is_list or rhs_is_dict)
+                self.assign_lhs(node, target, rhs_var_is_list, rhs_var_is_dict)  # var is normal (lower=local, upper=named) or matrix (lower=named, upper=named)
+            # Check var types
+            if rhs_is_matrix_rpn_op or rhs_var_is_list or rhs_var_is_dict:
+                self.assert_matrix_var_lhs(target)
+            elif lhs_is_subscript:
+                self.assert_matrix_lhs(target)
+
         self.pending_stack_args = []  # must have, cos could just be assigning single values, not BinOp and not Expr
         self.end(node)
 
@@ -522,12 +526,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         # Sets IJ accordingly so that a subsequent RCLEL will give the value or STOEL will store something.
         self.program.insert_xeq('p2MxIJ')  # (key) -> () -  Finds the key, X is dropped.
-
-    def assert_var_ok_for_matrix(self, lhs_is_subscript, rhs_is_matrix, target, rhs_var_name_is_matrix):
-        if rhs_is_matrix or rhs_var_name_is_matrix:
-            self.assert_matrix_var_lhs(target)
-        elif lhs_is_subscript:
-            self.assert_matrix_lhs(target)
 
     def assert_matrix_var_lhs(self, target):
         assert '.Store' in str(target.ctx)
