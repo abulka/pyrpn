@@ -286,8 +286,8 @@ class RpnTests2(BaseTest):
 
     def test_list_append_to_existing(self):
         self.parse(dedent("""
-            A = [200]
-            A.append(5)
+            a = [200]
+            a.append(5)
             """))
         expected = dedent("""
             0
@@ -296,14 +296,14 @@ class RpnTests2(BaseTest):
             200
             XEQ "LIST+"
             RCL "ZLIST"
-            STO "A"
-            RCL "A"
+            STO "a"
+            RCL "a"
             SF 01
             XEQ "pMxPrep"
             5
             XEQ "LIST+"
             RCL "ZLIST"
-            STO "A"
+            STO "a"
             """)
         self.compare(de_comment(expected))
 

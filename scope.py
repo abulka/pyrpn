@@ -121,7 +121,7 @@ class Scopes(object):
         register_name = self.current.data[var_name]
         return '"' in register_name  # presence of " means its a named register - good
 
-    def ensure_is_named_matrix_register(self, var_name):
+    def ensure_is_named_matrix_register(self, var_name, node):
         if not self.is_named_matrix_register(var_name):
             raise RpnError(f'Variable "{var_name}" is not a list or dict type, {source_code_line_info(node)}')
 

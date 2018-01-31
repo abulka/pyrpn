@@ -428,9 +428,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
             # Check var types
             if rhs_is_matrix_rpn_op or rhs_var_is_list or rhs_var_is_dict:
-                self.scopes.ensure_is_named_matrix_register(var_name=target.id)
+                self.scopes.ensure_is_named_matrix_register(var_name=target.id, node=node)
             elif lhs_is_subscript:
-                self.scopes.ensure_is_named_matrix_register(var_name=target.value.id)  # drill into subscript node to get list or dict name
+                self.scopes.ensure_is_named_matrix_register(var_name=target.value.id, node=node)  # drill into subscript node to get list or dict name
 
         self.pending_stack_args = []  # must have, cos could just be assigning single values, not BinOp and not Expr
         self.end(node)
@@ -480,7 +480,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.visit(subscript_node.value)  # RCL list or dict onto stack
 
         var_name_mtx = subscript_node.value.id
-        self.scopes.ensure_is_named_matrix_register(var_name_mtx)
+        self.scopes.ensure_is_named_matrix_register(var_name_mtx, subscript_node)
 
         if self.scopes.is_dictionary(var_name_mtx):
             self.process_dict_access(subscript_node)
@@ -1154,10 +1154,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         return func_name
 
     def calling_append(self, node):
-        var_name = self.get_node_name_id_or_n(node.func.value)  # the name 'a' of the a.append()
-        if var_name.islower():
-            raise RpnError(f'Variable "{var_name}" is not a list or dict type, {source_code_line_info(node)}')
-        self.visit(node.func.value)
+        self.visit(node.func.value)  # recalls the list name e.g. the 'a' of the a.append() onto stack and prepares it
+        self.scopes.ensure_is_named_matrix_register(var_name=self.get_node_name_id_or_n(node.func.value), node=node)
         for arg in node.args:
             self.visit(arg)
             self.program.insert_xeq('LIST+')
