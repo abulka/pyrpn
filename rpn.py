@@ -510,6 +510,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                                 type_='empty' if empty else '')
 
     def process_list_access(self, subscript_node):
+        if isinstance(subscript_node.slice, ast.Slice):  # has a from and to value
+            raise RpnError(f'Python slice operations on arrays are currently not supported - sorry. Consider building a new list accessing the elements you want one by one, {source_code_line_info(subscript_node)}')
         # Get Index position onto stack X
         assert isinstance(subscript_node.slice, ast.Index)
         self.visit(subscript_node.slice.value)

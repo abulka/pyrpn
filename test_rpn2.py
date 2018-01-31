@@ -878,7 +878,6 @@ class RpnTests2(BaseTest):
         """
         self.assertRaises(RpnError, self.parse, dedent(src))
 
-    @unittest.skip('hard')
     def test_list_slicing(self):
         src = """
             a = [1,2,3]
