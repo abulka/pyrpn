@@ -165,8 +165,9 @@ def example_edit(id):
         return redirect(url_for('example_edit', id=example_clone.id))
 
     if request.method == 'GET' and to_rpn:
-        rpn = parse(example.source).lines_to_str(comments=True, linenos=True)
-        rpn_free42 = parse(example.source).lines_to_str(comments=False, linenos=True)
+        options = {'emit_pyrpn_lib': False}
+        rpn = parse(example.source, options).lines_to_str(comments=True, linenos=True)
+        rpn_free42 = parse(example.source, options).lines_to_str(comments=False, linenos=True)
         log.info(f'main converter converting example {example.id} title "{example.title}"')
         return jsonify(rpn=rpn, rpn_free42=rpn_free42)
 
