@@ -96,9 +96,9 @@
             return {
               is_visible: false,
               show_rpn_pre: false,
-              show_rpn_comments: false,
+              show_rpn_comments: true,
               rpn: '',
-              rpn_comments: '',
+              rpn_with_comments: '',
               rpn_free42: '',
               num_python_lines: -1,
               num_rpn_lines: -1,
@@ -116,7 +116,7 @@
                 this.num_python_lines = this.source.split('\n').length
                 let url = `/example/${this.example_id}?to-rpn=1`
                 $.get(url).then((response) => {  // I think the use of this.$http() is only in vue components and data is in response.data
-                  this.rpn_comments = response.rpn;
+                  this.rpn_with_comments = response.rpn;
                   this.rpn_free42 = response.rpn_free42;
                   this.toggle_rpn_comments();
                   this.show_rpn_pre = true
@@ -127,7 +127,7 @@
 
             toggle_rpn_comments() {
               if (this.show_rpn_comments)
-                this.rpn = this.rpn_comments
+                this.rpn = this.rpn_with_comments
               else
                 this.rpn = this.rpn_free42
             }
