@@ -385,10 +385,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             - elts (list of elements)
         """
         self.begin(node)
-
-        if self.for_loop_info:
-            log.debug('SHOULD BE ITERATING THROUGH literal [] [] [] [] [] [] []')
-
         self.program.insert('0', comment='not a matrix (empty)')
         self.prepare_matrix(node, 'SF 01', empty=True)
         for child in node.elts:
@@ -396,6 +392,18 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             if self.program.is_previous_line('string'):
                 self.program.insert('ASTO ST X')
             self.program.insert_xeq('LIST+')
+
+        if self.for_loop_info and not self.in_range:
+            log.debug(f'{self.indent_during}ITERATING THROUGH literal []')
+            code = f"""
+                0                   // from
+                {len(node.elts)}    // to
+                1                   // step
+                XEQ "pISG"
+                STO {self.for_loop_info[-1].register}  // the for looping var      
+            """
+            self.program.insert_raw_lines(code)
+
         self.end(node)
 
     def visit_Dict(self,node):
@@ -405,6 +413,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             - values
         """
         self.begin(node)
+
         self.program.insert('0', comment='not a matrix (empty)')
         self.prepare_matrix(node, 'CF 01', empty=True)
         for index, key in enumerate(node.keys):
