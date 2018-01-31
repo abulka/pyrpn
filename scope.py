@@ -1,7 +1,7 @@
 from attr import attrs, attrib, Factory
 import logging
 from logger import config_log
-from rpn_exceptions import RpnError
+from rpn_exceptions import RpnError, source_code_line_info
 
 log = logging.getLogger(__name__)
 config_log(log)
@@ -123,7 +123,7 @@ class Scopes(object):
 
     def ensure_is_named_matrix_register(self, var_name):
         if not self.is_named_matrix_register(var_name):
-            raise RpnError(f'Variable "{var_name}" is not a list or dict type.')
+            raise RpnError(f'Variable "{var_name}" is not a list or dict type, {source_code_line_info(node)}')
 
     def is_range_index(self, var_name):
         return var_name in self.current.range_vars

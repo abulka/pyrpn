@@ -8,7 +8,7 @@ import settings
 from cmd_list import cmd_list
 import tokenize
 import logging
-from rpn_exceptions import RpnError
+from rpn_exceptions import RpnError, source_code_line_info
 
 log = logging.getLogger(__name__)
 config_log(log)
@@ -184,9 +184,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def check_supported(self, name, node):
         if name in ['NOT', 'OR', 'AND']:
-            raise RpnError(f'The RPN command "{name}" is not supported - use native Python instead, line: {node.lineno}\n{node.first_token.line.strip()}')
+            raise RpnError(f'The RPN command "{name}" is not supported - use native Python instead, {source_code_line_info(node)}')
         elif name in ('aview',):
-            raise RpnError(f'The command "{name}" is no longer supported')
+            raise RpnError(f'The command "{name}" is no longer supported, {source_code_line_info(node)}')
 
     def is_built_in_cmd_with_param_fragments(self, func_name, node):
         return func_name in cmd_list and \
@@ -277,7 +277,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         elif num_args == 4:
             self.program.insert_xeq('p4Param', comment='reorder 4 params for storage')
         else:
-            raise RpnError(f'cannot handle more then four parameters to a function (4 level stack, remember), sorry.  You have {num_args}.')
+            raise RpnError(f'cannot handle more then four parameters to a function (4 level stack, remember), sorry.  You have {num_args}, {source_code_line_info(node)}')
 
         self.visit_children(node)
         self.end(node)
@@ -352,7 +352,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def visit_Str(self, node):
         self.begin(node)
         if self.disallow_string_args:
-            raise RpnError(f'Error: function disallows parameters of type string, line: {node.lineno}\n{node.first_token.line.strip()}')
+            raise RpnError(f'Error: function disallows parameters of type string, {source_code_line_info(node)}')
         if self.inside_alpha:
             # self.program.insert(f'├"{node.s[0:15]}"')
             self.split_alpha_text(node.s, append=self.alpha_append_mode)
@@ -645,7 +645,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         # self.log_pending_args()
 
         if len(self.pending_stack_args) > 4:
-            raise RpnError(f'Potential RPN stack overflow detected - expression too complex for 4 level stack - simplify! {self.pending_stack_args}')
+            raise RpnError(f'Potential RPN stack overflow detected - expression too complex for 4 level stack - simplify! {self.pending_stack_args}, {source_code_line_info(node)}')
 
         self.visit(node.op)
 
@@ -655,7 +655,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         # Never gets triggered. pending_ops never gets above 2, no matter how complex the expression.  the operators
         # don't stack up so much as the parameters on the stack, which we track with pending_stack_args
         if len(self.pending_ops) > 4:
-            raise RpnError("Potential RPN stack overflow detected - we blew our expression operator stack %s" % self.pending_ops)
+            raise RpnError(f"Potential RPN stack overflow detected - we blew our expression operator stack {self.pending_ops}, {source_code_line_info(node)}")
 
         self.program.insert(self.pending_ops[-1])
         self.pending_ops.pop()
@@ -985,7 +985,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         def num_after_point(x):
             # returns the frac digits, excluding the .
             s = str(x)
-            if '.' not in s: raise RpnError(f'cannot construct range ISG value based on to of {x}')
+            if '.' not in s: raise RpnError(f'cannot construct range ISG value based on to of {x}, {source_code_line_info(node)}')
             return s[s.index('.') + 1:]
 
         args = all_literals(node.args)
@@ -1000,8 +1000,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             from_ -= step_ if step_ else 1
             to_ -= 1
             if to_ > 1000:
-                raise RpnError(
-                    f'for range() loops are limited to max to value of 999 (ISG ccccccc.fffii limitation of fff')
+                raise RpnError(f'for range() loops are limited to max to value of 999 (ISG ccccccc.fffii limitation of fff, {source_code_line_info(node)}')
             # Calculate the .nnnss
             rhs = to_ / 1000
             if step_:
@@ -1071,11 +1070,11 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             for keyword in node.keywords:
                 if keyword.arg == 'sep':
                     if not isinstance(keyword.value, ast.Str):
-                        raise RpnError(f'sep= must be a string separator')
+                        raise RpnError(f'sep= must be a string separator, {source_code_line_info(node)}')
                     self.alpha_separator = keyword.value.s
                 elif keyword.arg == 'append':
                     if not isinstance(keyword.value, ast.NameConstant):
-                        raise RpnError(f'append= must be set to True or False')
+                        raise RpnError(f'append= must be set to True or False, {source_code_line_info(node)}')
                     named_constant_t_f = keyword.value
                     self.alpha_append_mode = named_constant_t_f.value
 
@@ -1096,7 +1095,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                     line = node.first_token.line.strip()
                     msg = f' with value "{value}"' if value else ''
                     msg += f' in "{line}"'
-                    raise RpnError(f'Do not know how to alpha {arg}{msg}')
+                    raise RpnError(f'Do not know how to alpha {arg}{msg}, {source_code_line_info(node)}')
 
                 if not self.alpha_append_mode:
                     self.alpha_append_mode = True
@@ -1141,12 +1140,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         if func_name in cmd_list and len(node.args) == 0:
             # Check that built in command has been given enough parameters
             if cmd_list[func_name]['num_arg_fragments'] > 0:
-                raise RpnError(
-                    f'{func_name} requires {cmd_list[func_name]["num_arg_fragments"]} parameters to be supplied')
+                raise RpnError(f'{func_name} requires {cmd_list[func_name]["num_arg_fragments"]} parameters to be supplied, {source_code_line_info(node)}')
             # Check that built in command has been given parameters (anti stack philosophy), even though HP41S spec actually allows params
             elif func_name in settings.CMDS_WHO_OPERATE_ON_STACK_SO_DISALLOW_NO_ARGS:
-                raise RpnError(
-                    f'{func_name} requires parameters (variable or literal number) to be supplied - referring to stack x not allowed')
+                raise RpnError(f'{func_name} requires parameters (variable or literal number) to be supplied - referring to stack x not allowed, {source_code_line_info(node)}')
 
     def adjust_function_name(self, func_name):
         if func_name == 'isFS':     func_name = 'pFS'
@@ -1159,8 +1156,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def calling_append(self, node):
         var_name = self.get_node_name_id_or_n(node.func.value)  # the name 'a' of the a.append()
         if var_name.islower():
-            raise RpnError(
-                f'Variable "{var_name}" is not a list or dict type.')
+            raise RpnError(f'Variable "{var_name}" is not a list or dict type, {source_code_line_info(node)}')
         self.visit(node.func.value)
         for arg in node.args:
             self.visit(arg)
