@@ -85,7 +85,7 @@
                 <div v-show="is_visible">
                     <label>comments <input type="checkbox" v-model="show_rpn_comments" v-on:change="toggle_rpn_comments()"></label>
                     <button type="button" @click="hide_me" style="float: right">x</button>
-                    <pre v-if="show_rpn_pre">{{ rpn }}</pre>
+                    <pre v-if="show_rpn_pre"><code>{{ rpn }}</code></pre>
                     <p style="font-size: smaller">{{ num_python_lines }} python lines, {{ num_rpn_lines }} rpn lines.</p>
                     <hr>
                 </div>
