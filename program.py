@@ -91,7 +91,8 @@ class Program(BaseRpnProgram):
             # A bit of a guess - list/dict/matrix related
             return \
                 'LIST' in self.last_line.text or \
-                'STOEL' in self.last_line.text
+                'STOEL' in self.last_line.text or \
+                'pMxPrep' in self.last_line.text
 
         if 'empty' in self.last_line.type_:
             self.insert('0')  # signifies an empty list, since empty matrixes are not possible

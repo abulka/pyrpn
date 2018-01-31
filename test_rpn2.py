@@ -912,7 +912,6 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    @unittest.skip('hard')
     def test_list_assign_between_vars(self):
         self.parse(dedent("""
             a = [1]
@@ -929,6 +928,9 @@ class RpnTests2(BaseTest):
             STO "a"
 
             RCL "a"
+            SF 01           // not needed but hard to repress
+            XEQ "pMxPrep"   // not needed but hard to repress
+            RCL "ZLIST"     // forced to generate this in order to get the RCL "a" back onto the stack, due to pMxPrep eating it up  
             STO "b"
             
             RCL "b"

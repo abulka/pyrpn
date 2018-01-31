@@ -116,10 +116,13 @@ class Scopes(object):
     def get_register(self, var):
         return self.current.data[var]
 
-    def ensure_is_named_matrix_register(self, var_name):
+    def is_named_matrix_register(self, var_name):
         assert self._has_mapping(var_name)
         register_name = self.current.data[var_name]
-        if not '"' in register_name:  # presence of " means its a named register - good
+        return '"' in register_name  # presence of " means its a named register - good
+
+    def ensure_is_named_matrix_register(self, var_name):
+        if not self.is_named_matrix_register(var_name):
             raise RpnError(f'Variable "{var_name}" is not a list or dict type.')
 
     def is_range_index(self, var_name):
