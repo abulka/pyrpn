@@ -321,14 +321,16 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 self.program.insert('CLA')
                 self.alpha_already_cleared = True
 
-            if self.for_loop_info and not self.in_range:
+            iter_through_list_var_name = self.for_loop_info and not self.in_range
+
+            if iter_through_list_var_name:
                 log.debug(f'{self.indent_during}ITERATING THROUGH LIST VAR')
                 self.program.insert('0', comment='from')
 
             cmd = 'ARCL' if self.inside_alpha and \
                             not self.inside_calculation and \
                             not self.var_name_is_loop_counter(node.id) and \
-                            not (self.for_loop_info and not self.in_range) and \
+                            not iter_through_list_var_name and \
                             not self.inside_matrix_access else 'RCL'
 
             self.program.insert(f'{cmd} {self.scopes.var_to_reg(node.id)}', comment=node.id)
@@ -339,7 +341,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 if self.scopes.is_dictionary(node.id):
                     self.prepare_matrix(node, 'CF 01')
 
-            if self.for_loop_info and not self.in_range:
+            if iter_through_list_var_name:
                 code = f"""
                     XEQ "pMxLen"  
                     1       // step
