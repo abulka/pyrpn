@@ -906,8 +906,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         done = False
         self.inside_calculation = True
 
-        if isinstance(node.func, ast.Attribute) and node.func.attr == 'append':
-            self.calling_append(node)
+        if isinstance(node.func, ast.Attribute) and node.func.attr in ('append', 'pop'):
+            self.calling_append_or_pop(node, cmd=node.func.attr)
         else:
             func_name = node.func.id
             func_name = self.adjust_function_name(func_name)
@@ -1161,12 +1161,20 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         if func_name == 'print':    func_name = 'AVIEW'
         return func_name
 
-    def calling_append(self, node):
+    def calling_append_or_pop(self, node, cmd):
+        assert cmd in ('append', 'pop')
         self.visit(node.func.value)  # recalls the list name e.g. the 'a' of the a.append() onto stack and prepares it
         self.scopes.ensure_is_named_matrix_register(var_name=self.get_node_name_id_or_n(node.func.value), node=node)
+        if cmd == 'pop':
+            rpn = 'LIST-'
+            self.program.insert_xeq(rpn)
         for arg in node.args:
             self.visit(arg)
-            self.program.insert_xeq('LIST+')
+            if cmd == 'append':
+                rpn = 'LIST+'
+                self.program.insert_xeq(rpn)
+            else:
+                raise RpnError(f'Parameters to pop are not currently supported, {source_code_line_info(node)}')
         self.program.insert_sto(self.scopes.var_to_reg(node.func.value.id), comment=f'{node.func.value.id}')
         self.end(node)
 

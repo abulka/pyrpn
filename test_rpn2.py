@@ -846,7 +846,6 @@ class RpnTests2(BaseTest):
 
     # more advanced list operations
 
-    @unittest.skip('hard')
     def test_list_pop(self):
         self.parse(dedent("""
             a = [1]
