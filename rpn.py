@@ -425,11 +425,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 self.subscript_is_on_lhs_thus_assign(target)
             else:
                 self.assign_lhs(node, target, rhs_var_is_list, rhs_var_is_dict)  # var is normal (lower=local, upper=named) or matrix (lower=named, upper=named)
+
             # Check var types
             if rhs_is_matrix_rpn_op or rhs_var_is_list or rhs_var_is_dict:
-                self.assert_matrix_var_lhs(target)
+                self.scopes.ensure_is_named_matrix_register(var_name=target.id)
             elif lhs_is_subscript:
-                self.assert_matrix_lhs(target)
+                self.scopes.ensure_is_named_matrix_register(var_name=target.value.id)  # drill into subscript node to get list or dict name
 
         self.pending_stack_args = []  # must have, cos could just be assigning single values, not BinOp and not Expr
         self.end(node)
@@ -526,16 +527,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         # Sets IJ accordingly so that a subsequent RCLEL will give the value or STOEL will store something.
         self.program.insert_xeq('p2MxIJ')  # (key) -> () -  Finds the key, X is dropped.
-
-    def assert_matrix_var_lhs(self, target):
-        assert '.Store' in str(target.ctx)
-        assert isinstance(target.ctx, ast.Store)
-        var_name = target.id
-        self.scopes.ensure_is_named_matrix_register(var_name)
-
-    def assert_matrix_lhs(self, target):
-        var_name = target.value.id  # drill into subscript nodes to get list or dict name
-        self.scopes.ensure_is_named_matrix_register(var_name)
 
     def visit_AugAssign(self,node):
         """ visit a AugAssign e.g. += node and visits it recursively"""
