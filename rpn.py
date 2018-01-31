@@ -565,6 +565,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.pending_ops.append('Y↑X')
         self.end(node)
 
+    def visit_Delete(self,node):
+        """ visit a Power node """
+        self.begin(node)
+        raise RpnError(f'The del python command is not supported - sorry, {source_code_line_info(node)}')
+        self.end(node)
+
     def visit_BoolOp(self, node):
         """
         BoolOp(

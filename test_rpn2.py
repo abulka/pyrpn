@@ -871,7 +871,6 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    @unittest.skip('hard')
     def test_list_del(self):
         src = """
             a = [1]
