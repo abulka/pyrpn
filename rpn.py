@@ -514,16 +514,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         assert isinstance(subscript_node.slice, ast.Index)
         self.visit(subscript_node.slice.value)
 
-        try:
-            value = int(self.program.last_line.text)
-            if value < 0:
-                self.program.lines.pop()
-                self.program.insert_xeq('pMxLen', comment='get length of list, to figure out last index pos')
-                self.program.insert(str(abs(value)))
-                self.program.insert('-')
-        except ValueError:
-            pass  # it was a string, not an int.
-
         # Sets IJ accordingly so that a subsequent RCLEL will give the value or STOEL will store something.
         self.program.insert_xeq('p1MxIJ')  # (index) -> () -  X is dropped.
 

@@ -487,12 +487,20 @@ class RpnTemplates:
         RTN
         """)
 
-    p1MxIJ = dedent("""
+    p1MxIJ = dedent(f"""
         LBL "p1MxIJ"     // Set IJ for List. (index) -> () & sets IJ for list access
 
-        // Sets IJ for list access to 'index'.  
+        // Sets IJ for list access to 'index'.  Now handles negative indexes.  
         // Assumes ZLIST is indexed.
 
+        X≥0?
+        GTO {easy}
+
+        // Handle negative index, look up length of list
+        XEQ "pMxLen"
+        +              // add the negative index to length to get the wanted index
+                
+        LBL {easy}
         1
         +               // adjust row from 0 based (python) to 1 based (RPN matrix)
         1               // col (always, in lists)

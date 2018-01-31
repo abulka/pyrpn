@@ -904,39 +904,8 @@ class RpnTests2(BaseTest):
             RCL "a"
             SF 01
             XEQ "pMxPrep"
-            
-            XEQ "pMxLen"  // Get matrix row length. () -> length of ZLIST
-            1
-            -
-            XEQ "p1MxIJ"  // set IJ to zero based index, which will be converted to ZLIST one based row index            
-            RCLEL
-            """)
-        self.compare(de_comment(expected))
-
-    def test_list_minus_two_indexing(self):
-        self.parse(dedent("""
-            a = [1,2]
-            a[-2]
-            """))
-        expected = dedent("""
-            0
-            SF 01
-            XEQ "pMxPrep"
-            1
-            XEQ "LIST+"
-            2
-            XEQ "LIST+"
-            RCL "ZLIST"
-            STO "a"
-
-            RCL "a"
-            SF 01
-            XEQ "pMxPrep"
-
-            XEQ "pMxLen"  // Get matrix row length. () -> length of ZLIST
-            2
-            -
-            XEQ "p1MxIJ"  // set IJ to zero based index, which will be converted to ZLIST one based row index            
+            -1
+            XEQ "p1MxIJ"  // set IJ, takes python 0 based index convention, converts to IJ 1 based, now handles negative indices            
             RCLEL
             """)
         self.compare(de_comment(expected))
@@ -960,11 +929,8 @@ class RpnTests2(BaseTest):
             RCL "a"
             SF 01
             XEQ "pMxPrep"
-            
-            XEQ "pMxLen"  // Get matrix row length. () -> length of ZLIST
-            1
-            -
-            XEQ "p1MxIJ"  // set IJ to zero based index, which will be converted to ZLIST one based row index            
+            -1
+            XEQ "p1MxIJ"  // set IJ, takes python 0 based index convention, converts to IJ 1 based, now handles negative indices            
             STOEL
             
             RCL "ZLIST"
