@@ -131,10 +131,10 @@ class Scopes(object):
         if not self.is_named_matrix_register(var_name):
             raise RpnError(f'Variable "{var_name}" is not a list or dict type, {source_code_line_info(node)}')
 
-    def is_range_index(self, var_name):
+    def is_range_var(self, var_name):
         return var_name in self.current.range_vars
 
-    def is_range_index_el(self, var_name):
+    def is_el_var(self, var_name):
         return var_name in self.current.for_el_vars.keys()
 
     def is_dictionary(self, var_name):
@@ -143,13 +143,13 @@ class Scopes(object):
     def is_list(self, var_name):
         return var_name in self.current.list_vars
 
-    def set_iter_matrix(self, index_el_var, iter_matrix_var):
-        assert self.is_range_index_el(index_el_var)
-        self.current.for_el_vars[index_el_var] = iter_matrix_var  # what matrix var this index el is tracking
+    def map_el_to_list(self, el_var, list_var):
+        assert self.is_el_var(el_var)
+        self.current.for_el_vars[el_var] = list_var  # what matrix var this index el is tracking
 
-    def iterating_through_what_matrix_var(self, var_name_el):
-        assert self.is_range_index_el(var_name_el)
-        return self.current.for_el_vars[var_name_el]
+    def list_var_from_el(self, el_var):
+        assert self.is_el_var(el_var)
+        return self.current.for_el_vars[el_var]
 
     # Util
 

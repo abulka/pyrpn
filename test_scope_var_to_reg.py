@@ -114,9 +114,9 @@ class ListDictMatrixTests(BaseTest):
         scopes = Scopes()
         register = scopes.var_to_reg('el', is_range_index_el=True)#, iter_var='a')
         self.assertEqual('00', register)
-        scopes.set_iter_matrix(index_el_var='el', iter_matrix_var='a')
-        self.assertTrue(scopes.is_range_index_el('el'))
-        self.assertEqual('a', scopes.iterating_through_what_matrix_var('el'))
+        scopes.map_el_to_list(el_var='el', list_var='a')
+        self.assertTrue(scopes.is_el_var('el'))
+        self.assertEqual('a', scopes.list_var_from_el('el'))
 
         # cause the upgrade
         scopes.var_to_reg('a', is_dict_var=True)
@@ -131,10 +131,10 @@ class RangeVarNames(BaseTest):
         var_name = 'i'
         register = scopes.var_to_reg(var_name, is_range_index=False)
         self.assertEqual('00', register)
-        self.assertFalse(scopes.is_range_index(var_name))
+        self.assertFalse(scopes.is_range_var(var_name))
 
     def test_i(self):
         scopes = Scopes()
         var_name = 'i'
         register = scopes.var_to_reg(var_name, is_range_index=True)
-        self.assertTrue(scopes.is_range_index(var_name))
+        self.assertTrue(scopes.is_range_var(var_name))

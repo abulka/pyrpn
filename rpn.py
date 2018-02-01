@@ -118,8 +118,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         if settings.LOG_AST_CHILDREN_COMPLETE:
             self.log_state(f'{type(node).__name__} children complete')
 
-    def var_name_is_loop_counter(self, var_name):
-        return self.scopes.is_range_index(var_name)
+    def var_name_is_loop_index_or_el(self, var_name):
+        return self.scopes.is_range_var(var_name) or \
+               self.scopes.is_el_var(var_name)
 
     def find_comment(self, node):
         # Finds comment in the original python source code associated with this token.
@@ -217,7 +218,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             need_st_x = True
         if isinstance(node.args[0], ast.Name):
             need_st_x = False
-            if self.scopes.is_range_index(node.args[0].id) or self.scopes.is_range_index_el(node.args[0].id):
+            if self.scopes.is_range_var(node.args[0].id) or self.scopes.is_el_var(node.args[0].id):
                 need_st_x = True
         return need_st_x
 
@@ -340,7 +341,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         if '.Load' in str(node.ctx):
             assert isinstance(node.ctx, ast.Load)
             self.rcl_clear_alpha()
-            self.rcl_var(node)
+            self.rcl_var(node)      # normal RCL, though if iterating a matrix, prepares the matrix
             if self.iterating_list:
                 self.iter_through_var(node)
             self.rcl_var_index(node)
@@ -350,12 +351,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.end(node)
 
     def rcl_var_index(self, node):
-        # TODO the var_name_is_loop_counter() call could potentially be a combo of both
-        if self.scopes.is_range_index(node.id):  # self.var_name_is_loop_counter(node.id):
+        # TODO the var_name_is_loop_index_or_el() call could potentially be a combo of both
+        if self.scopes.is_range_var(node.id):  # self.var_name_is_loop_index_or_el(node.id):
             self.program.insert('IP')  # just get the integer portion of isg counter
-        elif self.scopes.is_range_index_el(node.id):
+        elif self.scopes.is_el_var(node.id):
             self.program.insert('IP')  # just get the integer portion of isg counter
-            iter_var = self.scopes.iterating_through_what_matrix_var(var_name_el=node.id)
+            iter_var = self.scopes.list_var_from_el(el_var=node.id)
             register = self.scopes.var_to_reg(iter_var)
             code = f"""
                     RCL {register} // its an el index so prepare associated list for access
@@ -376,7 +377,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 XEQ "pISG"
                 STO {self.for_loop_info[-1].register}  // the for looping index var      
             """
-        self.scopes.set_iter_matrix(index_el_var=self.for_loop_info[-1].var_name, iter_matrix_var=node.id)
+        self.scopes.map_el_to_list(el_var=self.for_loop_info[-1].var_name, list_var=node.id)
         self.program.insert_raw_lines(code)
 
     @property
@@ -392,7 +393,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def rcl_var(self, node):
         rcl_cmd = 'ARCL' if self.inside_alpha and \
                             not self.inside_calculation and \
-                            not self.var_name_is_loop_counter(node.id) and \
+                            not self.var_name_is_loop_index_or_el(node.id) and \
                             not self.iterating_list and \
                             not self.inside_matrix_access else 'RCL'
         self.program.insert(f'{rcl_cmd} {self.scopes.var_to_reg(node.id)}', comment=node.id)
@@ -1136,7 +1137,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             if isinstance(arg, ast.Name):  # reference to a variable, thus pull out a register name
                 comment = arg_val
                 # hack if trying to access i
-                if self.var_name_is_loop_counter(arg_val):
+                if self.var_name_is_loop_index_or_el(arg_val):
                     comment = arg_val + ' (loop var)'
                     register = arg_val = self.scopes.var_to_reg(arg_val)
                     self.program.insert(f'RCL {register}', comment=comment)
@@ -1182,7 +1183,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 if isinstance(arg, (ast.Num, ast.BinOp, ast.Compare, ast.Subscript, ast.Call)):  # others?
                     self.program.insert('ARCL ST X')
                 elif isinstance(arg, ast.Name):
-                    if self.var_name_is_loop_counter(arg.id):
+                    if self.var_name_is_loop_index_or_el(arg.id):
                         self.program.insert('ARCL ST X')
                 elif isinstance(arg, ast.Str):
                     pass
