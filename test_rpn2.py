@@ -1131,7 +1131,6 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    # @unittest.skip('so hard - need temp var for list itself')
     def test_list_for_in_literal_list(self):
         self.parse(dedent("""
             a = ['aa', 'bb']
@@ -1188,10 +1187,10 @@ class RpnTests2(BaseTest):
             ARCL ST X
             ├" "
             
-            1       // indexing in to position 1
             RCL "a"
             SF 01
             XEQ "pMxPrep"
+            1       // indexing in to position 1
             XEQ "p1MxIJ"
             RCLEL   // get el
             ARCL ST X            
