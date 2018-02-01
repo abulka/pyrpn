@@ -187,10 +187,82 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 self.program.insert(f'{leading_symbol}"{fragment}"')  # , comment=alpha_text
 
     def check_supported(self, name, node):
+        built_ins = ['abs',
+                     'dict',
+                     'help',
+                     'min',
+                     'setattr',
+                     'all',
+                     'dir',
+                     'hex',
+                     'next',
+                     'slice',
+                     'any',
+                     'divmod',
+                     'id',
+                     'object',
+                     'sorted',
+                     'ascii',
+                     'enumerate',
+                     'input',
+                     'raw_input',
+                     'oct',
+                     'staticmethod',
+                     'bin',
+                     'eval',
+                     'int',
+                     'open',
+                     'str',
+                     'bool',
+                     'exec',
+                     'isinstance',
+                     'ord',
+                     'sum',
+                     'bytearray',
+                     'filter',
+                     'issubclass',
+                     'pow',
+                     'super',
+                     'bytes',
+                     'float',
+                     'iter',
+                     # 'print',
+                     'tuple',
+                     'callable',
+                     'format',
+                     # 'len',
+                     'property',
+                     'type',
+                     'chr',
+                     'frozenset',
+                     'list',
+                     # 'range',
+                     'vars',
+                     'classmethod',
+                     'getattr',
+                     'locals',
+                     'repr',
+                     'zip',
+                     'compile',
+                     'globals',
+                     'map',
+                     'reversed',
+                     '__import__',
+                     'complex',
+                     'hasattr',
+                     'max',
+                     'round',
+                     'delattr',
+                     'hash',
+                     'memoryview',
+                     'set',
+                     ]
         if name in ['NOT', 'OR', 'AND']:
             raise RpnError(f'The RPN command "{name}" is not supported - use native Python instead, {source_code_line_info(node)}')
         elif name in ('aview',):
             raise RpnError(f'The command "{name}" is no longer supported, {source_code_line_info(node)}')
+        elif name in built_ins:
+            raise RpnError(f'The built-in Python command "{name}" is not supported, sorry. Consider calling a HP42S rpn command instead e.g. SIN(n) or PI() etc. {source_code_line_info(node)}')
 
     def is_built_in_cmd_with_param_fragments(self, func_name, node):
         return func_name in cmd_list and \
@@ -656,6 +728,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         """ visit a Power node """
         self.begin(node)
         raise RpnError(f'The del python command is not supported - sorry, {source_code_line_info(node)}')
+        self.end(node)
+
+    def visit_Tuple(self,node):
+        """ visit a Power node """
+        self.begin(node)
+        raise RpnError(f'Python tuples are currently not supported - sorry, {source_code_line_info(node)}')
         self.end(node)
 
     def visit_BoolOp(self, node):

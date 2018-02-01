@@ -1202,6 +1202,29 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+    def test_list_enumerate_tuple(self):
+        src = """
+            a = [1,2]
+            for i, v in enumerate(a):  # tuples not supported
+                pass
+        """
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    def test_list_enumerate(self):
+        src = """
+            a = [1,2]
+            enumerate(a)  # not supported
+        """
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    # advanced dictionary operations
+
+    def test_dict_del(self):
+        src = """
+            a = {'aa':1}
+            del a['aa']  # del not supported
+        """
+        self.assertRaises(RpnError, self.parse, dedent(src))
 
     # assert
 
