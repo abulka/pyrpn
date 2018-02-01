@@ -40,7 +40,7 @@ class Scopes(object):
         if len(self.stack) > 1:  # always leave first permanent scope
             self.stack.pop()
 
-    def var_to_reg(self, var_name, force_reg_name=None, is_range_index=False, is_dict_var=False, is_list_var=False):
+    def var_to_reg(self, var_name, force_reg_name=None, is_range_index=False, is_range_index_el=False, is_dict_var=False, is_list_var=False):
         """
         Figure out the register to use to store/recall 'var_name' e.g. 00 or "x" - also taking into account our scope system.
 
@@ -57,6 +57,7 @@ class Scopes(object):
         :param var_name: python identifier e.g. 'x'
         :param force_reg_name: force the mapping to be to this
         :param is_range_index: record that this is a range loop related var
+        :param is_range_index_el: record that this is a list or dict element accessing loop related var
         :param is_dict_var: record that this var is matrix related
         :param is_list_var: record that this var is matrix related
         :return: register name as a string
@@ -86,6 +87,11 @@ class Scopes(object):
                 # Track list vars
                 if is_list_var and var_name not in self.current.list_vars:
                     self.current.list_vars.append(var_name)
+
+                # Track indexes used to access elements of a list or dictionary
+                if is_range_index_el and var_name not in self.current.for_el_vars:
+                    # TODO need to store matrix var so that we know for whom we are an el ref for
+                    self.current.for_el_vars.append(var_name)
 
         if force_reg_name:
             register = force_reg_name
@@ -128,6 +134,9 @@ class Scopes(object):
     def is_range_index(self, var_name):
         return var_name in self.current.range_vars
 
+    def is_range_index_el(self, var_name):
+        return var_name in self.current.for_el_vars
+
     def is_dictionary(self, var_name):
         return var_name in self.current.dict_vars
 
@@ -144,6 +153,7 @@ class Scopes(object):
 class Scope(object):
     data = attrib(default=Factory(dict))  # var name to register name
     range_vars = attrib(default=Factory(list))  # keep track of var names which are used in for loop ranges
+    for_el_vars = attrib(default=Factory(list))  # keep track of var names which are used in for..in loop list/dict element acceses
     dict_vars = attrib(default=Factory(list))  # keep track of var names which are dictionaries
     list_vars = attrib(default=Factory(list))  # keep track of var names which are lists
 

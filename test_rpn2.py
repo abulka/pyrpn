@@ -991,7 +991,7 @@ class RpnTests2(BaseTest):
         self.parse(dedent("""
             a = [1, 2]
             for el in a:
-                pass
+                VIEW(el)
             """))
         expected = dedent("""
             0
@@ -1021,10 +1021,21 @@ class RpnTests2(BaseTest):
             GTO 01  // for body
             GTO 02  // resume
             LBL 01  // for body
+            
+            RCL 00  // get the index 
+            IP
+            RCL "a" // its an el index so prepare associated list for access
+            SF 01
+            XEQ "pMxPrep"
+            XEQ "p1MxIJ"
+            RCLEL   // get el
+            VIEW ST X
             GTO 00  // for
-            LBL 02  // resume            """)
+            LBL 02  // resume
+            """)
         self.compare(de_comment(expected))
 
+    @unittest.skip('so hard - need temp var for list itself')
     def test_list_for_in_literal_list(self):
         self.parse(dedent("""
             for el in [1, 2]:

@@ -194,10 +194,48 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                cmd_list[func_name]['num_arg_fragments'] > 0
 
     def cmd_st_x_situation(self, func_name, node):
+        """
+        VIEW is part of a family of commands that needs e.g. the literal 5 in VIEW(5) on the stack
+        thus is needs to be expressed as VIEW ST X
+
+        VIEW of a variable is not a stack x situation because VIEW(a) can just expressed simply as
+        VIEW "a" or VIEW 00
+
+        Both for loop index variables VIEW(i) and VIEW(el) are variable references but they need
+        further manipulation work on the stack, thus are ST X situations.
+
+        node is the Call node e.g. VIEW
+        node.args[0] is the Num or Name node being passed e.g. 5, i, el
+
+        This routine should not assume args are being passed in, because it we may be being called
+        about PSE() or something.
+
+        # via because
         # if its a variable reference, then we can happily construct an all in one cmd with fragment e.g. VIEW 00
-        # otherwise its a cmd_st_x_situation situation where we visit recurse normally and then do a ST X as arg to the built in command
-        return func_name in settings.CMDS_WHO_NEED_LITERAL_NUM_ON_STACK_X and \
-               not isinstance(node.args[0], ast.Name)
+        # otherwise its a cmd_st_x_situation situation where we visit recurse normally and then do a ST X as arg
+        # to the built in command.
+        # If its a variable name being referenced, then we can refer directly to a register and is thus not a ST X situation.
+        # It that variable is a index to a for loop, then we need to put it on the stack to IP or do matrix elaccess
+        # and thus it is a ST X situation.
+        """
+        if len(node.args) == 0:
+            return False
+
+        need_st_x = False
+
+        if func_name in settings.CMDS_WHO_NEED_LITERAL_NUM_ON_STACK_X:
+            need_st_x = True
+        if isinstance(node.args[0], ast.Name):
+            need_st_x = False
+            if self.scopes.is_range_index(node.args[0].id) or self.scopes.is_range_index_el(node.args[0].id):
+                need_st_x = True
+        return need_st_x
+        # is_var_so_no_st_x = isinstance(node.args[0], ast.Name)
+        # better_to_access_register_directly = isinstance(node.args[0], ast.Name) and \
+        #                                not (self.scopes.is_range_index(node.args[0].id) or
+        #                                     self.scopes.is_range_index_el(node.args[0].id))
+        # return func_name in settings.CMDS_WHO_NEED_LITERAL_NUM_ON_STACK_X and \
+        #        not better_to_access_register_directly
 
     def friendly_type(self, node):
         if isinstance(node, ast.Dict):
@@ -321,11 +359,11 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 self.program.insert('CLA')
                 self.alpha_already_cleared = True
 
-            iter_through_list_var_name = self.for_loop_info and not self.in_range
+            iter_through_list_var_name = len(self.for_loop_info) > 0 and not self.in_range
 
             if iter_through_list_var_name:
                 log.debug(f'{self.indent_during}ITERATING THROUGH LIST VAR')
-                self.program.insert('0', comment='from')
+                self.program.insert('0', comment='from')  # FROM
 
             cmd = 'ARCL' if self.inside_alpha and \
                             not self.inside_calculation and \
@@ -343,16 +381,27 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
             if iter_through_list_var_name:
                 code = f"""
-                    XEQ "pMxLen"  
-                    1       // step
+                    XEQ "pMxLen"    // TO
+                    1               // STEP
                     XEQ "pISG"
                     STO {self.for_loop_info[-1].register}  // the for looping var      
                 """
                 self.program.insert_raw_lines(code)
 
-
-            if self.var_name_is_loop_counter(node.id):
+            # TODO the var_name_is_loop_counter() call could potentially be a combo of both
+            if self.scopes.is_range_index(node.id): # self.var_name_is_loop_counter(node.id):
                 self.program.insert('IP')  # just get the integer portion of isg counter
+            elif self.scopes.is_range_index_el(node.id):
+                self.program.insert('IP')  # just get the integer portion of isg counter
+                code = """
+                    RCL "a" // its an el index so prepare associated list for access
+                    SF 01
+                    XEQ "pMxPrep"
+                    XEQ "p1MxIJ"
+                    RCLEL   // get el
+                """
+                self.program.insert_raw_lines(code)
+
             if self.pending_unary_op:
                 self.program.insert('CHS')
                 self.pending_unary_op = ''
@@ -900,7 +949,20 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         log.debug(f'{self.indent} for')
         self.visit(node.target)
         varname = node.target.id
-        register = self.scopes.var_to_reg(varname, is_range_index=True)
+
+        if isinstance(node.iter, ast.Call):  # range
+            print('FOR CALL')
+            register = self.scopes.var_to_reg(varname, is_range_index=True)
+        elif isinstance(node.iter, ast.Name):
+            print('FOR IN NAME')
+            pass # need to change varname to be a matrix list element not an index
+            register = self.scopes.var_to_reg(varname, is_range_index_el=True)
+        elif isinstance(node.iter, ast.List):
+            print('FOR IN LITERAL LIST')
+            pass # need to change varname to be a matrix list element not an index
+            register = self.scopes.var_to_reg(varname, is_range_index_el=True)
+
+
         self.for_loop_info.append(ForLoopItem(varname, register, label_for))
 
         log.debug(f'{self.indent} in')
