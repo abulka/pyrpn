@@ -1166,7 +1166,7 @@ class RpnTests2(BaseTest):
             SF 01
             XEQ "pMxPrep"
             0               // from
-            XEQ "pMxLen"    // to
+            2               // to
             1               // step
             XEQ "pISG"
             STO 00            

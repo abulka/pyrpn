@@ -437,9 +437,14 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 self.program.insert('ASTO ST X')
             self.program.insert_xeq('LIST+')
 
-        if self.for_loop_info and not self.in_range:
+        if self.iterating_list:
             log.debug(f'{self.indent_during}ITERATING THROUGH literal []')
             code = f"""
+                RCL "ZLIST"
+                STO "pTmpLst"
+                RCL "pTmpLst"
+                SF 01
+                XEQ "pMxPrep"            
                 0                   // from
                 {len(node.elts)}    // to
                 1                   // step
