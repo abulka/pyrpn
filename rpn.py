@@ -1138,6 +1138,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 comment = arg_val
                 # hack if trying to access i
                 if self.var_name_is_loop_index_or_el(arg_val):
+                    assert not self.scopes.is_el_var(node.id)  # Haven't implemented this yet - look to rcl_var_index() for inspiration/DRY
                     comment = arg_val + ' (loop var)'
                     register = arg_val = self.scopes.var_to_reg(arg_val)
                     self.program.insert(f'RCL {register}', comment=comment)
