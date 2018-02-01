@@ -351,11 +351,11 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.end(node)
 
     def rcl_var_index(self, node):
-        # TODO the var_name_is_loop_index_or_el() call could potentially be a combo of both
-        if self.scopes.is_range_var(node.id):  # self.var_name_is_loop_index_or_el(node.id):
+        if self.var_name_is_loop_index_or_el(node.id):
+            assert self.scopes.is_range_var(node.id) or self.scopes.is_el_var(node.id)
             self.program.insert('IP')  # just get the integer portion of isg counter
-        elif self.scopes.is_el_var(node.id):
-            self.program.insert('IP')  # just get the integer portion of isg counter
+        # Additional work if for..in
+        if self.scopes.is_el_var(node.id):
             iter_var = self.scopes.list_var_from_el(el_var=node.id)
             register = self.scopes.var_to_reg(iter_var)
             code = f"""
@@ -370,10 +370,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def iter_through_var(self, node):
         assert self.iterating_list
         log.debug(f'{self.indent_during}ITERATING THROUGH LIST VAR')
-        self.program.insert('0', comment='from')  # FROM
+        self.program.insert('0', comment='from')  # // FROM
         code = f"""
-                XEQ "pMxLen"    // TO
-                1               // STEP
+                XEQ "pMxLen"                        // TO
+                1                                   // STEP
                 XEQ "pISG"
                 STO {self.for_loop_info[-1].register}  // the for looping index var      
             """

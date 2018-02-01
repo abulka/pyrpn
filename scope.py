@@ -77,8 +77,8 @@ class Scopes(object):
                 self._add_mapping(var_name, register=register)
 
                 # Track variables which are used in range() for loops
-                if is_range_index and var_name not in self.current.range_vars:
-                    self.current.range_vars.append(var_name)
+                if is_range_index and var_name not in self.current.for_range_vars:
+                    self.current.for_range_vars.append(var_name)
 
                 # Track dictionary vars
                 if is_dict_var and var_name not in self.current.dict_vars:
@@ -132,7 +132,7 @@ class Scopes(object):
             raise RpnError(f'Variable "{var_name}" is not a list or dict type, {source_code_line_info(node)}')
 
     def is_range_var(self, var_name):
-        return var_name in self.current.range_vars
+        return var_name in self.current.for_range_vars
 
     def is_el_var(self, var_name):
         return var_name in self.current.for_el_vars.keys()
@@ -160,10 +160,10 @@ class Scopes(object):
 @attrs
 class Scope(object):
     data = attrib(default=Factory(dict))  # var name to register name
-    range_vars = attrib(default=Factory(list))  # keep track of var names which are used in for loop ranges
+    for_range_vars = attrib(default=Factory(list))  # keep track of var names which are used in for loop ranges
     for_el_vars = attrib(default=Factory(dict))  # keep track of var names which are used in for..in loop list/dict element acceses - and what matrix they are tracking
-    dict_vars = attrib(default=Factory(list))  # keep track of var names which are dictionaries
     list_vars = attrib(default=Factory(list))  # keep track of var names which are lists
+    dict_vars = attrib(default=Factory(list))  # keep track of var names which are dictionaries
 
     @property
     def empty(self):
