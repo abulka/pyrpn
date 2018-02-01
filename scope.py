@@ -143,6 +143,12 @@ class Scopes(object):
     def is_list(self, var_name):
         return var_name in self.current.list_vars
 
+    def set_iter_matrix(self, index_el_var='el', iter_matrix_var='a'):
+        pass  # TODO
+
+    def iterating_through_what_matrix_var(self, var_name_el):
+        return 'a'  # TODO
+
     # Util
 
     def dump(self):

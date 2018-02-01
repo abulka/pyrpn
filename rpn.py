@@ -368,8 +368,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                     XEQ "pMxLen"    // TO
                     1               // STEP
                     XEQ "pISG"
-                    STO {self.for_loop_info[-1].register}  // the for looping var      
+                    STO {self.for_loop_info[-1].register}  // the for looping index var      
                 """
+                self.scopes.set_iter_matrix(index_el_var=self.for_loop_info[-1].var_name, iter_matrix_var=node.id)
                 self.program.insert_raw_lines(code)
 
             # TODO the var_name_is_loop_counter() call could potentially be a combo of both
@@ -377,8 +378,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 self.program.insert('IP')  # just get the integer portion of isg counter
             elif self.scopes.is_range_index_el(node.id):
                 self.program.insert('IP')  # just get the integer portion of isg counter
-                code = """
-                    RCL "a" // its an el index so prepare associated list for access
+                iter_var = self.scopes.iterating_through_what_matrix_var(var_name_el=node.id)
+                register = self.scopes.var_to_reg(iter_var)
+                code = f"""
+                    RCL {register} // its an el index so prepare associated list for access
                     SF 01
                     XEQ "pMxPrep"
                     XEQ "p1MxIJ"
@@ -935,14 +938,14 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         varname = node.target.id
 
         if isinstance(node.iter, ast.Call):  # range
-            print('FOR CALL')
+            # print('FOR CALL')
             register = self.scopes.var_to_reg(varname, is_range_index=True)
         elif isinstance(node.iter, ast.Name):
-            print('FOR IN NAME')
+            # print('FOR IN NAME')
             pass # need to change varname to be a matrix list element not an index
             register = self.scopes.var_to_reg(varname, is_range_index_el=True)
         elif isinstance(node.iter, ast.List):
-            print('FOR IN LITERAL LIST')
+            # print('FOR IN LITERAL LIST')
             pass # need to change varname to be a matrix list element not an index
             register = self.scopes.var_to_reg(varname, is_range_index_el=True)
 

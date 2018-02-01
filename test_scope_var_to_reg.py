@@ -109,6 +109,19 @@ class ListDictMatrixTests(BaseTest):
         scopes.var_to_reg('a', is_dict_var=True)
         self.assertEqual('"a"', scopes.var_to_reg('a'))
 
+    def test_matrix_el(self):
+        # for el in a: ...  assuming a is a list
+        scopes = Scopes()
+        register = scopes.var_to_reg('el', is_range_index_el=True)#, iter_var='a')
+        self.assertEqual('00', register)
+        scopes.set_iter_matrix(index_el_var='el', iter_matrix_var='a')
+        self.assertTrue(scopes.is_range_index_el('el'))
+        self.assertEqual('a', scopes.iterating_through_what_matrix_var('el'))
+
+        # cause the upgrade
+        scopes.var_to_reg('a', is_dict_var=True)
+        self.assertEqual('"a"', scopes.var_to_reg('a'))
+
 
 class RangeVarNames(BaseTest):
     # Track that certain variables have been used in for loop range expressions
