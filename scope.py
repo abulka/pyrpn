@@ -143,12 +143,13 @@ class Scopes(object):
     def is_list(self, var_name):
         return var_name in self.current.list_vars
 
-    def set_iter_matrix(self, index_el_var='el', iter_matrix_var='a'):
+    def set_iter_matrix(self, index_el_var, iter_matrix_var):
         assert self.is_range_index_el(index_el_var)
         self.current.for_el_vars[index_el_var] = iter_matrix_var  # what matrix var this index el is tracking
 
     def iterating_through_what_matrix_var(self, var_name_el):
-        return 'a'  # TODO
+        assert self.is_range_index_el(var_name_el)
+        return self.current.for_el_vars[var_name_el]
 
     # Util
 
