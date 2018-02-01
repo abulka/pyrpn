@@ -209,20 +209,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         This routine should not assume args are being passed in, because it we may be being called
         about PSE() or something.
-
-        # via because
-        # if its a variable reference, then we can happily construct an all in one cmd with fragment e.g. VIEW 00
-        # otherwise its a cmd_st_x_situation situation where we visit recurse normally and then do a ST X as arg
-        # to the built in command.
-        # If its a variable name being referenced, then we can refer directly to a register and is thus not a ST X situation.
-        # It that variable is a index to a for loop, then we need to put it on the stack to IP or do matrix elaccess
-        # and thus it is a ST X situation.
         """
         if len(node.args) == 0:
             return False
-
         need_st_x = False
-
         if func_name in settings.CMDS_WHO_NEED_LITERAL_NUM_ON_STACK_X:
             need_st_x = True
         if isinstance(node.args[0], ast.Name):
@@ -230,12 +220,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             if self.scopes.is_range_index(node.args[0].id) or self.scopes.is_range_index_el(node.args[0].id):
                 need_st_x = True
         return need_st_x
-        # is_var_so_no_st_x = isinstance(node.args[0], ast.Name)
-        # better_to_access_register_directly = isinstance(node.args[0], ast.Name) and \
-        #                                not (self.scopes.is_range_index(node.args[0].id) or
-        #                                     self.scopes.is_range_index_el(node.args[0].id))
-        # return func_name in settings.CMDS_WHO_NEED_LITERAL_NUM_ON_STACK_X and \
-        #        not better_to_access_register_directly
 
     def friendly_type(self, node):
         if isinstance(node, ast.Dict):
