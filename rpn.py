@@ -339,31 +339,15 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.check_supported(node.id, node)
         if '.Load' in str(node.ctx):
             assert isinstance(node.ctx, ast.Load)
-            if self.inside_alpha and not self.alpha_append_mode and not self.alpha_already_cleared:
-                self.program.insert('CLA')
-                self.alpha_already_cleared = True
+            self.rcl_clear_alpha()
 
-            iter_through_list_var_name = len(self.for_loop_info) > 0 and not self.in_range
-
-            if iter_through_list_var_name:
+            if self.iterating_list:
                 log.debug(f'{self.indent_during}ITERATING THROUGH LIST VAR')
                 self.program.insert('0', comment='from')  # FROM
 
-            cmd = 'ARCL' if self.inside_alpha and \
-                            not self.inside_calculation and \
-                            not self.var_name_is_loop_counter(node.id) and \
-                            not iter_through_list_var_name and \
-                            not self.inside_matrix_access else 'RCL'
+            self.rcl_var(node)
 
-            self.program.insert(f'{cmd} {self.scopes.var_to_reg(node.id)}', comment=node.id)
-            self.pending_stack_args.append(node.id)
-            if cmd == 'RCL':
-                if self.scopes.is_list(node.id):
-                    self.prepare_matrix(node, 'SF 01')
-                if self.scopes.is_dictionary(node.id):
-                    self.prepare_matrix(node, 'CF 01')
-
-            if iter_through_list_var_name:
+            if self.iterating_list:
                 code = f"""
                     XEQ "pMxLen"    // TO
                     1               // STEP
@@ -394,11 +378,33 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 self.pending_unary_op = ''
         self.end(node)
 
-    def visit_Num(self, node):
-        self.begin(node)
+    @property
+    def iterating_list(self):
+        # are iterating through a list referred to by a variable
+        return len(self.for_loop_info) > 0 and not self.in_range
+
+    def rcl_clear_alpha(self):
         if self.inside_alpha and not self.alpha_append_mode and not self.alpha_already_cleared:
             self.program.insert('CLA')
             self.alpha_already_cleared = True
+
+    def rcl_var(self, node):
+        rcl_cmd = 'ARCL' if self.inside_alpha and \
+                            not self.inside_calculation and \
+                            not self.var_name_is_loop_counter(node.id) and \
+                            not self.iterating_list and \
+                            not self.inside_matrix_access else 'RCL'
+        self.program.insert(f'{rcl_cmd} {self.scopes.var_to_reg(node.id)}', comment=node.id)
+        self.pending_stack_args.append(node.id)
+        # Add matrix rcl
+        if rcl_cmd == 'RCL' and self.scopes.is_list(node.id):
+                self.prepare_matrix(node, 'SF 01')
+        elif rcl_cmd == 'RCL' and self.scopes.is_dictionary(node.id):
+                self.prepare_matrix(node, 'CF 01')
+
+    def visit_Num(self, node):
+        self.begin(node)
+        self.rcl_clear_alpha()
         self.program.insert(f'{self.pending_unary_op}{node.n}')
         self.pending_stack_args.append(node.n)
         self.pending_unary_op = ''
