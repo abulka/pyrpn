@@ -341,42 +341,43 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             assert isinstance(node.ctx, ast.Load)
             self.rcl_clear_alpha()
             self.rcl_var(node)
-
             if self.iterating_list:
-                log.debug(f'{self.indent_during}ITERATING THROUGH LIST VAR')
-                self.program.insert('0', comment='from')  # FROM
+                self.iter_through_var(node)
+            self.rcl_var_index(node)
+            if self.pending_unary_op:
+                self.program.insert('CHS')
+                self.pending_unary_op = ''
+        self.end(node)
 
-
-            if self.iterating_list:
-                code = f"""
-                    XEQ "pMxLen"    // TO
-                    1               // STEP
-                    XEQ "pISG"
-                    STO {self.for_loop_info[-1].register}  // the for looping index var      
-                """
-                self.scopes.set_iter_matrix(index_el_var=self.for_loop_info[-1].var_name, iter_matrix_var=node.id)
-                self.program.insert_raw_lines(code)
-
-            # TODO the var_name_is_loop_counter() call could potentially be a combo of both
-            if self.scopes.is_range_index(node.id): # self.var_name_is_loop_counter(node.id):
-                self.program.insert('IP')  # just get the integer portion of isg counter
-            elif self.scopes.is_range_index_el(node.id):
-                self.program.insert('IP')  # just get the integer portion of isg counter
-                iter_var = self.scopes.iterating_through_what_matrix_var(var_name_el=node.id)
-                register = self.scopes.var_to_reg(iter_var)
-                code = f"""
+    def rcl_var_index(self, node):
+        # TODO the var_name_is_loop_counter() call could potentially be a combo of both
+        if self.scopes.is_range_index(node.id):  # self.var_name_is_loop_counter(node.id):
+            self.program.insert('IP')  # just get the integer portion of isg counter
+        elif self.scopes.is_range_index_el(node.id):
+            self.program.insert('IP')  # just get the integer portion of isg counter
+            iter_var = self.scopes.iterating_through_what_matrix_var(var_name_el=node.id)
+            register = self.scopes.var_to_reg(iter_var)
+            code = f"""
                     RCL {register} // its an el index so prepare associated list for access
                     SF 01
                     XEQ "pMxPrep"
                     XEQ "p1MxIJ"
                     RCLEL   // get el
                 """
-                self.program.insert_raw_lines(code)
+            self.program.insert_raw_lines(code)
 
-            if self.pending_unary_op:
-                self.program.insert('CHS')
-                self.pending_unary_op = ''
-        self.end(node)
+    def iter_through_var(self, node):
+        assert self.iterating_list
+        log.debug(f'{self.indent_during}ITERATING THROUGH LIST VAR')
+        self.program.insert('0', comment='from')  # FROM
+        code = f"""
+                XEQ "pMxLen"    // TO
+                1               // STEP
+                XEQ "pISG"
+                STO {self.for_loop_info[-1].register}  // the for looping index var      
+            """
+        self.scopes.set_iter_matrix(index_el_var=self.for_loop_info[-1].var_name, iter_matrix_var=node.id)
+        self.program.insert_raw_lines(code)
 
     @property
     def iterating_list(self):
