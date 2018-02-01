@@ -1033,7 +1033,6 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    @unittest.skip('alpha variation complexities - test is written OK')
     def test_list_for_in_var_prompt(self):
         self.parse(dedent("""
             a = [1, 2]
@@ -1051,17 +1050,15 @@ class RpnTests2(BaseTest):
             RCL "ZLIST"
             STO "a"
 
-            // for loop
-            
-            // setup
-            0       // from
-            RCL "a" // to
+            // setup for loop
+            RCL "a"         // prepare matrix
             SF 01
             XEQ "pMxPrep"
-            XEQ "pMxLen"  
-            1       // step
+            0               // from
+            XEQ "pMxLen"    // to
+            1               // step
             XEQ "pISG"
-            STO 00  // range i
+            STO 00            
                         
             LBL 00  // for
             ISG 00  // test
@@ -1069,7 +1066,7 @@ class RpnTests2(BaseTest):
             GTO 02  // resume
             LBL 01  // for body
             
-            CLA
+            CLA     // <----------------- DIFFERENT
             RCL 00  // get the index 
             IP
             RCL "a" // its an el index so prepare associated list for access
@@ -1077,9 +1074,8 @@ class RpnTests2(BaseTest):
             XEQ "pMxPrep"
             XEQ "p1MxIJ"
             RCLEL   // get el
-            ARCL ST X
-            PROMPT
-            
+            ARCL ST X   // <----------------- DIFFERENT
+            PROMPT      // <----------------- DIFFERENT
             GTO 00  // for
             LBL 02  // resume
             """)
