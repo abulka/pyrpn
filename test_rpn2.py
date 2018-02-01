@@ -1131,37 +1131,73 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    @unittest.skip('so hard - need temp var for list itself')
+    # @unittest.skip('so hard - need temp var for list itself')
     def test_list_for_in_literal_list(self):
         self.parse(dedent("""
-            for el in [1, 2]:
-                pass
+            a = ['aa', 'bb']
+            for el in [11, 22]:
+                PROMPT(el, a[1])
             """))
         expected = dedent("""
             0
             SF 01
             XEQ "pMxPrep"
-            1
+            "aa"
+            ASTO ST X
             XEQ "LIST+"
-            2
+            "bb"
+            ASTO ST X
             XEQ "LIST+"
-            //RCL "ZLIST"
-            //STO "temp_list"
-
-            // for loop
+            RCL "ZLIST"
+            STO "a"
             
-            // setup
-            0       // from
-            2       // to
-            1       // step
+            0
+            SF 01
+            XEQ "pMxPrep"
+            11
+            XEQ "LIST+"
+            22
+            XEQ "LIST+"
+            RCL "ZLIST"
+            STO "pTmpLst"
+
+            // setup for loop
+            RCL "pTmpLst"   // prepare matrix
+            SF 01
+            XEQ "pMxPrep"
+            0               // from
+            XEQ "pMxLen"    // to
+            1               // step
             XEQ "pISG"
-            STO 00  // range i
+            STO 00            
                         
             LBL 00  // for
             ISG 00  // test
             GTO 01  // for body
             GTO 02  // resume
             LBL 01  // for body
+            
+            CLA
+            RCL 00  // get the index 
+            IP
+            RCL "a" // its an el index so prepare associated list for access
+            SF 01
+            XEQ "pMxPrep"
+            XEQ "p1MxIJ"
+            RCLEL   // get el
+            ARCL ST X
+            ├" "
+            
+            1
+            RCL "pTmpLst"
+            SF 01
+            XEQ "pMxPrep"
+            XEQ "p1MxIJ"
+            RCLEL   // get el
+            ARCL ST X            
+            
+            PROMPT            
+            
             GTO 00  // for
             LBL 02  // resume
             """)
