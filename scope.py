@@ -89,9 +89,9 @@ class Scopes(object):
                     self.current.list_vars.append(var_name)
 
                 # Track indexes used to access elements of a list or dictionary
-                if is_range_index_el and var_name not in self.current.for_el_vars:
-                    # TODO need to store matrix var so that we know for whom we are an el ref for
-                    self.current.for_el_vars.append(var_name)
+                if is_range_index_el and var_name not in self.current.for_el_vars.keys():
+                    # Store matrix var so that we know for whom we are an el ref for
+                    self.current.for_el_vars[var_name] = ''
 
         if force_reg_name:
             register = force_reg_name
@@ -135,7 +135,7 @@ class Scopes(object):
         return var_name in self.current.range_vars
 
     def is_range_index_el(self, var_name):
-        return var_name in self.current.for_el_vars
+        return var_name in self.current.for_el_vars.keys()
 
     def is_dictionary(self, var_name):
         return var_name in self.current.dict_vars
@@ -144,7 +144,8 @@ class Scopes(object):
         return var_name in self.current.list_vars
 
     def set_iter_matrix(self, index_el_var='el', iter_matrix_var='a'):
-        pass  # TODO
+        assert self.is_range_index_el(index_el_var)
+        self.current.for_el_vars[index_el_var] = iter_matrix_var  # what matrix var this index el is tracking
 
     def iterating_through_what_matrix_var(self, var_name_el):
         return 'a'  # TODO
@@ -159,7 +160,7 @@ class Scopes(object):
 class Scope(object):
     data = attrib(default=Factory(dict))  # var name to register name
     range_vars = attrib(default=Factory(list))  # keep track of var names which are used in for loop ranges
-    for_el_vars = attrib(default=Factory(list))  # keep track of var names which are used in for..in loop list/dict element acceses
+    for_el_vars = attrib(default=Factory(dict))  # keep track of var names which are used in for..in loop list/dict element acceses - and what matrix they are tracking
     dict_vars = attrib(default=Factory(list))  # keep track of var names which are dictionaries
     list_vars = attrib(default=Factory(list))  # keep track of var names which are lists
 
