@@ -1004,17 +1004,15 @@ class RpnTests2(BaseTest):
             RCL "ZLIST"
             STO "a"
 
-            // for loop
-            
-            // setup
-            0       // from
-            RCL "a" // to
+            // setup for loop
+            RCL "a"         // prepare matrix
             SF 01
             XEQ "pMxPrep"
-            XEQ "pMxLen"  
-            1       // step
+            0               // from
+            XEQ "pMxLen"    // to
+            1               // step
             XEQ "pISG"
-            STO 00  // range i
+            STO 00            
                         
             LBL 00  // for
             ISG 00  // test

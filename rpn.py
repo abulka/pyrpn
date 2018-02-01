@@ -340,12 +340,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         if '.Load' in str(node.ctx):
             assert isinstance(node.ctx, ast.Load)
             self.rcl_clear_alpha()
+            self.rcl_var(node)
 
             if self.iterating_list:
                 log.debug(f'{self.indent_during}ITERATING THROUGH LIST VAR')
                 self.program.insert('0', comment='from')  # FROM
 
-            self.rcl_var(node)
 
             if self.iterating_list:
                 code = f"""
