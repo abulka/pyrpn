@@ -1178,9 +1178,9 @@ class RpnTests2(BaseTest):
             LBL 01  // for body
             
             CLA
-            RCL 00  // get the index 
+            RCL 00  // get the index var 'el' 
             IP
-            RCL "a" // its an el index so prepare associated list for access
+            RCL "pTmpLst"
             SF 01
             XEQ "pMxPrep"
             XEQ "p1MxIJ"
@@ -1188,8 +1188,8 @@ class RpnTests2(BaseTest):
             ARCL ST X
             ├" "
             
-            1
-            RCL "pTmpLst"
+            1       // indexing in to position 1
+            RCL "a"
             SF 01
             XEQ "pMxPrep"
             XEQ "p1MxIJ"

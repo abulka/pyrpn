@@ -85,6 +85,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def log_state(self, msg=''):
         log.debug(f'{self.indent}{msg}')
         log.debug(f'{self.indent}{self.scopes.dump()}{self.labels.dump()}')
+        log.debug(f'{self.indent}current for_el_vars {self.scopes.current.for_el_vars}')
+        log.debug(f'{self.indent}current list_vars {self.scopes.current.list_vars}')
         self.log_pending_args()
 
     def log_pending_args(self):
@@ -377,8 +379,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 XEQ "pISG"
                 STO {self.for_loop_info[-1].register}  // the for looping index var      
             """
-        self.scopes.map_el_to_list(el_var=self.for_loop_info[-1].var_name, list_var=node.id)
         self.program.insert_raw_lines(code)
+        self.scopes.map_el_to_list(el_var=self.for_loop_info[-1].var_name, list_var=node.id)
 
     @property
     def iterating_list(self):
@@ -452,6 +454,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 STO {self.for_loop_info[-1].register}  // the for looping var      
             """
             self.program.insert_raw_lines(code)
+            self.scopes.var_to_reg('pTmpLst', force_reg_name='"pTmpLst"')
+            self.scopes.map_el_to_list(el_var=self.for_loop_info[-1].var_name, list_var='pTmpLst')
 
         self.end(node)
 
