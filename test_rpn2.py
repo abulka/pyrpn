@@ -1231,6 +1231,40 @@ class RpnTests2(BaseTest):
         """
         self.assertRaises(RpnError, self.parse, dedent(src))
 
+    def test_list_alpha_keys_compare_eq(self):
+        self.parse(dedent("""
+            my = ['a', 'b']
+            my[0] == 'blah'
+            """))
+        expected = dedent("""
+            0
+            SF 01
+            XEQ "pMxPrep"
+            "a"
+            ENTER
+            ASTO ST X
+            XEQ "LIST+"
+            "b"
+            ENTER
+            ASTO ST X
+            XEQ "LIST+"
+            RCL "ZLIST"
+            STO "my"
+    
+            RCL "my"
+            SF 01
+            XEQ "pMxPrep"
+            0       // indexing in to position 0
+            XEQ "p1MxIJ"
+            RCLEL   // get el
+            
+            "blah"
+            ENTER
+            ASTO ST X
+            XEQ "pEQ"
+            """)
+        self.compare(de_comment(expected))
+
     # advanced dictionary operations
 
     def test_dict_del(self):

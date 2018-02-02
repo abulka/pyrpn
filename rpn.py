@@ -899,6 +899,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.visit(node.left)
         for o, e in zip(node.ops, node.comparators):
             self.visit(e)
+            if self.program.is_previous_line('string'):
+                self.program.insert(
+                    'ENTER')  # duplicate what's on the stack so it doesn't get clobbered by the ASTO ST X
+                self.program.insert('ASTO ST X')
             subf = self.cmpops[o.__class__.__name__]
             self.program.insert_xeq(subf, comment='compare, return bool')
 
