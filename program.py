@@ -121,7 +121,7 @@ class Program(BaseRpnProgram):
         if self.rpn_templates.need_all_templates:
             self.inject_dependencies(sorted(self.rpn_templates.template_names))
         else:
-            # Supercedes any tracking - we just scan the lines repeatedly...
+            # Supersedes any tracking - we just scan the lines repeatedly...
             dependencies = set()
             while True:
                 new_dependencies = self.find_dependencies() - dependencies
@@ -144,7 +144,7 @@ class Program(BaseRpnProgram):
         # Scan all the needed library functions for their dependencies - all XEQ calls need to be recorded into a set
         labels_called = set()
         for line in self.lines:
-            if 'XEQ "' in line.text:
+            if 'XEQ "' in line.text or 'GTO "' in line.text:
                 func_name = self.extract_func_name(line.text)
                 if func_name in ('LIST+', 'LIST-', 'CLIST'):
                     func_name = 'pList'
@@ -187,3 +187,5 @@ class Program(BaseRpnProgram):
                 replace_with_local_label(line, 'XEQ')
             elif 'LBL "' in line.text:
                 replace_with_local_label(line, 'LBL')
+            elif 'GTO "' in line.text:
+                replace_with_local_label(line, 'GTO')
