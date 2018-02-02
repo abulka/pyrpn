@@ -397,9 +397,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         """
         self.begin(node)
         self.visit_children(node)
-        if self.program.is_previous_line('string'):
-            self.program.insert('ENTER')  # duplicate what's on the stack so it doesn't get clobbered by the ASTO ST X
-            self.program.insert('ASTO ST X')
+        self.astox()
         self.program.insert(f'RTN', comment='return')
         self.end(node)
 
@@ -523,9 +521,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.prepare_matrix(node, 'SF 01', empty=True)
         for child in node.elts:
             self.visit(child)
-            if self.program.is_previous_line('string'):
-                self.program.insert('ENTER')        # duplicate what's on the stack so it doesn't get clobbered by the ASTO ST X
-                self.program.insert('ASTO ST X')
+            self.astox()
             self.program.insert_xeq('LIST+')
 
         if self.iterating_list:
@@ -560,14 +556,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.prepare_matrix(node, 'CF 01', empty=True)
         for index, key in enumerate(node.keys):
             self.visit(node.values[index])  # corresponding value
-            if self.program.is_previous_line('string'):
-                self.program.insert('ENTER')        # duplicate what's on the stack so it doesn't get clobbered by the ASTO ST X
-                self.program.insert('ASTO ST X')
+            self.astox()
 
             self.visit(key)  # key
-            if self.program.is_previous_line('string'):
-                self.program.insert('ENTER')  # duplicate what's on the stack so it doesn't get clobbered by the ASTO ST X
-                self.program.insert('ASTO ST X')
+            self.astox()
             self.program.insert_xeq('LIST+')  # push value then key (y:value x:key)
 
         if self.iterating_list:
@@ -696,9 +688,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         # Get Index position onto stack X
         assert isinstance(subscript_node.slice, ast.Index)
         self.visit(subscript_node.slice.value)
-        if self.program.is_previous_line('string'):
-            self.program.insert('ENTER')  # duplicate what's on the stack so it doesn't get clobbered by the ASTO ST X
-            self.program.insert('ASTO ST X')
+        self.astox()
 
         # Sets IJ accordingly so that a subsequent RCLEL will give the value or STOEL will store something.
         self.program.insert_xeq('p1MxIJ')  # (index) -> () -  X is dropped.
@@ -707,9 +697,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         # Get Key onto stack X
         assert isinstance(subscript_node.slice, ast.Index)
         self.visit(subscript_node.slice.value)
-        if self.program.is_previous_line('string'):
-            self.program.insert('ENTER')  # duplicate what's on the stack so it doesn't get clobbered by the ASTO ST X
-            self.program.insert('ASTO ST X')
+        self.astox()
 
         auto_create = 'SF' if isinstance(subscript_node.ctx, ast.Store) else 'CF'
         self.program.insert(f'{auto_create} {settings.FLAG_LIST_AUTO_CREATE_IF_KEY_NOT_FOUND}', comment='if set, auto create if key not found, else error')
@@ -899,9 +887,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.visit(node.left)
         for o, e in zip(node.ops, node.comparators):
             self.visit(e)
-            if self.program.is_previous_line('string'):
-                self.program.insert('ENTER')  # duplicate what's on the stack so it doesn't get clobbered by the ASTO ST X
-                self.program.insert('ASTO ST X')
+            self.astox()
             subf = self.cmpops[o.__class__.__name__]
             self.program.insert_xeq(subf, comment='compare, return bool')
 
@@ -1382,9 +1368,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.program.insert_xeq(rpn)
         for arg in node.args:
             self.visit(arg)
-            if self.program.is_previous_line('string'):
-                self.program.insert('ENTER')  # duplicate what's on the stack so it doesn't get clobbered by the ASTO ST X
-                self.program.insert('ASTO ST X')
+            self.astox()
             if cmd == 'append':
                 rpn = 'LIST+'
                 self.program.insert_xeq(rpn)
@@ -1392,6 +1376,11 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 raise RpnError(f'Parameters to pop are not currently supported, {source_code_line_info(node)}')
         self.program.insert_sto(self.scopes.var_to_reg(node.func.value.id), comment=f'{node.func.value.id}')
         self.end(node)
+
+    def astox(self):
+        if self.program.is_previous_line('string'):
+            self.program.insert('ENTER')  # duplicate what's on the stack so it doesn't get clobbered by the ASTO ST X
+            self.program.insert('ASTO ST X')
 
 
 @attrs
