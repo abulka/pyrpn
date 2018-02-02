@@ -1226,6 +1226,67 @@ class RpnTests2(BaseTest):
         """
         self.assertRaises(RpnError, self.parse, dedent(src))
 
+    def test_dict_for_keys_varname(self):
+        self.parse(dedent("""
+            a = {'aa': 2, 'bb':3}
+            for el in a:
+                PROMPT(el)
+            """))
+        expected = dedent("""
+            0
+            CF 01
+            XEQ "pMxPrep"
+            2           // value
+            "aa"         // key
+            ASTO ST X
+            XEQ "LIST+"
+            3           // value
+            "bb"         // key
+            ASTO ST X
+            XEQ "LIST+"
+            RCL "ZLIST"
+            STO "a"
+            
+            // setup for loop
+            RCL "a"         // prepare matrix
+            CF 01           // <------- difference
+            XEQ "pMxPrep"
+            0               // from
+            XEQ "pMxLen"    // to   <------- same
+            1               // step
+            XEQ "pISG"
+            STO 00            
+                        
+            LBL 00  // for
+            ISG 00  // test
+            GTO 01  // for body
+            GTO 02  // resume
+            LBL 01  // for body
+            
+            CLA
+            RCL 00  // get the index 
+            IP
+            RCL "a" // its an el index so prepare associated list for access
+            CF 01           // <------- difference
+            XEQ "pMxPrep"
+
+            // hand crafted IJ access - could make this another support func
+            1
+            +
+            2
+            STOIJ
+            RDN
+            RDN
+            //XEQ "p2MxIJr"
+
+            RCLEL   // get el
+            ARCL ST X
+            PROMPT
+            GTO 00  // for
+            LBL 02  // resume            
+            """)
+        self.compare(de_comment(expected))
+
     # assert
 
     def test_assert(self):

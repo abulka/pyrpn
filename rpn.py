@@ -432,13 +432,28 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         if self.scopes.is_el_var(node.id):
             iter_var = self.scopes.list_var_from_el(el_var=node.id)
             register = self.scopes.var_to_reg(iter_var)
-            code = f"""
+            if self.scopes.is_list(iter_var):
+                code = f"""
                     RCL {register} // its an el index so prepare associated list for access
                     SF 01
                     XEQ "pMxPrep"
                     XEQ "p1MxIJ"
                     RCLEL   // get el
-                """
+                    """
+            elif self.scopes.is_dictionary(iter_var):
+                    code = f"""
+                    RCL {register} // its an el index so prepare associated dict for access
+                    CF 01
+                    XEQ "pMxPrep"
+                    1
+                    +
+                    2
+                    STOIJ
+                    RDN
+                    RDN
+                    //XEQ "p2MxIJr"
+                    RCLEL   // get el
+                    """
             self.program.insert_raw_lines(code)
 
     def iter_through_var(self, node):
@@ -526,7 +541,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 STO {self.for_loop_info[-1].register}  // the for looping var      
             """
             self.program.insert_raw_lines(code)
-            self.scopes.var_to_reg('pTmpLst', force_reg_name='"pTmpLst"')
+            self.scopes.var_to_reg('pTmpLst', force_reg_name='"pTmpLst"', is_list_var=True)
             self.scopes.map_el_to_list(el_var=self.for_loop_info[-1].var_name, list_var='pTmpLst')
 
         self.end(node)
@@ -550,6 +565,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             if self.program.is_previous_line('string'):
                 self.program.insert('ASTO ST X')
             self.program.insert_xeq('LIST+')  # push value then key (y:value x:key)
+
+        if self.iterating_list:
+            raise RuntimeError('not implemented- copy the code/DRY from visit_list taking into account 2nd index val')
+
         self.end(node)
 
     def visit_Subscript(self,node):
