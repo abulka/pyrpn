@@ -1051,9 +1051,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.visit(node.target)
         varname = node.target.id
 
-        if isinstance(node.iter, ast.Call):  # range
+        if isinstance(node.iter, ast.Call) and not isinstance(node.iter.func, ast.Attribute):  # probably range
             # print('FOR CALL')
             register = self.scopes.var_to_reg(varname, is_range_index=True)
+        elif isinstance(node.iter, ast.Call) and isinstance(node.iter.func, ast.Attribute):  # probably d.keys()
+            # print('FOR CALL.keys()')
+            register = self.scopes.var_to_reg(varname, is_range_index_el=True)
         elif isinstance(node.iter, ast.Name):
             # print('FOR IN NAME')
             pass # need to change varname to be a matrix list element not an index
@@ -1102,7 +1105,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.inside_calculation = True
 
         if isinstance(node.func, ast.Attribute) and node.func.attr in ('append', 'pop'):
-            self.calling_append_or_pop(node, cmd=node.func.attr)
+                self.calling_append_or_pop(node, cmd=node.func.attr)
+        elif isinstance(node.func, ast.Attribute) and node.func.attr in ('keys',):
+            self.visit(node.func.value)  # recalls the list name e.g. the 'a' of the a.append() onto stack and prepares it
+            self.scopes.ensure_is_named_matrix_register(var_name=self.get_node_name_id_or_n(node.func.value), node=node)
         else:
             func_name = node.func.id
             func_name = self.adjust_function_name(func_name)

@@ -1299,13 +1299,7 @@ class RpnTests2(BaseTest):
         """
         self.assertRaises(RpnError, self.parse, dedent(src))
 
-    def test_dict_alpha_for_keys_varname(self):
-        self.parse(dedent("""
-            a = {'aa': 2, 'bb':3}
-            for el in a:
-                PROMPT(el)
-            """))
-        expected = dedent("""
+    expected_1 = dedent("""
             0
             CF 01
             XEQ "pMxPrep"
@@ -1360,6 +1354,23 @@ class RpnTests2(BaseTest):
             GTO 00  // for
             LBL 02  // resume            
             """)
+
+    def test_dict_alpha_for_keys_varname(self):
+        self.parse(dedent("""
+            a = {'aa': 2, 'bb':3}
+            for el in a:
+                PROMPT(el)
+            """))
+        expected = self.expected_1
+        self.compare(de_comment(expected))
+
+    def test_dict_alpha_for_keys_varname_keys(self):
+        self.parse(dedent("""
+            a = {'aa': 2, 'bb':3}
+            for el in a.keys():
+                PROMPT(el)
+            """))
+        expected = self.expected_1
         self.compare(de_comment(expected))
 
     # assert
