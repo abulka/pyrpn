@@ -666,7 +666,7 @@ class RpnTests2(BaseTest):
             
             "a"         // search for this key
             ENTER
-            ASTO X
+            ASTO ST X
             SF 02       // auto create if necessary
             XEQ "p2MxIJ"
             

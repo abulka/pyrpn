@@ -398,6 +398,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.begin(node)
         self.visit_children(node)
         if self.program.is_previous_line('string'):
+            self.program.insert('ENTER')  # duplicate what's on the stack so it doesn't get clobbered by the ASTO ST X
             self.program.insert('ASTO ST X')
         self.program.insert(f'RTN', comment='return')
         self.end(node)
@@ -523,6 +524,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         for child in node.elts:
             self.visit(child)
             if self.program.is_previous_line('string'):
+                self.program.insert('ENTER')        # duplicate what's on the stack so it doesn't get clobbered by the ASTO ST X
                 self.program.insert('ASTO ST X')
             self.program.insert_xeq('LIST+')
 
@@ -559,10 +561,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         for index, key in enumerate(node.keys):
             self.visit(node.values[index])  # corresponding value
             if self.program.is_previous_line('string'):
+                self.program.insert('ENTER')        # duplicate what's on the stack so it doesn't get clobbered by the ASTO ST X
                 self.program.insert('ASTO ST X')
 
             self.visit(key)  # key
             if self.program.is_previous_line('string'):
+                self.program.insert('ENTER')  # duplicate what's on the stack so it doesn't get clobbered by the ASTO ST X
                 self.program.insert('ASTO ST X')
             self.program.insert_xeq('LIST+')  # push value then key (y:value x:key)
 
@@ -614,6 +618,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def assign_push_rhs(self, node):
         self.visit(node.value)  # a single Num or Str or Name or List (of elements)
         if isinstance(node.targets[0], ast.Subscript) and self.program.is_previous_line('string'):  # hack (looking ahead at first target to see if we are assigning to a list element)
+            self.program.insert('ENTER')  # duplicate what's on the stack so it doesn't get clobbered by the ASTO ST X
             self.program.insert('ASTO ST X')
 
     def assign_lhs(self, node, target, rhs_is_list=False, rhs_is_dict=False):
@@ -691,6 +696,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         # Get Index position onto stack X
         assert isinstance(subscript_node.slice, ast.Index)
         self.visit(subscript_node.slice.value)
+        if self.program.is_previous_line('string'):
+            self.program.insert('ENTER')  # duplicate what's on the stack so it doesn't get clobbered by the ASTO ST X
+            self.program.insert('ASTO ST X')
 
         # Sets IJ accordingly so that a subsequent RCLEL will give the value or STOEL will store something.
         self.program.insert_xeq('p1MxIJ')  # (index) -> () -  X is dropped.
@@ -699,6 +707,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         # Get Key onto stack X
         assert isinstance(subscript_node.slice, ast.Index)
         self.visit(subscript_node.slice.value)
+        if self.program.is_previous_line('string'):
+            self.program.insert('ENTER')  # duplicate what's on the stack so it doesn't get clobbered by the ASTO ST X
+            self.program.insert('ASTO ST X')
 
         auto_create = 'SF' if isinstance(subscript_node.ctx, ast.Store) else 'CF'
         self.program.insert(f'{auto_create} {settings.FLAG_LIST_AUTO_CREATE_IF_KEY_NOT_FOUND}', comment='if set, auto create if key not found, else error')

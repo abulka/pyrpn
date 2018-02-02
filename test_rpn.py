@@ -1325,6 +1325,7 @@ class RpnCodeGenTests(BaseTest):
             GTO 05  // elif 2
             LBL 04  // elif body 1
             "one"
+            ENTER   // duplicate what's on the stack so it doesn't get clobbered by the ASTO ST X
             ASTO ST X
             RTN  // return
             GTO 01  // resume
@@ -1337,11 +1338,13 @@ class RpnCodeGenTests(BaseTest):
             GTO 02  // else
             LBL 06  // elif body 2
             "two"
+            ENTER   // duplicate what's on the stack so it doesn't get clobbered by the ASTO ST X
             ASTO ST X
             RTN  // return
             GTO 01  // resume
             LBL 02  // else
             "dunno"
+            ENTER   // duplicate what's on the stack so it doesn't get clobbered by the ASTO ST X
             ASTO ST X
             RTN  // return
             LBL 01  // resume
