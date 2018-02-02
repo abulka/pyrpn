@@ -398,7 +398,7 @@ class RpnTests2(BaseTest):
         self.compare(de_comment(expected))
 
 
-    def test_list_strings(self):
+    def test_list_alpha_strings(self):
         self.parse(dedent("""
           A = ["hi", "there"]
           A[0] = "hello"
@@ -409,10 +409,12 @@ class RpnTests2(BaseTest):
             XEQ "pMxPrep"
             
             "hi"
+            ENTER
             ASTO ST X
             XEQ "LIST+"
             
             "there"
+            ENTER
             ASTO ST X
             XEQ "LIST+"
             
@@ -420,6 +422,7 @@ class RpnTests2(BaseTest):
             STO "A"
             
             "hello"
+            ENTER
             ASTO ST X
             RCL "A"
             SF 01
@@ -435,7 +438,7 @@ class RpnTests2(BaseTest):
         self.compare(de_comment(expected))
 
 
-    def test_list_aview_element(self):
+    def test_list_alpha_aview_element(self):
         self.parse(dedent("""
             A = ["hi"]
             AVIEW(A[0])
@@ -446,6 +449,7 @@ class RpnTests2(BaseTest):
             XEQ "pMxPrep"
 
             "hi"
+            ENTER
             ASTO ST X
             XEQ "LIST+"
             RCL "ZLIST"
@@ -616,7 +620,7 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    def test_dict_basic_two(self):
+    def test_dict_alpha_basic_two_keys(self):
         self.parse(dedent("""
             A = {'a': 2, 'b':3}
             """))
@@ -627,11 +631,13 @@ class RpnTests2(BaseTest):
             
             2           // value
             "a"         // key
+            ENTER
             ASTO ST X
             XEQ "LIST+"
             
             3           // value
             "b"         // key
+            ENTER
             ASTO ST X
             XEQ "LIST+"
             
@@ -640,7 +646,7 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    def test_dict_set_key(self):
+    def test_dict_alpha_set_key(self):
         self.parse(dedent("""
             A = {}
             A['a'] = 2
@@ -659,6 +665,8 @@ class RpnTests2(BaseTest):
             XEQ "pMxPrep"
             
             "a"         // search for this key
+            ENTER
+            ASTO X
             SF 02       // auto create if necessary
             XEQ "p2MxIJ"
             
@@ -789,7 +797,7 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    def test_dict_len(self):
+    def test_dict_alpha_len_keys(self):
         self.parse(dedent("""
             A = {'a': 2, 'b':3}
             x = len(A)
@@ -801,11 +809,13 @@ class RpnTests2(BaseTest):
             
             2           // value
             "a"         // key
+            ENTER
             ASTO ST X
             XEQ "LIST+"
 
             3           // value
             "b"         // key
+            ENTER
             ASTO ST X
             XEQ "LIST+"
 
@@ -1081,7 +1091,7 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    def test_list_for_in_var_prompt_strings(self):
+    def test_list_alpha_keys_for_in_var(self):
         self.parse(dedent("""
             a = ['aa', 'bb']
             for el in a:
@@ -1092,9 +1102,11 @@ class RpnTests2(BaseTest):
             SF 01
             XEQ "pMxPrep"
             "aa"
+            ENTER
             ASTO ST X
             XEQ "LIST+"
             "bb"
+            ENTER
             ASTO ST X
             XEQ "LIST+"
             RCL "ZLIST"
@@ -1131,7 +1143,7 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    def test_list_for_in_literal_list(self):
+    def test_list_alpha_keys_for_in_literal_list(self):
         self.parse(dedent("""
             a = ['aa', 'bb']
             for el in [11, 22]:
@@ -1142,9 +1154,11 @@ class RpnTests2(BaseTest):
             SF 01
             XEQ "pMxPrep"
             "aa"
+            ENTER
             ASTO ST X
             XEQ "LIST+"
             "bb"
+            ENTER
             ASTO ST X
             XEQ "LIST+"
             RCL "ZLIST"
@@ -1226,7 +1240,7 @@ class RpnTests2(BaseTest):
         """
         self.assertRaises(RpnError, self.parse, dedent(src))
 
-    def test_dict_for_keys_varname(self):
+    def test_dict_alpha_for_keys_varname(self):
         self.parse(dedent("""
             a = {'aa': 2, 'bb':3}
             for el in a:
@@ -1238,10 +1252,12 @@ class RpnTests2(BaseTest):
             XEQ "pMxPrep"
             2           // value
             "aa"         // key
+            ENTER
             ASTO ST X
             XEQ "LIST+"
             3           // value
             "bb"         // key
+            ENTER
             ASTO ST X
             XEQ "LIST+"
             RCL "ZLIST"
