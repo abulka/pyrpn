@@ -25,11 +25,16 @@
 			regularly, so make sure you delete this "PyLIB" program and paste the latest version into your
 			calculator/Free42 regularly.</p>
 
+		<div class="result-view">
+			<!-- The buttons used to copy the text -->
+			<button class="btn btn-primary" data-clipboard-text="{{ rpn }}" title="Copy RPN text as shown">Copy</button>
+			<button class="btn btn-primary" data-clipboard-text="{{ rpn_free42 }}" title="Copy RPN text - ready to paste into Free42 calc (no comments, line numbers)">Copy for Free42</button>
+		</div>
 		<img src="static/calc_icon1.png" style="float: right;">
 		<pre>{{ rpn }}</pre>
 
 
-		<div id="result-view">
+		<div class="result-view">
 			<!-- The buttons used to copy the text -->
 			<button class="btn btn-primary" data-clipboard-text="{{ rpn }}" title="Copy RPN text as shown">Copy</button>
 			<button class="btn btn-primary" data-clipboard-text="{{ rpn_free42 }}" title="Copy RPN text - ready to paste into Free42 calc (no comments, line numbers)">Copy for Free42</button>

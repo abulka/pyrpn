@@ -38,11 +38,16 @@
           </div>
           <div class="right-half">
             <article>
-               <!--<h1>RPN</h1>-->
+                <div class="result-view" style="display: none">
+                    <!-- The buttons used to copy the text -->
+                    <button class="btn btn-primary" data-clipboard-text="{{ rpn }}" title="Copy RPN text as shown">Copy</button>
+                    <button class="btn btn-primary" data-clipboard-text="{{ rpn_free42 }}" title="Copy RPN text - ready to paste into Free42 calc (no comments, line numbers)">Copy for Free42</button>
+                </div>
+                <!--<h1>RPN</h1>-->
                 <img src="static/calc_icon1.png" style="float: right;">
                 <pre>{{ rpn }}</pre>
 
-                <div id="result-view" style="display: none">
+                <div class="result-view" style="display: none">
                     <!-- The buttons used to copy the text -->
                     <button class="btn btn-primary" data-clipboard-text="{{ rpn }}" title="Copy RPN text as shown">Copy</button>
                     <button class="btn btn-primary" data-clipboard-text="{{ rpn_free42 }}" title="Copy RPN text - ready to paste into Free42 calc (no comments, line numbers)">Copy for Free42</button>
@@ -55,7 +60,7 @@
 
     <script>
         var first_time = $('.right-half pre').text() == "Press Convert"
-        if (! first_time) $('#result-view').show()
+        if (! first_time) $('.result-view').show()
 
         var options1 = {lineNumbers: true,
                         mode: "python",
