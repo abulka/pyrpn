@@ -2140,7 +2140,6 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
 
-
     def test_text_alpha_long_string(self):
         src = """
             alpha("Hello there all is well in London!!")
