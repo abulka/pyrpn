@@ -87,6 +87,10 @@
             {{ form.csrf_token }}
         </form>
 
+        {% if example_id %}
+            <p><a href="/{{ example_id }}" title="Remember to save!">Load in Converter Editor</a></p>
+        {% endif %}
+
     </div>
 
     <script>
