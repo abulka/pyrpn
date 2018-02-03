@@ -122,6 +122,13 @@ class ListDictMatrixTests(BaseTest):
         scopes.var_to_reg('a', is_dict_var=True)
         self.assertEqual('"a"', scopes.var_to_reg('a'))
 
+    def test_list_by_ref(self):
+        scopes = Scopes()
+        scopes.var_to_reg('a', is_dict_var=True)
+        scopes.var_to_reg('b', is_dict_var=True, by_ref_to_var='a')
+        self.assertEqual('"a"', scopes.var_to_reg('a'))
+        self.assertEqual('"a"', scopes.var_to_reg('b'))
+
 
 class RangeVarNames(BaseTest):
     # Track that certain variables have been used in for loop range expressions

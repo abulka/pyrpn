@@ -40,7 +40,7 @@ class Scopes(object):
         if len(self.stack) > 1:  # always leave first permanent scope
             self.stack.pop()
 
-    def var_to_reg(self, var_name, force_reg_name=None, is_range_index=False, is_range_index_el=False, is_dict_var=False, is_list_var=False):
+    def var_to_reg(self, var_name, force_reg_name=None, is_range_index=False, is_range_index_el=False, is_dict_var=False, is_list_var=False, by_ref_to_var=''):
         """
         Figure out the register to use to store/recall 'var_name' e.g. 00 or "x" - also taking into account our scope system.
 
@@ -54,12 +54,15 @@ class Scopes(object):
 
         Will upgrade a mapping from numeric to named if necessary, if is_dict_var / is_list_var is true
 
+        Now support 'by reference'.
+
         :param var_name: python identifier e.g. 'x'
         :param force_reg_name: force the mapping to be to this
         :param is_range_index: record that this is a range loop related var
         :param is_range_index_el: record that this is a list or dict element accessing loop related var
         :param is_dict_var: record that this var is matrix related
         :param is_list_var: record that this var is matrix related
+        :param by_ref_to_var: means accessing the variable will instead access the variable 'by_ref_to_var'
         :return: register name as a string
         """
         def map_it(var_name, register=None):

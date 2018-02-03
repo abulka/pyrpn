@@ -296,13 +296,17 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 need_st_x = True
         return need_st_x
 
-    def friendly_type(self, node):
-        if isinstance(node, ast.Dict):
-            result = '(matrix type Dictionary)'
-        elif isinstance(node, ast.List):
-            result = '(matrix type List)'
+    def friendly_type(self, is_list_var, is_dict_var, by_ref_to_var):
+        if is_dict_var:
+            result = '(matrix type Dictionary'
+        elif is_list_var:
+            result = '(matrix type List'
         else:
             result = ''
+        if by_ref_to_var:
+            result += f' by ref to "{by_ref_to_var}"'
+        if result:
+            result += ')'
         return result
 
     # Finishing up
@@ -588,18 +592,19 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         self.assign_push_rhs(node)
         rhs_is_matrix_rpn_op = 'pMxPrep' in self.program.last_line.text
-        rhs_var_is_list = isinstance(node.value, ast.Name) and self.scopes.is_list(node.value.id)
-        rhs_var_is_dict = isinstance(node.value, ast.Name) and self.scopes.is_dictionary(node.value.id)
+        rhs_is_list_var = isinstance(node.value, ast.Name) and self.scopes.is_list(node.value.id)
+        rhs_is_dict_var = isinstance(node.value, ast.Name) and self.scopes.is_dictionary(node.value.id)
+        by_ref_to_rhs_var = node.value.id if rhs_is_list_var or rhs_is_dict_var else ''
 
         for target in node.targets:
             lhs_is_subscript = isinstance(target, ast.Subscript)
             if lhs_is_subscript:
                 self.subscript_is_on_lhs_thus_assign(target)
             else:
-                self.assign_lhs(node, target, rhs_var_is_list, rhs_var_is_dict)  # var is normal (lower=local, upper=named) or matrix (lower=named, upper=named)
+                self.assign_lhs(node, target, rhs_is_list_var, rhs_is_dict_var, by_ref_to_rhs_var)  # var is normal (lower=local, upper=named) or matrix (lower=named, upper=named)
 
             # Check var types
-            if rhs_is_matrix_rpn_op or rhs_var_is_list or rhs_var_is_dict:
+            if rhs_is_matrix_rpn_op or rhs_is_list_var or rhs_is_dict_var:
                 self.scopes.ensure_is_named_matrix_register(var_name=target.id, node=node)
             elif lhs_is_subscript:
                 self.scopes.ensure_is_named_matrix_register(var_name=target.value.id, node=node)  # drill into subscript node to get list or dict name
@@ -613,14 +618,18 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.program.insert('ENTER')  # duplicate what's on the stack so it doesn't get clobbered by the ASTO ST X
             self.program.insert('ASTO ST X')
 
-    def assign_lhs(self, node, target, rhs_is_list=False, rhs_is_dict=False):
+    def assign_lhs(self, node, target, rhs_is_list_var=False, rhs_is_dict_var=False, by_ref_to_rhs_var=''):
         # Create the variable and mark its type
-        friendly_type = self.friendly_type(node.value)
+        is_list_var = isinstance(node.value, ast.List) or rhs_is_list_var
+        is_dict_var = isinstance(node.value, ast.Dict) or rhs_is_dict_var
+        by_ref_to_var = by_ref_to_rhs_var
+        friendly_type = self.friendly_type(is_list_var, is_dict_var, by_ref_to_var)
         log.info(f'{self.indent_during}created variable "{target.id}" {friendly_type}')
         self.program.insert_sto(
             self.scopes.var_to_reg(target.id,
-                                   is_list_var=isinstance(node.value, ast.List) or rhs_is_list,
-                                   is_dict_var=isinstance(node.value, ast.Dict) or rhs_is_dict,
+                                   is_list_var=is_list_var,
+                                   is_dict_var=is_dict_var,
+                                   by_ref_to_var=by_ref_to_var,
                                    ),
             comment=f'{target.id} {friendly_type}'
         )

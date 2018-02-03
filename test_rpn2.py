@@ -1362,6 +1362,49 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+    @unittest.skip('by ref')
+    def test_list_assign_by_ref(self):
+        self.parse(dedent("""
+            a = []
+            b = a
+            a.append(5)
+            b[0]        # this should actually recall 'a' cos of by ref
+            """))
+        expected = dedent("""
+            0
+            SF 01
+            XEQ "pMxPrep"
+            0
+            STO "a"
+            
+            // assign
+            RCL "a"
+            SF 01           // not needed but hard to repress
+            XEQ "pMxPrep"   // not needed but hard to repress
+            RCL "ZLIST"     // forced to generate this in order to get the RCL "a" back onto the stack, due to pMxPrep eating it up  
+            STO "b" 
+            // Secretly we also mark variable b so that it recalls a instead of b
+            // Actually saving a copy of a into b is NOT NECESSARY - prevent if we can            
+            
+            // append
+            RCL "a"
+            SF 01          // 1D mode
+            XEQ "pMxPrep"  // prepare ZLIST
+            5
+            XEQ "LIST+"
+            RCL "ZLIST"
+            STO "a"            
+
+            // Test that a and b are the same list
+            RCL "a"         // <------ even though we are looking at 'b' we recall 'a' cos of by ref
+            SF 01
+            XEQ "pMxPrep"
+            0
+            XEQ "p1MxIJ"  // set IJ to index 0 (which is ZLIST row 1)            
+            RCLEL
+            """)
+        self.compare(de_comment(expected))
+
     # assert
 
     def test_assert(self):
