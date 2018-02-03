@@ -138,7 +138,7 @@ def example_create():
             return redirect(url_for('example_edit', id=example.id))
     else:  # GET
         form = ExampleForm()
-    return render_template('example.html', form=form, title='Example Edit', admin=admin)
+    return render_template('example.html', form=form, title='Example Edit', admin=admin, example_id='')
 
 @app.route('/example/<int:id>', methods=['GET', 'POST'])
 def example_edit(id):
@@ -183,7 +183,8 @@ def example_edit(id):
         dic = example.asdict
         dic['public'] = Example.redis_bool_to_bool(example.public)
         form = ExampleForm(**dic)
-        return render_template('example.html', form=form, title='Example Edit', admin=admin)
+        log.debug('id %s', id)
+        return render_template('example.html', form=form, title='Example Edit', admin=admin, example_id=id)
 
     elif request.method == 'POST':  # Wish forms could send put verb properly...
         form = ExampleForm(request.form)
@@ -200,7 +201,7 @@ def example_edit(id):
             es.save_to_file(example)
         else:
             log.warning('form did not validate')
-        return render_template('example.html', form=form, title='Example Edit', admin=admin)
+        return render_template('example.html', form=form, title='Example Edit', admin=admin, example_id=id)
 
 def vote_via_email(example):
     dic = example.asdict
