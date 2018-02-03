@@ -206,6 +206,125 @@ class RpnTests2(BaseTest):
             """)
         self.assertRaises(RpnError, self.parse, dedent(src))
 
+    # Parameters forced to be INT
+
+    def test_params_force_int(self):
+        self.parse(dedent("""
+            def f(a, b):  # rpn: int
+                pass
+          """))
+        expected = dedent("""
+            LBL "f"
+            XEQ "p2Param"   // reorder 2 params for storage
+            IP
+            STO 00          // param: a
+            RDN
+            IP
+            STO 01          // param: b
+            RDN
+            RTN
+            """)
+        self.compare(de_comment(expected))
+
+    # Parameter reversal for some commands
+
+    def test_params_pixel_swap(self):
+        """
+        Intuitive order for calling a user defined function is a,b,c which results in z:a y:b x:c which is
+        wrong way around for def parsing where parameters are stored in register in order of the param declaration.
+        So RPN code is inserted to reverse the parameter order at the beginning of all user defined functions.
+
+        However a built in function like PIXEL takes y: row (y axis), x: col (x axis) which is not intuitive,
+        cos when you enter coordinate its x,y which means PIXEL should arguably take Y:x X:y - but would have
+        been weird cos of the coincidence re the names being around the wrong way, so probably HP switched it.
+        But for algebraic notation use, it should be the other way around, so I correct this.
+        :return:
+        """
+        self.parse(dedent("""
+            PIXEL(100, 1)
+          """))
+        expected = dedent("""
+            100
+            1
+            X<>Y
+            PIXEL
+            """)
+        self.compare(de_comment(expected))
+
+    # += and -= expressions
+
+    def test_y_plus_eq_one(self):
+        self.parse(dedent("""
+            y += 1
+          """))
+        expected = dedent("""
+            1
+            STO+ 00
+            """)
+        self.compare(de_comment(expected))
+
+    def test_y_minus_eq_one(self):
+        self.parse(dedent("""
+            y -= 1
+          """))
+        expected = dedent("""
+            1
+            STO- 00
+            """)
+        self.compare(de_comment(expected))
+
+    def test_y_minus_eq_neg_one(self):
+        self.parse(dedent("""
+            y -= -1
+          """))
+        expected = dedent("""
+            -1
+            STO- 00
+            """)
+        self.compare(de_comment(expected))
+
+    # negatives inside expressions inside parameters
+
+    def test_neg_inside_param(self):
+        self.parse(dedent("""
+            fred(-y)
+          """))
+        expected = dedent("""
+            RCL 00
+            CHS
+            XEQ A
+            """)
+        self.compare(de_comment(expected))
+
+    def test_neg_expr_inside_param(self):
+        self.parse(dedent("""
+            fred(-y + 1)
+          """))
+        expected = dedent("""
+            RCL 00
+            CHS
+            1
+            +
+            XEQ A
+            """)
+        self.compare(de_comment(expected))
+
+    # boolean expessions inside expressions inside parameters
+
+    def test_bool_inside_param(self):
+        self.parse(dedent("""
+            print(x < y)
+          """))
+        expected = dedent("""
+            CLA
+            RCL 00
+            RCL 01
+            XEQ "pLT"
+            ARCL ST X
+            AVIEW
+            """)
+        self.compare(de_comment(expected))
+
     # Lists - using LIST util rpn
 
     def test_list_basic_empty(self):
@@ -332,7 +451,6 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-
     def test_list_append_i_in_loop(self):
         self.parse(dedent("""
             def a10():
@@ -422,7 +540,6 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-
     def test_list_alpha_strings(self):
         self.parse(dedent("""
           A = ["hi", "there"]
@@ -462,7 +579,6 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-
     def test_list_alpha_aview_element(self):
         self.parse(dedent("""
             A = ["hi"]
@@ -493,126 +609,6 @@ class RpnTests2(BaseTest):
             AVIEW
             """)
         self.compare(de_comment(expected))
-
-    # Parameters forced to be INT
-
-    def test_params_force_int(self):
-        self.parse(dedent("""
-            def f(a, b):  # rpn: int
-                pass
-          """))
-        expected = dedent("""
-            LBL "f"
-            XEQ "p2Param"   // reorder 2 params for storage
-            IP
-            STO 00          // param: a
-            RDN
-            IP
-            STO 01          // param: b
-            RDN
-            RTN
-            """)
-        self.compare(de_comment(expected))
-
-    # Parameter reversal for some commands
-
-    def test_params_pixel_swap(self):
-        """
-        Intuitive order for calling a user defined function is a,b,c which results in z:a y:b x:c which is
-        wrong way around for def parsing where parameters are stored in register in order of the param declaration.
-        So RPN code is inserted to reverse the parameter order at the beginning of all user defined functions.
-
-        However a built in function like PIXEL takes y: row (y axis), x: col (x axis) which is not intuitive,
-        cos when you enter coordinate its x,y which means PIXEL should arguably take Y:x X:y - but would have
-        been weird cos of the coincidence re the names being around the wrong way, so probably HP switched it.
-        But for algebraic notation use, it should be the other way around, so I correct this.
-        :return:
-        """
-        self.parse(dedent("""
-            PIXEL(100, 1)
-          """))
-        expected = dedent("""
-            100
-            1
-            X<>Y
-            PIXEL
-            """)
-        self.compare(de_comment(expected))
-
-    # += and -= expressions
-
-    def test_y_plus_eq_one(self):
-        self.parse(dedent("""
-            y += 1
-          """))
-        expected = dedent("""
-            1
-            STO+ 00
-            """)
-        self.compare(de_comment(expected))
-
-    def test_y_minus_eq_one(self):
-        self.parse(dedent("""
-            y -= 1
-          """))
-        expected = dedent("""
-            1
-            STO- 00
-            """)
-        self.compare(de_comment(expected))
-
-    def test_y_minus_eq_neg_one(self):
-        self.parse(dedent("""
-            y -= -1
-          """))
-        expected = dedent("""
-            -1
-            STO- 00
-            """)
-        self.compare(de_comment(expected))
-
-    # negatives inside expressions inside parameters
-
-    def test_neg_inside_param(self):
-        self.parse(dedent("""
-            fred(-y)
-          """))
-        expected = dedent("""
-            RCL 00
-            CHS
-            XEQ A
-            """)
-        self.compare(de_comment(expected))
-
-    def test_neg_expr_inside_param(self):
-        self.parse(dedent("""
-            fred(-y + 1)
-          """))
-        expected = dedent("""
-            RCL 00
-            CHS
-            1
-            +
-            XEQ A
-            """)
-        self.compare(de_comment(expected))
-
-    # boolean expessions inside expressions inside parameters
-
-    def test_bool_inside_param(self):
-        self.parse(dedent("""
-            print(x < y)
-          """))
-        expected = dedent("""
-            CLA
-            RCL 00
-            RCL 01
-            XEQ "pLT"
-            ARCL ST X
-            AVIEW
-            """)
-        self.compare(de_comment(expected))
-
 
     # dictionaries
 
@@ -1332,6 +1328,8 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+    # lists and dictionaries - by reference
+
     def test_list_assign_by_ref(self):
         self.parse(dedent("""
             a = [1]
@@ -1403,6 +1401,64 @@ class RpnTests2(BaseTest):
             0
             XEQ "p1MxIJ"  // set IJ to index 0 (which is ZLIST row 1)            
             RCLEL
+            """)
+        self.compare(de_comment(expected))
+
+    @unittest.skip('byref dict')
+    def test_dict_assign_by_ref_alpha(self):
+        self.parse(dedent("""
+            a = {}
+            b = a
+            b['first'] = 100
+            a['first']      # should produce 100
+            b['first']      # should produce 100
+          """))
+        expected = dedent("""
+            0
+            CF 01
+            XEQ "pMxPrep"
+            0
+            STO "a"
+            
+            // assign
+            RCL "a"
+            SF 01           // not needed but hard to repress
+            XEQ "pMxPrep"   // not needed but hard to repress
+            RCL "ZLIST"     // forced to generate this in order to get the RCL "a" back onto the stack, due to pMxPrep eating it up  
+            STO "a"         // redundant - store back into itself, cos b is really a
+            // Secretly we also mark variable b so that it recalls a instead of b
+            // Actually saving a copy of a into b is NOT NECESSARY - prevent if we can            
+
+            100
+            RCL "a"     // b is really a
+            CF 01
+            XEQ "pMxPrep"
+            "first"         // search for this key
+            ENTER
+            ASTO ST X
+            SF 02       // auto create if necessary
+            XEQ "p2MxIJ"
+            STOEL
+
+            RCL "a"
+            CF 01
+            XEQ "pMxPrep"
+            "first"         // search for this key
+            ENTER
+            ASTO ST X
+            CF 02         // auto create if necessary  
+            XEQ "p2MxIJ" // IJ is set nicely for us...
+            RCLEL         // access a['a']
+            
+            RCL "a"     // b is really a
+            CF 01
+            XEQ "pMxPrep"
+            "first"         // search for this key
+            ENTER
+            ASTO ST X
+            CF 02         // auto create if necessary  
+            XEQ "p2MxIJ" // IJ is set nicely for us...
+            RCLEL         // access a['a']
             """)
         self.compare(de_comment(expected))
 
