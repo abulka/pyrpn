@@ -1404,7 +1404,6 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    @unittest.skip('byref dict')
     def test_dict_assign_by_ref_alpha(self):
         self.parse(dedent("""
             a = {}
@@ -1422,7 +1421,7 @@ class RpnTests2(BaseTest):
             
             // assign
             RCL "a"
-            SF 01           // not needed but hard to repress
+            CF 01           // not needed but hard to repress
             XEQ "pMxPrep"   // not needed but hard to repress
             RCL "ZLIST"     // forced to generate this in order to get the RCL "a" back onto the stack, due to pMxPrep eating it up  
             STO "a"         // redundant - store back into itself, cos b is really a
@@ -1439,7 +1438,9 @@ class RpnTests2(BaseTest):
             SF 02       // auto create if necessary
             XEQ "p2MxIJ"
             STOEL
-
+            RCL "ZLIST"
+            STO "a"
+            
             RCL "a"
             CF 01
             XEQ "pMxPrep"
