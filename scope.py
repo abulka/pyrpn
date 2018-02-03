@@ -89,13 +89,13 @@ class Scopes(object):
                 if is_range_index and var_name not in self.current.for_range_vars:
                     self.current.for_range_vars.append(var_name)
 
-                # Track dictionary vars
-                if is_dict_var and var_name not in self.current.dict_vars:
-                    self.current.dict_vars.append(var_name)
-
                 # Track list vars
                 if is_list_var and var_name not in [matrix_var.var_name for matrix_var in self.current.list_vars]:
                     self.current.list_vars.append(MatrixVar(var_name, by_ref_to_var))
+
+                # Track dictionary vars
+                if is_dict_var and var_name not in [matrix_var.var_name for matrix_var in self.current.dict_vars]:
+                    self.current.dict_vars.append(MatrixVar(var_name, by_ref_to_var))
 
                 # Track indexes used to access elements of a list or dictionary
                 if is_range_index_el and var_name not in self.current.for_el_vars.keys():
@@ -122,9 +122,12 @@ class Scopes(object):
     # By ref
 
     def byref_override(self, var_name, register):
-        # hmmm have to search for it? in self.list_vars
         if self.is_list(var_name):
             matrix_var = [matrix_var for matrix_var in self.current.list_vars if matrix_var.var_name == var_name][0]
+            if matrix_var.by_ref_to_var:
+                register = self.get_register(matrix_var.by_ref_to_var)  # get the register of the original by ref to variable, not var_name variable
+        elif self.is_dictionary(var_name):
+            matrix_var = [matrix_var for matrix_var in self.current.dict_vars if matrix_var.var_name == var_name][0]
             if matrix_var.by_ref_to_var:
                 register = self.get_register(matrix_var.by_ref_to_var)  # get the register of the original by ref to variable, not var_name variable
         return register
@@ -134,8 +137,9 @@ class Scopes(object):
         if self.is_list(var_name):
             matrix_var = [matrix_var for matrix_var in self.current.list_vars if matrix_var.var_name == var_name][0]
             to_var = matrix_var.by_ref_to_var
-        # elif self.is_dict(var_name):
-        #     FIX...  matrix_var = [matrix_var for matrix_var in self.current.list_vars if matrix_var.var_name == var_name][0]
+        elif self.is_dictionary(var_name):
+            matrix_var = [matrix_var for matrix_var in self.current.dict_vars if matrix_var.var_name == var_name][0]
+            to_var = matrix_var.by_ref_to_var
         return to_var
 
     # Core
@@ -174,7 +178,7 @@ class Scopes(object):
         return var_name in self.current.for_el_vars.keys()
 
     def is_dictionary(self, var_name):
-        return var_name in self.current.dict_vars
+        return var_name in [matrix_var.var_name for matrix_var in self.current.dict_vars]
 
     def is_list(self, var_name):
         return var_name in [matrix_var.var_name for matrix_var in self.current.list_vars]

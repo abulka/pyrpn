@@ -131,7 +131,6 @@ class ListDictMatrixTests(BaseTest):
         self.assertEqual('"a"', scopes.var_to_reg('b'))
         self.assertEqual('a', scopes.by_ref_to_var('b'))
 
-    @unittest.skip('byref dict')
     def test_dict_by_ref(self):
         scopes = Scopes()
         scopes.var_to_reg('a', is_dict_var=True)
