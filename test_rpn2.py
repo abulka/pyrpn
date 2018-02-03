@@ -970,6 +970,7 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+    @unittest.skip('by ref')
     def test_list_assign_between_vars(self):
         self.parse(dedent("""
             a = [1]

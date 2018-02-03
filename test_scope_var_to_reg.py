@@ -124,8 +124,8 @@ class ListDictMatrixTests(BaseTest):
 
     def test_list_by_ref(self):
         scopes = Scopes()
-        scopes.var_to_reg('a', is_dict_var=True)
-        scopes.var_to_reg('b', is_dict_var=True, by_ref_to_var='a')
+        scopes.var_to_reg('a', is_list_var=True)
+        scopes.var_to_reg('b', is_list_var=True, by_ref_to_var='a')
         self.assertEqual('"a"', scopes.var_to_reg('a'))
         self.assertEqual('"a"', scopes.var_to_reg('b'))
 
