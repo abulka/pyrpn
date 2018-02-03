@@ -18,6 +18,19 @@
 </ul>
 
 <div class="andy_content">
+
+
+    Categories:
+    <select id="example_category">
+        <option value="intro">Introductory Examples</option>
+        <option value="lists">Lists and Dictionaries</option>
+        <option value="drawing">Drawing Primitives</option>
+        <option value="all">All Examples</option>
+    </select>
+    <br>
+    <br>
+
+
     <table border=1 class="examples_table">
         <tr>
             <th>Example</th>
@@ -25,7 +38,7 @@
             <th><img src="static/calc_icon2.png" width="90px"></th>
         </tr>
         {% for example in examples %}
-        <tr>
+        <tr class="category category_{{example.id}}">
             <td>
                 <div class="top">
                     <h2>{{ example.title }}</h2>
@@ -77,8 +90,8 @@
     $(document).ready(function () {
 
         Vue.component('rpn', {
-          props: ['example_id', 'source'],
-          template: `
+            props: ['example_id', 'source'],
+            template: `
             {% raw %}
             <div>
                 <a v-on:click.prevent="calc_rpn" href="#" v-show="! is_visible">Preview</a>
@@ -91,54 +104,77 @@
                 </div>
             </div>
             {% endraw %}
-          `,
-          data() {
-            return {
-              is_visible: false,
-              show_rpn_pre: false,
-              show_rpn_comments: true,
-              rpn: '',
-              rpn_with_comments: '',
-              rpn_free42: '',
-              num_python_lines: -1,
-              num_rpn_lines: -1,
-            }
-          },
-          methods: {
-            hide_me() {
-              this.is_visible = false
+            `,
+            data() {
+                return {
+                    is_visible: false,
+                    show_rpn_pre: false,
+                    show_rpn_comments: true,
+                    rpn: '',
+                    rpn_with_comments: '',
+                    rpn_free42: '',
+                    num_python_lines: -1,
+                    num_rpn_lines: -1,
+                }
             },
-            calc_rpn(e) {
-              this.is_visible = !this.is_visible
-              if (!this.is_visible)
-                return
-              if (this.rpn == '') {
-                this.num_python_lines = this.source.split('\n').length
-                let url = `/example/${this.example_id}?to-rpn=1`
-                $.get(url).then((response) => {  // I think the use of this.$http() is only in vue components and data is in response.data
-                  this.rpn_with_comments = response.rpn;
-                  this.rpn_free42 = response.rpn_free42;
-                  this.toggle_rpn_comments();
-                  this.show_rpn_pre = true
-                  this.num_rpn_lines = this.rpn.split('\n').length
-                });
-              }
-            },
+            methods: {
+                hide_me() {
+                    this.is_visible = false
+                },
+                calc_rpn(e) {
+                    this.is_visible = !this.is_visible
+                    if (!this.is_visible)
+                        return
+                    if (this.rpn == '') {
+                        this.num_python_lines = this.source.split('\n').length
+                        let url = `/example/${this.example_id}?to-rpn=1`
+                        $.get(url).then((response) => {  // I think the use of this.$http() is only in vue components and data is in response.data
+                            this.rpn_with_comments = response.rpn;
+                            this.rpn_free42 = response.rpn_free42;
+                            this.toggle_rpn_comments();
+                            this.show_rpn_pre = true
+                            this.num_rpn_lines = this.rpn.split('\n').length
+                        });
+                    }
+                },
 
-            toggle_rpn_comments() {
-              if (this.show_rpn_comments)
-                this.rpn = this.rpn_with_comments
-              else
-                this.rpn = this.rpn_free42
+                toggle_rpn_comments() {
+                    if (this.show_rpn_comments)
+                        this.rpn = this.rpn_with_comments
+                    else
+                        this.rpn = this.rpn_free42
+                }
             }
-          }
         })
 
-      new Vue({
-        el: '.andy_content',
-      })
+        new Vue({
+            el: '.andy_content',
+        })
 
 
+        $('#example_category').on('change', function () {
+            let category = this.value
+            display_examples(category)
+        });
+
+        function display_examples(category) {
+            $('.category').hide()
+            if (category == 'intro') {
+                $('.category_' + '16').show()
+                $('.category_' + '2').show()
+                $('.category_' + '3').show()
+            }
+            else if (category == 'lists') {
+                $('.category_' + '21').show()
+                $('.category_' + '9').show()
+            }
+            else if (category == 'drawing') {
+                $('.category_' + '20').show()
+            }
+            else
+                $('.category').show()
+
+        }
 
     })
 </script>
