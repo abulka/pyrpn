@@ -119,6 +119,8 @@ class Scopes(object):
         # log.debug(f'var_name {var_name} mapped to register {register}')
         return register
 
+    # By ref
+
     def byref_override(self, var_name, register):
         # hmmm have to search for it? in self.list_vars
         if self.is_list(var_name):
@@ -126,6 +128,17 @@ class Scopes(object):
             if matrix_var.by_ref_to_var:
                 register = self.get_register(matrix_var.by_ref_to_var)  # get the register of the original by ref to variable, not var_name variable
         return register
+
+    def by_ref_to_var(self, var_name):
+        to_var = ''
+        if self.is_list(var_name):
+            matrix_var = [matrix_var for matrix_var in self.current.list_vars if matrix_var.var_name == var_name][0]
+            to_var = matrix_var.by_ref_to_var
+        # elif self.is_dict(var_name):
+        #     FIX...  matrix_var = [matrix_var for matrix_var in self.current.list_vars if matrix_var.var_name == var_name][0]
+        return to_var
+
+    # Core
 
     def _add_mapping(self, var, register=None):
         if register == None:

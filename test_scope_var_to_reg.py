@@ -128,6 +128,7 @@ class ListDictMatrixTests(BaseTest):
         scopes.var_to_reg('b', is_list_var=True, by_ref_to_var='a')
         self.assertEqual('"a"', scopes.var_to_reg('a'))
         self.assertEqual('"a"', scopes.var_to_reg('b'))
+        self.assertEqual('a', scopes.by_ref_to_var('b'))
 
 
 class RangeVarNames(BaseTest):

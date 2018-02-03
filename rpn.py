@@ -488,7 +488,14 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                             not self.var_name_is_loop_index_or_el(node.id) and \
                             not self.iterating_list and \
                             not self.inside_matrix_access else 'RCL'
-        self.program.insert(f'{rcl_cmd} {self.scopes.var_to_reg(node.id)}', comment=node.id)
+
+        comment = node.id
+        # self.friendly_type()
+        by_ref_to_var = self.scopes.by_ref_to_var(node.id)
+        if by_ref_to_var:
+            comment += f' (is really "{by_ref_to_var}" by reference)'
+
+        self.program.insert(f'{rcl_cmd} {self.scopes.var_to_reg(node.id)}', comment=comment)
         self.pending_stack_args.append(node.id)
         # Add matrix rcl
         if rcl_cmd == 'RCL' and self.scopes.is_list(node.id):

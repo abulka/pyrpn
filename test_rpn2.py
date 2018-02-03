@@ -970,37 +970,6 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    @unittest.skip('by ref')
-    def test_list_assign_between_vars(self):
-        self.parse(dedent("""
-            a = [1]
-            b = a
-            b[0]
-            """))
-        expected = dedent("""
-            0
-            SF 01
-            XEQ "pMxPrep"
-            1
-            XEQ "LIST+"
-            RCL "ZLIST"
-            STO "a"
-
-            RCL "a"
-            SF 01           // not needed but hard to repress
-            XEQ "pMxPrep"   // not needed but hard to repress
-            RCL "ZLIST"     // forced to generate this in order to get the RCL "a" back onto the stack, due to pMxPrep eating it up  
-            STO "b"
-            
-            RCL "b"
-            SF 01
-            XEQ "pMxPrep"
-            0
-            XEQ "p1MxIJ"  // set IJ to index 0 (which is ZLIST row 1)            
-            RCLEL
-            """)
-        self.compare(de_comment(expected))
-
     def test_list_print(self):
         self.parse(dedent("""
             a = [1, 2]
@@ -1363,8 +1332,39 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    @unittest.skip('by ref')
     def test_list_assign_by_ref(self):
+        self.parse(dedent("""
+            a = [1]
+            b = a
+            b[0]
+            """))
+        expected = dedent("""
+            0
+            SF 01
+            XEQ "pMxPrep"
+            1
+            XEQ "LIST+"
+            RCL "ZLIST"
+            STO "a"
+
+            RCL "a"
+            SF 01           // not needed but hard to repress
+            XEQ "pMxPrep"   // not needed but hard to repress
+            RCL "ZLIST"     // forced to generate this in order to get the RCL "a" back onto the stack, due to pMxPrep eating it up  
+            //STO "b"
+            STO "a"         // redundant - store back into itself, cos b is really a
+
+            //RCL "b"
+            RCL "a"         // <------ even though we are looking at 'b' we recall 'a' cos of by ref
+            SF 01
+            XEQ "pMxPrep"
+            0
+            XEQ "p1MxIJ"  // set IJ to index 0 (which is ZLIST row 1)            
+            RCLEL
+            """)
+        self.compare(de_comment(expected))
+
+    def test_list_assign_by_ref_append(self):
         self.parse(dedent("""
             a = []
             b = a
@@ -1383,7 +1383,7 @@ class RpnTests2(BaseTest):
             SF 01           // not needed but hard to repress
             XEQ "pMxPrep"   // not needed but hard to repress
             RCL "ZLIST"     // forced to generate this in order to get the RCL "a" back onto the stack, due to pMxPrep eating it up  
-            STO "b" 
+            STO "a"         // redundant - store back into itself, cos b is really a
             // Secretly we also mark variable b so that it recalls a instead of b
             // Actually saving a copy of a into b is NOT NECESSARY - prevent if we can            
             
