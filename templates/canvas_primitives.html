@@ -42,6 +42,7 @@
     <canvas id="myCanvas0" width="131" height="16" style="border:1px solid #000000; border-color: red;"></canvas>
     <canvas id="myCanvas1" width="131" height="16" style="border:1px solid #000000; border-color: red;"></canvas>
     <canvas id="myCanvas2" width="131" height="16" style="border:1px solid #000000; border-color: red;"></canvas>
+    <canvas id="myCanvas3" width="131" height="16" style="border:1px solid #000000; border-color: red;"></canvas>
     <p>(131 x 16)</p>
 
     <h1>DM42</h1>
@@ -49,6 +50,7 @@
     <canvas id="myCanvas11" width="200" height="120" style="border:1px solid #000000; border-color: red;"></canvas>
     <p>(200 x 120)</p>
     <canvas id="myCanvas20" width="400" height="240" style="border:1px solid #000000; border-color: red;"></canvas>
+    <canvas id="myCanvas21" width="400" height="240" style="border:1px solid #000000; border-color: red;"></canvas>
     <p>(400 x 240)</p>
 
     <h3>Notes</h3>
@@ -287,6 +289,28 @@
 
     }
 
+    function draw5() {
+        let x;
+
+        // some lines (note the quite likely 'Moire pattern')
+        for (x = 1; x <= vinfo.xres; x += 30) {
+            // console.log('Moire', 0, 0, x, vinfo.yres)
+            draw_line(0, 0, x, vinfo.yres);
+        }
+
+        // some rectangles
+        fill_rect(vinfo.xres / 2, 10, vinfo.xres / 18, vinfo.yres / 18);
+        draw_rect(vinfo.xres / 2, vinfo.yres / 8, vinfo.xres / 6, vinfo.yres / 6);
+
+        // some circles
+        let d;
+        for (d = 2; d < vinfo.yres / 6; d += 12) {
+            draw_circle(3 * vinfo.xres / 4, 2 * vinfo.yres / 4, d);  // read as 3/4 across, 2/4 down
+        }
+
+        fill_circle(vinfo.xres- vinfo.xres / 10, vinfo.yres / 4, vinfo.yres / 20);
+
+    }
 
     setup('myCanvas0')
     draw()
@@ -295,6 +319,8 @@
     setup('myCanvas2')
     draw3()
     draw4()
+    setup('myCanvas3')
+    draw5()
 
     setup('myCanvas10')
     draw()
@@ -303,6 +329,8 @@
 
     setup('myCanvas20')
     draw2()
+    setup('myCanvas21')
+    draw5()
 
 
 </script>
