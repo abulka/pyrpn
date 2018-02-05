@@ -102,10 +102,11 @@ def examples_list():
         eg_tags = [tag.strip() for tag in eg.tags.split(',') if eg.tags.strip() != '']
         all_tags = all_tags | set(eg_tags)
     all_tags = sorted(all_tags)
-    all_tags.remove('Introductory Examples')
-    all_tags.insert(0, 'Introductory Examples')
+    all_tags.remove('Introductory_Examples')
+    all_tags.insert(0, 'Introductory_Examples')
     all_tags.remove('Advanced')
     all_tags.append('Advanced')
+    all_tags = [(tag, tag.replace('_', ' ')) for tag in all_tags]
     return render_template('examples_list.html', examples=examples_sorted, title="Examples", admin=admin, all_tags=all_tags)
 
 

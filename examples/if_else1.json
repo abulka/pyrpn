@@ -3,6 +3,6 @@
     "public": "yes",
     "sortnum": 0,
     "source": "def bigger(a, b):\r\n  if a > b:\r\n    print('Param a=', a, ' is bigger than b=', b, ' yey!')\r\n  else:\r\n    print('Param a=', a, ' is not bigger than b=', b, ' sorry!')",
-    "tags": "Introductory Examples, If",
+    "tags": "Introductory_Examples, Flow_of_Control",
     "title": "If"
 }

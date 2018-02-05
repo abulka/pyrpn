@@ -31,8 +31,8 @@
     <br>
     Categories:
     <select id="example_category_">
-        {% for tag in all_tags %}
-            <option value="category_{{tag}}">{{tag}}</option>
+        {% for tag, tag_with_spaces in all_tags %}
+            <option value="category_{{tag}}">{{tag_with_spaces}}</option>
         {% endfor %}
     </select>
     <br>

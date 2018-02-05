@@ -3,6 +3,6 @@
     "public": "",
     "sortnum": 50,
     "source": "def demo():\r\n    total = 0\r\n    for i in range(10):\r\n        result = calc_something(i, 5)\r\n        print('Counter', i, 'result=', total)\r\n        total += result\r\n    print('Final total was:', total)\r\n\r\ndef calc_something(a,b):\r\n    # adds two numbers then squares them\r\n    return (a + b)**2",
-    "tags": "Introductory Examples",
+    "tags": "Introductory_Examples",
     "title": "Demo 1"
 }

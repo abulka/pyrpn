@@ -3,6 +3,6 @@
     "public": "yes",
     "sortnum": 0,
     "source": "def add_positive(a, b):\r\n  # Adds two numbers if they are both positive, otherwise returns 0\r\n  if a < 0 or b < 0:\r\n    return 0\r\n  return a+b",
-    "tags": "Introductory Examples, Algorithms",
+    "tags": "Introductory_Examples, Algorithms",
     "title": "Function to add positive numbers"
 }
