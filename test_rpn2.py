@@ -1570,6 +1570,17 @@ class RpnTests2(BaseTest):
             """)
         self.assertRaises(RpnError, self.parse, dedent(src))
 
+    # dictionary not supported
+
+    def test_dict_misc_not_supported(self):
+        # various unsupported dictionary commands - https://www.tutorialspoint.com/python/python_dictionary.htm
+        for func in ['clear', 'copy', 'fromkeys', 'get', 'items', 'setdefault', 'update', 'values']:
+            src = dedent(f"""
+                a = {{'a':1, 'b': 2}}
+                a.{func}()
+                """)
+            self.assertRaises(RpnError, self.parse, dedent(src))
+
     # assert
 
     def test_passert_deprecated(self):
