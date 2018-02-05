@@ -95,7 +95,14 @@ def examples_list():
     for eg in examples:
         eg.sortnum = int(eg.sortnum)  # repair the integer
     examples_sorted = sorted(examples, key=lambda eg: (eg.sortnum, eg.filename, eg.id), reverse=True)
-    return render_template('examples_list.html', examples=examples_sorted, title="Examples", admin=admin)
+
+    # prepare tag info
+    all_tags = []
+    for eg in examples:
+        eg_tags = [tag.strip() for tag in eg.tags.split(',') if eg.tags.strip() != '']
+        all_tags.extend(eg_tags)
+
+    return render_template('examples_list.html', examples=examples_sorted, title="Examples", admin=admin, all_tags=all_tags)
 
 
 @app.route('/sync')
@@ -133,6 +140,7 @@ def example_create():
                 public = Example.bool_to_redis_bool(form.public.data),
                 filename=form.filename.data,
                 sortnum=form.sortnum.data,
+                tags=form.tags.data,
             )
             log.info(f'created example {example}')
             return redirect(url_for('example_edit', id=example.id))
@@ -196,6 +204,7 @@ def example_edit(id):
             example.public = Example.bool_to_redis_bool(form.public.data)
             example.filename=form.filename.data
             example.sortnum=form.sortnum.data
+            example.tags=form.tags.data
             example.save()
             log.info(f'example_edit: {id} updated and saved {example}')
             es.save_to_file(example)

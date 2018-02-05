@@ -38,3 +38,4 @@ class ExampleForm(FlaskForm):
     public = BooleanField('Make public', default=True)
     filename = StringField('Filename', default='')
     sortnum = IntegerField('Sort number', default=0, validators=[validators.NumberRange(message='Range should be between 0 and 999.', min=0, max=999)])
+    tags = StringField('Tags', default='')

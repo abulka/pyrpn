@@ -29,6 +29,14 @@
     </select>
     <br>
     <br>
+    Categories:
+    <select id="example_category_">
+        {% for tag in all_tags %}
+            <option value="tag_{{tag}}">{{tag}}</option>
+        {% endfor %}
+    </select>
+    <br>
+    <br>
 
 
     <table border=1 class="examples_table">
@@ -66,6 +74,9 @@
                     {% endif %}
                     {% if example.sortnum %}
                         <p style="font-size: small; color: green">sort num: <b>{{ example.sortnum }}</b></p>
+                    {% endif %}
+                    {% if example.tags %}
+                        <p style="font-size: small; color: green">tags: <b>{{ example.tags }}</b></p>
                     {% endif %}
                 {% endif %}
             </td>
