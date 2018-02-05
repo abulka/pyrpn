@@ -44,7 +44,9 @@
             {% for tag in e.tags %}
                 category_{{tag}}
             {% endfor %}
-            ">
+            "
+            style="display: none"
+        >
             <td>
                 <div class="top">
                     <h2>{{ e.example.title }}</h2>
@@ -174,7 +176,8 @@
                 $('.' + category).show()
             }
         }
-
+        // Init
+        display_examples('category_Introductory_Examples')
 
     })
 </script>
