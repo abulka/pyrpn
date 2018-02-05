@@ -96,10 +96,10 @@ def examples_list():
         eg.sortnum = int(eg.sortnum)  # repair the integer
     examples_sorted = sorted(examples, key=lambda eg: (eg.sortnum, eg.filename, eg.id), reverse=True)
 
-    # prepare tag info
+    # prepare tag info and the richer example dict with tags split by comma etc
     all_examples = []
     all_tags = set()
-    for eg in examples:
+    for eg in examples_sorted:
         eg_tags = [tag.strip() for tag in eg.tags.split(',') if eg.tags.strip() != '']
         all_tags = all_tags | set(eg_tags)
         eg_dict = { 'example': eg,

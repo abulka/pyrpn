@@ -1,7 +1,7 @@
 {
     "description": "<p>You must use uppercase variables for lists.&nbsp; You can also initialise a list with values then append to it later e.g.</p>\r\n<pre class=\"language-python\"><code>A = [200]\r\nA.append(5)</code></pre>\r\n<p>Lists are implemented as matrices with one column, and as many rows as is needed (matrix grows as you append elements).</p>\r\n<p>You can <strong>get</strong> elements of an array with e.g. <code>A[2]</code> though remember Python lists are 0 based, so to get the first element, you want <code>A[0]</code>.&nbsp;&nbsp;You can of course also <strong>set</strong> elements of an array e.g.</p>\r\n<pre class=\"language-python\"><code>def set_array_n_to_99(n):\r\n  A = [1,2,3]\r\n  A[n] = 99</code></pre>\r\n<p>You can even store short strings (max 6 chars) as list elements in lists.</p>\r\n<pre class=\"language-python\"><code>def strmanip():\r\n  A = [\"hi\", \"there\"]\r\n  A[0] = \"hello\"</code></pre>\r\n<p>&nbsp;</p>",
     "public": "yes",
-    "sortnum": 0,
+    "sortnum": 10,
     "source": "def a10():\r\n  A = []\r\n  for i in range(10):\r\n    A.append(i)",
     "tags": "Lists",
     "title": "Lists"
