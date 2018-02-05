@@ -604,6 +604,46 @@ class RpnTemplates:
         RTN
         """)
 
+    """
+    Potential replacement - true stack push pop.
+    
+    https://forum.swissmicros.com/viewtopic.php?f=19&t=298
+    Before first use, create a 1x4 matrix and call it "STACK".
+    Of course, the stack may not hold complex numbers or matrices.
+
+    LBL "PUSHST"
+    INDEX "STACK"
+    INSR
+    R^
+    STOEL
+    J+
+    R^
+    STOEL
+    J+
+    R^
+    STOEL
+    J+
+    R^
+    STOEL
+    EXITALL
+    RTN
+    
+    LBL "POPST"
+    INDEX "STACK"
+    STO ST L
+    RCLEL
+    ENTER
+    ->
+    ENTER
+    ->
+    ENTER
+    ->
+    DELR
+    EXITALL
+    // 29 X<> ST L
+    RTN    
+    """
+
     # Code
 
     @classmethod
