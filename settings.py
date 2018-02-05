@@ -22,6 +22,8 @@ CMDS_WHO_NEED_LITERAL_NUM_ON_STACK_X = ('VIEW',)
 CMDS_WHO_OPERATE_ON_STACK_SO_DISALLOW_NO_ARGS = ('AIP',)
 CMDS_WHO_DISALLOW_STRINGS = ('AIP',)
 CMDS_WHO_NEED_PARAM_SWAPPING = ('PIXEL',)
+LIST_UNSUPPORTED = ('cmp', 'index', 'count', 'extend', 'insert', 'remove', 'reverse', 'sort')
+DICT_UNSUPPORTED = ('clear', 'copy', 'fromkeys', 'get', 'items', 'setdefault', 'update', 'values')
 
 # Specifications of RPN limitations
 MAX_RPN_LABEL_LENGTH = 7
