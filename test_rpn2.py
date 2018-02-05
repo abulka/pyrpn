@@ -1474,9 +1474,16 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+    # del and find
+
+    """
+    Could potentially implement del using matrix DELR
+    And could implement finding stuff in a regualar list using the same looping algorithm I already use in p2MxIJ 
+    """
+
     # assert
 
-    def test_assert(self):
+    def test_passert(self):
         self.parse(dedent("""
             passert(2 == 2)
             """))
@@ -1487,6 +1494,20 @@ class RpnTests2(BaseTest):
             XEQ "pAssert"
             """)
         self.compare(de_comment(expected))
+
+    def test_assert(self):
+        self.parse(dedent("""
+            assert 2 == 2
+            """))
+        expected = dedent("""
+            2
+            2
+            XEQ "pEQ"
+            XEQ "pAssert"
+            """)
+        self.compare(de_comment(expected))
+
+    # Misc
 
     def get_all_lib(self):
         from program import Program

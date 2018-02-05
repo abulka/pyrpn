@@ -910,6 +910,17 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.inside_calculation = False
         self.end(node)
 
+    def visit_Assert(self, node):
+        """
+            - test (which is typically an ast_Compare
+            - ops
+            - comparators
+        """
+        self.begin(node)
+        self.visit(node.test)
+        self.program.insert_xeq('pAssert', comment='Python assert')
+        self.end(node)
+
     def visit_If(self, node):
         """
         If's sub-nodes are:

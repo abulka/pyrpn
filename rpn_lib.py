@@ -552,7 +552,7 @@ class RpnTemplates:
         X=Y?                    // see if element matches
         GTO {have_found}        //   found
         RDN                     // else
-        I+                      //   increment row
+        I+                      //   increment row - could also use ↓ move down one element in the indexed matrix.
         GTO {loop}              // keep looking
         
         LBL {have_found}        // have found
