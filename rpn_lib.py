@@ -660,7 +660,7 @@ class RpnTemplates:
         return {
             'pFS': {'description': 'is flag set?'},
             'pFC': {'description': 'is flag clear?'},
-            'pAssert': {'description': 'is param True?'},
+            # 'pAssert': {'description': 'is param True?'},  # not user callable anymore.
             'pMxLen': {'description': 'length of list or dict'},
         }
 

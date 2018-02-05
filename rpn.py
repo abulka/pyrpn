@@ -259,7 +259,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                      ]
         if name in ['NOT', 'OR', 'AND']:
             raise RpnError(f'The RPN command "{name}" is not supported - use native Python instead, {source_code_line_info(node)}')
-        elif name in ('aview',):
+        elif name in ('aview', 'passert'):
             raise RpnError(f'The command "{name}" is no longer supported, {source_code_line_info(node)}')
         elif name in built_ins:
             raise RpnError(f'The built-in Python command "{name}" is not supported, sorry. Consider calling a HP42S rpn command instead e.g. SIN(n) or PI() etc. {source_code_line_info(node)}')
@@ -1387,7 +1387,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def adjust_function_name(self, func_name):
         if func_name == 'isFS':     func_name = 'pFS'
         if func_name == 'isFC':     func_name = 'pFC'
-        if func_name == 'passert':  func_name = 'pAssert'
+        # if func_name == 'passert':  func_name = 'pAssert'  # not supported anymore, not user insertable anymore.
         if func_name == 'len':      func_name = 'pMxLen'
         if func_name == 'print':    func_name = 'AVIEW'
         return func_name
