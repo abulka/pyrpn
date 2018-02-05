@@ -256,6 +256,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                      'hash',
                      'memoryview',
                      'set',
+
+                     # Extras for lists
+                     'cmp',
+
                      ]
         if name in ['NOT', 'OR', 'AND']:
             raise RpnError(f'The RPN command "{name}" is not supported - use native Python instead, {source_code_line_info(node)}')
@@ -1133,6 +1137,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         if isinstance(node.func, ast.Attribute) and node.func.attr in ('append', 'pop'):
                 self.calling_append_or_pop(node, cmd=node.func.attr)
+        elif isinstance(node.func, ast.Attribute) and node.func.attr in ('cmp', 'index', 'count', 'extend', 'insert', 'remove', 'reverse', 'sort'):
+            raise RpnError(f'The built-in Python command "{node.func.attr}" is not supported yet, sorry. If you are willing to handcraft an algorithm in RPN that implements this functionality please submit to Andy. {source_code_line_info(node)}')
         elif isinstance(node.func, ast.Attribute) and node.func.attr in ('keys',):
             self.visit(node.func.value)  # recalls the list name e.g. the 'a' of the a.append() onto stack and prepares it
             self.scopes.ensure_is_named_matrix_register(var_name=self.get_node_name_id_or_n(node.func.value), node=node)

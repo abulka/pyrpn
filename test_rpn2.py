@@ -1474,12 +1474,101 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    # del and find
+    # del, remove, index, and other list operations
 
     """
     Could potentially implement del using matrix DELR
-    And could implement finding stuff in a regualar list using the same looping algorithm I already use in p2MxIJ 
+    And could implement finding stuff in a regualar list using the same looping algorithm I already use in p2MxIJ
+    
+    https://www.tutorialspoint.com/python/python_lists.htm 
     """
+
+    def test_list_cmp_not_supported(self):
+        # cmp(list1, list2) Compares elements of both lists.
+        src = dedent("""
+            a = [1, 2, 3]
+            cmp(a, a)
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    def test_list_max_not_supported(self):
+        # max(list) Returns item from the list with max value.
+        src = dedent("""
+            a = [1, 2, 3]
+            max(a)
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    def test_list_min_not_supported(self):
+        # min(list) Returns item from the list with min value.
+        src = dedent("""
+            a = [1, 2, 3]
+            min(a)
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    def test_list_list_not_supported(self):
+        # list(seq) Converts a tuple into list.
+        src = dedent("""
+            a = [1, 2, 3]
+            list(a)
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    def test_list_index_not_supported(self):
+        src = dedent("""
+            a = [1, 2, 3]
+            a.index(2)
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    def test_list_count_not_supported(self):
+        # list.count(obj) Returns count of how many times obj occurs in list
+        src = dedent("""
+            a = [1, 2, 3]
+            a.count(2)
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    def test_list_extend_not_supported(self):
+        # list.extend(seq) Appends the contents of seq to list
+        src = dedent("""
+            a = [1, 2, 3]
+            a.extend([5])
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    def test_list_insert_not_supported(self):
+        # list.insert(index, obj) Inserts object obj into list at offset index
+        src = dedent("""
+            a = [1, 2, 3]
+            a.insert(0, 5)
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    def test_list_remove_not_supported(self):
+        # list.remove(obj) Removes object obj from list
+        src = dedent("""
+            a = [1, 2, 3]
+            a.remove(2)
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    def test_list_reverse_not_supported(self):
+        # list.reverse() Reverses objects of list in place
+        src = dedent("""
+            a = [1, 2, 3]
+            a.reverse()
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    def test_list_sort_not_supported(self):
+        # list.sort([func]) Sorts objects of list, use compare func if given
+        src = dedent("""
+            a = [1, 2, 3]
+            a.sort(f)
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
 
     # assert
 
