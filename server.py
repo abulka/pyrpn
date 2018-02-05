@@ -97,17 +97,23 @@ def examples_list():
     examples_sorted = sorted(examples, key=lambda eg: (eg.sortnum, eg.filename, eg.id), reverse=True)
 
     # prepare tag info
+    all_examples = []
     all_tags = set()
     for eg in examples:
         eg_tags = [tag.strip() for tag in eg.tags.split(',') if eg.tags.strip() != '']
         all_tags = all_tags | set(eg_tags)
+        eg_dict = { 'example': eg,
+                    'tags': eg_tags}
+        all_examples.append(eg_dict)
     all_tags = sorted(all_tags)
     all_tags.remove('Introductory_Examples')
     all_tags.insert(0, 'Introductory_Examples')
     all_tags.remove('Advanced')
     all_tags.append('Advanced')
     all_tags = [(tag, tag.replace('_', ' ')) for tag in all_tags]
-    return render_template('examples_list.html', examples=examples_sorted, title="Examples", admin=admin, all_tags=all_tags)
+
+    # prepare examples with extra tag info properly prepared - list of dicts
+    return render_template('examples_list.html', examples=all_examples, title="Examples", admin=admin, all_tags=all_tags)
 
 
 @app.route('/sync')

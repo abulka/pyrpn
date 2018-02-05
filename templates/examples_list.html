@@ -45,46 +45,49 @@
             <th><img src="https://www.python.org/static/community_logos/python-logo-master-v3-TM-flattened.png" width="40%"></th>
             <th><img src="static/calc_icon2.png" width="90px"></th>
         </tr>
-        {% for example in examples %}
-        <!--<p>category_{{example.tags}}</p>-->
-        <tr class="category category_{{example.id}} category_{{example.tags}}">
+        {% for e in examples %}
+        <tr class="category category_{{e.example.id}}
+            {% for tag in e.tags %}
+                category_{{tag}}
+            {% endfor %}
+            ">
             <td>
                 <div class="top">
-                    <h2>{{ example.title }}</h2>
-                    {{ example.description.strip()|safe }}
+                    <h2>{{ e.example.title }}</h2>
+                    {{ e.example.description.strip()|safe }}
                 </div>
                 <div class="bot">
-                    {% if admin or not example.filename %}
-                        <span class="examples_action_link"><a href="/example/{{ example.id }}" title="Edit">Edit</a></span>
-                        <span class="examples_action_link"><a href="/example/{{ example.id }}?clone=1" title="Make a new copy of this example">Clone</a></span>
-                        <span class="examples_action_link"><a href="/example/{{ example.id }}?delete=1" title="Delete this example - no confirmation.  Please be careful about deleting other people's work.">Delete</a></span>
-                        {% if not (admin and example.filename) %}
-                        <span class="examples_action_link"><a href="/example/{{ example.id }}?vote=1" title="Send request to make this example permanent">Vote</a></span>
+                    {% if admin or not e.example.filename %}
+                        <span class="examples_action_link"><a href="/example/{{ e.example.id }}" title="Edit">Edit</a></span>
+                        <span class="examples_action_link"><a href="/example/{{ e.example.id }}?clone=1" title="Make a new copy of this example">Clone</a></span>
+                        <span class="examples_action_link"><a href="/example/{{ e.example.id }}?delete=1" title="Delete this example - no confirmation.  Please be careful about deleting other people's work.">Delete</a></span>
+                        {% if not (admin and e.example.filename) %}
+                        <span class="examples_action_link"><a href="/example/{{ e.example.id }}?vote=1" title="Send request to make this example permanent">Vote</a></span>
                         {% endif %}
-                    {% elif not admin and example.filename %}
-                        <span class="examples_action_link"><a href="/example/{{ example.id }}?clone=1" title="Make a new, editable copy of this example">Clone</a></span>
+                    {% elif not admin and e.example.filename %}
+                        <span class="examples_action_link"><a href="/example/{{ e.example.id }}?clone=1" title="Make a new, editable copy of this example">Clone</a></span>
                     {% endif %}
                 </div>
             </td>
             <td>
-                <pre><code class="language-python">{{ example.source.strip() }}</code></pre>
+                <pre><code class="language-python">{{ e.example.source.strip() }}</code></pre>
                 {% if admin %}
-                    <p style="font-size: small; color: green">id: <b>{{ example.id }}</b></p>
-                    {% if example.filename %}
-                        <p style="font-size: small; color: green">filename: <b>{{ example.filename }}</b></p>
+                    <p style="font-size: small; color: green">id: <b>{{ e.example.id }}</b></p>
+                    {% if e.example.filename %}
+                        <p style="font-size: small; color: green">filename: <b>{{ e.example.filename }}</b></p>
                     {% endif %}
-                    {% if example.sortnum %}
-                        <p style="font-size: small; color: green">sort num: <b>{{ example.sortnum }}</b></p>
+                    {% if e.example.sortnum %}
+                        <p style="font-size: small; color: green">sort num: <b>{{ e.example.sortnum }}</b></p>
                     {% endif %}
-                    {% if example.tags %}
-                        <p style="font-size: small; color: green">tags: <b>{{ example.tags }}</b></p>
+                    {% if e.example.tags %}
+                        <p style="font-size: small; color: green">tags: <b>{{ e.example.tags }}</b></p>
                     {% endif %}
                 {% endif %}
             </td>
             <td>
-                <rpn example_id="{{ example.id }}" source="{{ example.source.strip() }}"></rpn>
+                <rpn example_id="{{ e.example.id }}" source="{{ e.example.source.strip() }}"></rpn>
                 <br>
-                <p><a href="/{{ example.id }}">Load in Converter Editor</a></p>
+                <p><a href="/{{ e.example.id }}">Load in Converter Editor</a></p>
             </td>
         </tr>
 
@@ -166,7 +169,6 @@
 
         $('#example_category_').on('change', function () {
             let category = this.value
-            console.log('this.value is', this.value)
             display_examples_(category)
         });
 
