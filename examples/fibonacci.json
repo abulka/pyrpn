@@ -3,5 +3,6 @@
     "public": "yes",
     "sortnum": 0,
     "source": "def fib(n):\r\n  a = 0\r\n  b = 1\r\n  for i in range(0, n):\r\n    old_b = b\r\n    b = a + b\r\n    a = old_b\r\n  return a",
+    "tags": "Introductory Examples, Algorithms",
     "title": "Fibonacci"
 }

@@ -77,7 +77,16 @@ table.examples_table td:nth-child(3) {
     /*text-align: left;*/
     /*vertical-align: middle;*/
     vertical-align: top;
-    width: 55em;
+}
+
+table.examples_table td:nth-child(1) {
+    width: 40%;
+}
+table.examples_table td:nth-child(2) {
+    width: 30%;
+}
+table.examples_table td:nth-child(3) {
+    width: 30%;
 }
 
 table.examples_table td:nth-child(3) div div {

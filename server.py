@@ -97,11 +97,15 @@ def examples_list():
     examples_sorted = sorted(examples, key=lambda eg: (eg.sortnum, eg.filename, eg.id), reverse=True)
 
     # prepare tag info
-    all_tags = []
+    all_tags = set()
     for eg in examples:
         eg_tags = [tag.strip() for tag in eg.tags.split(',') if eg.tags.strip() != '']
-        all_tags.extend(eg_tags)
-
+        all_tags = all_tags | set(eg_tags)
+    all_tags = sorted(all_tags)
+    all_tags.remove('Introductory Examples')
+    all_tags.insert(0, 'Introductory Examples')
+    all_tags.remove('Advanced')
+    all_tags.append('Advanced')
     return render_template('examples_list.html', examples=examples_sorted, title="Examples", admin=admin, all_tags=all_tags)
 
 

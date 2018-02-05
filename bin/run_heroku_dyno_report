@@ -1,1 +1,4 @@
 heroku ps -a pyrpn
+echo if no dynos then issue
+echo heroku ps:scale web=1:free -a pyrpn
+

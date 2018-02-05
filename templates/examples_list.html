@@ -32,7 +32,7 @@
     Categories:
     <select id="example_category_">
         {% for tag in all_tags %}
-            <option value="tag_{{tag}}">{{tag}}</option>
+            <option value="category_{{tag}}">{{tag}}</option>
         {% endfor %}
     </select>
     <br>
@@ -46,7 +46,8 @@
             <th><img src="static/calc_icon2.png" width="90px"></th>
         </tr>
         {% for example in examples %}
-        <tr class="category category_{{example.id}}">
+        <!--<p>category_{{example.tags}}</p>-->
+        <tr class="category category_{{example.id}} category_{{example.tags}}">
             <td>
                 <div class="top">
                     <h2>{{ example.title }}</h2>
@@ -162,6 +163,19 @@
             el: '.andy_content',
         })
 
+
+        $('#example_category_').on('change', function () {
+            let category = this.value
+            console.log('this.value is', this.value)
+            display_examples_(category)
+        });
+
+        function display_examples_(category) {
+            $('.category').hide()
+            cat_name = '.' + category
+            // console.log(cat_name)
+            $(cat_name).show()
+        }
 
         $('#example_category').on('change', function () {
             let category = this.value

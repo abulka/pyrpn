@@ -3,5 +3,6 @@
     "public": "yes",
     "sortnum": 0,
     "source": "assert 2 == 2\r\nassert(2 == 2)  # not correct, because Python's assert is a keyword and not a function",
+    "tags": "Advanced",
     "title": "Assert"
 }

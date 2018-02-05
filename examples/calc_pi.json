@@ -3,5 +3,6 @@
     "public": "yes",
     "sortnum": 0,
     "source": "def calc_pi(max_iterations):\r\n    result = 1.0\r\n    subtract = True\r\n    for i in range(3, max_iterations, 2):\r\n        if subtract:\r\n            result -= 1.0/i\r\n            subtract = False\r\n        else:\r\n            result += 1.0/i\r\n            subtract = True\r\n    result *= 4\r\n    return result",
+    "tags": "Algorithms",
     "title": "Calculate Pi"
 }
