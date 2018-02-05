@@ -22,18 +22,10 @@
 
     Categories:
     <select id="example_category">
-        <option value="intro">Introductory Examples</option>
-        <option value="lists">Lists and Dictionaries</option>
-        <option value="drawing">Drawing Primitives</option>
-        <option value="all">All Examples</option>
-    </select>
-    <br>
-    <br>
-    Categories:
-    <select id="example_category_">
         {% for tag, tag_with_spaces in all_tags %}
             <option value="category_{{tag}}">{{tag_with_spaces}}</option>
         {% endfor %}
+        <option value="">All</option>
     </select>
     <br>
     <br>
@@ -46,7 +38,9 @@
             <th><img src="static/calc_icon2.png" width="90px"></th>
         </tr>
         {% for e in examples %}
-        <tr class="category category_{{e.example.id}}
+        <tr class="
+            category
+            category_{{e.example.id}}
             {% for tag in e.tags %}
                 category_{{tag}}
             {% endfor %}
@@ -167,41 +161,20 @@
         })
 
 
-        $('#example_category_').on('change', function () {
-            let category = this.value
-            display_examples_(category)
-        });
-
-        function display_examples_(category) {
-            $('.category').hide()
-            cat_name = '.' + category
-            // console.log(cat_name)
-            $(cat_name).show()
-        }
-
         $('#example_category').on('change', function () {
             let category = this.value
             display_examples(category)
         });
 
         function display_examples(category) {
-            $('.category').hide()
-            if (category == 'intro') {
-                $('.category_' + '16').show()
-                $('.category_' + '2').show()
-                $('.category_' + '3').show()
-            }
-            else if (category == 'lists') {
-                $('.category_' + '21').show()
-                $('.category_' + '9').show()
-            }
-            else if (category == 'drawing') {
-                $('.category_' + '20').show()
-            }
-            else
+            if (category == '')
                 $('.category').show()
-
+            else {
+                $('.category').hide()
+                $('.' + category).show()
+            }
         }
+
 
     })
 </script>
