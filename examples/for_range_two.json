@@ -1,0 +1,8 @@
+{
+    "description": "<p>range with step of two</p>",
+    "public": "yes",
+    "sortnum": 0,
+    "source": "def by2():\r\n  n = 10\r\n  for i in range(-50, 200, n):\r\n    print('Counter ', i)",
+    "tags": "Flow_of_Control",
+    "title": "Range by 2"
+}

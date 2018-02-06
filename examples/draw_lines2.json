@@ -1,0 +1,8 @@
+{
+    "description": "<p>Drawing lines.</p>",
+    "public": "yes",
+    "sortnum": 0,
+    "source": "def dd1():\r\n  FIX(0)\r\n  CLLCD()\r\n  draw_line(0, 0, 10, 10)\r\n  draw_line(10, 10, 20, 5)\r\n  draw_line(20, 5, 100, 16)\r\n  draw_line(100, 16, 131, 1)\r\n  \r\ndef draw_line(x0, y0, x1, y1):\r\n    dx = ABS(x1 - x0)\r\n    dy = ABS(y1 - y0)\r\n    if x0 < x1:\r\n        sx = 1\r\n    else:\r\n        sx = -1\r\n    if y0 < y1:\r\n        sy = 1\r\n    else:\r\n        sy = -1\r\n    err = dx - dy\r\n    done = 0\r\n    while not done:\r\n        #alpha('pixel ', x0, ' ', y0)\r\n        #PRA()\r\n        PIXEL(y0, x0);  # note col, row not row, col\r\n        #alpha('if ', x0, ' ', x1, ' ', y0, ' ', y1)\r\n        #PRA()\r\n        if (x0 == x1) and (y0 == y1):\r\n            done = 1\r\n        else:\r\n            e2 = 2 * err\r\n            if e2 > -dy:\r\n                err = err - dy\r\n                x0 = x0 + sx\r\n            if e2 < dx:\r\n                err = err + dx\r\n                y0 = y0 + sy",
+    "tags": "Drawing",
+    "title": "Drawing Lines"
+}

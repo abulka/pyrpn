@@ -1,0 +1,8 @@
+{
+    "description": "<p>Quick demo of list and dict lookup operations 1</p>",
+    "public": "yes",
+    "sortnum": 0,
+    "source": "# test of list and dict lookups\r\ndef z1():\r\n  X = [1,2,3,4]\r\n  PROMPT('element 2 in list is', X[2], 'should be 3')\r\n  Y = {1:99, 2:100}\r\n  PROMPT('key 2 in dict is', Y[2], 'should be 100')",
+    "tags": "Lists, Dictionaries",
+    "title": "test list dict 1"
+}
