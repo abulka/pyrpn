@@ -128,5 +128,5 @@ class ExamplesSync():
     def repopulate_redis(self):
         self.build_mappings()
         self.files_to_redis()
-        self.redis_to_files()
+        # self.redis_to_files()  - problematic - this writes all examples with filenames to disk, overwriting more recent git controlled example files.
         log.warning('redis db repopulated from example files on disk.')
