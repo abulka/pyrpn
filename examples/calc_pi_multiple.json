@@ -1,8 +1,8 @@
 {
-    "description": "<p>testing</p>",
+    "description": "<p>This calls the algorithm to calculate PI repeatedly, and shows how the value converges towards real PI as the max iterations increases.</p>",
     "public": "yes",
     "sortnum": 0,
-    "source": "def calc_pi(max_iterations):\r\n    result = 1.0\r\n    subtract = True\r\n    for i in range(3, max_iterations, 2):\r\n        if subtract:\r\n            result -= 1.0/i\r\n            subtract = False\r\n        else:\r\n            result += 1.0/i\r\n            subtract = True\r\n    result *= 4\r\n    PRX(result)\r\n    return result\r\ndef cc1():  # rpn: export\r\n  calc_pi(10)\r\n  calc_pi(50)\r\n  calc_pi(100)\r\n  calc_pi(500)\r\n  calc_pi(1000)",
+    "source": "def calc_pi(max_iterations):\r\n    result = 1.0\r\n    subtract = True\r\n    for i in range(3, max_iterations, 2):\r\n        if subtract:\r\n            result -= 1.0/i\r\n            subtract = False\r\n        else:\r\n            result += 1.0/i\r\n            subtract = True\r\n    result *= 4\r\n    PRX(result)  # print variable\r\n    return result\r\ndef cc1():  # rpn: export\r\n  ALL()\r\n  calc_pi(4)\r\n  calc_pi(10)\r\n  calc_pi(50)\r\n  calc_pi(100)\r\n  calc_pi(500)\r\n  calc_pi(1000)  # max is 1000 because RPN's ISG has max of 1000",
     "tags": "Algorithms",
-    "title": "calc_pi multiple"
+    "title": "Calculate Pi repeatedly"
 }

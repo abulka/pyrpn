@@ -35,7 +35,7 @@ A note on how I'm using flags and registers
 
 Registers 00-NN - allocated as variables as needed when lowercase variables are encountered
 Uppercase Named Registers e.g. "FRED" - created when python code has uppercase variable names
-Lowercase Named Registers - not used
+Lowercase Named Registers - not used unless # rpn: named added to Python code as a comment.
 
 Named register pSaveT          - used by pISG
 Named register pISGvar         - used by p2MxIJ 

@@ -148,6 +148,9 @@ class Program(BaseRpnProgram):
                 func_name = self.extract_func_name(line.text)
                 if func_name in ('LIST+', 'LIST-', 'CLIST'):
                     func_name = 'pList'
+                elif func_name not in self.rpn_templates.template_names:
+                    # log.debug(f'skipping dependency on {func_name}')
+                    continue
                 labels_called.add(func_name)
         return labels_called
 
@@ -177,7 +180,7 @@ class Program(BaseRpnProgram):
                 elif func_name == 'CLIST':
                     label = settings.LIST_CLIST
                 else:
-                    log.debug(f'skipped global label "{func_name}"?')
+                    log.debug(f'skipped converting global label "{func_name}" to local')
                     return
                 line.text = f'{cmd} {label}'
                 log.debug(f'replaced global label "{func_name}" with local label {label}')
