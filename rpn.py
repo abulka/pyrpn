@@ -519,11 +519,15 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.begin(node)
         if self.disallow_string_args:
             raise RpnError(f'Error: function disallows parameters of type string, {source_code_line_info(node)}')
-        if self.inside_alpha:
-            # self.program.insert(f'├"{node.s[0:15]}"')
-            self.split_alpha_text(node.s, append=self.alpha_append_mode)
+        if '\n' in node.s:
+            pass  # probably a multiline comment - so skip it
         else:
-            self.program.insert(f'"{node.s[0:15]}"', type_='string')
+            # s = node.s.strip().replace('\n', ' ')  # clean up multi line comment strings
+            if self.inside_alpha:
+                # self.program.insert(f'├"{node.s[0:15]}"')
+                self.split_alpha_text(node.s, append=self.alpha_append_mode)
+            else:
+                self.program.insert(f'"{node.s[0:15]}"', type_='string')
         self.end(node)
 
     def visit_List(self,node):

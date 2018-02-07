@@ -1601,6 +1601,17 @@ class RpnTests2(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+    def test_comments_triple_quotes(self):
+        self.parse(dedent('''
+            """
+            This is
+            a multi line comment
+            """
+            '''))
+        expected = dedent("""
+            """)
+        self.compare(de_comment(expected))
+
     # Misc
 
     def get_all_lib(self):
