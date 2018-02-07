@@ -1,0 +1,8 @@
+{
+    "description": "<p>The directive rpn: named will force a Python variable to be mapped to a HP42S register of the same name, instead of being mapped to a numeric register.&nbsp; Use this directive any time you want a a Python variable to be stored in a HP42S lowercase named register mapping instead of the default numbered register.</p>\r\n<p>Normally Python variables are mapped to numeric registers 00..nn in order to avoid polluting the HP42S global variable namespace.&nbsp; However in some circumstances you may wish to expose the variable to look at or use later. This directive forces the converter to allocate a named register.</p>\r\n<p>For example, its useful for the INPUT command to be given descriptive variable names e.g. Normally <code>INPUT(weight)</code> would result in INPUT 00, resulting in a user prompt for 00 which is not really helpful.&nbsp; You could work around this and use the uppercase convention whereby all uppercase Python variables are named resigter thus <code>INPUT(WEIGHT)</code> would result in INPUT \"WEIGHT\".&nbsp; But if you prefer lower case, you can use the directive and <code>INPUT(weight)&nbsp; # rpn: named</code>&nbsp;which would result in INPUT \"weight\".&nbsp;&nbsp;</p>",
+    "public": "yes",
+    "sortnum": 0,
+    "source": "x = 100\r\ny = 100  # rpn: named\r\nINPUT(weight)  # rpn: named",
+    "tags": "Advanced",
+    "title": "Variables"
+}

@@ -866,7 +866,31 @@ class RpnCodeGenTests(BaseTest):
             """)
         self.compare(de_comment(expected), lines, dump=True)
 
-    # Calls to HP42s methods
+    # Variable assignment
+
+    def test_var_named_lower(self):
+        lines = self.parse(dedent("""
+            x = 100  # rpn: named
+            """))
+        expected = dedent("""
+            100
+            STO "x"
+            """)
+        self.compare(de_comment(expected), lines, dump=True)
+
+    def test_var_named_lower_in_func_call(self):
+        lines = self.parse(dedent("""
+            INPUT(x)  # rpn: named
+            x += 1
+            """))
+        expected = dedent("""
+            INPUT "x"
+            1
+            STO+ "x"
+            """)
+        self.compare(de_comment(expected), lines, dump=True)
+
+    # Calls to HP42s mvar and varmenu methods
 
     def test_mvar(self):
         lines = self.parse(dedent("""
@@ -935,7 +959,7 @@ class RpnCodeGenTests(BaseTest):
         """)
         self.compare(de_comment(expected), lines, dump=True)
 
-    # generic handling of any 41S command
+    # generic handling of any 42S command
 
     def test_generic_cmds_1(self):
         """

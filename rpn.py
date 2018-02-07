@@ -635,9 +635,15 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         is_dict_var = isinstance(node.value, ast.Dict) or rhs_is_dict_var
         by_ref_to_var = by_ref_to_rhs_var
         friendly_type = self.friendly_type(is_list_var, is_dict_var, by_ref_to_var)
-        log.info(f'{self.indent_during}created variable "{target.id}" {friendly_type}')
+        var_name = target.id
+        log.info(f'{self.indent_during}created variable "{var_name}" {friendly_type}')
+
+        comment = self.find_comment(node)
+        force_reg_name = f'"{var_name}"' if 'rpn: ' in comment and 'named' in comment else None
+
         self.program.insert_sto(
             self.scopes.var_to_reg(target.id,
+                                   force_reg_name=force_reg_name,
                                    is_list_var=is_list_var,
                                    is_dict_var=is_dict_var,
                                    by_ref_to_var=by_ref_to_var,
@@ -1274,34 +1280,38 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         # command, thus we cannot rely on normal visit parsing but must look ahead and extract needed info.
         cmd_info = cmd_list[func_name]
         args = ''
-        comment = cmd_info['description']
+        comment_to_emit = cmd_info['description']
         for i in range(cmd_info['num_arg_fragments']):
             arg = node.args[i]
             arg_val = self.get_node_name_id_or_n(arg)
 
-            if isinstance(arg, ast.Str):
+            if isinstance(arg, ast.Str):   # literal string
                 arg_val = f'"{arg_val}"'
 
             if isinstance(arg, ast.Name):  # reference to a variable, thus pull out a register name
-                comment = arg_val
+                var_name = comment_to_emit = arg_val
                 # hack if trying to access i
-                if self.var_name_is_loop_index_or_el(arg_val):
-                    assert not self.scopes.is_el_var(node.id)  # Haven't implemented this yet - look to rcl_var_index() for inspiration/DRY
-                    comment = arg_val + ' (loop var)'
-                    register = arg_val = self.scopes.var_to_reg(arg_val)
-                    self.program.insert(f'RCL {register}', comment=comment)
-                    self.program.insert('IP')  # just get the integer portion of isg counter
-                    arg_val = 'ST X'  # access the value in stack x rather than in the register
+                if self.var_name_is_loop_index_or_el(var_name):
                     assert cmd_info['indirect_allowed']
+                    assert not self.scopes.is_el_var(node.id)  # Haven't implemented this yet - look to rcl_var_index() for inspiration/DRY
+                    comment_to_emit = var_name + ' (loop var)'
+                    register = self.scopes.var_to_reg(var_name)
+                    self.program.insert(f'RCL {register}', comment=comment_to_emit)
+                    self.program.insert('IP')  # just get the integer portion of isg counter
+                    register = 'ST X'  # access the value in stack x rather than in the register
                 else:
-                    arg_val = self.scopes.var_to_reg(arg_val)
+                    comment = self.find_comment(node)
+                    force_reg_name = f'"{var_name}"' if 'rpn: ' in comment and 'named' in comment else None
+                    register = self.scopes.var_to_reg(var_name, force_reg_name=force_reg_name)  # just in case this is the first reference to var, create it and allow lowercase e.g. INPUT(weight) to create nice named variable "weight"
+                    log.debug(f'{self.indent_during}mapped {var_name} to register {register}, force_reg_name={force_reg_name}')
+                arg_val = register
 
             elif isinstance(arg, ast.Num):
                 arg_val = f'{arg_val:02d}'  # TODO probably need more formats e.g. nnnn
 
             args += ' ' if arg_val else ''
             args += arg_val
-        self.program.insert(f'{func_name}{args}', comment=comment)
+        self.program.insert(f'{func_name}{args}', comment=comment_to_emit)
 
     def calling_alpha_family(self, func_name, node):
         old_inside_calculation = self.inside_calculation
