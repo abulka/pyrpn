@@ -1,0 +1,8 @@
+{
+    "description": "<p>While loops are a fantastic alternative to <code>for</code> loops.&nbsp; Continue and break are supported.</p>",
+    "public": "yes",
+    "sortnum": 5,
+    "source": "def while_demo():\r\n  # while loop\r\n  n = 0\r\n  total = 0\r\n  while n < 100:\r\n    n += 1\r\n    total += SIN(n)\r\n  print('done', total)\r\n\r\n# continue and break are supported\r\nn = 0\r\nwhile n < 100:\r\n  n += 1\r\n  if n > 60:\r\n    continue\r\n  if n == 50:\r\n    break",
+    "tags": "Flow_of_Control",
+    "title": "While"
+}

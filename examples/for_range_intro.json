@@ -1,0 +1,8 @@
+{
+    "description": "<p>For loops a common way of looping in Python.&nbsp; The range function specifies from, to and step.&nbsp; You can leave out 'step' and it defaults to a step of 1.</p>\r\n<p>Note that under the hood, for range loops are implemented with RPN's <code>ISG</code> command, which has a max of 1000 due to the&nbsp;ISG <em>ccccccc.fffii</em> format of <em>fff</em>.&nbsp; If you want to loop more than 1000 then use a while loop and your own counter variable.&nbsp; I might add a rpn: comment directive one day to bypass ISG and implement for using while loops automatically.</p>",
+    "public": "yes",
+    "sortnum": 10,
+    "source": "def for_demo():\r\n    total = 0\r\n    \r\n    for i in range(10):  # from 0 to 10 (but excluding 10)\r\n      total += i\r\n      \r\n    for x in range(5,500, 50):  # from 5 to 500 in steps of 50\r\n      total *= x\r\n      \r\n    for i in range(1,5):  # if you leave step out, it defaults to 1.\r\n      if i == 2:\r\n        break\r\n      total = total * total\r\n      \r\n    ALL()  # change display to show all digits\r\n    print('Final total was:', total)",
+    "tags": "Flow_of_Control",
+    "title": "For loops"
+}
