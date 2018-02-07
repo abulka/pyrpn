@@ -1,0 +1,8 @@
+{
+    "description": "<p>Not many people know this advanced Python syntax for while.&nbsp; The else clause is only executed when your while condition becomes false. If you break out of the loop, or if an exception is raised, it won't be executed.</p>\r\n<p>The else clause is executed if you exit a block normally, by hitting the loop condition or falling off the bottom of a try block. It is not executed if you break or return out of a block, or raise an exception. It works for not only while and for loops, but also try blocks.</p>",
+    "public": "yes",
+    "sortnum": 0,
+    "source": "# while..else is supported\r\nn = 10\r\nwhile n > 2:\r\n    n -= 1\r\nelse:\r\n    VIEW(n)",
+    "tags": "Advanced",
+    "title": "While else"
+}

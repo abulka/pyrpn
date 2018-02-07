@@ -108,7 +108,7 @@ class ExamplesSync():
         if self.is_production:
             return
         for info in self.mappings:
-            if info.redis_id and info.filename:
+            if info.redis_id and info.filename and not info.has_file:
                 example = Example.get(info.redis_id)
                 self.save_to_file(example)
         self.build_mappings()
@@ -128,5 +128,5 @@ class ExamplesSync():
     def repopulate_redis(self):
         self.build_mappings()
         self.files_to_redis()
-        # self.redis_to_files()  - problematic - this writes all examples with filenames to disk, overwriting more recent git controlled example files.
+        self.redis_to_files()  # changed to only write out to file that don't exist - otherwise problematic - this writes all examples with filenames to disk, overwriting more recent git controlled example files.
         log.warning('redis db repopulated from example files on disk.')
