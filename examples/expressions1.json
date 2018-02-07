@@ -3,6 +3,6 @@
     "public": "yes",
     "sortnum": 30,
     "source": "x = 1 + 2 * 6 + 1 * 9 / 100 + 1 + 2 * 6\r\ny = ((1 + 2) * (6 + 2 - 3) * (2 + 7)) / 200  # brackets",
-    "tags": "Introductory_Examples, Expressions",
+    "tags": "Advanced",
     "title": "Long expressions"
 }

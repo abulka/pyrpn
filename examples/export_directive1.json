@@ -3,6 +3,6 @@
     "public": "",
     "sortnum": 0,
     "source": "def main():\r\n  useful()\r\n\r\ndef useful():  # rpn: export\r\n  pass",
-    "tags": "Functions, Advanced",
+    "tags": "Advanced",
     "title": "Export directive"
 }

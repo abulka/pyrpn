@@ -3,6 +3,6 @@
     "public": "yes",
     "sortnum": 10,
     "source": "def a10():\r\n  A = []\r\n  for i in range(10):\r\n    A.append(i)",
-    "tags": "Lists",
+    "tags": "Lists_and_Dictionaries",
     "title": "Lists"
 }
