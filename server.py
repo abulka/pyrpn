@@ -86,6 +86,7 @@ def spy(source, default_source):
 def examples_list():
     log.info(f'examples being listed.')
     admin = request.args.get('admin')
+    tag = request.args.get('tag')
     if FORCE_ADMIN: admin = True
 
     if len(Example.ids()) == 0:
@@ -97,8 +98,8 @@ def examples_list():
     examples_sorted = sorted(examples, key=lambda eg: (eg.sortnum, eg.filename, eg.id), reverse=True)
 
     all_examples, all_tags = prepare_examples_and_tags(examples_sorted)
-
-    return render_template('examples_list.html', examples=all_examples, title="Examples", admin=admin, all_tags=all_tags)
+    show_initial_tag = tag if tag else 'Introductory_Examples'
+    return render_template('examples_list.html', examples=all_examples, title="Examples", admin=admin, all_tags=all_tags, show_initial_tag=show_initial_tag)
 
 
 def prepare_examples_and_tags(examples):

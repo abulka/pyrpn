@@ -30,6 +30,7 @@
     <br>
     <br>
 
+    <div id="show_initial_tag" style="display: none">{{show_initial_tag}}</div>
 
     <table border=1 class="examples_table">
         <tr>
@@ -174,10 +175,12 @@
             else {
                 $('.category').hide()
                 $('.' + category).show()
+                $("select#example_category").val(category);  // change the select combo - hopefully this won't trigger change event!
             }
         }
         // Init
-        display_examples('category_Introductory_Examples')
+        // display_examples('category_Introductory_Examples')
+        display_examples('category_' + $('#show_initial_tag').text())
 
     })
 </script>
