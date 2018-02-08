@@ -306,14 +306,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                                     my_matrix_var.delr(row_num)
                                  where the parameter is the row number.
                                  
-                INVRT, TRANS
-                DET, FNRM
-                                 Replaced with the syntax
-                                    my_matrix_var.invrt() 
-                                    my_matrix_var.trans() 
-                                    my_matrix_var.det() 
-                                    my_matrix_var.fnrm() 
-                                    
                 R<>R            Syntactically not even valid Python.
                                 Replaced with the syntax
                                     my_matrix_var.row_swap_row(1,2)
@@ -322,6 +314,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                                     my_matrix_var.wrap()
                                     my_matrix_var.grow()
                                   
+                INVRT, TRANS, DET, FNRM RSUM UVEC, RNRM - normal calls e.g. m2 = INVRT(m) 
+                DOT, CROSS                              - normal calls e.g. DOT(m1, m2) 
+
             """)
             raise RpnError(f'The RPN command "{name}" is not supported because there are cleaner "Pythonic" and "NumPy compatible" alternatives like slicing.{rich_info}{source_code_line_info(node)}')
 

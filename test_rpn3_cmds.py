@@ -6,6 +6,7 @@ import logging
 from logger import config_log
 from rpn import RpnError
 from parse import parse
+import settings
 
 log = logging.getLogger(__name__)
 config_log(log)
@@ -366,8 +367,7 @@ class RpnTests3Cmds(BaseTest):
 
     def test_matrices_not_supported(self):
         # various unsupported matrix related commands - use pythonic and numpy alternatives !
-        for func in ['INDEX', 'STOIJ', 'RCLIJ', 'PUTM', 'GETM', 'INSR', 'DELR',
-                     'DIM', 'INVRT', 'TRANS', 'DET', 'FNRM', 'GROW', 'WRAP']:
+        for func in settings.MATRIX_UNSUPPORTED:
             src = dedent(f"""
                 {func}(1)
                 """)
@@ -446,11 +446,43 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    @unittest.skip('matrices')
-    def test_matrices_invert(self):
+    # Matrix manipulation
+
+    """
+    These all act on the matrix in x, thus operate like any other command
+    INVRT
+    TRANS
+    DET  
+    FNRM 
+    RSUM 
+    UVEC 
+    
+    DOT(m1, m2) - returns matrix        
+    CROSS(m1, m2) - returns matrix
+    
+    RNRM - returns a number
+
+    SIMQ ?
+
+    Possible bug in Free42?
+        For example, if you press . X^2 when there is a matrix in the X-register, 
+        each element in the matrix is squared.
+
+    """
+
+    # @unittest.skip('matrices')
+    def test_matrices_invert_trans_det(self):
         self.parse(dedent("""
             x = NEWMAT(1,4)
-            x.invrt()
+            INVRT(x)
+            TRANS(x)
+            DET(x)
+            FNRM(x)
+            RSUM(x)
+            UVEC(x)
+            RNRM(x)
+            DOT(x, x)
+            CROSS(x, x)
             """))
         expected = dedent("""
             1
@@ -460,81 +492,27 @@ class RpnTests3Cmds(BaseTest):
             
             RCL "x"
             INVRT
-            STO "x"
-            """)
-        self.compare(de_comment(expected))
-
-    @unittest.skip('matrices')
-    def test_matrices_trans(self):
-        self.parse(dedent("""
-            x = NEWMAT(1,4)
-            x.trans()
-            """))
-        expected = dedent("""
-            1
-            4
-            NEWMAT
-            STO "x"
-            
             RCL "x"
             TRANS
-            STO "x"
-            """)
-        self.compare(de_comment(expected))
-
-    @unittest.skip('matrices')
-    def test_matrices_det(self):
-        self.parse(dedent("""
-            x = NEWMAT(1,4)
-            x.det()
-            """))
-        expected = dedent("""
-            1
-            4
-            NEWMAT
-            STO "x"
-            
             RCL "x"
             DET
-            STO "x"
-            """)
-        self.compare(de_comment(expected))
-
-    @unittest.skip('matrices')
-    def test_matrices_det(self):
-        self.parse(dedent("""
-            x = NEWMAT(1,4)
-            x.fnrm()
-            """))
-        expected = dedent("""
-            1
-            4
-            NEWMAT
-            STO "x"
-            
             RCL "x"
             FNRM
-            STO "x"
+            RCL "x"
+            RSUM
+            RCL "x"
+            UVEC
+            RCL "x"
+            RNRM
+            RCL "x"
+            RCL "x"
+            DOT
+            RCL "x"
+            RCL "x"
+            CROSS
             """)
         self.compare(de_comment(expected))
 
-    """
-    Todo
-    
-   
-    RSUM        - returns an m x 1 matrix       m2 = m.rsum()
-    UVEC        - matrix adjusted               m2 = m.uvec()
-    RNRM        - returns a number              num = m.rnrm()
-    DOT(m1, m2) - returns matrix                m = DOT(m1, m2)        
-    CROSS(m1, m2) - returns matrix              m = CROSS(m1, m2)
-    
-    SIMQ ?
-    
-    Possible bug in Free42?
-        For example, if you press . X^2 when there is a matrix in the X-register, 
-        each element in the matrix is squared.
-     
-    """
 
     @unittest.skip('matrices')
     def test_matrices_wrap_grow(self):
