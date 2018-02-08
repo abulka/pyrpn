@@ -185,8 +185,14 @@ class RpnTemplates:
             XEQ {prepare}       
             FC?C 25       // if was error (flag cleared)
             GTO {init}    //   init list then push
+            
+            // ALl this does is add a row.  To add a row you must be in 
+            // grow mode, and positioned on the last row, last column.  
+            // The trick to positioning yourself at this point is start at 1,1
+            // then do a J- which takes you from 1,1 to last_row,last_col
+             
             GROW          // else
-            J-            //   grow, j-, j+ wrap, push()
+            J-            //   appends row via grow, j-, j+ trick
             J+
             WRAP
 

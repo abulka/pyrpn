@@ -508,6 +508,20 @@ class RpnTests3Cmds(BaseTest):
 
     @unittest.skip('matrices')
     def test_matrices_wrap_grow(self):
+        """
+        Actually grow and wrap and -> and <- navigation
+        together with STOEL and RCLEL could be handy.
+        But don't want to get into supporting INDEX and the
+        idea of a current matrix. Could perhaps support
+            GROW(x)
+            WRAP(x)
+            x.row_I_plus
+            x.row_I_minus
+            x.col_J_plus
+            x.col_J_minus
+            x.stoel(val)
+            RCLEL(x)
+        """
         self.parse(dedent("""
             x = NEWMAT(1,4)
             x.wrap()
