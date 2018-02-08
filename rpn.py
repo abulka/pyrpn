@@ -39,7 +39,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.alpha_separator = ' '
         self.inside_calculation = False
         self.disallow_string_args = False
-        self.inside_matrix_access = False
+        self.inside_matrix_subscript_access = False
         self.def_params_as_ints = False
         self.matrix_index_adjust = False
 
@@ -498,8 +498,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                             not self.inside_calculation and \
                             not self.var_name_is_loop_index_or_el(node.id) and \
                             not self.iterating_list and \
-                            not self.inside_matrix_access else 'RCL'
-        if self.scopes.is_matrix(node.id):
+                            not self.inside_matrix_subscript_access else 'RCL'
+        if self.scopes.is_matrix(node.id) and self.inside_matrix_subscript_access:
             rcl_cmd = 'INDEX'
 
         comment = node.id
@@ -686,15 +686,15 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         # Assign to the list/dictionary
         assert isinstance(target.ctx, ast.Store)
         log.debug(f'{self.indent_during}lhs subscript "{target.value.id}" detected')
-        self.process_matrix_access(target)
+        self.process_matrix_subscript_access(target)
 
     def subscript_is_on_rhs_thus_read(self, node):
         # Recall the list/dictionary onto the stack
         assert isinstance(node.ctx, ast.Load)
         log.debug(f'{self.indent_during}rhs subscript "{node.value.id}" detected')
-        self.process_matrix_access(node)
+        self.process_matrix_subscript_access(node)
 
-    def process_matrix_access(self, subscript_node):
+    def process_matrix_subscript_access(self, subscript_node):
         """
         Generate RPN code to get the matrix onto stack, and read from it or write to it.
 
@@ -704,8 +704,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             - Then either
                 - Recall the list element, or the dict value for the key
                 - Store the value on stack (found at ST X) into that matrix element (if we are assigning, the value we are assigning has already been emitted and is on the stack)
+
+            - Now also cater for accessing pure matrices too.
         """
-        self.inside_matrix_access = True
+        self.inside_matrix_subscript_access = True
 
         self.visit(subscript_node.value)  # RCL list or dict onto stack
 
@@ -730,7 +732,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         if isinstance(subscript_node.ctx, ast.Store) and not self.scopes.is_matrix(var_name_mtx):  # pure matrix access doesn't work via ZLIST, just via INDEXing directly.
             self.program.insert_sto(self.scopes.var_to_reg(var_name_mtx), comment=f'{var_name_mtx}')
 
-        self.inside_matrix_access = False
+        self.inside_matrix_subscript_access = False
 
     def prepare_matrix(self, node, flag_list_or_dict, empty=False):
         assert flag_list_or_dict in ('SF 01', 'CF 01')  # represent the flag to set for LIST rpn operations
@@ -790,10 +792,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 RDN
                 """
             self.program.insert_raw_lines(code)
-            self.visit(subscript_node.slice.dims[0].upper)  # to row
-            self.visit(subscript_node.slice.dims[1].upper)  # to col
-            self.program.insert_xeq('p2MxSub')  # (row_to, col_to) -> (row_size, col_size) - Converts from 0 based Python 'to' into 1 based size for GETM
-            # self.program.insert('GETM')
+            if isinstance(subscript_node.ctx, ast.Load):
+                self.visit(subscript_node.slice.dims[0].upper)  # to row
+                self.visit(subscript_node.slice.dims[1].upper)  # to col
+                self.program.insert_xeq('p2MxSub')  # (row_to, col_to) -> (row_size, col_size) - Converts from 0 based Python 'to' into 1 based size for GETM
 
 
     def visit_AugAssign(self,node):

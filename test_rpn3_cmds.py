@@ -155,7 +155,14 @@ class RpnTests3Cmds(BaseTest):
 
     def test_matrices_getm(self):
         """
-        Radical idea for avoiding the need for PUTM and GETM
+        Radical idea for avoiding the need for GETM
+
+        GETM recalls the submatrix to the X-register.
+            1. Move the index pointers to the first element of the submatrix.
+            2. Enter the dimensions of the submatrix: number of rows in the Y-
+                register and number of columns in the X-register.
+            3. Execute the GETM (get matrix) function (. 1MATRIX 1  .U l)·
+                GETM recalls the submatrix to the X-register.
         """
         self.parse(dedent("""
             x = NEWMAT(10,11)   # 10x11 matrix (ten rows, eleven columns) viz. np.zeros((10,11), np.int) zero based thus 0..9 rows 0..10 cols
@@ -178,6 +185,55 @@ class RpnTests3Cmds(BaseTest):
             XEQ "p2MxSub"  // (row_to, col_to) -> (row_size, col_size) - Converts from 0 based Python 'to' into 1 based size for GETM
             GETM
             STO "n"
+            """)
+        self.compare(de_comment(expected))
+
+    def test_matrices_putm(self):
+        """
+        Radical idea for avoiding the need for PUTM
+
+        PUTM copies the matrix in the X-register, element for element, into the indexed matrix beginning at the current element.
+            1. Move the index pointers to the element where you want the first element of the submatrix to go.
+            2. Execute the PUTM (put matrix) function. PUTM copies the matrix in the X-register,
+            element for element, into the indexed matrix beginning at the current element.
+
+        Numpy version:
+            import numpy as np
+
+            zeros = np.zeros((270,270))
+            ones = np.ones((150,150))
+            zeros[60:210,60:210] = ones
+
+            x = np.zeros((10,11), np.int)
+            z = np.ones((2,3), np.int)
+            x[2:4, 5:8] = z    # cannot use [2,5]. the trick is to just add the size to the 'to' values 2 and 5 e.g. 2+2=4, 5+3=8
+                               # aha, but could use [2,5] since HP42S doesn't check or care.
+        """
+        self.parse(dedent("""
+            x = NEWMAT(10,11)   # 10x11 matrix
+            z = NEWMAT(2,3)     # 2x3 matrix
+            x[2:4, 5:8] = z     # alternative to PUTM - uses pythonic numpy syntax, no messing with IJ
+            """))
+        expected = dedent("""
+            10
+            11
+            NEWMAT
+            STO "x"
+
+            2
+            3
+            NEWMAT
+            STO "z"
+
+            RCL "z"
+            
+            INDEX "x"
+            3              // from
+            6
+            STOIJ
+            RDN
+            RDN
+            PUTM
             """)
         self.compare(de_comment(expected))
 
