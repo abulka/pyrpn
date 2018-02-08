@@ -441,12 +441,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             assert self.scopes.is_range_var(node.id) or self.scopes.is_el_var(node.id)
             self.program.insert('IP')  # just get the integer portion of isg counter
 
-        elif self.scopes.is_matrix(node.id):
-            code = f"""
-                INDEX "x"
-                """
-            self.program.insert_raw_lines(code)
-
         # Additional work in future to support if for..in
 
         if self.scopes.is_el_var(node.id):
@@ -505,6 +499,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                             not self.var_name_is_loop_index_or_el(node.id) and \
                             not self.iterating_list and \
                             not self.inside_matrix_access else 'RCL'
+        if self.scopes.is_matrix(node.id):
+            rcl_cmd = 'INDEX'
 
         comment = node.id
         # self.friendly_type()

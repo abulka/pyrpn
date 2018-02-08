@@ -45,7 +45,6 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    @unittest.skip('matrices')
     def test_matrices_index_numpy(self):
         """
         """
@@ -66,7 +65,7 @@ class RpnTests3Cmds(BaseTest):
             RDN
             RDN
             RCLEL
-            STO "y"
+            STO 00
             """)
         self.compare(de_comment(expected))
 
