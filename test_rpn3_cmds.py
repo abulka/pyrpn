@@ -442,31 +442,28 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    # Matrix manipulation
-
     """
-    These all act on the matrix in x, thus operate like any other command
-    INVRT
-    TRANS
-    DET  
-    FNRM 
-    RSUM 
-    UVEC 
-    
-    DOT(m1, m2) - returns matrix        
-    CROSS(m1, m2) - returns matrix
-    
-    RNRM - returns a number
-
-    SIMQ ?
-
     Possible bug in Free42?
         For example, if you press . X^2 when there is a matrix in the X-register, 
         each element in the matrix is squared.
-
     """
 
+    # Matrix manipulation
+
     def test_matrices_invert_trans_det(self):
+        """
+        These all act on the matrix in x, thus operate
+        like any other command
+            INVRT
+            TRANS
+            DET
+            FNRM
+            RSUM
+            UVEC
+            DOT(m1, m2) - returns matrix
+            CROSS(m1, m2) - returns matrix
+            RNRM - returns a number
+        """
         self.parse(dedent("""
             x = NEWMAT(1,4)
             INVRT(x)

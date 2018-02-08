@@ -316,6 +316,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                                   
                 INVRT, TRANS, DET, FNRM RSUM UVEC, RNRM - normal calls e.g. m2 = INVRT(m) 
                 DOT, CROSS                              - normal calls e.g. DOT(m1, m2) 
+                
+                SIMQ            Not programmable.
 
             """)
             raise RpnError(f'The RPN command "{name}" is not supported because there are cleaner "Pythonic" and "NumPy compatible" alternatives like slicing.{rich_info}{source_code_line_info(node)}')
