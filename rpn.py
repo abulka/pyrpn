@@ -87,6 +87,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         log.debug(f'{self.indent}{self.scopes.dump()}{self.labels.dump()}')
         log.debug(f'{self.indent}current for_el_vars {self.scopes.current.for_el_vars}')
         log.debug(f'{self.indent}current list_vars {self.scopes.current.list_vars}')
+        log.debug(f'{self.indent}current dict_vars {self.scopes.current.dict_vars}')
+        log.debug(f'{self.indent}current matrix_vars {self.scopes.current.matrix_vars}')
         self.log_pending_args()
 
     def log_pending_args(self):
@@ -300,11 +302,13 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 need_st_x = True
         return need_st_x
 
-    def friendly_type(self, is_list_var, is_dict_var, by_ref_to_var):
+    def friendly_type(self, is_list_var, is_dict_var, by_ref_to_var, is_matrix):
         if is_dict_var:
             result = '(matrix type Dictionary'
         elif is_list_var:
             result = '(matrix type List'
+        elif is_matrix:
+            result = '(matrix'
         else:
             result = ''
         if by_ref_to_var:
@@ -606,9 +610,11 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.begin(node)
 
         self.assign_push_rhs(node)
-        rhs_is_matrix_rpn_op = 'pMxPrep' in self.program.last_line.text
+        rhs_is_matrix_rpn_op = 'pMxPrep' in self.program.last_line.text or \
+                               'NEWMAT' in self.program.last_line.text
         rhs_is_list_var = isinstance(node.value, ast.Name) and self.scopes.is_list(node.value.id)
         rhs_is_dict_var = isinstance(node.value, ast.Name) and self.scopes.is_dictionary(node.value.id)
+        rhs_is_matrix = 'NEWMAT' in self.program.last_line.text  # or is a ast.Call to matrix function?
         by_ref_to_rhs_var = node.value.id if rhs_is_list_var or rhs_is_dict_var else ''
 
         for target in node.targets:
@@ -616,7 +622,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             if lhs_is_subscript:
                 self.subscript_is_on_lhs_thus_assign(target)
             else:
-                self.assign_lhs(node, target, rhs_is_list_var, rhs_is_dict_var, by_ref_to_rhs_var)  # var is normal (lower=local, upper=named) or matrix (lower=named, upper=named)
+                self.assign_lhs(node, target, rhs_is_list_var, rhs_is_dict_var, by_ref_to_rhs_var, rhs_is_matrix)  # var is normal (lower=local, upper=named) or matrix (lower=named, upper=named)
 
             # Check var types
             if rhs_is_matrix_rpn_op or rhs_is_list_var or rhs_is_dict_var:
@@ -633,12 +639,13 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.program.insert('ENTER')  # duplicate what's on the stack so it doesn't get clobbered by the ASTO ST X
             self.program.insert('ASTO ST X')
 
-    def assign_lhs(self, node, target, rhs_is_list_var=False, rhs_is_dict_var=False, by_ref_to_rhs_var=''):
+    def assign_lhs(self, node, target, rhs_is_list_var=False, rhs_is_dict_var=False, by_ref_to_rhs_var='', rhs_is_matrix=False):
         # Create the variable and mark its type
         is_list_var = isinstance(node.value, ast.List) or rhs_is_list_var
         is_dict_var = isinstance(node.value, ast.Dict) or rhs_is_dict_var
         by_ref_to_var = by_ref_to_rhs_var
-        friendly_type = self.friendly_type(is_list_var, is_dict_var, by_ref_to_var)
+        is_matrix_var = rhs_is_matrix
+        friendly_type = self.friendly_type(is_list_var, is_dict_var, by_ref_to_var, is_matrix_var)
         var_name = target.id
         log.info(f'{self.indent_during}created variable "{var_name}" {friendly_type}')
 
@@ -651,6 +658,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                                    is_list_var=is_list_var,
                                    is_dict_var=is_dict_var,
                                    by_ref_to_var=by_ref_to_var,
+                                   is_matrix_var=is_matrix_var,
                                    ),
             comment=f'{target.id} {friendly_type}'
         )

@@ -33,7 +33,6 @@ class RpnTests3Cmds(BaseTest):
     # and PUTM, GETM   <--- yikes, requires slicing !!
     # INSR and DELR are however, probably OK
 
-    @unittest.skip('matrices')
     def test_matrices_newmat(self):
         self.parse(dedent("""
             x = NEWMAT(1,4)

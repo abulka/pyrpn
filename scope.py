@@ -46,7 +46,9 @@ class Scopes(object):
                    is_range_index_el=False,
                    is_dict_var=False,
                    is_list_var=False,
-                   by_ref_to_var=''):
+                   by_ref_to_var='',
+                   is_matrix_var=False,
+                   ):
         """
         Figure out the register to use to store/recall 'var_name' e.g. 00 or "x" - also taking into account our scope system.
 
@@ -61,6 +63,7 @@ class Scopes(object):
         Will upgrade a mapping from numeric to named if necessary, if is_dict_var / is_list_var is true
 
         Now supports 'by reference' for list and dict vars
+        Now support 'is_matrix'
 
         :param var_name: python identifier e.g. 'x'
         :param force_reg_name: force the mapping to be to this
@@ -97,6 +100,10 @@ class Scopes(object):
                 if is_dict_var and var_name not in [matrix_var.var_name for matrix_var in self.current.dict_vars]:
                     self.current.dict_vars.append(MatrixVar(var_name, by_ref_to_var))
 
+                # Track matrix vars
+                if is_matrix_var and var_name not in [matrix_var.var_name for matrix_var in self.current.matrix_vars]:
+                    self.current.matrix_vars.append(MatrixVar(var_name, by_ref_to_var))
+
                 # Track indexes used to access elements of a list or dictionary
                 if is_range_index_el and var_name not in self.current.for_el_vars.keys():
                     # Store matrix var so that we know for whom we are an el ref for
@@ -108,7 +115,7 @@ class Scopes(object):
         elif var_name.isupper():
             register = f'"{var_name.upper()[-7:]}"'
             map_it(var_name, register)
-        elif is_list_var or is_dict_var:  # must be a named register, case doesn't matter
+        elif is_list_var or is_dict_var or is_matrix_var:  # must be a named register, case doesn't matter
             register = f'"{var_name[-7:]}"'
             map_it(var_name, register)
             register = self.byref_override(var_name, register)
@@ -177,11 +184,14 @@ class Scopes(object):
     def is_el_var(self, var_name):
         return var_name in self.current.for_el_vars.keys()
 
+    def is_list(self, var_name):
+        return var_name in [matrix_var.var_name for matrix_var in self.current.list_vars]
+
     def is_dictionary(self, var_name):
         return var_name in [matrix_var.var_name for matrix_var in self.current.dict_vars]
 
-    def is_list(self, var_name):
-        return var_name in [matrix_var.var_name for matrix_var in self.current.list_vars]
+    def is_matrix(self, var_name):
+        return var_name in [matrix_var.var_name for matrix_var in self.current.matrix_vars]
 
     # Smarter mappings
 
@@ -217,6 +227,7 @@ class Scope(object):
     for_el_vars = attrib(default=Factory(dict))  # keep track of var names which are used in for..in loop list/dict element acceses - and what matrix they are tracking
     list_vars = attrib(default=Factory(list))  # keep track of var names which are lists
     dict_vars = attrib(default=Factory(list))  # keep track of var names which are dictionaries
+    matrix_vars = attrib(default=Factory(list))  # keep track of var names which are pure matrices
 
     @property
     def empty(self):
