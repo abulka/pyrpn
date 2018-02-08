@@ -377,7 +377,6 @@ class RpnTests3Cmds(BaseTest):
 
     # more matrix operations
 
-    @unittest.skip('matrices')
     def test_matrices_multiply_scalar(self):
         self.parse(dedent("""
             x = NEWMAT(1,4)
@@ -394,7 +393,6 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    @unittest.skip('matrices')
     def test_matrices_multiply_scalar_more(self):
         self.parse(dedent("""
             x = NEWMAT(1,4)
@@ -411,7 +409,6 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    @unittest.skip('matrices')
     def test_matrices_sin(self):
         self.parse(dedent("""
             x = NEWMAT(1,4)
@@ -428,7 +425,6 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    @unittest.skip('matrices')
     def test_matrices_sin_and_store(self):
         self.parse(dedent("""
             x = NEWMAT(1,4)
@@ -470,7 +466,6 @@ class RpnTests3Cmds(BaseTest):
 
     """
 
-    # @unittest.skip('matrices')
     def test_matrices_invert_trans_det(self):
         self.parse(dedent("""
             x = NEWMAT(1,4)
