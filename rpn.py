@@ -1464,7 +1464,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             arg = node.args[0].s
             self.scopes.var_to_reg(arg, force_reg_name=f'"{arg}"')
         self.end(node)
-        self.inside_calculation = False
 
     def calling_varmenu(self, node):
         for arg in node.args:
@@ -1476,7 +1475,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         for arg in node.args:
             self.scopes.var_to_reg(arg.s, force_reg_name=f'"{arg.s}"')
         self.end(node)
-        self.inside_calculation = False
 
     def check_cmd_enough_args(self, func_name, node):
         if func_name in cmd_list and len(node.args) == 0:
