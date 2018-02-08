@@ -95,7 +95,7 @@ class Program(BaseRpnProgram):
                 'pMxPrep' in self.last_line.text
 
         if 'empty' in self.last_line.type_:
-            self.insert('0')  # signifies an empty list, since empty matrixes are not possible
+            self.insert('0')  # signifies an empty list, since empty matrices are not possible
         elif need_rcl_zlist():
             self.insert('RCL "ZLIST"')
 

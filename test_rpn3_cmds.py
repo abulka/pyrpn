@@ -99,10 +99,8 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    @unittest.skip('matrices')
     def test_matrices_index_numpy_store(self):
         """
-        Radical idea for avoiding the need for INDEX, STOIJ, RCLIJ, I+, I-, J+, J-
         """
         self.parse(dedent("""
             x = NEWMAT(1,4)

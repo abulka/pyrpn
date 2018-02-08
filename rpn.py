@@ -729,7 +729,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 """
         self.program.insert_raw_lines(code)
 
-        if isinstance(subscript_node.ctx, ast.Store):
+        if isinstance(subscript_node.ctx, ast.Store) and not self.scopes.is_matrix(var_name_mtx):  # pure matrix access doesn't work via ZLIST, just via INDEXing directly.
             self.program.insert_sto(self.scopes.var_to_reg(var_name_mtx), comment=f'{var_name_mtx}')
 
         self.inside_matrix_access = False
