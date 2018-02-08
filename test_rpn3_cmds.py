@@ -23,6 +23,16 @@ class RpnTests3Cmds(BaseTest):
 
     # Matrices
 
+    """
+    np.zeros((5,8), np.int)
+    
+    """
+
+    # Radical idea for avoiding the need for
+    # INDEX, STOIJ, RCLIJ, I+, I-, J+, J-
+    # and PUTM, GETM   <--- yikes, requires slicing !!
+    # INSR and DELR are however, probably OK
+
     @unittest.skip('matrices')
     def test_matrices_newmat(self):
         self.parse(dedent("""
@@ -36,7 +46,120 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+    @unittest.skip('matrices')
+    def test_matrices_index_numpy(self):
+        """
+        """
+        self.parse(dedent("""
+            x = NEWMAT(1,4)
+            y = x[0,2]
+            x[0,2] = 100
+            """))
+        expected = dedent("""
+            1
+            4
+            NEWMAT
+            STO "x"
 
+            INDEX "x"
+            1
+            3
+            STOIJ
+            RDN
+            RDN
+            RCLEL
+            STO "y"
+            """)
+        self.compare(de_comment(expected))
+
+    @unittest.skip('matrices')
+    def test_matrices_index_numpy_store(self):
+        """
+        Radical idea for avoiding the need for INDEX, STOIJ, RCLIJ, I+, I-, J+, J-
+        """
+        self.parse(dedent("""
+            x = NEWMAT(1,4)
+            x[0,2] = 100
+            """))
+        expected = dedent("""
+            1
+            4
+            NEWMAT
+            STO "x"
+
+            100
+            INDEX "x"
+            1
+            3
+            STOIJ
+            RDN
+            RDN
+            STOEL
+            """)
+        self.compare(de_comment(expected))
+
+    @unittest.skip('matrices')
+    def test_matrices_getm(self):
+        """
+        Radical idea for avoiding the need for PUTM and GETM
+        """
+        self.parse(dedent("""
+            x = NEWMAT(1,4)
+            y = x[0,2]
+            x[0,2] = 100
+            """))
+        expected = dedent("""
+            1
+            4
+            NEWMAT
+            STO "x"
+
+            INDEX "x"
+            1
+            3
+            STOIJ
+            RDN
+            RDN
+            RCLEL
+            STO "y"
+            """)
+        self.compare(de_comment(expected))
+
+    @unittest.skip('matrices')
+    def test_matrices_insert_row(self):
+        """
+        Inserting and deleting rows
+        """
+        self.parse(dedent("""
+            x = NEWMAT(1,4)
+            INSR(1)
+            DELR(1)
+            """))
+        expected = dedent("""
+            1
+            4
+            NEWMAT
+            STO "x"
+
+            INDEX "x"
+            1
+            1
+            STOIJ
+            RDN
+            RDN
+            INSR
+
+            INDEX "x"
+            1
+            1
+            STOIJ
+            RDN
+            RDN
+            DELR
+            """)
+        self.compare(de_comment(expected))
+
+    # END radical
 
     @unittest.skip('matrices')
     def test_matrices_dim(self):
@@ -125,6 +248,11 @@ class RpnTests3Cmds(BaseTest):
 
     @unittest.skip('matrices')
     def test_matrices_index_ij(self):
+        """
+        import numpy as np
+        x = np.zeros((1,4)) # or np.array([[0,0,0,0]])
+        y = x[0,2]
+        """
         self.parse(dedent("""
             x = NEWMAT(1,4)
             INDEX(x)
