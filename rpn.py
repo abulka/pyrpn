@@ -1515,7 +1515,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def calling_dim(self, node, cmd):
         assert cmd in ('dim',)
         matrix_var_name = node.func.value.id
-        assert self.scopes.is_matrix(matrix_var_name)
+        if not self.scopes.is_matrix(matrix_var_name):
+            raise RpnError(f'Cannot redimension a matrix "{matrix_var_name}" that does not exist. Try creating the matrix first, {source_code_line_info(node)}')
         register = self.scopes.var_to_reg(matrix_var_name)
         for arg in node.args:
             self.visit(arg)

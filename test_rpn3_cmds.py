@@ -330,23 +330,13 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    @unittest.skip('matrices')
     def test_matrices_dim_non_existing(self):
         # redimension a matrix that doesn't exist - should be an error
-        self.parse(dedent("""
-            x.dim(12,15)
-            """))
-        expected = dedent("""
-            1
-            4
-            NEWMAT
-            STO "x"
-            
-            12
-            15
-            DIM "x"
+        src = dedent("""
+            x.dim()
+            #x.dim(12,15)
             """)
-        self.compare(de_comment(expected))
+        self.assertRaises(RpnError, self.parse, dedent(src))
 
     def test_matrices_not_supported(self):
         # various unsupported matrix related commands - use pythonic and numpy alternatives !
