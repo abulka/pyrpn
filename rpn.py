@@ -1229,6 +1229,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 self.calling_varmenu(node)
             elif func_name in ('MVAR', 'VARMENU', 'STOP', 'EXITALL'):
                 self.calling_varmenu_mvar(func_name, node)
+            elif func_name in ('INSR', 'DELR',):
+                self.calling_insrow_delrow(func_name, node)
             elif func_name in ('alpha', 'AVIEW', 'PROMPT', 'PRA'):
                 self.calling_alpha_family(func_name, node)
             elif self.is_built_in_cmd_with_param_fragments(func_name, node) and not self.cmd_st_x_situation(func_name, node):
@@ -1441,6 +1443,19 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.inside_calculation = old_inside_calculation
         if len(self.pending_stack_args):
             self.pending_stack_args.pop()
+
+    def calling_insrow_delrow(self, func_name, node):
+        assert self.scopes.is_matrix(node.id)
+        self.visit(node.args[0])
+        code = f"""
+            1               // always the same, col is irrelevant to insertion/deletion of rows
+            STOIJ
+            RDN
+            RDN
+            {func_name}
+        """
+        self.program.insert_raw_lines(code)
+        self.end(node)
 
     def calling_varmenu_mvar(self, func_name, node):
         arg = f' "{node.args[0].s}"' if node.args else ''

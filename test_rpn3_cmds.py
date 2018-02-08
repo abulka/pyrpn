@@ -282,11 +282,14 @@ class RpnTests3Cmds(BaseTest):
     def test_matrices_insert_row(self):
         """
         Inserting and deleting rows
+        Actually this needs thought - which matrix are we operating on when
+        we specify INSR ?
         """
         self.parse(dedent("""
             x = NEWMAT(1,4)
             INSR(1)
             DELR(2)
+            x.insr(1)  # better?
             """))
         expected = dedent("""
             1
