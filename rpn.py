@@ -516,6 +516,13 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         elif rcl_cmd == 'RCL' and self.scopes.is_dictionary(node.id):
                 self.prepare_matrix(node, 'CF 01')
 
+        if self.matrix_index_adjust:
+            code = f"""
+                    1
+                    +
+                    """
+            self.program.insert_raw_lines(code)
+
     def visit_Num(self, node):
         self.begin(node)
         self.rcl_clear_alpha()

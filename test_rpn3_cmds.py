@@ -45,7 +45,7 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    def test_matrices_index_numpy(self):
+    def test_matrices_index_numpy_literal(self):
         """
         """
         self.parse(dedent("""
@@ -66,6 +66,36 @@ class RpnTests3Cmds(BaseTest):
             RDN
             RCLEL
             STO 00
+            """)
+        self.compare(de_comment(expected))
+
+    def test_matrices_index_numpy_dynamic(self):
+        """
+        """
+        self.parse(dedent("""
+            x = NEWMAT(1,4)
+            row = 0
+            y = x[row,2]
+            """))
+        expected = dedent("""
+            1
+            4
+            NEWMAT
+            STO "x"
+
+            0
+            STO 00      // y
+
+            INDEX "x"
+            RCL 00
+            1
+            +           // adjust from 0 based python to 1 based hp42s
+            3
+            STOIJ
+            RDN
+            RDN
+            RCLEL
+            STO 01
             """)
         self.compare(de_comment(expected))
 
