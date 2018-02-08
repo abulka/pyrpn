@@ -367,11 +367,15 @@ class RpnTests3Cmds(BaseTest):
     def test_matrices_not_supported(self):
         # various unsupported matrix related commands - use pythonic and numpy alternatives !
         for func in ['INDEX', 'STOIJ', 'RCLIJ', 'PUTM', 'GETM', 'INSR', 'DELR',
-                     'DIM', 'INVRT', 'GROW', 'WRAP']:
+                     'DIM', 'INVRT', 'TRANS', 'DET', 'FNRM', 'GROW', 'WRAP']:
             src = dedent(f"""
                 {func}(1)
                 """)
-            self.assertRaises(RpnError, self.parse, dedent(src))
+            # self.assertRaises(RpnError, self.parse, dedent(src))
+            with self.assertRaises(RpnError, msg=f'no exception raised for {func}'):
+                self.parse(dedent(src))
+
+    # more matrix operations
 
     @unittest.skip('matrices')
     def test_matrices_multiply_scalar(self):
@@ -385,9 +389,59 @@ class RpnTests3Cmds(BaseTest):
             NEWMAT
             STO "x"
             
-            RCL "x"
             3.5
-            *
+            STO* "x"
+            """)
+        self.compare(de_comment(expected))
+
+    @unittest.skip('matrices')
+    def test_matrices_multiply_scalar_more(self):
+        self.parse(dedent("""
+            x = NEWMAT(1,4)
+            x -= 3
+            """))
+        expected = dedent("""
+            1
+            4
+            NEWMAT
+            STO "x"
+            
+            3
+            STO- "x"
+            """)
+        self.compare(de_comment(expected))
+
+    @unittest.skip('matrices')
+    def test_matrices_sin(self):
+        self.parse(dedent("""
+            x = NEWMAT(1,4)
+            SIN(x)
+            """))
+        expected = dedent("""
+            1
+            4
+            NEWMAT
+            STO "x"
+            
+            RCL "x"
+            SIN
+            """)
+        self.compare(de_comment(expected))
+
+    @unittest.skip('matrices')
+    def test_matrices_sin_and_store(self):
+        self.parse(dedent("""
+            x = NEWMAT(1,4)
+            x = SIN(x)
+            """))
+        expected = dedent("""
+            1
+            4
+            NEWMAT
+            STO "x"
+            
+            RCL "x"
+            SIN
             STO "x"
             """)
         self.compare(de_comment(expected))
@@ -409,6 +463,78 @@ class RpnTests3Cmds(BaseTest):
             STO "x"
             """)
         self.compare(de_comment(expected))
+
+    @unittest.skip('matrices')
+    def test_matrices_trans(self):
+        self.parse(dedent("""
+            x = NEWMAT(1,4)
+            x.trans()
+            """))
+        expected = dedent("""
+            1
+            4
+            NEWMAT
+            STO "x"
+            
+            RCL "x"
+            TRANS
+            STO "x"
+            """)
+        self.compare(de_comment(expected))
+
+    @unittest.skip('matrices')
+    def test_matrices_det(self):
+        self.parse(dedent("""
+            x = NEWMAT(1,4)
+            x.det()
+            """))
+        expected = dedent("""
+            1
+            4
+            NEWMAT
+            STO "x"
+            
+            RCL "x"
+            DET
+            STO "x"
+            """)
+        self.compare(de_comment(expected))
+
+    @unittest.skip('matrices')
+    def test_matrices_det(self):
+        self.parse(dedent("""
+            x = NEWMAT(1,4)
+            x.fnrm()
+            """))
+        expected = dedent("""
+            1
+            4
+            NEWMAT
+            STO "x"
+            
+            RCL "x"
+            FNRM
+            STO "x"
+            """)
+        self.compare(de_comment(expected))
+
+    """
+    Todo
+    
+   
+    RSUM        - returns an m x 1 matrix       m2 = m.rsum()
+    UVEC        - matrix adjusted               m2 = m.uvec()
+    RNRM        - returns a number              num = m.rnrm()
+    DOT(m1, m2) - returns matrix                m = DOT(m1, m2)        
+    CROSS(m1, m2) - returns matrix              m = CROSS(m1, m2)
+    
+    SIMQ ?
+    
+    Possible bug in Free42?
+        For example, if you press . X^2 when there is a matrix in the X-register, 
+        each element in the matrix is squared.
+     
+    """
 
     @unittest.skip('matrices')
     def test_matrices_wrap_grow(self):

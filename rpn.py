@@ -277,7 +277,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 NEWMAT           Supported.  e.g.
                                     my_matrix_var = NEWMAT(1,4)
                                  
-                DIM              Not supported.  Instead use the invented syntax
+                DIM              Not supported.  Instead use the syntax
                                     my_matrix_var.dim(10,10) 
                                  to redimension an existing matrix.
                                  You cannot create matrices with the .dim() command.              
@@ -301,19 +301,24 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 P.S. slicing syntax is zero based (HP42S matrices are 1 based)
                 and is [row_from:row_to, col_from:col_to], 'to' is excluded.   
                                  
-                INSR and DELR    Replaced with invented syntax 
+                INSR and DELR    Replaced with syntax 
                                     my_matrix_var.insr(row_num) and 
                                     my_matrix_var.delr(row_num)
                                  where the parameter is the row number.
                                  
-                INVRT           Replaced with the invented syntax
+                INVRT, TRANS
+                DET, FNRM
+                                 Replaced with the syntax
                                     my_matrix_var.invrt() 
+                                    my_matrix_var.trans() 
+                                    my_matrix_var.det() 
+                                    my_matrix_var.fnrm() 
                                     
                 R<>R            Syntactically not even valid Python.
-                                Replaced with the invented syntax
+                                Replaced with the syntax
                                     my_matrix_var.row_swap_row(1,2)
                                     
-                GROW, WRAP      Replaced with the invented syntax
+                GROW, WRAP      Replaced with the syntax
                                     my_matrix_var.wrap()
                                     my_matrix_var.grow()
                                   
