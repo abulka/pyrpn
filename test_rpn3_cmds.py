@@ -52,7 +52,6 @@ class RpnTests3Cmds(BaseTest):
         self.parse(dedent("""
             x = NEWMAT(1,4)
             y = x[0,2]
-            x[0,2] = 100
             """))
         expected = dedent("""
             1
@@ -366,7 +365,6 @@ class RpnTests3Cmds(BaseTest):
 
     # Complex numbers
 
-    # @unittest.skip('complex')
     def test_complex_create(self):
         self.parse(dedent("""
             x = COMPLEX(1, 0)

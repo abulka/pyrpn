@@ -41,6 +41,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.disallow_string_args = False
         self.inside_matrix_access = False
         self.def_params_as_ints = False
+        self.matrix_index_adjust = False
 
     # Recursion support
 
@@ -85,10 +86,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def log_state(self, msg=''):
         log.debug(f'{self.indent}{msg}')
         log.debug(f'{self.indent}{self.scopes.dump()}{self.labels.dump()}')
-        log.debug(f'{self.indent}current for_el_vars {self.scopes.current.for_el_vars}')
-        log.debug(f'{self.indent}current list_vars {self.scopes.current.list_vars}')
-        log.debug(f'{self.indent}current dict_vars {self.scopes.current.dict_vars}')
-        log.debug(f'{self.indent}current matrix_vars {self.scopes.current.matrix_vars}')
+        if self.scopes.current.for_el_vars: log.debug(f'{self.indent}current for_el_vars {self.scopes.current.for_el_vars}')
+        if self.scopes.current.list_vars: log.debug(f'{self.indent}current list_vars {self.scopes.current.list_vars}')
+        if self.scopes.current.dict_vars: log.debug(f'{self.indent}current dict_vars {self.scopes.current.dict_vars}')
+        if self.scopes.current.matrix_vars: log.debug(f'{self.indent}current matrix_vars {self.scopes.current.matrix_vars}')
         self.log_pending_args()
 
     def log_pending_args(self):
@@ -439,11 +440,19 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         if self.var_name_is_loop_index_or_el(node.id):
             assert self.scopes.is_range_var(node.id) or self.scopes.is_el_var(node.id)
             self.program.insert('IP')  # just get the integer portion of isg counter
-        # Additional work if for..in
+
+        elif self.scopes.is_matrix(node.id):
+            code = f"""
+                INDEX "x"
+                """
+            self.program.insert_raw_lines(code)
+
+        # Additional work in future to support if for..in
+
         if self.scopes.is_el_var(node.id):
-            iter_var = self.scopes.list_var_from_el(el_var=node.id)
-            register = self.scopes.var_to_reg(iter_var)
-            if self.scopes.is_list(iter_var):
+            iterating_through_var = self.scopes.list_var_from_el(el_var=node.id)
+            register = self.scopes.var_to_reg(iterating_through_var)
+            if self.scopes.is_list(iterating_through_var):
                 code = f"""
                     RCL {register} // its an el index so prepare associated list for access
                     SF 01
@@ -451,7 +460,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                     XEQ "p1MxIJ"
                     RCLEL   // get el
                     """
-            elif self.scopes.is_dictionary(iter_var):
+            elif self.scopes.is_dictionary(iterating_through_var):
                     code = f"""
                     RCL {register} // its an el index so prepare associated dict for access
                     CF 01
@@ -514,7 +523,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def visit_Num(self, node):
         self.begin(node)
         self.rcl_clear_alpha()
-        self.program.insert(f'{self.pending_unary_op}{node.n}')
+        num = node.n
+        if self.matrix_index_adjust:
+            num = int(node.n)
+            assert not self.pending_unary_op  # need to think about -1 references etc.
+            num += 1
+        self.program.insert(f'{self.pending_unary_op}{num}')
         self.pending_stack_args.append(node.n)
         self.pending_unary_op = ''
         self.end(node)
@@ -693,10 +707,15 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         var_name_mtx = subscript_node.value.id
         self.scopes.ensure_is_named_matrix_register(var_name_mtx, subscript_node)
 
-        if self.scopes.is_dictionary(var_name_mtx):
-            self.process_dict_access(subscript_node)
-        else:
+        if self.scopes.is_list(var_name_mtx):
             self.process_list_access(subscript_node)
+        elif self.scopes.is_dictionary(var_name_mtx):
+            self.process_dict_access(subscript_node)
+        elif self.scopes.is_matrix(var_name_mtx):
+            self.process_pure_matrix_access(subscript_node)
+        else:
+            raise RpnError(f'Unknown matrix subscript operation. {source_code_line_info(node)}')
+
         if isinstance(subscript_node.ctx, ast.Load):
             code = f"""
                 RCLEL
@@ -743,6 +762,32 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         # Sets IJ accordingly so that a subsequent RCLEL will give the value or STOEL will store something.
         self.program.insert_xeq('p2MxIJ')  # (key) -> () -  Finds the key, X is dropped.
 
+    def process_pure_matrix_access(self, subscript_node):
+        if isinstance(subscript_node.slice, ast.Slice):  # has a from and to value
+            raise RpnError(f'Python slice operations on matrices are currently not supported - sorry, {source_code_line_info(subscript_node)}')
+
+        # Get row column position onto stack X, Y
+        assert isinstance(subscript_node.slice, ast.Index)
+        self.matrix_index_adjust = True
+        self.visit(subscript_node.slice.value)  # tuple
+        self.matrix_index_adjust = False
+
+        code = f"""
+            STOIJ
+            RDN
+            RDN
+            """
+        self.program.insert_raw_lines(code)
+        # if isinstance(subscript_node.slice, ast.Slice):  # has a from and to value
+        #     raise RpnError(f'Python slice operations on arrays are currently not supported - sorry. Consider building a new list accessing the elements you want one by one, {source_code_line_info(subscript_node)}')
+        # # Get Index position onto stack X
+        # assert isinstance(subscript_node.slice, ast.Index)
+        # self.visit(subscript_node.slice.value)
+        # self.astox()
+        #
+        # # Sets IJ accordingly so that a subsequent RCLEL will give the value or STOEL will store something.
+        # self.program.insert_xeq('p1MxIJ')  # (index) -> () -  X is dropped.
+
     def visit_AugAssign(self,node):
         """ visit a AugAssign e.g. += node and visits it recursively"""
         self.begin(node)
@@ -787,9 +832,16 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.end(node)
 
     def visit_Tuple(self,node):
-        """ visit a Power node """
+        """
+        visit a Tuple node
+            - elts (list of elements)
+        """
         self.begin(node)
-        raise RpnError(f'Python tuples are currently not supported - sorry, {source_code_line_info(node)}')
+        if isinstance(node.ctx, ast.Store):
+            raise RpnError(f'Python tuples are currently not supported in a Store Context - sorry, {source_code_line_info(node)}')
+        else:
+            for elt in node.elts:
+                self.visit(elt)
         self.end(node)
 
     def visit_BoolOp(self, node):
