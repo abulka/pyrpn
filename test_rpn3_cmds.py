@@ -239,8 +239,16 @@ class RpnTests3Cmds(BaseTest):
 
     def test_matrices_putm_simpler(self):
         """
-        aha, allow [2:,5:] since HP42S doesn't check or care about the upper 'to'.
+        aha, allow [2:,5:] since HP42S doesn't check or care about the upper 'to'.  This is actually not allowed in numpy - but hey!
         don't allow [2,5] since that is single element assignment syntax.
+
+        import numpy as np
+        x = np.zeros((10,11), np.int)
+        z = np.ones((2,3), np.int)
+        x[2:4, 5:8] = z
+
+        # x[2, 5] = z  FAILS
+        # x[2:, 5:] = z  FAILS
         """
         self.parse(dedent("""
             x = NEWMAT(10,11)   # 10x11 matrix
