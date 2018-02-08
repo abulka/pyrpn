@@ -366,28 +366,12 @@ class RpnTests3Cmds(BaseTest):
 
     def test_matrices_not_supported(self):
         # various unsupported matrix related commands - use pythonic and numpy alternatives !
-        for func in ['INDEX', 'STOIJ', 'RCLIJ', 'PUTM', 'GETM', 'INSR', 'DELR', 'DIM']:
+        for func in ['INDEX', 'STOIJ', 'RCLIJ', 'PUTM', 'GETM', 'INSR', 'DELR',
+                     'DIM', 'INVRT', 'GROW', 'WRAP']:
             src = dedent(f"""
                 {func}(1)
                 """)
             self.assertRaises(RpnError, self.parse, dedent(src))
-
-    # END radical
-
-    @unittest.skip('matrices')
-    def test_matrices_dim(self):
-        self.parse(dedent("""
-            #x = DIM(1,4)   # hmmmm
-            DIM(x, 1,4)  # perhaps this is better - but not Pythonic?
-            #x.dim(1,4)  # perhaps even nicer
-            """))
-        expected = dedent("""
-            1
-            4
-            DIM "x"
-            """)
-        self.compare(de_comment(expected))
-
 
     @unittest.skip('matrices')
     def test_matrices_multiply_scalar(self):
@@ -412,7 +396,7 @@ class RpnTests3Cmds(BaseTest):
     def test_matrices_invert(self):
         self.parse(dedent("""
             x = NEWMAT(1,4)
-            x = INVRT(x)
+            x.invrt()
             """))
         expected = dedent("""
             1
@@ -427,138 +411,31 @@ class RpnTests3Cmds(BaseTest):
         self.compare(de_comment(expected))
 
     @unittest.skip('matrices')
-    def test_matrices_index(self):
-        self.parse(dedent("""
-            x = NEWMAT(1,4)
-            INDEX(x)
-            """))
-        expected = dedent("""
-            1
-            4
-            NEWMAT
-            STO "x"
-            
-            INDEX "x"
-            """)
-        self.compare(de_comment(expected))
-
-    @unittest.skip('matrices')
-    def test_matrices_index_ij(self):
-        """
-        import numpy as np
-        x = np.zeros((1,4)) # or np.array([[0,0,0,0]])
-        y = x[0,2]
-        """
-        self.parse(dedent("""
-            x = NEWMAT(1,4)
-            INDEX(x)
-            STOIJ(1,2)
-            y = RCLEL()
-            Iplus
-            Iminus
-            Jplus
-            Jminus
-            a, b = RCLIJ()
-            """))
-        expected = dedent("""
-            1
-            4
-            NEWMAT
-            STO "x"
-            
-            INDEX "x"
-            1
-            2
-            STOIJ
-            RCLEL
-            STO "y"
-            I+
-            I-
-            J+
-            J-
-            RCLIJ
-            STO 00
-            X<>Y
-            STO 01
-            """)
-        self.compare(de_comment(expected))
-
-    @unittest.skip('matrices')
     def test_matrices_wrap_grow(self):
         self.parse(dedent("""
             x = NEWMAT(1,4)
-            INDEX(x)
-            INSR()
-            DELR()
-            WRAP()
-            GROW()
-            ROWswapROW(1,2)
+            x.wrap()
+            x.grow()
+            x.row_swap_row(1,2)
             """))
         expected = dedent("""
             1
             4
             NEWMAT
             STO "x"
-            INDEX "x"
 
-            INSR
-            DELR
+            INDEX "x"
             WRAP
+            
+            INDEX "x"
             GROW
             
+            INDEX "x"
             1
             2
             R<>R
             """)
         self.compare(de_comment(expected))
-
-    @unittest.skip('matrices')
-    def test_matrices_getm_putm(self):
-        """
-        GETM recalls the submatrix to the X-register.
-            1. Move the index pointers to the first element of the submatrix.
-            2. Enter the dimensions of the submatrix: number of rows in the Y-
-                register and number of columns in the X-register.
-            3. Execute the GETM (get matrix) function (. 1MATRIX 1  .U l)·
-                GETM recalls the submatrix to the X-register.
-
-        PUTM copies the matrix in the X-register, element for element, into the indexed matrix beginning at the current element.
-            1. Move the index pointers to the element where you want the first element of the submatrix to go.
-            2. Execute the PUTM (put matrix) function (. 1MATRIX I  ). PUTM copies the matrix in the X-register,
-            element for element, into the indexed matrix beginning at the current element.
-        """
-        self.parse(dedent("""
-            x = NEWMAT(1,4)
-            INDEX(x)
-            STOIJ(1,3)      # step 1
-            z = GETM(1,1)   # steps 2 & 3
-            
-            STOIJ(1,3)      # step 1
-            PUTM(z)         # step 2
-            """))
-        expected = dedent("""
-            1
-            4
-            NEWMAT
-            STO "x"
-            INDEX "x"
-
-            1
-            3
-            STOIJ
-            1
-            1
-            GETM
-            STO "z"
-            
-            1
-            3
-            STOIJ
-            RCL "z"
-            PUTM
-            """)
-        self.compare(de_comment(expected))
-
 
 
     # Complex numbers

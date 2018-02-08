@@ -305,6 +305,17 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                                     my_matrix_var.insr(row_num) and 
                                     my_matrix_var.delr(row_num)
                                  where the parameter is the row number.
+                                 
+                INVRT           Replaced with the invented syntax
+                                    my_matrix_var.invrt() 
+                                    
+                R<>R            Syntactically not even valid Python.
+                                Replaced with the invented syntax
+                                    my_matrix_var.row_swap_row(1,2)
+                                    
+                GROW, WRAP      Replaced with the invented syntax
+                                    my_matrix_var.wrap()
+                                    my_matrix_var.grow()
                                   
             """)
             raise RpnError(f'The RPN command "{name}" is not supported because there are cleaner "Pythonic" and "NumPy compatible" alternatives like slicing.{rich_info}{source_code_line_info(node)}')
@@ -1529,7 +1540,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def error_if_matrix_not_declared(self, matrix_var_name, node):
         if not self.scopes.is_matrix(matrix_var_name):
-            raise RpnError(f'Cannot operate on a matrix "{matrix_var_name}" that does not exist. Try creating the matrix first, {source_code_line_info(node)}')
+            raise RpnError(f'Cannot operate on a matrix "{matrix_var_name}" that does not exist. Try creating the matrix first e.g. "my_matrix = NEWMAT(1,2)", {source_code_line_info(node)}')
 
     def calling_varmenu_mvar(self, func_name, node):
         arg = f' "{node.args[0].s}"' if node.args else ''
