@@ -153,30 +153,31 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    @unittest.skip('matrices')
     def test_matrices_getm(self):
         """
         Radical idea for avoiding the need for PUTM and GETM
         """
         self.parse(dedent("""
-            x = NEWMAT(1,4)
-            y = x[0,2]
-            x[0,2] = 100
+            x = NEWMAT(10,11)   # 10x11 matrix (ten rows, eleven columns) viz. np.zeros((10,11), np.int) zero based thus 0..9 rows 0..10 cols
+            n = x[0:5, 1:6]     # alternative to GETM - uses pythonic numpy syntax, no messing with IJ
             """))
         expected = dedent("""
-            1
-            4
+            10
+            11
             NEWMAT
             STO "x"
 
             INDEX "x"
-            1
-            3
+            1              // from
+            2
             STOIJ
             RDN
             RDN
-            RCLEL
-            STO "y"
+            5              // size of sub-matrix to extract
+            6
+            XEQ "p2MxSub"  // (row_to, col_to) -> (row_size, col_size) - Converts from 0 based Python 'to' into 1 based size for GETM
+            GETM
+            STO "n"
             """)
         self.compare(de_comment(expected))
 
@@ -221,6 +222,7 @@ class RpnTests3Cmds(BaseTest):
         self.parse(dedent("""
             #x = DIM(1,4)   # hmmmm
             DIM(x, 1,4)  # perhaps this is better - but not Pythonic?
+            #x.dim(1,4)  # perhaps even nicer
             """))
         expected = dedent("""
             1

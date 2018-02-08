@@ -628,10 +628,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         self.assign_push_rhs(node)
         rhs_is_matrix_rpn_op = 'pMxPrep' in self.program.last_line.text or \
-                               'NEWMAT' in self.program.last_line.text
+                               'NEWMAT' in self.program.last_line.text or \
+                               'GETM' in self.program.last_line.text
         rhs_is_list_var = isinstance(node.value, ast.Name) and self.scopes.is_list(node.value.id)
         rhs_is_dict_var = isinstance(node.value, ast.Name) and self.scopes.is_dictionary(node.value.id)
-        rhs_is_matrix = 'NEWMAT' in self.program.last_line.text  # or is a ast.Call to matrix function?
+        rhs_is_matrix = 'NEWMAT' in self.program.last_line.text or \
+                        'GETM' in self.program.last_line.text
         by_ref_to_rhs_var = node.value.id if rhs_is_list_var or rhs_is_dict_var else ''
 
         for target in node.targets:
@@ -719,14 +721,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         else:
             raise RpnError(f'Unknown matrix subscript operation. {source_code_line_info(node)}')
 
-        if isinstance(subscript_node.ctx, ast.Load):
-            code = f"""
-                RCLEL
-                """
-        elif isinstance(subscript_node.ctx, ast.Store):
-            code = """
-                STOEL
-                """
+        if self.scopes.is_matrix(subscript_node.value.id) and isinstance(subscript_node.slice, ast.ExtSlice):
+            code = 'GETM' if isinstance(subscript_node.ctx, ast.Load) else 'PUTM'
+        else:
+            code = 'RCLEL' if isinstance(subscript_node.ctx, ast.Load) else 'STOEL'
         self.program.insert_raw_lines(code)
 
         if isinstance(subscript_node.ctx, ast.Store) and not self.scopes.is_matrix(var_name_mtx):  # pure matrix access doesn't work via ZLIST, just via INDEXing directly.
@@ -769,27 +767,34 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         if isinstance(subscript_node.slice, ast.Slice):  # has a from and to value
             raise RpnError(f'Python slice operations on matrices are currently not supported - sorry, {source_code_line_info(subscript_node)}')
 
-        # Get row column position onto stack X, Y
-        assert isinstance(subscript_node.slice, ast.Index)
-        self.matrix_index_adjust = True
-        self.visit(subscript_node.slice.value)  # tuple
-        self.matrix_index_adjust = False
+        if isinstance(subscript_node.slice, ast.Index):
+            # Get row, column position onto stack X, Y for STOIJ use
+            self.matrix_index_adjust = True
+            self.visit(subscript_node.slice.value)  # tuple
+            self.matrix_index_adjust = False
+            code = f"""
+                STOIJ
+                RDN
+                RDN
+                """
+            self.program.insert_raw_lines(code)
+        elif isinstance(subscript_node.slice, ast.ExtSlice):
+            # slicing a matrix
+            self.matrix_index_adjust = True
+            self.visit(subscript_node.slice.dims[0].lower)  # from row
+            self.visit(subscript_node.slice.dims[1].lower)  # from col
+            self.matrix_index_adjust = False
+            code = f"""
+                STOIJ
+                RDN
+                RDN
+                """
+            self.program.insert_raw_lines(code)
+            self.visit(subscript_node.slice.dims[0].upper)  # to row
+            self.visit(subscript_node.slice.dims[1].upper)  # to col
+            self.program.insert_xeq('p2MxSub')  # (row_to, col_to) -> (row_size, col_size) - Converts from 0 based Python 'to' into 1 based size for GETM
+            # self.program.insert('GETM')
 
-        code = f"""
-            STOIJ
-            RDN
-            RDN
-            """
-        self.program.insert_raw_lines(code)
-        # if isinstance(subscript_node.slice, ast.Slice):  # has a from and to value
-        #     raise RpnError(f'Python slice operations on arrays are currently not supported - sorry. Consider building a new list accessing the elements you want one by one, {source_code_line_info(subscript_node)}')
-        # # Get Index position onto stack X
-        # assert isinstance(subscript_node.slice, ast.Index)
-        # self.visit(subscript_node.slice.value)
-        # self.astox()
-        #
-        # # Sets IJ accordingly so that a subsequent RCLEL will give the value or STOEL will store something.
-        # self.program.insert_xeq('p1MxIJ')  # (index) -> () -  X is dropped.
 
     def visit_AugAssign(self,node):
         """ visit a AugAssign e.g. += node and visits it recursively"""
