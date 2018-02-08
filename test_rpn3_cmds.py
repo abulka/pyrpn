@@ -207,12 +207,45 @@ class RpnTests3Cmds(BaseTest):
             x = np.zeros((10,11), np.int)
             z = np.ones((2,3), np.int)
             x[2:4, 5:8] = z    # cannot use [2,5]. the trick is to just add the size to the 'to' values 2 and 5 e.g. 2+2=4, 5+3=8
-                               # aha, but could use [2,5] since HP42S doesn't check or care.
+                               # aha, but could use [2:,5:] since HP42S doesn't check or care.
         """
         self.parse(dedent("""
             x = NEWMAT(10,11)   # 10x11 matrix
             z = NEWMAT(2,3)     # 2x3 matrix
             x[2:4, 5:8] = z     # alternative to PUTM - uses pythonic numpy syntax, no messing with IJ
+            """))
+        expected = dedent("""
+            10
+            11
+            NEWMAT
+            STO "x"
+
+            2
+            3
+            NEWMAT
+            STO "z"
+
+            RCL "z"
+            
+            INDEX "x"
+            3              // from
+            6
+            STOIJ
+            RDN
+            RDN
+            PUTM
+            """)
+        self.compare(de_comment(expected))
+
+    def test_matrices_putm_simpler(self):
+        """
+        aha, allow [2:,5:] since HP42S doesn't check or care about the upper 'to'.
+        don't allow [2,5] since that is single element assignment syntax.
+        """
+        self.parse(dedent("""
+            x = NEWMAT(10,11)   # 10x11 matrix
+            z = NEWMAT(2,3)     # 2x3 matrix
+            x[2:, 5:] = z         # alternative to PUTM - uses pythonic numpy syntax, no messing with IJ
             """))
         expected = dedent("""
             10
@@ -245,7 +278,7 @@ class RpnTests3Cmds(BaseTest):
         self.parse(dedent("""
             x = NEWMAT(1,4)
             INSR(1)
-            DELR(1)
+            DELR(2)
             """))
         expected = dedent("""
             1
@@ -255,15 +288,15 @@ class RpnTests3Cmds(BaseTest):
 
             INDEX "x"
             1
-            1
+            1           // always the same, col is irrelevant to insertion of rows
             STOIJ
             RDN
             RDN
             INSR
 
             INDEX "x"
-            1
-            1
+            2
+            1           // always the same, col is irrelevant to deletion of rows
             STOIJ
             RDN
             RDN
