@@ -312,6 +312,19 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+    def test_matrices_insr_non_existing(self):
+        src = dedent("""
+            x.insr()
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    def test_matrices_insr_needs_args(self):
+        src = dedent("""
+            x = NEWMAT(1,4)
+            x.insr()
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
     def test_matrices_dim_existing(self):
         # redimension a matrix
         self.parse(dedent("""
@@ -333,8 +346,21 @@ class RpnTests3Cmds(BaseTest):
     def test_matrices_dim_non_existing(self):
         # redimension a matrix that doesn't exist - should be an error
         src = dedent("""
+            x.dim(12,15)
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    def test_matrices_dim_needs_args(self):
+        src = dedent("""
+            x = NEWMAT(1,4)
             x.dim()
-            #x.dim(12,15)
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    def test_matrices_dim_needs_args_more(self):
+        src = dedent("""
+            x = NEWMAT(1,4)
+            x.dim(1)
             """)
         self.assertRaises(RpnError, self.parse, dedent(src))
 

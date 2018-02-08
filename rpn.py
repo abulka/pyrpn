@@ -1492,10 +1492,13 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def calling_insrow_delrow(self, node, cmd):
         assert cmd in ('insr', 'delr')
         matrix_var_name = node.func.value.id
+        self.error_if_matrix_not_declared(matrix_var_name, node)
         assert self.scopes.is_matrix(matrix_var_name)
         register = self.scopes.var_to_reg(matrix_var_name)
         self.program.insert(f'INDEX {register}')
 
+        if len(node.args) != 1:
+            raise RpnError(f'Requires an argument, {source_code_line_info(node)}')
         self.visit(node.args[0])
 
         if cmd == 'insr':
@@ -1515,13 +1518,18 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
     def calling_dim(self, node, cmd):
         assert cmd in ('dim',)
         matrix_var_name = node.func.value.id
-        if not self.scopes.is_matrix(matrix_var_name):
-            raise RpnError(f'Cannot redimension a matrix "{matrix_var_name}" that does not exist. Try creating the matrix first, {source_code_line_info(node)}')
+        self.error_if_matrix_not_declared(matrix_var_name, node)
         register = self.scopes.var_to_reg(matrix_var_name)
+        if len(node.args) != 2:
+            raise RpnError(f'Requires two arguments, {source_code_line_info(node)}')
         for arg in node.args:
             self.visit(arg)
         self.program.insert(f'DIM {register}')
         self.end(node)
+
+    def error_if_matrix_not_declared(self, matrix_var_name, node):
+        if not self.scopes.is_matrix(matrix_var_name):
+            raise RpnError(f'Cannot operate on a matrix "{matrix_var_name}" that does not exist. Try creating the matrix first, {source_code_line_info(node)}')
 
     def calling_varmenu_mvar(self, func_name, node):
         arg = f' "{node.args[0].s}"' if node.args else ''
