@@ -774,29 +774,24 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.matrix_index_adjust = True
             self.visit(subscript_node.slice.value)  # tuple
             self.matrix_index_adjust = False
-            code = f"""
-                STOIJ
-                RDN
-                RDN
-                """
-            self.program.insert_raw_lines(code)
         elif isinstance(subscript_node.slice, ast.ExtSlice):
             # slicing a matrix
             self.matrix_index_adjust = True
             self.visit(subscript_node.slice.dims[0].lower)  # from row
             self.visit(subscript_node.slice.dims[1].lower)  # from col
             self.matrix_index_adjust = False
-            code = f"""
-                STOIJ
-                RDN
-                RDN
-                """
-            self.program.insert_raw_lines(code)
-            if isinstance(subscript_node.ctx, ast.Load):
-                self.visit(subscript_node.slice.dims[0].upper)  # to row
-                self.visit(subscript_node.slice.dims[1].upper)  # to col
-                self.program.insert_xeq('p2MxSub')  # (row_to, col_to) -> (row_size, col_size) - Converts from 0 based Python 'to' into 1 based size for GETM
 
+        code = f"""
+            STOIJ
+            RDN
+            RDN
+            """
+        self.program.insert_raw_lines(code)
+
+        if isinstance(subscript_node.slice, ast.ExtSlice) and isinstance(subscript_node.ctx, ast.Load):
+            self.visit(subscript_node.slice.dims[0].upper)  # to row
+            self.visit(subscript_node.slice.dims[1].upper)  # to col
+            self.program.insert_xeq('p2MxSub')  # (row_to, col_to) -> (row_size, col_size) - Converts from 0 based Python 'to' into 1 based size for GETM
 
     def visit_AugAssign(self,node):
         """ visit a AugAssign e.g. += node and visits it recursively"""
