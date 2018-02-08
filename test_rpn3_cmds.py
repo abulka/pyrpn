@@ -29,9 +29,10 @@ class RpnTests3Cmds(BaseTest):
     """
 
     # Radical idea for avoiding the need for
-    # INDEX, STOIJ, RCLIJ, I+, I-, J+, J-
-    # and PUTM, GETM   <--- yikes, requires slicing !!
-    # INSR and DELR are however, probably OK
+    # INDEX, STOIJ, RCLIJ       replaced with slicing
+    # I+, I-, J+, J-            syntaxtically not allowed in python, use python indexing and slicing
+    # PUTM, GETM                replaced with slicing
+    # INSR and DELR             replaced with m.insr(1) and m.delr(1)
 
     def test_matrices_newmat(self):
         self.parse(dedent("""
@@ -278,7 +279,6 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    @unittest.skip('matrices')
     def test_matrices_insert_row(self):
         """
         Inserting and deleting rows
@@ -287,9 +287,10 @@ class RpnTests3Cmds(BaseTest):
         """
         self.parse(dedent("""
             x = NEWMAT(1,4)
-            INSR(1)
-            DELR(2)
-            x.insr(1)  # better?
+            # INSR(1)
+            # DELR(2)
+            x.insr(1)
+            x.delr(2)
             """))
         expected = dedent("""
             1
@@ -314,6 +315,14 @@ class RpnTests3Cmds(BaseTest):
             DELR
             """)
         self.compare(de_comment(expected))
+
+    def test_matrices_not_supported(self):
+        # various unsupported matrix related commands - use pythonic and numpy alternatives !
+        for func in ['INDEX', 'STOIJ', 'RCLIJ', 'PUTM', 'GETM', 'INSR', 'DELR']:
+            src = dedent(f"""
+                {func}(1)
+                """)
+            self.assertRaises(RpnError, self.parse, dedent(src))
 
     # END radical
 

@@ -9,6 +9,7 @@ from cmd_list import cmd_list
 import tokenize
 import logging
 from rpn_exceptions import RpnError, source_code_line_info
+from textwrap import dedent
 
 log = logging.getLogger(__name__)
 config_log(log)
@@ -270,6 +271,38 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             raise RpnError(f'The command "{name}" is no longer supported, {source_code_line_info(node)}')
         elif name in built_ins:
             raise RpnError(f'The built-in Python command "{name}" is not supported, sorry. Consider calling a HP42S rpn command instead e.g. SIN(n) or PI() etc. {source_code_line_info(node)}')
+        elif name in settings.MATRIX_UNSUPPORTED:
+            rich_info = dedent("""
+            
+                NEWMAT           Is the only HP42S matrix command that is allowed. e.g.
+                                 my_matrix = NEWMAT(1,4)
+                                 
+                INDEX            Not needed, is inserted automatically where needed 
+                                 in the generated RPN.
+                
+                I+, I-, J+, J-   Syntactically not even valid Python.  
+                                 Simply use regular Python indexing and slicing. e.g. 
+                                 To access a matrix element result = my_matrix[0,2]  
+                                 To change a matrix element my_matrix[row,2] = 100
+                                      
+                PUTM, GETM       Replaced with Python NumPy slicing syntax. 
+                                 For extracting a sub-matrix with GETM use 
+                                    n = some_matrix_var[0:5, 1:6] 
+                                 For injecting a matrix into another matrix
+                                 with PUTM use 
+                                    x[2:, 5:] = some_matrix_var   or 
+                                    x[2:n, 5:n] = some_matrix_var where n is the 'to'
+                                    
+                P.S. slicing syntax is zero based (HP42S matrices are 1 based)
+                and is [row_from:row_to, col_from:col_to], 'to' is excluded.   
+                                 
+                INSR and DELR    Replaced with invented syntax 
+                                    some_matrix_var.insr(row_num) and 
+                                    some_matrix_var.delr(row_num)
+                                 where the parameter is the row number.
+                                  
+            """)
+            raise RpnError(f'The RPN command "{name}" is not supported because there are cleaner "Pythonic" and "NumPy compatible" alternatives like slicing.{rich_info}{source_code_line_info(node)}')
 
     def is_built_in_cmd_with_param_fragments(self, func_name, node):
         return func_name in cmd_list and \
@@ -1220,6 +1253,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         elif isinstance(node.func, ast.Attribute) and node.func.attr in ('keys',):
             self.visit(node.func.value)  # recalls the list name e.g. the 'a' of the a.append() onto stack and prepares it
             self.scopes.ensure_is_named_matrix_register(var_name=self.get_node_name_id_or_n(node.func.value), node=node)
+        elif isinstance(node.func, ast.Attribute) and node.func.attr in ('insr', 'delr'):
+            self.calling_insrow_delrow(node, cmd=node.func.attr)
         else:
             func_name = node.func.id
             func_name = self.adjust_function_name(func_name)
@@ -1229,8 +1264,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 self.calling_varmenu(node)
             elif func_name in ('MVAR', 'VARMENU', 'STOP', 'EXITALL'):
                 self.calling_varmenu_mvar(func_name, node)
-            elif func_name in ('INSR', 'DELR',):
-                self.calling_insrow_delrow(func_name, node)
+            # elif func_name in ('INSR', 'DELR',):
+            #     self.calling_insrow_delrow(func_name, node)
             elif func_name in ('alpha', 'AVIEW', 'PROMPT', 'PRA'):
                 self.calling_alpha_family(func_name, node)
             elif self.is_built_in_cmd_with_param_fragments(func_name, node) and not self.cmd_st_x_situation(func_name, node):
@@ -1444,9 +1479,19 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         if len(self.pending_stack_args):
             self.pending_stack_args.pop()
 
-    def calling_insrow_delrow(self, func_name, node):
-        assert self.scopes.is_matrix(node.id)
+    def calling_insrow_delrow(self, node, cmd):
+        assert cmd in ('insr', 'delr')
+        matrix_var_name = node.func.value.id
+        assert self.scopes.is_matrix(matrix_var_name)
+        register = self.scopes.var_to_reg(matrix_var_name)
+        self.program.insert(f'INDEX {register}')
+
         self.visit(node.args[0])
+
+        if cmd == 'insr':
+            func_name = 'INSR'
+        elif cmd == 'delr':
+            func_name = 'DELR'
         code = f"""
             1               // always the same, col is irrelevant to insertion/deletion of rows
             STOIJ

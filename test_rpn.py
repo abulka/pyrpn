@@ -1013,12 +1013,10 @@ class RpnCodeGenTests(BaseTest):
         multi-part commands that require an arg fragment "parameter" as part of the single rpn command
         """
         lines = self.parse(dedent("""
-            INDEX("matrix1")
             INPUT("length")
             INTEG("somevar")
             """))
         expected = dedent("""
-            INDEX "matrix1"
             INPUT "length"
             INTEG "somevar"
         """)
