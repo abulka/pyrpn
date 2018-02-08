@@ -282,13 +282,9 @@ class RpnTests3Cmds(BaseTest):
     def test_matrices_insert_row(self):
         """
         Inserting and deleting rows
-        Actually this needs thought - which matrix are we operating on when
-        we specify INSR ?
         """
         self.parse(dedent("""
             x = NEWMAT(1,4)
-            # INSR(1)
-            # DELR(2)
             x.insr(1)
             x.delr(2)
             """))
@@ -316,9 +312,45 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+    def test_matrices_dim_existing(self):
+        # redimension a matrix
+        self.parse(dedent("""
+            x = NEWMAT(1,4)
+            x.dim(12,15)
+            """))
+        expected = dedent("""
+            1
+            4
+            NEWMAT
+            STO "x"
+            
+            12
+            15
+            DIM "x"
+            """)
+        self.compare(de_comment(expected))
+
+    @unittest.skip('matrices')
+    def test_matrices_dim_non_existing(self):
+        # redimension a matrix that doesn't exist - should be an error
+        self.parse(dedent("""
+            x.dim(12,15)
+            """))
+        expected = dedent("""
+            1
+            4
+            NEWMAT
+            STO "x"
+            
+            12
+            15
+            DIM "x"
+            """)
+        self.compare(de_comment(expected))
+
     def test_matrices_not_supported(self):
         # various unsupported matrix related commands - use pythonic and numpy alternatives !
-        for func in ['INDEX', 'STOIJ', 'RCLIJ', 'PUTM', 'GETM', 'INSR', 'DELR']:
+        for func in ['INDEX', 'STOIJ', 'RCLIJ', 'PUTM', 'GETM', 'INSR', 'DELR', 'DIM']:
             src = dedent(f"""
                 {func}(1)
                 """)
@@ -340,24 +372,6 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    @unittest.skip('matrices')
-    def test_matrices_dim_existing(self):
-        # redimension a matrix
-        self.parse(dedent("""
-            x = DIM(1,4)
-            #x = DIM(2,5)  # hmmmmmm
-            x = DIM(x, 2,5)  # perhaps this is better?
-            #x.DIM(2,5)  # or this?
-            """))
-        expected = dedent("""
-            1
-            4
-            DIM "x"
-            2
-            5
-            DIM "x"
-            """)
-        self.compare(de_comment(expected))
 
     @unittest.skip('matrices')
     def test_matrices_multiply_scalar(self):

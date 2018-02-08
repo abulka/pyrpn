@@ -274,31 +274,36 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         elif name in settings.MATRIX_UNSUPPORTED:
             rich_info = dedent("""
             
-                NEWMAT           Is the only HP42S matrix command that is allowed. e.g.
-                                 my_matrix = NEWMAT(1,4)
+                NEWMAT           Supported.  e.g.
+                                    my_matrix_var = NEWMAT(1,4)
                                  
+                DIM              Not supported.  Instead use the invented syntax
+                                    my_matrix_var.dim(10,10) 
+                                 to redimension an existing matrix.
+                                 You cannot create matrices with the .dim() command.              
+                                                 
                 INDEX            Not needed, is inserted automatically where needed 
                                  in the generated RPN.
                 
                 I+, I-, J+, J-   Syntactically not even valid Python.  
                                  Simply use regular Python indexing and slicing. e.g. 
-                                 To access a matrix element result = my_matrix[0,2]  
-                                 To change a matrix element my_matrix[row,2] = 100
+                                 To access a matrix element result = my_matrix_var[0,2]  
+                                 To change a matrix element my_matrix_var[row,2] = 100
                                       
                 PUTM, GETM       Replaced with Python NumPy slicing syntax. 
                                  For extracting a sub-matrix with GETM use 
-                                    n = some_matrix_var[0:5, 1:6] 
+                                    n = my_matrix_var[0:5, 1:6] 
                                  For injecting a matrix into another matrix
                                  with PUTM use 
-                                    x[2:, 5:] = some_matrix_var   or 
-                                    x[2:n, 5:n] = some_matrix_var where n is the 'to'
+                                    x[2:, 5:] = my_matrix_var    or 
+                                    x[2:n, 5:n] = my_matrix_var  where n is the 'to'
                                     
                 P.S. slicing syntax is zero based (HP42S matrices are 1 based)
                 and is [row_from:row_to, col_from:col_to], 'to' is excluded.   
                                  
                 INSR and DELR    Replaced with invented syntax 
-                                    some_matrix_var.insr(row_num) and 
-                                    some_matrix_var.delr(row_num)
+                                    my_matrix_var.insr(row_num) and 
+                                    my_matrix_var.delr(row_num)
                                  where the parameter is the row number.
                                   
             """)
@@ -1255,8 +1260,13 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.scopes.ensure_is_named_matrix_register(var_name=self.get_node_name_id_or_n(node.func.value), node=node)
         elif isinstance(node.func, ast.Attribute) and node.func.attr in ('insr', 'delr'):
             self.calling_insrow_delrow(node, cmd=node.func.attr)
+        elif isinstance(node.func, ast.Attribute) and node.func.attr in ('dim',):
+            self.calling_dim(node, cmd=node.func.attr)
         else:
-            func_name = node.func.id
+            try:
+                func_name = node.func.id
+            except AttributeError:
+                raise RpnError(f'Unsupported attribute "{node.func.attr}", {source_code_line_info(node)}')
             func_name = self.adjust_function_name(func_name)
             self.check_supported(func_name, node)
             self.check_cmd_enough_args(func_name, node)
@@ -1500,6 +1510,16 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             {func_name}
         """
         self.program.insert_raw_lines(code)
+        self.end(node)
+
+    def calling_dim(self, node, cmd):
+        assert cmd in ('dim',)
+        matrix_var_name = node.func.value.id
+        assert self.scopes.is_matrix(matrix_var_name)
+        register = self.scopes.var_to_reg(matrix_var_name)
+        for arg in node.args:
+            self.visit(arg)
+        self.program.insert(f'DIM {register}')
         self.end(node)
 
     def calling_varmenu_mvar(self, func_name, node):
