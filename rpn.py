@@ -866,7 +866,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 self.program.insert_raw_lines(code)
                 self.visit(subscript_node.slice.dims[0].upper)  # to row
                 self.visit(subscript_node.slice.dims[1].upper)  # to col
-                self.program.insert_xeq('pMxSubm')  # (row_from, row_to, row_to, col_to) -> (row_size, col_size) - Converts from 0 based Python 'to' into 1 based size for GETM
+                self.program.insert_xeq('pMxSubm')  # (row_from, col_from, row_to, col_to) -> (row_size, col_size) - Converts from 0 based Python 'to' into 1 based size for GETM
             else:
                 code = f"""
                     STOIJ

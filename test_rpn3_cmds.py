@@ -182,7 +182,7 @@ class RpnTests3Cmds(BaseTest):
             STOIJ
             5              // size of sub-matrix to extract
             6
-            XEQ "pMxSubm"  // (row_from, row_to, row_to, col_to) -> (row_size, col_size) - Converts from 0 based 
+            XEQ "pMxSubm"  // (row_from, row_to, col_from, col_to) -> (row_size, col_size) - Converts from 0 based 
                            // Python slice into 1 based size values for GETM
             GETM
             STO "n"

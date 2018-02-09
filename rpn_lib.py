@@ -588,6 +588,28 @@ class RpnTemplates:
         RTN
         """)
 
+    pMxSubm = dedent(f"""
+        LBL "pMxSubm"  // Matrix Sub-slice (t:row_from, z:col_from, y:row_to, x:col_to) -> (y:row_size, x:col_size)
+                       // Converts from 0 based Python slice into 1 based size values for GETM
+                       
+        // Warning: row_from, col_from are already 1 based.
+        //          row_to, col_to are still Pythonic 0 based - upper el (non inclusive)
+        // Algorithm: 
+        //          row_size = row_to - row_from + 1
+        //          col_size = col_to - col_from + 1
+        RDN
+        RDN
+        STO- ST Z
+        RDN
+        STO- ST Z
+        RDN
+        1
+        STO+ ST Y
+        STO+ ST Z
+        RDN
+        RTN
+        """)
+
     pStoStk = dedent("""
         LBL "pStoStk"           // Saves the stack. (t,z,y,x) -> (t,z,y,x) & saves to regs pT, pZ, pY, pX
         STO "pX"
