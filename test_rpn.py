@@ -1789,7 +1789,10 @@ class RpnCodeGenTests(BaseTest):
              FIX mode or whatever before you do the AVIEW. I might later support a mode=fix02 option in AVIEW 
              commands. (currently not implemented) 
 
-    PRA      - same multi parameter features as alpha, adds PRA for printing alpha register to printer/virtual printer.                          
+    PRA    - Same multi parameter features as alpha, adds PRA for printing alpha register to printer/virtual printer.
+    
+    PRX    - Prints a variable to the virtual or real printer.  Nothing to do with the alpha register.  E.g. PRX(myvar), and even matrices are printed.
+                              
     """
 
     def test_text_string_assignment(self):
