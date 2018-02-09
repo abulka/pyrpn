@@ -1306,6 +1306,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.calling_insrow_delrow(node, cmd=node.func.attr)
         elif isinstance(node.func, ast.Attribute) and node.func.attr in ('dim',):
             self.calling_dim(node, cmd=node.func.attr)
+        elif isinstance(node.func, ast.Attribute) and node.func.attr in ('row_swap',):
+            self.calling_row_swap(node, cmd=node.func.attr)
         else:
             try:
                 func_name = node.func.id
@@ -1318,8 +1320,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 self.calling_varmenu(node)
             elif func_name in ('MVAR', 'VARMENU', 'STOP', 'EXITALL'):
                 self.calling_varmenu_mvar(func_name, node)
-            # elif func_name in ('INSR', 'DELR',):
-            #     self.calling_insrow_delrow(func_name, node)
             elif func_name in ('alpha', 'AVIEW', 'PROMPT', 'PRA'):
                 self.calling_alpha_family(func_name, node)
             elif self.is_built_in_cmd_with_param_fragments(func_name, node) and not self.cmd_st_x_situation(func_name, node):
@@ -1564,12 +1564,26 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         matrix_var_name = node.func.value.id
         self.error_if_matrix_not_declared(matrix_var_name, node)
         register = self.scopes.var_to_reg(matrix_var_name)
+        self.matrix_op_visit_two_args(node)
+        self.program.insert(f'DIM {register}')
+        self.end(node)
+
+    def calling_row_swap(self, node, cmd):
+        assert cmd in ('row_swap',)
+        matrix_var_name = node.func.value.id
+        self.error_if_matrix_not_declared(matrix_var_name, node)
+        assert self.scopes.is_matrix(matrix_var_name)
+        register = self.scopes.var_to_reg(matrix_var_name)
+        self.program.insert(f'INDEX {register}')
+        self.matrix_op_visit_two_args(node)
+        self.program.insert('R<>R')
+        self.end(node)
+
+    def matrix_op_visit_two_args(self, node):
         if len(node.args) != 2:
             raise RpnError(f'Requires two arguments, {source_code_line_info(node)}')
         for arg in node.args:
             self.visit(arg)
-        self.program.insert(f'DIM {register}')
-        self.end(node)
 
     def error_if_matrix_not_declared(self, matrix_var_name, node):
         if not self.scopes.is_matrix(matrix_var_name):

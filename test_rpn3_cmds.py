@@ -534,7 +534,6 @@ class RpnTests3Cmds(BaseTest):
         the matrix before looping, or add or insert extra rows.
         """
 
-    @unittest.skip('matrices')
     def test_matrices_row_swap(self):
         self.parse(dedent("""
             x = NEWMAT(1,4)
