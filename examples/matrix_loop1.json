@@ -1,0 +1,8 @@
+{
+    "description": "<p>Looping through a matrix.</p>",
+    "public": "yes",
+    "sortnum": 10,
+    "source": "def loop_matrix():\r\n  m = NEWMAT(2,4)  # two rows, four columns\r\n  for row in range(2):   # 0..2 excluding 2\r\n    for col in range(4): # 0..4 excluding 4\r\n      print('row', row, 'col', col, 'value', m[row, col])",
+    "tags": "Matrices",
+    "title": "Matrix Looping"
+}

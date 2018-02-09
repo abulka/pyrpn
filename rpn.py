@@ -516,6 +516,13 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             assert self.scopes.is_range_var(node.id) or self.scopes.is_el_var(node.id)
             self.program.insert('IP')  # just get the integer portion of isg counter
 
+        if self.matrix_index_adjust:
+            code = f"""
+                    1
+                    +
+                    """
+            self.program.insert_raw_lines(code)
+
         # Additional work in future to support if for..in
 
         if self.scopes.is_el_var(node.id):
@@ -590,13 +597,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 self.prepare_matrix(node, 'SF 01')
         elif rcl_cmd == 'RCL' and self.scopes.is_dictionary(node.id):
                 self.prepare_matrix(node, 'CF 01')
-
-        if self.matrix_index_adjust:
-            code = f"""
-                    1
-                    +
-                    """
-            self.program.insert_raw_lines(code)
 
     def visit_Num(self, node):
         self.begin(node)

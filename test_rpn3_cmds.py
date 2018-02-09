@@ -127,9 +127,9 @@ class RpnTests3Cmds(BaseTest):
             INDEX "x"
             1           // row, +1 adjusted
             RCL 00      // col
+            IP          //<--- needs to happen before the adjust cos might be -0.003 which needs to be IP into 0
             1
             +           // adjust from 0 based python to 1 based hp42s
-            IP
             STOIJ
             RDN
             RDN
