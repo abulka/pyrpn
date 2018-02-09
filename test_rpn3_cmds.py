@@ -180,11 +180,10 @@ class RpnTests3Cmds(BaseTest):
             1              // from
             2
             STOIJ
-            RDN
-            RDN
             5              // size of sub-matrix to extract
             6
-            XEQ "p2MxSub"  // (row_to, col_to) -> (row_size, col_size) - Converts from 0 based Python 'to' into 1 based size for GETM
+            XEQ "pMxSubm"  // (row_from, row_to, row_to, col_to) -> (row_size, col_size) - Converts from 0 based 
+                           // Python slice into 1 based size values for GETM
             GETM
             STO "n"
             """)
@@ -505,9 +504,6 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-
-    @unittest.skip('matrices')
-    def test_matrices_wrap_grow(self):
         """
         Actually grow and wrap and -> and <- navigation
         together with STOEL and RCLEL could be handy.
@@ -527,7 +523,7 @@ class RpnTests3Cmds(BaseTest):
 
         Might be simpler to ban all the above, and if you
         want to grow by one row, this is really append, so offer
-            ADDR(x) or x.append_row()
+            x.appendr()
         and if want to incrementally set values into the matrix
         then bad luck.  Or just
             for row in range(10):
@@ -537,11 +533,12 @@ class RpnTests3Cmds(BaseTest):
         when programmatically doing stuff, then you can redim
         the matrix before looping, or add or insert extra rows.
         """
+
+    @unittest.skip('matrices')
+    def test_matrices_row_swap(self):
         self.parse(dedent("""
             x = NEWMAT(1,4)
-            x.wrap()
-            x.grow()
-            x.row_swap_row(1,2)
+            x.row_swap(1,2)     # 0 based
             """))
         expected = dedent("""
             1
@@ -549,12 +546,6 @@ class RpnTests3Cmds(BaseTest):
             NEWMAT
             STO "x"
 
-            INDEX "x"
-            WRAP
-            
-            INDEX "x"
-            GROW
-            
             INDEX "x"
             1
             2

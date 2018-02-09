@@ -308,17 +308,38 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                                  
                 R<>R            Syntactically not even valid Python.
                                 Replaced with the syntax
-                                    my_matrix_var.row_swap_row(1,2)
+                                    my_matrix_var.row_swap(1,2)
                                     
-                GROW, WRAP      Replaced with the syntax
-                                    my_matrix_var.wrap()
-                                    my_matrix_var.grow()
+                GROW, WRAP      Not supported. If you want to grow the matrix 
+                                programmatically use m.dim(rows, cols) or 
+                                m.insr(at_row_num) or the new command 
+                                m.appendr() to append a row (which is all that
+                                GROW, J+ does). Lots of options. 
+                                
+                                And Python supports len(my_matrix_var) to give 
+                                the number of rows so that nested iteration e.g.
+                                    for row in range(len(matrix)):
+                                        for col in range(5):
+                                            m[row,col] = val                                
+                                can easily replace J+ based iteration.
                                   
-                INVRT, TRANS, DET, FNRM RSUM UVEC, RNRM - normal calls e.g. m2 = INVRT(m) 
-                DOT, CROSS                              - normal calls e.g. DOT(m1, m2) 
+                INVRT, TRANS, 
+                DET, FNRM 
+                RSUM UVEC, 
+                RNRM            Supported, normal calls e.g. m2 = INVRT(m)
+                 
+                DOT, CROSS      Supported, normal calls e.g. DOT(m1, m2) 
                 
-                SIMQ            Not programmable.
+                SIMQ            Not programmable (HP42S limitation).
 
+                Scalar          Supported e.g.
+                                    x = NEWMAT(1,4)
+                                    x *= 3.5
+                                    
+                Ops on matrices Supported e.g.
+                                    x = NEWMAT(1,4)
+                                    x = SIN(x)
+                                            
             """)
             raise RpnError(f'The RPN command "{name}" is not supported because there are cleaner "Pythonic" and "NumPy compatible" alternatives like slicing.{rich_info}{source_code_line_info(node)}')
 
@@ -825,24 +846,34 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.matrix_index_adjust = True
             self.visit(subscript_node.slice.value)  # tuple
             self.matrix_index_adjust = False
+            code = f"""
+                STOIJ
+                RDN
+                RDN
+                """
+            self.program.insert_raw_lines(code)
         elif isinstance(subscript_node.slice, ast.ExtSlice):
             # slicing a matrix
             self.matrix_index_adjust = True
             self.visit(subscript_node.slice.dims[0].lower)  # from row
             self.visit(subscript_node.slice.dims[1].lower)  # from col
             self.matrix_index_adjust = False
-
-        code = f"""
-            STOIJ
-            RDN
-            RDN
-            """
-        self.program.insert_raw_lines(code)
-
-        if isinstance(subscript_node.slice, ast.ExtSlice) and isinstance(subscript_node.ctx, ast.Load):
-            self.visit(subscript_node.slice.dims[0].upper)  # to row
-            self.visit(subscript_node.slice.dims[1].upper)  # to col
-            self.program.insert_xeq('p2MxSub')  # (row_to, col_to) -> (row_size, col_size) - Converts from 0 based Python 'to' into 1 based size for GETM
+            if isinstance(subscript_node.ctx, ast.Load):
+                code = f"""
+                    STOIJ
+                    // the two RDN are not done here, the lib function pMxSubm needs this info
+                    """
+                self.program.insert_raw_lines(code)
+                self.visit(subscript_node.slice.dims[0].upper)  # to row
+                self.visit(subscript_node.slice.dims[1].upper)  # to col
+                self.program.insert_xeq('pMxSubm')  # (row_from, row_to, row_to, col_to) -> (row_size, col_size) - Converts from 0 based Python 'to' into 1 based size for GETM
+            else:
+                code = f"""
+                    STOIJ
+                    RDN
+                    RDN
+                    """
+                self.program.insert_raw_lines(code)
 
     def visit_AugAssign(self,node):
         """ visit a AugAssign e.g. += node and visits it recursively"""
