@@ -287,8 +287,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 
                 I+, I-, J+, J-   Syntactically not even valid Python.  
                                  Simply use regular Python indexing and slicing. e.g. 
-                                 To access a matrix element result = my_matrix_var[0,2]  
-                                 To change a matrix element my_matrix_var[row,2] = 100
+                                 To access a matrix element
+                                    result = my_matrix_var[0,2]  
+                                 To change a matrix element 
+                                    my_matrix_var[row,2] = 100
                                       
                 PUTM, GETM       Replaced with Python NumPy slicing syntax. 
                                  For extracting a sub-matrix with GETM use 
@@ -318,10 +320,11 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                                 
                                 And Python supports len(my_matrix_var) to give 
                                 the number of rows so that nested iteration e.g.
+                                can easily replace J+ based iteration. e.g.
+                                
                                     for row in range(len(matrix)):
                                         for col in range(5):
                                             m[row,col] = val                                
-                                can easily replace J+ based iteration.
                                   
                 INVRT, TRANS, 
                 DET, FNRM 
@@ -332,11 +335,11 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 
                 SIMQ            Not programmable (HP42S limitation).
 
-                Scalar          Supported e.g.
+                Scalar Ops      Supported e.g.
                                     x = NEWMAT(1,4)
                                     x *= 3.5
                                     
-                Ops on matrices Supported e.g.
+                Other Ops       Supported e.g.
                                     x = NEWMAT(1,4)
                                     x = SIN(x)
                                             

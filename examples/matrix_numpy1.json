@@ -1,0 +1,8 @@
+{
+    "description": "<p><span id=\"docs-internal-guid-5e34bc1f-7965-47a5-d5f7-152f71cfe03d\"><span style=\"font-size: 11pt; font-family: Arial; background-color: transparent; font-variant-numeric: normal; font-variant-east-asian: normal; vertical-align: baseline; white-space: pre-wrap;\">Create a matrix of 0&rsquo;s and inject into it a matrix of 1&rsquo;s.</span></span></p>",
+    "public": "yes",
+    "sortnum": 0,
+    "source": "def numpy1():\r\n  zeros = NEWMAT(10,11)\r\n  ones = NEWMAT(2,3)\r\n  ones += 1\r\n  #PRX(zeros)\r\n  #PRX(ones)\r\n  ones[0,1] = 99\r\n  ones[1,1] = 98\r\n  #PRX(ones)\r\n  zeros[2:4, 5:8] = ones\r\n  #PRX(zeros)\r\n\r\n  # Visualize as pixels :-)\r\n  CLLCD()\r\n  for row in range(1,10):  # todo - should be 0,10 \r\n    for col in range(1,11):\r\n      if zeros[row, col] == 0:\r\n        PIXEL(row, col)\r\n  ",
+    "tags": "Matrices",
+    "title": "Matrix Injection"
+}
