@@ -184,8 +184,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             if append:
                 first = False
             while s:
-                fragment = s[0:settings.MAX_RPN_ALPHA_STRING_LENGTH]  # max 15 chars allowed
-                s = s[settings.MAX_RPN_ALPHA_STRING_LENGTH:]
+                # max 15 chars allowed on first line, any subsequent append lines its 14 chars
+                MAX_CHARS = settings.MAX_RPN_ALPHA_STRING_LENGTH if first else settings.MAX_RPN_ALPHA_STRING_LENGTH - 1
+                fragment = s[0:MAX_CHARS]
+                s = s[MAX_CHARS:]
                 leading_symbol = '' if first else '├'
                 first = False
                 self.program.insert(f'{leading_symbol}"{fragment}"')  # , comment=alpha_text

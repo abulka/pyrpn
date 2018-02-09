@@ -2095,8 +2095,8 @@ class RpnCodeGenTests(BaseTest):
         """
         expected = dedent("""
             "Hello there all"
-            ├" is well in Lon"
-            ├"don!!"
+            ├" is well in Lo"
+            ├"ndon!!"
             AVIEW
         """)
         lines = self.parse(dedent(src))
@@ -2174,8 +2174,8 @@ class RpnCodeGenTests(BaseTest):
         """
         expected = dedent("""
             "Hello there all"
-            ├" is well in Lon"
-            ├"don!!"
+            ├" is well in Lo"
+            ├"ndon!!"
         """)
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
@@ -2196,8 +2196,8 @@ class RpnCodeGenTests(BaseTest):
         """
         expected = dedent("""
             "Hello there all"
-            ├" is well in Lon"
-            ├"don!!"
+            ├" is well in Lo"
+            ├"ndon!!"
             3
             ARCL ST X
         """)
@@ -2210,10 +2210,10 @@ class RpnCodeGenTests(BaseTest):
         """
         expected = dedent("""
             "hello there thi"
-            ├"s is a test of "
-            ├"things"
-            ├"fred is a very "
-            ├"big man"
+            ├"s is a test of"
+            ├" things"
+            ├"fred is a very"
+            ├" big man"
         """)
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
@@ -2441,20 +2441,20 @@ class RpnCodeGenTests(BaseTest):
         expected = dedent("""
             "this is my stri"
             ├"ng"
-            ASTO(s)
+            ASTO 00
         """)
         lines = self.parse(dedent(src))
         self.compare(de_comment(expected), lines)
 
-    def test_text_ASTO(self):
+    def test_text_ASTO_London(self):
         src = """
             alpha("Hello there all is well in London!!")
             ASTO(s)  # Copy the first six characters into a register or variable
         """
         expected = dedent("""
             "Hello there all"
-            ├" is well in Lon"
-            ├"don!!"
+            ├" is well in Lo"
+            ├"ndon!!"
             ASTO 00
         """)
         lines = self.parse(dedent(src))
