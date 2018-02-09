@@ -2571,12 +2571,25 @@ class RpnCodeGenTests(BaseTest):
         Power function
         """
         lines = self.parse(dedent("""
+            5**3
+            """))
+        expected = dedent("""
+            5
+            3
+            Y↑X
+            """)
+        self.compare(de_comment(expected), lines, dump=True)
+
+    def test_Pow_squared(self):
+        """
+        Power function ^2 needs to be converted to X↑2 rather than Y↑X because only X↑2 will work with a matrix.
+        """
+        lines = self.parse(dedent("""
             5**2
             """))
         expected = dedent("""
             5
-            2
-            Y↑X
+            X↑2
             """)
         self.compare(de_comment(expected), lines, dump=True)
 

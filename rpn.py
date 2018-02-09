@@ -1026,6 +1026,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         if len(self.pending_ops) > 4:
             raise RpnError(f"Potential RPN stack overflow detected - we blew our expression operator stack {self.pending_ops}, {source_code_line_info(node)}")
 
+        self.adjust_pending_op_if_necessary()
         self.program.insert(self.pending_ops[-1])
         self.pending_ops.pop()
 
@@ -1052,6 +1053,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         "In":     "PyIn",
         "NotIn":  "PyNotIn",
         }
+
+    def adjust_pending_op_if_necessary(self):
+        # Convert Y↑X into X↑2 where possible because matrixes only work with X↑2
+        if self.pending_ops[-1] == 'Y↑X' and self.program.last_line.text == '2':
+            self.pending_ops[-1] = 'X↑2'
+            self.program.lines.pop()
 
     def visit_Compare(self, node):
         """

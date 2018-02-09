@@ -480,12 +480,6 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    """
-    Possible bug in Free42?
-        For example, if you press . X^2 when there is a matrix in the X-register, 
-        each element in the matrix is squared.
-    """
-
     # Matrix manipulation
 
     def test_matrices_invert_trans_det(self):
