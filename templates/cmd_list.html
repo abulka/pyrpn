@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block additional_js %}
+{% endblock %}
+
+{% block content %}
+    <ul>
+        <li><a href="/">Converter</a></li>
+        <li><a href="/examples">Examples</a></li>
+        <li><a href="/example">Create Example</a></li>
+        <li><a href="/subscribe">Subscribe to new feature announcements</a></li>
+        <li><a href="/py-rpn-lib">Python RPN Utility Functions Library</a></li>
+    </ul>
+
+    <div class="andy_content">
+
+        <table border=1 class="cmd_list_table">
+            <tr>
+                <th>HP42S Command</th>
+                <th>Python to RPN?</th>
+                <th>Description</th>
+            </tr>
+            {% for cmd in cmd_list.keys() %}
+            <tr>
+                <td>
+                    {{ cmd }}
+                </td>
+                <td>
+                    {% if cmd_list[cmd]['supported'] == 'tocheck' %}
+                        ?
+                    {% else %}
+                        {{ cmd_list[cmd]['supported'] }}
+                    {% endif %}
+                </td>
+                <td align="left">
+                    {{ cmd_list[cmd]['description'] }}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <br>
+        <p>
+        <i>Acknowledgement</i>: List of commands taken from the
+            <a href="http://thomasokken.com/free42/42s.pdf">Alternative HP-42S/Free42 Manual</a>
+        </p>
+
+    </div>
+
+{% endblock %}

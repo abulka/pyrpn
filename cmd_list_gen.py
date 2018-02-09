@@ -21,10 +21,22 @@ with open('cmd_list.csv', newline='') as csvfile:
         else:
             num_arg_fragments = 0
 
+        supported = row[2]
+        if supported == 'tocheck':
+            supported = ""
+        elif supported == 'na':
+            supported = "Not Applicable"
+        elif supported == 'na flow':
+            supported = "No - use Python if statements instead"
+        elif supported == 'na stack':
+            supported = "No - use Python variables instead, not the stack"
+
+
         entry = {
             'description': description,
             'num_arg_fragments': num_arg_fragments,
             'indirect_allowed': '(indirect allowed)' in description,
+            'supported': supported,
         }
         data[cmd] = entry
 

@@ -16,6 +16,7 @@ import settings
 import sendgrid
 from sendgrid.helpers.mail import *
 from program import Program
+from cmd_list import cmd_list
 
 log = logging.getLogger(__name__)
 config_log(log)
@@ -269,6 +270,10 @@ def py_rpn_lib():
     rpn_free42 = program.lines_to_str(comments=False, linenos=True)
     log.info('generating standalone RPN support lib')
     return render_template('pyrpnlib.html', rpn=rpn, rpn_free42=rpn_free42, title='PyRpn Support Lib')
+
+@app.route('/cmds')
+def cmds():
+    return render_template('cmd_list.html', cmd_list=cmd_list, title='List of HP42S Commands Reference')
 
 @app.route('/help')
 def help():
