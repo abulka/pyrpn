@@ -1,0 +1,8 @@
+{
+    "description": "<p>Creates a matrix of 2's and square them into 4's, then checks the result.</p>\r\n<p>&nbsp;</p>",
+    "public": "yes",
+    "sortnum": 5,
+    "source": "def matsquare():\r\n  m = NEWMAT(1,4)\r\n  m += 2    # make every element in matrix equal 2\r\n  m = m**2  # matrix ^2 i.e. square each element\r\n\r\n  PRX(m)    # print the matrix to printer\r\n  \r\n  for col in range(4):\r\n    assert m[0,col] == 4  # ensure the correct result\r\n    \r\n  print('correct result in all matrix cells')",
+    "tags": "Matrices",
+    "title": "Square a matrix"
+}
