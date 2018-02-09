@@ -241,12 +241,12 @@ class RpnTests2(BaseTest):
         :return:
         """
         self.parse(dedent("""
-            PIXEL(100, 1)
+            PIXEL(100, 1)  # row, col
           """))
         expected = dedent("""
-            100
-            1
-            X<>Y
+            100     // row
+            1       // col
+            //X<>Y  // no longer needed, now that I understand better  
             PIXEL
             """)
         self.compare(de_comment(expected))
