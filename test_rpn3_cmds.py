@@ -521,6 +521,21 @@ class RpnTests3Cmds(BaseTest):
             x.col_J_minus
             x.stoel(val)
             RCLEL(x)
+        but what if we do things like
+            x.stoel( m[1,2] )
+        where accessing matrix 'm' wrecks IJ on matrix 'x'.
+
+        Might be simpler to ban all the above, and if you
+        want to grow by one row, this is really append, so offer
+            ADDR(x) or x.append_row()
+        and if want to incrementally set values into the matrix
+        then bad luck.  Or just
+            for row in range(10):
+                for col in range(5):
+                    m[row,col] = val
+        If you know how much data there is, as you would
+        when programmatically doing stuff, then you can redim
+        the matrix before looping, or add or insert extra rows.
         """
         self.parse(dedent("""
             x = NEWMAT(1,4)
