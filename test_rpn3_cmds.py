@@ -101,6 +101,45 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+    def test_matrices_index_numpy_for_loop(self):
+        """
+        """
+        self.parse(dedent("""
+            x = NEWMAT(1,4)
+            for col in range(4):
+                x[0, col]
+            """))
+        expected = dedent("""
+            1
+            4
+            NEWMAT
+            STO "x"
+
+            -1.003
+            STO 00  // i =
+                        
+            LBL 00  // for
+            ISG 00  // test
+            GTO 01  // for body
+            GTO 02  // resume
+            LBL 01  // for body
+            
+            INDEX "x"
+            1           // row, +1 adjusted
+            RCL 00      // col
+            1
+            +           // adjust from 0 based python to 1 based hp42s
+            IP
+            STOIJ
+            RDN
+            RDN
+            RCLEL
+
+            GTO 00  // for
+            LBL 02  // resume
+            """)
+        self.compare(de_comment(expected))
+
     def test_matrices_index_numpy_store_literal(self):
         """
         """
