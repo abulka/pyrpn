@@ -552,6 +552,24 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+    def test_matrices_appendr(self):
+        self.parse(dedent("""
+            x = NEWMAT(1,4)
+            x.appendr()
+            """))
+        expected = dedent("""
+            1
+            4
+            NEWMAT
+            STO "x"
+
+            INDEX "x"
+            GROW
+            J-
+            J+
+            WRAP
+            """)
+        self.compare(de_comment(expected))
 
     # Complex numbers
 

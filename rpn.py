@@ -1304,6 +1304,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.scopes.ensure_is_named_matrix_register(var_name=self.get_node_name_id_or_n(node.func.value), node=node)
         elif isinstance(node.func, ast.Attribute) and node.func.attr in ('insr', 'delr'):
             self.calling_insrow_delrow(node, cmd=node.func.attr)
+        elif isinstance(node.func, ast.Attribute) and node.func.attr in ('appendr',):
+            self.calling_appendr(node, cmd=node.func.attr)
         elif isinstance(node.func, ast.Attribute) and node.func.attr in ('dim',):
             self.calling_dim(node, cmd=node.func.attr)
         elif isinstance(node.func, ast.Attribute) and node.func.attr in ('row_swap',):
@@ -1566,6 +1568,23 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         register = self.scopes.var_to_reg(matrix_var_name)
         self.matrix_op_visit_two_args(node)
         self.program.insert(f'DIM {register}')
+        self.end(node)
+
+    def calling_appendr(self, node, cmd):
+        assert cmd in ('appendr',)
+        matrix_var_name = node.func.value.id
+        self.error_if_matrix_not_declared(matrix_var_name, node)
+        register = self.scopes.var_to_reg(matrix_var_name)
+        self.program.insert(f'INDEX {register}')
+        if len(node.args) != 0:
+            raise RpnError(f'Takes no arguments, {source_code_line_info(node)}')
+        code = f"""
+            GROW
+            J-
+            J+
+            WRAP
+            """
+        self.program.insert_raw_lines(code)
         self.end(node)
 
     def calling_row_swap(self, node, cmd):
