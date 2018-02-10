@@ -21,11 +21,11 @@ ATAN,Arc tangent. Returns tan–1 x.,ok
 ATANH,Arc hyperbolic tangent. Returns tanh–1 x.,ok
 ATOX,Alpha to X. Convert the left-most character in the Alpha register to its character code (returned to the x-register) and delete the character.,tocheck
 AVIEW,Alpha view. Display the Alpha register.,ok
-BASE+,Base addition. Returns the 36-bit sum of y + x.,tocheck
-BASE–,Base subtraction. Returns the 36-bit difference of y – x.,tocheck
-BASEx,Base multiplication. Returns the 36-bit product of y x x.,tocheck
-BASE÷,Base division. Returns the 36-bit quotient of y ÷ x.,tocheck
-BASE+/–,Base change sign. Returns the 36-bit 2's complement of x.,tocheck
+BASE+,Base addition. Returns the 36-bit sum of y + x.,remapped
+BASE–,Base subtraction. Returns the 36-bit difference of y – x.,remapped
+BASEx,Base multiplication. Returns the 36-bit product of y x x.,remapped
+BASE÷,Base division. Returns the 36-bit quotient of y ÷ x.,remapped
+BASE+/–,Base change sign. Returns the 36-bit 2's complement of x.,remapped
 BEEP,Sound a sequence of four tones.,ok
 BEST,Select the best curve-fitting model for the current statistical data.,ok
 BINM,Select Binary mode (base 2),ok

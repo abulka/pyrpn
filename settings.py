@@ -55,6 +55,11 @@ PYTHON_CMD_TO_RPN = {
     'HMSplus':      'HMS+',
     'HMSminus':     'HMS–',
     'Factorial':    'N!',
+    'BASEplus':     'BASE+',
+    'BASEminus':    'BASE–',
+    'BASEtimes':    'BASEx',
+    'BASEdivide':   'BASE÷',
+    'BASEplusMinus':'BASE+/–',
 
 }
 RPN_CMD_TO_PYTHON_REPLACEMENT = {v: k for k, v in PYTHON_CMD_TO_RPN.items()}
