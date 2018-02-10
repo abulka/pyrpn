@@ -69,7 +69,7 @@ ENG,Select Engineering display format. Parameter: number of digits (indirect all
 ENTER,"Separate two numbers keyed in sequentially; copies x into the y-register, y into the z-register, and z into the t-register, and loses t.",nostack
 EXITALL,Exit all menus.,ok
 EXPF,Select the exponential curve-fitting model.,ok
-E↑X,Natural exponential. Returns ex.,tocheck
+E↑X,Natural exponential. Returns ex.,remapped
 E↑X-1,"Natural exponential for values of x which are close to zero. Returns ex–1, which provides a much higher accuracy in the fractional part of the result.",tocheck
 FC?,"Flag clear test. If the specified flag is clear, executes the next program line; if the flag is set, skips the next program line. Parameter: flag number (indirect allowed)",Use isFC(nn) instead
 FC?C,"Flag clear test and clear. If the specified flag is clear, execute the next program line; if the flag is set, skip the next program line. Cleared after the test is complete. (This function can be used only with flags 00 through 35 and 81 through 99.) Parameter: flag number (indirect allowed)",noflag

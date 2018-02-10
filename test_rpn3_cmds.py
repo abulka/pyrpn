@@ -673,3 +673,16 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+    # Misc remapped commands
+
+    def test_cmd_EtoX(self):
+        # Converting a Complex Matrix to Real again
+        self.parse(dedent("""
+            EtoX(10)
+            """))
+        expected = dedent("""
+            10
+            E↑X
+            """)
+        self.compare(de_comment(expected))
+

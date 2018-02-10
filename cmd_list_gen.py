@@ -1,6 +1,7 @@
 #coding:utf8
 import csv
 import pprint
+import settings
 
 data = {}
 with open('cmd_list.csv', newline='') as csvfile:
@@ -56,6 +57,9 @@ with open('cmd_list.csv', newline='') as csvfile:
         elif supported == 'alpha':
             supported = "No"
             suggestion = 'Use the alpha() function to build up strings in the alpha register, specifying literal strings of any length, and multiple variables. See help for more details'
+        elif supported == 'remapped':
+            supported = '✓ (renamed)'
+            suggestion = f'Use {settings.RPN_CMD_TO_PYTHON_REPLACEMENT[cmd]}() instead.'
         elif supported == 'ok':
             supported = '✓'
             suggestion = ''

@@ -468,8 +468,8 @@ cmd_list = \
  'E↑X': {'description': 'Natural exponential. Returns ex.',
          'indirect_allowed': False,
          'num_arg_fragments': 0,
-         'suggestion': 'being researched',
-         'supported': ''},
+         'suggestion': 'Use EtoX() instead.',
+         'supported': '✓ (renamed)'},
  'E↑X-1': {'description': 'Natural exponential for values of x which are close '
                           'to zero. Returns ex–1, which provides a much higher '
                           'accuracy in the fractional part of the result.',
