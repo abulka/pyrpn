@@ -26,6 +26,12 @@ RPN_UNSUPPORTED = ['NOT', 'OR', 'AND', 'CLST', 'CLX']
 LIST_UNSUPPORTED = ('cmp', 'index', 'count', 'extend', 'insert', 'remove', 'reverse', 'sort')
 DICT_UNSUPPORTED = ('clear', 'copy', 'fromkeys', 'get', 'items', 'setdefault', 'update', 'values')
 MATRIX_UNSUPPORTED = ('INDEX', 'STOIJ', 'RCLIJ', 'PUTM', 'GETM', 'INSR', 'DELR', 'DIM', 'GROW', 'WRAP', 'SIMQ', 'GROW', 'WRAP')
+RPN_RENAMED_CMDS = {
+    'isFS':  'pFS',
+    'isFC':  'pFC',
+    'len':   'pMxLen',
+    'print': 'AVIEW',
+}
 
 # Specifications of RPN limitations
 MAX_RPN_LABEL_LENGTH = 7

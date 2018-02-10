@@ -1649,12 +1649,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 raise RpnError(f'{func_name} requires parameters (variable or literal number) to be supplied - referring to stack x not allowed, {source_code_line_info(node)}')
 
     def adjust_function_name(self, func_name):
-        if func_name == 'isFS':     func_name = 'pFS'
-        if func_name == 'isFC':     func_name = 'pFC'
-        # if func_name == 'passert':  func_name = 'pAssert'  # not supported anymore, not user insertable anymore.
-        if func_name == 'len':      func_name = 'pMxLen'
-        if func_name == 'print':    func_name = 'AVIEW'
-        return func_name
+        new_func_name = settings.RPN_RENAMED_CMDS.get(func_name, func_name)
+        return new_func_name
 
     def calling_append_or_pop(self, node, cmd):
         assert cmd in ('append', 'pop')
