@@ -1,164 +1,164 @@
-ABS,Absolute value. Returns |x|.,tocheck
-ACOS,Arc cosine. Returns cos–1 x.,tocheck
-ACOSH,Arc hyperbolic cosine. Returns cosh–1 x.,tocheck
-ADV,Advance the printer paper one line,tocheck
+ABS,Absolute value. Returns |x|.,ok
+ACOS,Arc cosine. Returns cos–1 x.,ok
+ACOSH,Arc hyperbolic cosine. Returns cosh–1 x.,ok
+ADV,Advance the printer paper one line,ok
 AGRAPH,Alpha graphics. Display a graphics image. Each character in the Alpha register specifies an 8-dot column pattern. The x- and y-registers specify the pixel location of the image.,tocheck
-AIP,Append Integer part of x to the Alpha register.,tocheck
-ALENG,Alpha length. Returns the number of characters in the Alpha register.,tocheck
-ALL,Select the All display format.,tocheck
+AIP,Append Integer part of x to the Alpha register.,ok
+ALENG,Alpha length. Returns the number of characters in the Alpha register.,ok
+ALL,Select the All display format.,ok
 ALLΣ,"Select ALLΣ (All-statistics) mode, which uses 13 summation coefficients.",tocheck
-AND,Logical AND. Returns x AND y.,tocheck
-AOFF,Alpha off. Exit from the ALPHA menu.,tocheck
-AON,Alpha on. Select the ALPHA menu.,tocheck
-ARCL,"Alpha recall. Copy data into the Alpha register, appending it to the current contents. Numbers are formatted using the current display format.  Parameter: register or variable.   (indirect allowed)",tocheck
-AROT,Alpha rotate. Rotate the Alpha register by the number of characters specified in the x-register.,tocheck
-ASHF,Alpha shift. Shifts the six left-most characters out of the Alpha register.,tocheck
-ASIN,Arc sine. Returns sin–1 x.,tocheck
-ASINH,Arc hyperbolic sine. Returns sinh–1 x.,tocheck
+AND,Logical AND. Returns x AND y.,nobool
+AOFF,Alpha off. Exit from the ALPHA menu.,ok
+AON,Alpha on. Select the ALPHA menu.,ok
+ARCL,"Alpha recall. Copy data into the Alpha register, appending it to the current contents. Numbers are formatted using the current display format.  Parameter: register or variable.   (indirect allowed)",alpha
+AROT,Alpha rotate. Rotate the Alpha register by the number of characters specified in the x-register.,ok
+ASHF,Alpha shift. Shifts the six left-most characters out of the Alpha register.,ok
+ASIN,Arc sine. Returns sin–1 x.,ok
+ASINH,Arc hyperbolic sine. Returns sinh–1 x.,ok
 ASSIGN,"Assign a function, program, or variable to a menu key in the CUSTOM menu. Parameter 1: function name, alpha program label, or variable name. Parameter 2: key number (01–18).",tocheck
-ASTO,Alpha store. Copy the first six characters in the Alpha register into a register or variable. Parameter: register or variable (indirect allowed),tocheck
-ATAN,Arc tangent. Returns tan–1 x.,tocheck
-ATANH,Arc hyperbolic tangent. Returns tanh–1 x.,tocheck
+ASTO,Alpha store. Copy the first six characters in the Alpha register into a register or variable. Parameter: register or variable (indirect allowed),Instead use alpha("this is my string") then ASTO(myvar)
+ATAN,Arc tangent. Returns tan–1 x.,ok
+ATANH,Arc hyperbolic tangent. Returns tanh–1 x.,ok
 ATOX,Alpha to X. Convert the left-most character in the Alpha register to its character code (returned to the x-register) and delete the character.,tocheck
-AVIEW,Alpha view. Display the Alpha register.,tocheck
+AVIEW,Alpha view. Display the Alpha register.,AVIEW(myvar) refers to variables and can take multiple parameters incl. literal string - powerful!
 BASE+,Base addition. Returns the 36-bit sum of y + x.,tocheck
 BASE–,Base subtraction. Returns the 36-bit difference of y – x.,tocheck
 BASEx,Base multiplication. Returns the 36-bit product of y x x.,tocheck
 BASE÷,Base division. Returns the 36-bit quotient of y ÷ x.,tocheck
 BASE+/–,Base change sign. Returns the 36-bit 2's complement of x.,tocheck
-BEEP,Sound a sequence of four tones.,tocheck
-BEST,Select the best curve-fitting model for the current statistical data.,tocheck
-BINM,Select Binary mode (base 2),tocheck
+BEEP,Sound a sequence of four tones.,ok
+BEST,Select the best curve-fitting model for the current statistical data.,ok
+BINM,Select Binary mode (base 2),ok
 BIT?,"Test the xth bit of y. If the bit is set (1), execute the next program line; if the bit is clear (0), skip the next program line.",tocheck
-BST,Back step. Move the program pointer to the previous program line. (Not programmable.),tocheck
-CF,Clear flag nn (00 ≤  nn ≤ 35 or 81 ≤  nn ≤ 99). Parameter: flag number (indirect allowed),tocheck
-CLA,"Clear Alpha register. If Alpha mode is on and character entry is terminated (no cursor displayed), then  ◄  also executes the CLA function.",tocheck
-CLALL,Clear all. Clear all stored programs and data.(Not Programmable.),tocheck
-CLD,Clear display. Clear a message from the display.,tocheck
-CLKEYS,Clear all CUSTOM menu key assignments.,tocheck
-CLLCD,Clear LCD (liquid crystal display). Blanks the entire display.,tocheck
-CLMENU,Clear MENU. Deletes all menu key definitions for the programmable menu.,tocheck
+BST,Back step. Move the program pointer to the previous program line. (Not programmable.),na
+CF,Clear flag nn (00 ≤  nn ≤ 35 or 81 ≤  nn ≤ 99). Parameter: flag number (indirect allowed),Use CF(nn)
+CLA,"Clear Alpha register. If Alpha mode is on and character entry is terminated (no cursor displayed), then  ◄  also executes the CLA function.",ok
+CLALL,Clear all. Clear all stored programs and data.(Not Programmable.),na
+CLD,Clear display. Clear a message from the display.,ok
+CLKEYS,Clear all CUSTOM menu key assignments.,ok
+CLLCD,Clear LCD (liquid crystal display). Blanks the entire display.,ok
+CLMENU,Clear MENU. Deletes all menu key definitions for the programmable menu.,ok
 CLP,Clear a program from memory. Parameter: global label,tocheck
-CLRG,Clear Registers. Clear all of the numbered storage registers to zero.,tocheck
-CLST,Clear Stack. Clear the stack registers to zero.,tocheck
+CLRG,Clear Registers. Clear all of the numbered storage registers to zero.,yes, will clear all Python variables (but not named variables) - use with care.
+CLST,Clear Stack. Clear the stack registers to zero.,na
 CLV,Clear a variable from memory. Parameter: variable name (indirect allowed),tocheck
-CLX,"Clear x-register to zero. If digit entry is terminated (no cursor in the display), then  ◄  also executes CLX.",tocheck
+CLX,"Clear x-register to zero. If digit entry is terminated (no cursor in the display), then  ◄  also executes CLX.",na
 CLZ,Clear statistics. Clear the accumulated statistical data in the summation registers.,tocheck
 COMB,Combinations of y items taken x at a time = y! / [x!(y-x)!],tocheck
-COMPLEX,Convert two real numbers (or matrices) into a complex number (or matrix). Converts a complex number (or matrix) into two real numbers (or matrices).,tocheck
-CORR,Returns a correlation coefficient using the current statistical data and curve-fitting model.,tocheck
-COS,Cosine. Returns cos(x).,tocheck
-COSH,Hyperbolic cosine. Returns cosh(x).,tocheck
-CPXRES,"Complex-results. Enable the calculator to return a complex result, even if the inputs are real numbers.",tocheck
+COMPLEX,Convert two real numbers (or matrices) into a complex number (or matrix). Converts a complex number (or matrix) into two real numbers (or matrices).,ok
+CORR,Returns a correlation coefficient using the current statistical data and curve-fitting model.,ok
+COS,Cosine. Returns cos(x).,ok
+COSH,Hyperbolic cosine. Returns cosh(x).,ok
+CPXRES,"Complex-results. Enable the calculator to return a complex result, even if the inputs are real numbers.",ok
 CPX?,"If the x-register contains a complex number, execute the next program line; if the x-register does not contain a complex number, skip the next program line.",tocheck
-CROSS,Returns the cross product of two vectors (matrices or complex numbers).,tocheck
-DECM,Selects Decimal mode (base 10).,tocheck
-DEG,Select the Degrees angular mode.,tocheck
-DEL,Delete the specified number of lines from the current program. Program-entry mode must be on. (Not programmable.) Parameter: number of lines.,tocheck
+CROSS,Returns the cross product of two vectors (matrices or complex numbers).,ok
+DECM,Selects Decimal mode (base 10).,ok
+DEG,Select the Degrees angular mode.,ok
+DEL,Delete the specified number of lines from the current program. Program-entry mode must be on. (Not programmable.) Parameter: number of lines.,na
 DELAY,Set the print delay time to x seconds.,tocheck
-DELR,Delete row. Delete the current row from the indexed matrix.,tocheck
-DET,Determinant. Returns the determinant of the matrix in the x-register.,tocheck
-DIM,"Dimension a matrix to x columns and y rows. If the matrix does not exist, DIM creates it. Parameter: variable name (indirect allowed)",tocheck
-DIM?,Returns the dimensions of the matrix in the x-register (rows to the y-register and columns to the x-register).,tocheck
-DOT,Dot Product.  Returns the dot product of two vectors (matrices or complex numbers).,tocheck
-DSE,"Decrement, Skip if (less than or) Equal. Given ccccccc.fflii in a variable or register, decrements ccccccc by ii and skips the next program line if ccccccc is now ≤  fff. Parameter: register or variable (indirect allowed)",tocheck
+DELR,Delete row. Delete the current row from the indexed matrix.,Use mymatrix.delr(n) instead.
+DET,Determinant. Returns the determinant of the matrix in the x-register.,ok
+DIM,"Dimension a matrix to x columns and y rows. If the matrix does not exist, DIM creates it. Parameter: variable name (indirect allowed)",Use mymatrix.dim(rows,cols) instead.  Cannot create new matrices with dim().
+DIM?,Returns the dimensions of the matrix in the x-register (rows to the y-register and columns to the x-register).,Use len(mymatrix) to get the length. TODO Still working on mymatrix.shape()
+DOT,Dot Product.  Returns the dot product of two vectors (matrices or complex numbers).,ok
+DSE,"Decrement, Skip if (less than or) Equal. Given ccccccc.fflii in a variable or register, decrements ccccccc by ii and skips the next program line if ccccccc is now ≤  fff. Parameter: register or variable (indirect allowed)",noloop
 EDIT,Edit a matrix in the x-register.,tocheck
 EDITN,Edit a named matrix. Parameter: variable name (indirect allowed),tocheck
-END,End of a program.,tocheck
-ENG,Select Engineering display format. Parameter: number of digits (indirect allowed),tocheck
-ENTER,"Separate two numbers keyed in sequentially; copies x into the y-register, y into the z-register, and z into the t-register, and loses t.",tocheck
-EXITALL,Exit all menus.,tocheck
-EXPF,Select the exponential curve-fitting model.,tocheck
+END,End of a program.,na
+ENG,Select Engineering display format. Parameter: number of digits (indirect allowed),ok
+ENTER,"Separate two numbers keyed in sequentially; copies x into the y-register, y into the z-register, and z into the t-register, and loses t.",nostack
+EXITALL,Exit all menus.,ok
+EXPF,Select the exponential curve-fitting model.,ok
 E↑X,Natural exponential. Returns ex.,tocheck
 E↑X-1,"Natural exponential for values of x which are close to zero. Returns ex–1, which provides a much higher accuracy in the fractional part of the result.",tocheck
-FC?,"Flag clear test. If the specified flag is clear, executes the next program line; if the flag is set, skips the next program line. Parameter: flag number (indirect allowed)",tocheck
-FC?C,"Flag clear test and clear. If the specified flag is clear, execute the next program line; if the flag is set, skip the next program line. Cleared after the test is complete. (This function can be used only with flags 00 through 35 and 81 through 99.) Parameter: flag number (indirect allowed)",tocheck
+FC?,"Flag clear test. If the specified flag is clear, executes the next program line; if the flag is set, skips the next program line. Parameter: flag number (indirect allowed)",Use isFC(nn) instead
+FC?C,"Flag clear test and clear. If the specified flag is clear, execute the next program line; if the flag is set, skip the next program line. Cleared after the test is complete. (This function can be used only with flags 00 through 35 and 81 through 99.) Parameter: flag number (indirect allowed)",noflag
 FCSTX,Forecasts an x-value given a y-value.,tocheck
 FCSTY,Forecasts a y-value given an x-value.,tocheck
-FIX,Select Fixed-decimal display format. Parameter: number of digits (indirect allowed),tocheck
-FNRM,Returns the Frobenius norm of the matrix in the x-register.,tocheck
-FP,Returns the fractional part of x.,tocheck
-FS?,"Flag set test. If the specified flag is set, execute the next program line; if the flag is clear, skip the next program line. Parameter: flag number (indirect allowed)",tocheck
-FS?C,"Flag set test and clear. If the specified flag is set, execute the next program line; if the flag is clear, skip the next program line. Clear the flag after the test is complete. (This function can be used only with flags 00 through 35 and 81 through 99.) Parameter: flag number (indirect allowed)",tocheck
-GAMMA,Gamma function. Returns Γ(x).,tocheck
-GETKEY,"Get key. The calculator waits for you to press a key. When you do, the key number is returned to the x-register. Keys are numbered from 1 through 37 ( Σ+  through  ÷ )for normal keys and 38 through 74 (■ Σ–   through ■CATALOG) for shifted keys.",tocheck
-GETM,Get matrix. Copy a submatrix into the x-register from the indexed matrix.,tocheck
-GRAD,Select Grads angular mode.,tocheck
-GROW,Select Grow mode. Executing  →  or J+ causes the matrix to grow by one new row if the index pointers are at the last (lower-right) element in the matrix.,tocheck
-GTO,"Go to label. From the keyboard, move the program pointer to the specified label. In a running program, cause the program to branch to the specified label. Parameter: local or global label (indirect allowed)",tocheck
-HEXM,Select Hexadecimal mode (base 16).,tocheck
+FIX,Select Fixed-decimal display format. Parameter: number of digits (indirect allowed),ok
+FNRM,Returns the Frobenius norm of the matrix in the x-register.,ok
+FP,Returns the fractional part of x.,ok
+FS?,"Flag set test. If the specified flag is set, execute the next program line; if the flag is clear, skip the next program line. Parameter: flag number (indirect allowed)",Use isFS() instead
+FS?C,"Flag set test and clear. If the specified flag is set, execute the next program line; if the flag is clear, skip the next program line. Clear the flag after the test is complete. (This function can be used only with flags 00 through 35 and 81 through 99.) Parameter: flag number (indirect allowed)",noflag
+GAMMA,Gamma function. Returns Γ(x).,ok
+GETKEY,"Get key. The calculator waits for you to press a key. When you do, the key number is returned to the x-register. Keys are numbered from 1 through 37 ( Σ+  through  ÷ )for normal keys and 38 through 74 (■ Σ–   through ■CATALOG) for shifted keys.",ok
+GETM,Get matrix. Copy a submatrix into the x-register from the indexed matrix.,nomatrix
+GRAD,Select Grads angular mode.,ok
+GROW,Select Grow mode. Executing  →  or J+ causes the matrix to grow by one new row if the index pointers are at the last (lower-right) element in the matrix.,No but new command mymatrix.appendr() added to compensate.
+GTO,"Go to label. From the keyboard, move the program pointer to the specified label. In a running program, cause the program to branch to the specified label. Parameter: local or global label (indirect allowed)",na
+HEXM,Select Hexadecimal mode (base 16).,ok
 HMS+,Add x and y using H.MMSSss (hours-minutes-seconds) format.,tocheck
 HMS–,Subtract x from y using H.MMSSss format.,tocheck
-I+,Increment the row pointer in the indexed matrix.,tocheck
-I–,Decrement the row pointer in the indexed matrix.,tocheck
-INDEX,Index a named matrix. Parameter: variable name (indirect allowed),tocheck
+I+,Increment the row pointer in the indexed matrix.,nomatrix
+I–,Decrement the row pointer in the indexed matrix.,nomatrix
+INDEX,Index a named matrix. Parameter: variable name (indirect allowed),nomatrix
 INPUT,"Recall a register or variable to the x-register, display the name of the register or variable along with the contents of the x-register, and halt program execution. Pressing R/S (or ■SST) stores x into the register or variable; pressing EXIT cancels. (Used only in programs.) Parameter: register or variable (indirect allowed)",tocheck
-INSR,Insert a row in the indexed matrix.,tocheck
+INSR,Insert a row in the indexed matrix.,Use your_matrix.insr() instead
 INTEG,Integrate the selected integration program with respect to the specified variable. Parameter: variable name (indirect allowed),tocheck
-INVRT,Returns the inverse of the matrix in the x-register.,tocheck
-IP,Returns the integer part of x,tocheck
-ISG,"Increment, Skip if Greater. Given ccccccc.fffii in a variable or register, increments ccccccc by ii and skips the next program line if ccccccc is now > fff. Parameter: register or variable (indirect allowed)",tocheck
-J+,Increment the column pointer in the indexed matrix.,tocheck
-J–,Decrement the column pointer in the indexed matrix.,tocheck
+INVRT,Returns the inverse of the matrix in the x-register.,ok
+IP,Returns the integer part of x,ok
+ISG,"Increment, Skip if Greater. Given ccccccc.fffii in a variable or register, increments ccccccc by ii and skips the next program line if ccccccc is now > fff. Parameter: register or variable (indirect allowed)",noloop
+J+,Increment the column pointer in the indexed matrix.,nomatrix
+J–,Decrement the column pointer in the indexed matrix.,nomatrix
 KEYASN,Selects key-assignments mode for the CUSTOM menu.,tocheck
 KEYG,"On menu key, go to. Branch to specified label to when a particular menu key is pressed.  Parameter 1:: Key number (1 through 9), Parameter 2: program label (global or local)",tocheck
-KEYX,"On menu key, execute. Execute (as a subroutine) specified label when a particular menu key is pressed. Parameter 1:: Key number (1 through 9), Parameter 2: program label (global or local)",tocheck
-LASTX,Last x. Recall the last value of x used in a calculation.,tocheck
-LBL,Label. Identify programs and routines for execution and branching. Parameter: local or global label.,tocheck
+KEYX,"On menu key, execute. Execute (as a subroutine) specified label when a particular menu key is pressed. Parameter 1:: Key number (1 through 9), Parameter 2: program label (global or local)",nostack
+LASTX,Last x. Recall the last value of x used in a calculation.,nostack
+LBL,Label. Identify programs and routines for execution and branching. Parameter: local or global label.,na
 LCLBL,Select Local label mode for the CUSTOM menu (to use CUSTOM menu assignments to execute local labels within the current program).,tocheck
 LINF,Select the linear curve-fitting model.,tocheck
 LINΣ,"Select Linear statistics mode, which uses six summation coefficients.",tocheck
-LIST,Print a portion of a program listing. (Not programmable.) Parameter: number of lines.,tocheck
-LN,Natural logarithm. Returns ln(x).,tocheck
+LIST,Print a portion of a program listing. (Not programmable.) Parameter: number of lines.,na
+LN,Natural logarithm. Returns ln(x).,ok
 LN1+X,"Natural logarithm for values close to zero. Returns ln(1 + x), which provides a much higher accuracy in the fractional part of the result.",tocheck
-LOG,Common logarithm. Returns log10(x).,tocheck
-LOGF,Select the logarithmic curve-fitting model.,tocheck
-MAN,Select Manual print mode.,tocheck
+LOG,Common logarithm. Returns log10(x).,ok
+LOGF,Select the logarithmic curve-fitting model.,ok
+MAN,Select Manual print mode.,ok
 MAT?,"If the x-register contains a matrix, execute the next program line; if the X-register does not contain a matrix, skip the next program line.",tocheck
 MEAN,Mean. Returns the mean of x-values (Σx / n) and the mean of y-values (Σy / n).,tocheck
 MENU,Select the programmable menu.,tocheck
 MOD,Modulo. Returns the remainder for y / x.,tocheck
 MVAR,Declare a menu variable in a SOLVER program. Parameter: variable name.,tocheck
 N!,Factorial. Returns x!.,tocheck
-NEWMAT,New matrix. Creates a y × x matrix in the x-register.,tocheck
-NORM,"Select Normal print mode, which prints a record of keystrokes.",tocheck
-NOT,Logical NOT. Returns NOT(x).,tocheck
-OCTM,Select Octal mode,tocheck
-OFF,Turn the calculator off (programmable). (Pressing ■OFF does not execute the programmable OFF function.),tocheck
-OLD,Recall the current element from the indexed matrix. (Equivalent to RCLEL.),tocheck
-ON,Continuous on. Prevent the calculator from automatically turning off after ten minutes of inactivity.,tocheck
-OR,Logical OR. Returns x OR y.,tocheck
+NEWMAT,New matrix. Creates a y × x matrix in the x-register.,ok
+NORM,"Select Normal print mode, which prints a record of keystrokes.",ok
+NOT,Logical NOT. Returns NOT(x).,nobool
+OCTM,Select Octal mode,ok
+OFF,Turn the calculator off (programmable). (Pressing ■OFF does not execute the programmable OFF function.),ok
+OLD,Recall the current element from the indexed matrix. (Equivalent to RCLEL.),nomatrix
+ON,Continuous on. Prevent the calculator from automatically turning off after ten minutes of inactivity.,ok
+OR,Logical OR. Returns x OR y.,nobool
 PERM,Permutations of y items taken x at a time. Returns y!/(y – x)!,tocheck
 PGMINT,Select a program to integrate. Parameter: global label (indirect allowed),tocheck
 PGMSLV,"Select a program to solve. Parameter: global label (indirect allowed) ,",tocheck
-PIXEL,Turn on a single pixel (dot) in the display y: row (y axis) x: col (x axis),tocheck
-PI,Put an approximation of π into the x-register (3.14159265359).,tocheck
-POLAR,Select polar coordinate mode for displaying complex numbers.,tocheck
+PIXEL,Turn on a single pixel (dot) in the display y: row (y axis) x: col (x axis),ok
+PI,Put an approximation of π into the x-register (3.14159265359).,ok
+POLAR,Select polar coordinate mode for displaying complex numbers.,ok
 POSA,"Position in Alpha. Searches the Alpha register for the target specified in the x-register. If found, returns the character position; if not found, returns -1.",tocheck
-PRA,Print Alpha register.,tocheck
-PRLCD,Print LCD (liquid crystal display). Prints the entire display.,tocheck
-PROFF,Printing off. Clears flags 21 and 55.,tocheck
-PROMPT,Display the Alpha register and halt program execution.,tocheck
-PRON,Printing on. Sets flags 21 and 55.,tocheck
-PRP,"Print program. If a label is not specified, print the current program. (Not programmable.)  Parameter: global label (optional)",tocheck
-PRSTK,"Print stack. Print the contents of the stack registers (x, y, z and t).",tocheck
-PRUSR,Print user variables and programs.,tocheck
+PRA,Print Alpha register.,ok
+PRLCD,Print LCD (liquid crystal display). Prints the entire display.,ok
+PROFF,Printing off. Clears flags 21 and 55.,ok
+PROMPT,Display the Alpha register and halt program execution.,ok
+PRON,Printing on. Sets flags 21 and 55.,ok
+PRP,"Print program. If a label is not specified, print the current program. (Not programmable.)  Parameter: global label (optional)",na
+PRSTK,"Print stack. Print the contents of the stack registers (x, y, z and t).",ok
+PRUSR,Print user variables and programs.,ok
 PRV,Print variable. Parameter: variable name (indirect allowed),tocheck
-PRX,Print x-register.,tocheck
+PRX,Print x-register.,ok
 PRZ,Print statistics. Prints the contents of the summation registers.,tocheck
-PSE,Pause program execution for about 1 second.,tocheck
-PUTM,Put matrix. Stores the matrix in the X-register into the indexed matrix beginning at the current element.,tocheck
-PWRF,Select the power curve-fitting model.,tocheck
-QUIET,Toggle flag 26 to disable or enable the beeper (Not programmable ),tocheck
-RAD,Select Radians angular mode,tocheck
-RAN,Returns a random number (0 ≤ x < 1),tocheck
-RCL,Recall data into the x-register. Parameter: register or variable (indirect allowed),tocheck
-RCL+,Recall addition. Recall data and add it to the contents of the x-register. Parameter: register or variable (indirect allowed),tocheck
-RCL-,Recall subtraction. Recall data and subtract it from the contents of the x-register. Parameter: register or variable (indirect allowed),tocheck
-RCL×,Recall multiplication. Recall data and multiply it by the contents of the x-register. Parameter: register or variable (indirect allowed),tocheck
-RCL÷,Recall division. Recall data and divide it into the contents of the x-register. Parameter: register or variable (indirect allowed),tocheck
-RCLEL,Recall element. Recalls the current matrix element from the indexed matrix.,tocheck
-RCLIJ,Recall the row- and column-pointer values (I and J) for the indexed matrix.,tocheck
+PSE,Pause program execution for about 1 second.,ok
+PUTM,Put matrix. Stores the matrix in the X-register into the indexed matrix beginning at the current element.,nomatrix
+PWRF,Select the power curve-fitting model.,ok
+QUIET,Toggle flag 26 to disable or enable the beeper (Not programmable ),na
+RAD,Select Radians angular mode,ok
+RAN,Returns a random number (0 ≤ x < 1),ok
+RCL,Recall data into the x-register. Parameter: register or variable (indirect allowed),noregs
+RCL+,Recall addition. Recall data and add it to the contents of the x-register. Parameter: register or variable (indirect allowed),noregs
+RCL-,Recall subtraction. Recall data and subtract it from the contents of the x-register. Parameter: register or variable (indirect allowed),noregs
+RCL×,Recall multiplication. Recall data and multiply it by the contents of the x-register. Parameter: register or variable (indirect allowed),noregs
+RCL÷,Recall division. Recall data and divide it into the contents of the x-register. Parameter: register or variable (indirect allowed),noregs
+RCLEL,Recall element. Recalls the current matrix element from the indexed matrix.,nomatrix
+RCLIJ,Recall the row- and column-pointer values (I and J) for the indexed matrix.,nomatrix
 "RDX,",Select a comma to be used as the radix mark (decimal point).,tocheck
 RDX.,Select a period to be used as the radix mark (decimal point).,tocheck
 REALRES,Real-results. Disables the calculator's ability to return a complex result using real-number inputs.,tocheck
@@ -168,59 +168,59 @@ RND,Round the number in the x-register using the current display format.,tocheck
 RNRM,Return the row norm of the matrix in the x-register.,tocheck
 ROTXY,Rotate the 36-bit number in the y-register by x bits.,tocheck
 RSUM,Return the row sum of each row of the matrix in the x-register and returns the sums in a column matrix.,tocheck
-RTN,"Return. In a running program, branches the program pointer back to the line following the most recent XEQ instruction. If there is no matching XEQ instruction, program execution halts. From the keyboard, RTN moves the program pointer to line 00 of the current program.",tocheck
-R<>R,Row swap row. Swaps the elements in rows x and y in the indexed matrix.,tocheck
-R↑,Roll up the contents of the four stack registers one position.,tocheck
-R↓,Roll down the contents of the four stack registers one position.,tocheck
-R/S,"Run/stop. Runs a program (beginning at the current program line) or stops a running program. In program-entry mode, inserts a STOP instruction into the program.",tocheck
+RTN,"Return. In a running program, branches the program pointer back to the line following the most recent XEQ instruction. If there is no matching XEQ instruction, program execution halts. From the keyboard, RTN moves the program pointer to line 00 of the current program.",Use the Python "return" statement instead
+R<>R,Row swap row. Swaps the elements in rows x and y in the indexed matrix.,Use mymatrix.row_swap(3,7) instead
+R↑,Roll up the contents of the four stack registers one position.,nostack
+R↓,Roll down the contents of the four stack registers one position.,nostack
+R/S,"Run/stop. Runs a program (beginning at the current program line) or stops a running program. In program-entry mode, inserts a STOP instruction into the program.",STOP() is supported
 SCI,Select scientific notation display format. Parameter: number of digits (indirect allowed),tocheck
 SDEV,Standard deviation. Returns sx and sy using the current statistical data.,tocheck
 SEED,Store a seed for the random number generator.,tocheck
-SF,Set flag nn (00 ≤ nn ≤ 35; 81 ≤ nn ≤ 99). Parameter: flag number (indirect allowed),tocheck
+SF,Set flag nn (00 ≤ nn ≤ 35; 81 ≤ nn ≤ 99). Parameter: flag number (indirect allowed),ok
 SIGN,"Sign. Return 1 for x ≥ 0, –1 for x < 0, and 0 for non-numbers. Returns the unit vector of a complex number.",tocheck
-SIN,Sine. Returns sin(x).,tocheck
-SINH,Hyperbolic sine. Returns sinh(x).,tocheck
+SIN,Sine. Returns sin(x).,ok
+SINH,Hyperbolic sine. Returns sinh(x).,ok
 SIZE,Set the number of storage registers. Parameter: number of registers.,tocheck
 SLOPE,Return the slope of the linear transformation of the current curve-fitting model.,tocheck
 SOLVE,Solve for an unknown variable. Parameter: variable name (indirect allowed),tocheck
-SORT,Square root. Returns √x.,tocheck
-SST,Single step. Moves the program pointer to the next program line. (Not programmable.),tocheck
-STO,Store a copy of x into a destination register or variable. Parameter: register or variable (indirect allowed),tocheck
-STO+,Store addition. Adds x to an existing register or variable. Parameter: register or variable (indirect allowed),tocheck
-STO–,Store subtraction. Subtracts x from an existing register or variable. Parameter: register or variable (indirect allowed),tocheck
-STO×,Store multiplication. Multiplies an existing register or variable by x. Parameter: register or variable (indirect allowed),tocheck
-STO÷,Store division. Divides an existing register or variable by x. Parameter: register or variable (indirect allowed),tocheck
-STOEL,Store element. Stores a copy of x into the current element of the indexed matrix.,tocheck
-STOIJ,Moves the row- and column-pointers to I = x and J = y in the indexed matrix.,tocheck
-STOP,Stop program execution. (R/S in program entry mode).,tocheck
+SQRT,Square root. Returns √x.,ok
+SST,Single step. Moves the program pointer to the next program line. (Not programmable.),na
+STO,Store a copy of x into a destination register or variable. Parameter: register or variable (indirect allowed),noregs
+STO+,Store addition. Adds x to an existing register or variable. Parameter: register or variable (indirect allowed),noregs
+STO–,Store subtraction. Subtracts x from an existing register or variable. Parameter: register or variable (indirect allowed),noregs
+STO×,Store multiplication. Multiplies an existing register or variable by x. Parameter: register or variable (indirect allowed),noregs
+STO÷,Store division. Divides an existing register or variable by x. Parameter: register or variable (indirect allowed),noregs
+STOEL,Store element. Stores a copy of x into the current element of the indexed matrix.,nomatrix
+STOIJ,Moves the row- and column-pointers to I = x and J = y in the indexed matrix.,nomatrix
+STOP,Stop program execution. (R/S in program entry mode).,ok
 STR?,"If the x-register contains an Alpha string, execute the next program line; if the x-register does not contain an Alpha string, skip the next program line.",tocheck
 SUM,Returns the sums Σx and Σy into the x- and y-registers.,tocheck
-TAN,Tangent. Returns tan(x).,tocheck
-TANH,Hyperbolic tangent. Returns tanh(x).,tocheck
-TONE,Sounds a tone. Parameter: tone number (0–9) (indirect allowed),tocheck
-TRACE,"Select Trace printing mode, which prints a record of keystrokes and results.",tocheck
-TRANS,Return the transpose of the matrix in the x-register.,tocheck
-UVEC,Unit vector. Return the unit vector for the matrix or complex number in the x-register.,tocheck
-VARMENU,Create a variable menu using MVAR instructions following the specified global label. Parameter: global program label. (indirect allowed),tocheck
-VIEW,View the contents of a register or variable. Parameter: register or variable (indirect allowed),tocheck
+TAN,Tangent. Returns tan(x).,ok
+TANH,Hyperbolic tangent. Returns tanh(x).,ok
+TONE,Sounds a tone. Parameter: tone number (0–9) (indirect allowed),ok
+TRACE,"Select Trace printing mode, which prints a record of keystrokes and results.",ok
+TRANS,Return the transpose of the matrix in the x-register.,ok
+UVEC,Unit vector. Return the unit vector for the matrix or complex number in the x-register.,ok
+VARMENU,Create a variable menu using MVAR instructions following the specified global label. Parameter: global program label. (indirect allowed),yes though also look at extra fancy varmenu() command in help
+VIEW,View the contents of a register or variable. Parameter: register or variable (indirect allowed),ok
 WMEAN,Weighted mean. Return the mean of x-values weighted by the y-values  Σxy / Σ y,tocheck
-WRAP,"Select Wrap mode, which prevents the indexed matrix from growing.",tocheck
-X<>,Swaps the contents of the x-register with another register or variable. Parameter: register or variable (indirect allowed),na stack
-X<>Y,Swaps the contents of the x- and y-registers.,na stack
-X<0?," X less than zero test. If true, execute the next program line; if false, skip the next program line",na flow
-X<Y?," X less than y test. If true, execute the next program line; if false, skip the next program line",na flow
-X≤0?," X less than or equal to zero test. If true, execute the next program line; if false, skip the next program line",na flow
-X≤Y?," X less than or equal to y test. If true, execute the next program line; if false, skip the next program line",na flow
-X=0?," X equal to zero test. If true, execute the next program line; if false, skip the next program line",na flow
-X=Y?," X equal to y test. If true, execute the next program line; if false, skip the next program line",na flow
-X≠0?," X not equal to zero test. If true, execute the next program line; if false, skip the next program line",na flow
-X≠Y?,"X not equal to y test. If true, execute the next program line; if false, skip the next program line",na flow
-X>0?,"X greater than zero test. If true, execute the next program line; if false, skip the next program line",na flow
-X>Y?,"X greater than y test. If true, execute the next program line; if false, skip the next program line",na flow
-X≥0?,"X greater than or equal to zero test. If true, execute the next program line; if false, skip the next program line",na flow
-X≥Y?,"X greater than or equal to y test. If true, execute the next program line; if false, skip the next program line",na flow
+WRAP,"Select Wrap mode, which prevents the indexed matrix from growing.",nomatrix
+X<>,Swaps the contents of the x-register with another register or variable. Parameter: register or variable (indirect allowed),nostack
+X<>Y,Swaps the contents of the x- and y-registers.,nostack
+X<0?," X less than zero test. If true, execute the next program line; if false, skip the next program line",noflow
+X<Y?," X less than y test. If true, execute the next program line; if false, skip the next program line",noflow
+X≤0?," X less than or equal to zero test. If true, execute the next program line; if false, skip the next program line",noflow
+X≤Y?," X less than or equal to y test. If true, execute the next program line; if false, skip the next program line",noflow
+X=0?," X equal to zero test. If true, execute the next program line; if false, skip the next program line",noflow
+X=Y?," X equal to y test. If true, execute the next program line; if false, skip the next program line",noflow
+X≠0?," X not equal to zero test. If true, execute the next program line; if false, skip the next program line",noflow
+X≠Y?,"X not equal to y test. If true, execute the next program line; if false, skip the next program line",noflow
+X>0?,"X greater than zero test. If true, execute the next program line; if false, skip the next program line",noflow
+X>Y?,"X greater than y test. If true, execute the next program line; if false, skip the next program line",noflow
+X≥0?,"X greater than or equal to zero test. If true, execute the next program line; if false, skip the next program line",noflow
+X≥Y?,"X greater than or equal to y test. If true, execute the next program line; if false, skip the next program line",noflow
 XEQ,Execute a function or program. Parameter: function or label (indirect allowed),na Just call a function e.g. myfunc()
-XOR,Logical XOR (exclusive OR). Returns x XOR y.,tocheck
+XOR,Logical XOR (exclusive OR). Returns x XOR y.,nobool
 XTOA," X to Alpha. Appends a character (specified by the code in the x-register) to the Alpha register. If the x-register contains an Alpha string, appends the entire string.",tocheck
 X↑2,Square. Returns x2.,Use y**2 syntax instead
 YINT,y-intercept. Returns the y-intercept of the curve fitted to the current statistical data.,tocheck
@@ -244,10 +244,10 @@ Y↑X,Power. Returns yx.,Use y**x syntax instead
 →POL,"To polar. Converts x and y to the corresponding polar coordinates r and θ. If the x-register contains a complex number, converts the two parts of the number to polar values.",tocheck
 →RAD,To radians. Converts a angle value in degrees to radians. Returns x×(π/180).,tocheck
 →REC,"To rectangular. Converts r (in the x-register) and θ (in the y-register) to the corresponding rectangular coordinates, x and y. If the X-register contains a complex number, converts the two parts of the number to rectangular values.",tocheck
-◄,"Backspace or clear x-register. In Program entry mode, deletes the current program line.",tocheck
-←,Move left one element in the indexed matrix.,tocheck
-↑,Move up one element in the indexed matrix.,tocheck
-↓,Move down one element in the indexed matrix.,tocheck
-→,Move right one element in the indexed matrix.,tocheck
+◄,"Backspace or clear x-register. In Program entry mode, deletes the current program line.",not programmable
+←,Move left one element in the indexed matrix.,nomatrix
+↑,Move up one element in the indexed matrix.,nomatrix
+↓,Move down one element in the indexed matrix.,nomatrix
+→,Move right one element in the indexed matrix.,nomatrix
 %,Percent. Returns (x × y) / 100. (Leaves the y value in the y-register.),tocheck
 %CH,Percent change. Returns (x – y)×(100 / y).,tocheck

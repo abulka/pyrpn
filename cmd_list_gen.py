@@ -23,13 +23,45 @@ with open('cmd_list.csv', newline='') as csvfile:
 
         supported = row[2]
         if supported == 'tocheck':
-            supported = ""
+            supported = ''
+            suggestion = 'being researched'
         elif supported == 'na':
-            supported = "Not Applicable"
-        elif supported == 'na flow':
-            supported = "No - use Python if statements instead"
-        elif supported == 'na stack':
-            supported = "No - use Python variables instead, not the stack"
+            if "(Not programmable.)" in description:
+                supported = "Not programmable"
+                suggestion = ''
+            else:
+                supported = "N/A"
+                suggestion = 'Not Applicable to Python or use built in Python facility'
+        elif supported == 'noflow':
+            supported = "No"
+            suggestion = 'Use Python "if" statements instead'
+        elif supported == 'noloop':
+            supported = "No"
+            suggestion = 'Use Python for...range() loops instead, or Python while loops'
+        elif supported == 'noflag':
+            supported = "No"
+            suggestion = 'Use any normal variable to store boolean values, test with the Python "if" statements instead'
+        elif supported == 'nostack':
+            supported = "No"
+            suggestion = 'Use Python variables'
+        elif supported == 'nobool':
+            supported = "No"
+            suggestion = 'Use built in Python boolean operators instead e.g. not val or val2 and val3'
+        elif supported == 'nomatrix':
+            supported = "No"
+            suggestion = 'Use Python matrix/list indexing and slicing syntax instead - read help for more info'
+        elif supported == 'noregs':
+            supported = "No"
+            suggestion = 'Use Python variables instead, e.g. myar = 100, myvar += 1, var2 = myvar or even expressions like myvar *= var3/(2-1)'
+        elif supported == 'alpha':
+            supported = "No"
+            suggestion = 'Use the alpha() function to build up strings in the alpha register, specifying literal strings of any length, and multiple variables. See help for more details'
+        elif supported == 'ok':
+            supported = '✓'
+            suggestion = ''
+        else:
+            supported = supported
+            suggestion = ''
 
 
         entry = {
@@ -37,6 +69,7 @@ with open('cmd_list.csv', newline='') as csvfile:
             'num_arg_fragments': num_arg_fragments,
             'indirect_allowed': '(indirect allowed)' in description,
             'supported': supported,
+            'suggestion': suggestion,
         }
         data[cmd] = entry
 

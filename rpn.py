@@ -267,8 +267,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                      'cmp',
 
                      ]
-        if name in ['NOT', 'OR', 'AND']:
-            raise RpnError(f'The RPN command "{name}" is not supported - use native Python instead, {source_code_line_info(node)}')
+        if name in settings.RPN_UNSUPPORTED:
+            raise RpnError(f'The RPN command "{name}" is not supported - use native Python concepts instead, {source_code_line_info(node)}')
         elif name in ('aview', 'passert'):
             raise RpnError(f'The command "{name}" is no longer supported, {source_code_line_info(node)}')
         elif name in built_ins:

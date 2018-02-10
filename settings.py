@@ -22,6 +22,7 @@ CMDS_WHO_NEED_LITERAL_NUM_ON_STACK_X = ('VIEW',)
 CMDS_WHO_OPERATE_ON_STACK_SO_DISALLOW_NO_ARGS = ('AIP',)
 CMDS_WHO_DISALLOW_STRINGS = ('AIP',)
 CMDS_WHO_NEED_PARAM_SWAPPING = []  # ('PIXEL',)
+RPN_UNSUPPORTED = ['NOT', 'OR', 'AND', 'CLST', 'CLX']
 LIST_UNSUPPORTED = ('cmp', 'index', 'count', 'extend', 'insert', 'remove', 'reverse', 'sort')
 DICT_UNSUPPORTED = ('clear', 'copy', 'fromkeys', 'get', 'items', 'setdefault', 'update', 'values')
 MATRIX_UNSUPPORTED = ('INDEX', 'STOIJ', 'RCLIJ', 'PUTM', 'GETM', 'INSR', 'DELR', 'DIM', 'GROW', 'WRAP', 'SIMQ', 'GROW', 'WRAP')
