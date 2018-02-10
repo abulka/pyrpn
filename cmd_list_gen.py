@@ -11,7 +11,7 @@ def extract(supported):
     s = 'suggestion:'
     if s in supported:
         offset = supported.index(s)
-        info = supported[0:offset]
+        info = supported[0:offset-1]
         offset += len(s) + 1
         suggestion = supported[offset:]
     else:
@@ -41,13 +41,15 @@ with open('cmd_list.csv', newline='') as csvfile:
         if supported == 'tocheck':
             supported = ''
             suggestion = 'being researched'
-        elif supported == 'na':
+        elif supported[0:2] == 'na':
             if "(Not programmable.)" in description:
                 supported = "Not programmable"
                 suggestion = ''
             else:
+                info, suggestion = extract(supported)
                 supported = "N/A"
-                suggestion = 'Not Applicable, please use native Python.'
+                if not suggestion:
+                    suggestion = 'Not Applicable, please use native Python.'
         elif supported == 'noflow':
             supported = "No"
             suggestion = 'Use Python "if" statements instead.'

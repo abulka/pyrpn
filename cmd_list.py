@@ -396,7 +396,7 @@ cmd_list = \
          'num_arg_fragments': 1,
          'suggestion': 'Use this to resize existing matrices - you cannot '
                        'create new matrices with dim()',
-         'supported': 'mymatrix.dim(rows,cols) '},
+         'supported': 'mymatrix.dim(rows,cols)'},
  'DIM?': {'description': 'Returns the dimensions of the matrix in the '
                          'x-register (rows to the y-register and columns to '
                          'the x-register).',
@@ -404,7 +404,7 @@ cmd_list = \
           'num_arg_fragments': 0,
           'suggestion': 'Currently len(mymatrix) to get the length. TODO Still '
                         'working on mymatrix.shape()',
-          'supported': 'len(mymatrix) '},
+          'supported': 'len(mymatrix)'},
  'DOT': {'description': 'Dot Product.  Returns the dot product of two vectors '
                         '(matrices or complex numbers).',
          'indirect_allowed': False,
@@ -478,8 +478,8 @@ cmd_list = \
                         '(indirect allowed)',
          'indirect_allowed': True,
          'num_arg_fragments': 1,
-         'suggestion': '',
-         'supported': 'isFC(nn)'},
+         'suggestion': 'isFC(nn)',
+         'supported': '✓ (renamed)'},
  'FC?C': {'description': 'Flag clear test and clear. If the specified flag is '
                          'clear, execute the next program line; if the flag is '
                          'set, skip the next program line. Cleared after the '
@@ -524,8 +524,8 @@ cmd_list = \
                         'allowed)',
          'indirect_allowed': True,
          'num_arg_fragments': 1,
-         'suggestion': '',
-         'supported': 'isFS()'},
+         'suggestion': 'isFS()',
+         'supported': '✓ (renamed)'},
  'FS?C': {'description': 'Flag set test and clear. If the specified flag is '
                          'set, execute the next program line; if the flag is '
                          'clear, skip the next program line. Clear the flag '
@@ -1370,8 +1370,8 @@ cmd_list = \
                         'label (indirect allowed)',
          'indirect_allowed': True,
          'num_arg_fragments': 1,
-         'suggestion': '',
-         'supported': 'na Just call a function e.g. myfunc()'},
+         'suggestion': 'Just call a function e.g. myfunc()',
+         'supported': 'N/A'},
  'XOR': {'description': 'Logical XOR (exclusive OR). Returns x XOR y.',
          'indirect_allowed': False,
          'num_arg_fragments': 0,
