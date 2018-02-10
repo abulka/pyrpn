@@ -4,6 +4,21 @@ import pprint
 import settings
 
 data = {}
+
+def extract(supported):
+    # blah blah suggestion: blah blah
+    # returns the first portion as info, the second portion as suggestion
+    s = 'suggestion:'
+    if s in supported:
+        offset = supported.index(s)
+        info = supported[0:offset]
+        offset += len(s) + 1
+        suggestion = supported[offset:]
+    else:
+        info = supported
+        suggestion = ''
+    return info, suggestion
+
 with open('cmd_list.csv', newline='') as csvfile:
     myreader = csv.reader(csvfile)
     for row in myreader:
@@ -32,41 +47,43 @@ with open('cmd_list.csv', newline='') as csvfile:
                 suggestion = ''
             else:
                 supported = "N/A"
-                suggestion = 'Not Applicable to Python or use built in Python facility'
+                suggestion = 'Not Applicable, please use native Python.'
         elif supported == 'noflow':
             supported = "No"
-            suggestion = 'Use Python "if" statements instead'
+            suggestion = 'Use Python "if" statements instead.'
         elif supported == 'noloop':
             supported = "No"
-            suggestion = 'Use Python for...range() loops instead, or Python while loops'
+            suggestion = 'Use native Python for...range() or while... for looping.'
         elif supported == 'noflag':
             supported = "No"
-            suggestion = 'Use any normal variable to store boolean values, test with the Python "if" statements instead'
+            suggestion = 'Use any normal variable to store boolean values, test with the Python "if".'
         elif supported == 'nostack':
             supported = "No"
             suggestion = 'Use Python variables'
         elif supported == 'nobool':
             supported = "No"
-            suggestion = 'Use built in Python boolean operators instead e.g. not val or val2 and val3'
+            suggestion = 'Use built in Python boolean operators instead e.g. "not val or val2 and val3"'
         elif supported == 'nomatrix':
             supported = "No"
-            suggestion = 'Use Python matrix/list indexing and slicing syntax instead - read help for more info'
+            suggestion = 'Use Python matrix/list indexing and slicing syntax.'
         elif supported == 'noregs':
             supported = "No"
-            suggestion = 'Use Python variables instead, e.g. myar = 100, myvar += 1, var2 = myvar or even expressions like myvar *= var3/(2-1)'
+            suggestion = 'Use Python variables instead, e.g. "myar = 100, myvar += 1, var2 = myvar" or even expressions like "myvar *= var3/(2-1)"'
         elif supported == 'alpha':
             supported = "No"
             suggestion = 'Use the alpha() function to build up strings in the alpha register, specifying literal strings of any length, and multiple variables. See help for more details'
         elif supported == 'remapped':
             supported = '✓ (renamed)'
-            suggestion = f'Use {settings.RPN_CMD_TO_PYTHON_REPLACEMENT[cmd]}() instead.'
-        elif supported == 'ok':
+            suggestion = f'{settings.RPN_CMD_TO_PYTHON_REPLACEMENT[cmd]}()'
+        elif 'No' in supported:
+            info, suggestion = extract(supported)
+            supported = 'No'
+        elif 'ok' in supported:
+            info, suggestion = extract(supported)
             supported = '✓'
-            suggestion = ''
         else:
-            supported = supported
-            suggestion = ''
-
+            info, suggestion = extract(supported)
+            supported = info
 
         entry = {
             'description': description,

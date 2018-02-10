@@ -20,8 +20,7 @@ cmd_list = \
                         'change the sign of the exponent.',
          'indirect_allowed': False,
          'num_arg_fragments': 0,
-         'suggestion': 'Not Applicable to Python or use built in Python '
-                       'facility',
+         'suggestion': 'Not Applicable, please use native Python.',
          'supported': 'N/A'},
  '1/x': {'description': 'Reciprocal. Returns 1/x.',
          'indirect_allowed': False,
@@ -86,8 +85,8 @@ cmd_list = \
  'AND': {'description': 'Logical AND. Returns x AND y.',
          'indirect_allowed': False,
          'num_arg_fragments': 0,
-         'suggestion': 'Use built in Python boolean operators instead e.g. not '
-                       'val or val2 and val3',
+         'suggestion': 'Use built in Python boolean operators instead e.g. '
+                       '"not val or val2 and val3"',
          'supported': 'No'},
  'AOFF': {'description': 'Alpha off. Exit from the ALPHA menu.',
           'indirect_allowed': False,
@@ -147,8 +146,7 @@ cmd_list = \
           'indirect_allowed': True,
           'num_arg_fragments': 1,
           'suggestion': '',
-          'supported': 'Instead use alpha("this is my string") then '
-                       'ASTO(myvar)'},
+          'supported': '✓'},
  'ATAN': {'description': 'Arc tangent. Returns tan–1 x.',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
@@ -170,8 +168,7 @@ cmd_list = \
            'indirect_allowed': False,
            'num_arg_fragments': 0,
            'suggestion': '',
-           'supported': 'AVIEW(myvar) refers to variables and can take '
-                        'multiple parameters incl. literal string - powerful!'},
+           'supported': '✓'},
  'BASE+': {'description': 'Base addition. Returns the 36-bit sum of y + x.',
            'indirect_allowed': False,
            'num_arg_fragments': 0,
@@ -235,7 +232,7 @@ cmd_list = \
         'indirect_allowed': True,
         'num_arg_fragments': 1,
         'suggestion': '',
-        'supported': 'Use CF(nn)'},
+        'supported': '✓'},
  'CLA': {'description': 'Clear Alpha register. If Alpha mode is on and '
                         'character entry is terminated (no cursor displayed), '
                         'then  ◄  also executes the CLA function.',
@@ -247,8 +244,7 @@ cmd_list = \
                           'Programmable.)',
            'indirect_allowed': False,
            'num_arg_fragments': 0,
-           'suggestion': 'Not Applicable to Python or use built in Python '
-                         'facility',
+           'suggestion': 'Not Applicable, please use native Python.',
            'supported': 'N/A'},
  'CLD': {'description': 'Clear display. Clear a message from the display.',
          'indirect_allowed': False,
@@ -281,13 +277,13 @@ cmd_list = \
                          'registers to zero.',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
-          'suggestion': '',
-          'supported': 'yes'},
+          'suggestion': 'Will clear all Python variables (but not named '
+                        'variables) - use with care.',
+          'supported': '✓'},
  'CLST': {'description': 'Clear Stack. Clear the stack registers to zero.',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
-          'suggestion': 'Not Applicable to Python or use built in Python '
-                        'facility',
+          'suggestion': 'Not Applicable, please use native Python.',
           'supported': 'N/A'},
  'CLV': {'description': 'Clear a variable from memory. Parameter: variable '
                         'name (indirect allowed)',
@@ -300,8 +296,7 @@ cmd_list = \
                         'executes CLX.',
          'indirect_allowed': False,
          'num_arg_fragments': 0,
-         'suggestion': 'Not Applicable to Python or use built in Python '
-                       'facility',
+         'suggestion': 'Not Applicable, please use native Python.',
          'supported': 'N/A'},
  'CLZ': {'description': 'Clear statistics. Clear the accumulated statistical '
                         'data in the summation registers.',
@@ -387,7 +382,7 @@ cmd_list = \
           'indirect_allowed': False,
           'num_arg_fragments': 0,
           'suggestion': '',
-          'supported': 'Use mymatrix.delr(n) instead.'},
+          'supported': 'mymatrix.delr(n)'},
  'DET': {'description': 'Determinant. Returns the determinant of the matrix in '
                         'the x-register.',
          'indirect_allowed': False,
@@ -399,16 +394,17 @@ cmd_list = \
                         'variable name (indirect allowed)',
          'indirect_allowed': True,
          'num_arg_fragments': 1,
-         'suggestion': '',
-         'supported': 'Use mymatrix.dim(rows'},
+         'suggestion': 'Use this to resize existing matrices - you cannot '
+                       'create new matrices with dim()',
+         'supported': 'mymatrix.dim(rows,cols) '},
  'DIM?': {'description': 'Returns the dimensions of the matrix in the '
                          'x-register (rows to the y-register and columns to '
                          'the x-register).',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
-          'suggestion': '',
-          'supported': 'Use len(mymatrix) to get the length. TODO Still '
-                       'working on mymatrix.shape()'},
+          'suggestion': 'Currently len(mymatrix) to get the length. TODO Still '
+                        'working on mymatrix.shape()',
+          'supported': 'len(mymatrix) '},
  'DOT': {'description': 'Dot Product.  Returns the dot product of two vectors '
                         '(matrices or complex numbers).',
          'indirect_allowed': False,
@@ -422,8 +418,8 @@ cmd_list = \
                         'variable (indirect allowed)',
          'indirect_allowed': True,
          'num_arg_fragments': 1,
-         'suggestion': 'Use Python for...range() loops instead, or Python '
-                       'while loops',
+         'suggestion': 'Use native Python for...range() or while... for '
+                       'looping.',
          'supported': 'No'},
  'EDIT': {'description': 'Edit a matrix in the x-register.',
           'indirect_allowed': False,
@@ -439,8 +435,7 @@ cmd_list = \
  'END': {'description': 'End of a program.',
          'indirect_allowed': False,
          'num_arg_fragments': 0,
-         'suggestion': 'Not Applicable to Python or use built in Python '
-                       'facility',
+         'suggestion': 'Not Applicable, please use native Python.',
          'supported': 'N/A'},
  'ENG': {'description': 'Select Engineering display format. Parameter: number '
                         'of digits (indirect allowed)',
@@ -468,7 +463,7 @@ cmd_list = \
  'E↑X': {'description': 'Natural exponential. Returns ex.',
          'indirect_allowed': False,
          'num_arg_fragments': 0,
-         'suggestion': 'Use EtoX() instead.',
+         'suggestion': 'EtoX()',
          'supported': '✓ (renamed)'},
  'E↑X-1': {'description': 'Natural exponential for values of x which are close '
                           'to zero. Returns ex–1, which provides a much higher '
@@ -484,7 +479,7 @@ cmd_list = \
          'indirect_allowed': True,
          'num_arg_fragments': 1,
          'suggestion': '',
-         'supported': 'Use isFC(nn) instead'},
+         'supported': 'isFC(nn)'},
  'FC?C': {'description': 'Flag clear test and clear. If the specified flag is '
                          'clear, execute the next program line; if the flag is '
                          'set, skip the next program line. Cleared after the '
@@ -494,7 +489,7 @@ cmd_list = \
           'indirect_allowed': True,
           'num_arg_fragments': 1,
           'suggestion': 'Use any normal variable to store boolean values, test '
-                        'with the Python "if" statements instead',
+                        'with the Python "if".',
           'supported': 'No'},
  'FCSTX': {'description': 'Forecasts an x-value given a y-value.',
            'indirect_allowed': False,
@@ -530,7 +525,7 @@ cmd_list = \
          'indirect_allowed': True,
          'num_arg_fragments': 1,
          'suggestion': '',
-         'supported': 'Use isFS() instead'},
+         'supported': 'isFS()'},
  'FS?C': {'description': 'Flag set test and clear. If the specified flag is '
                          'set, execute the next program line; if the flag is '
                          'clear, skip the next program line. Clear the flag '
@@ -540,7 +535,7 @@ cmd_list = \
           'indirect_allowed': True,
           'num_arg_fragments': 1,
           'suggestion': 'Use any normal variable to store boolean values, test '
-                        'with the Python "if" statements instead',
+                        'with the Python "if".',
           'supported': 'No'},
  'GAMMA': {'description': 'Gamma function. Returns Γ(x).',
            'indirect_allowed': False,
@@ -561,8 +556,7 @@ cmd_list = \
                          'from the indexed matrix.',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
-          'suggestion': 'Use Python matrix/list indexing and slicing syntax '
-                        'instead - read help for more info',
+          'suggestion': 'Use Python matrix/list indexing and slicing syntax.',
           'supported': 'No'},
  'GRAD': {'description': 'Select Grads angular mode.',
           'indirect_allowed': False,
@@ -574,17 +568,15 @@ cmd_list = \
                          'are at the last (lower-right) element in the matrix.',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
-          'suggestion': '',
-          'supported': 'No but new command mymatrix.appendr() added to '
-                       'compensate.'},
+          'suggestion': 'To compensate use the new command mymatrix.appendr()',
+          'supported': 'No'},
  'GTO': {'description': 'Go to label. From the keyboard, move the program '
                         'pointer to the specified label. In a running program, '
                         'cause the program to branch to the specified label. '
                         'Parameter: local or global label (indirect allowed)',
          'indirect_allowed': True,
          'num_arg_fragments': 1,
-         'suggestion': 'Not Applicable to Python or use built in Python '
-                       'facility',
+         'suggestion': 'Not Applicable, please use native Python.',
          'supported': 'N/A'},
  'HEXM': {'description': 'Select Hexadecimal mode (base 16).',
           'indirect_allowed': False,
@@ -605,15 +597,13 @@ cmd_list = \
  'I+': {'description': 'Increment the row pointer in the indexed matrix.',
         'indirect_allowed': False,
         'num_arg_fragments': 0,
-        'suggestion': 'Use Python matrix/list indexing and slicing syntax '
-                      'instead - read help for more info',
+        'suggestion': 'Use Python matrix/list indexing and slicing syntax.',
         'supported': 'No'},
  'INDEX': {'description': 'Index a named matrix. Parameter: variable name '
                           '(indirect allowed)',
            'indirect_allowed': True,
            'num_arg_fragments': 1,
-           'suggestion': 'Use Python matrix/list indexing and slicing syntax '
-                         'instead - read help for more info',
+           'suggestion': 'Use Python matrix/list indexing and slicing syntax.',
            'supported': 'No'},
  'INPUT': {'description': 'Recall a register or variable to the x-register, '
                           'display the name of the register or variable along '
@@ -630,7 +620,7 @@ cmd_list = \
           'indirect_allowed': False,
           'num_arg_fragments': 0,
           'suggestion': '',
-          'supported': 'Use your_matrix.insr() instead'},
+          'supported': 'mymatrix.insr()'},
  'INTEG': {'description': 'Integrate the selected integration program with '
                           'respect to the specified variable. Parameter: '
                           'variable name (indirect allowed)',
@@ -655,26 +645,23 @@ cmd_list = \
                         'Parameter: register or variable (indirect allowed)',
          'indirect_allowed': True,
          'num_arg_fragments': 1,
-         'suggestion': 'Use Python for...range() loops instead, or Python '
-                       'while loops',
+         'suggestion': 'Use native Python for...range() or while... for '
+                       'looping.',
          'supported': 'No'},
  'I–': {'description': 'Decrement the row pointer in the indexed matrix.',
         'indirect_allowed': False,
         'num_arg_fragments': 0,
-        'suggestion': 'Use Python matrix/list indexing and slicing syntax '
-                      'instead - read help for more info',
+        'suggestion': 'Use Python matrix/list indexing and slicing syntax.',
         'supported': 'No'},
  'J+': {'description': 'Increment the column pointer in the indexed matrix.',
         'indirect_allowed': False,
         'num_arg_fragments': 0,
-        'suggestion': 'Use Python matrix/list indexing and slicing syntax '
-                      'instead - read help for more info',
+        'suggestion': 'Use Python matrix/list indexing and slicing syntax.',
         'supported': 'No'},
  'J–': {'description': 'Decrement the column pointer in the indexed matrix.',
         'indirect_allowed': False,
         'num_arg_fragments': 0,
-        'suggestion': 'Use Python matrix/list indexing and slicing syntax '
-                      'instead - read help for more info',
+        'suggestion': 'Use Python matrix/list indexing and slicing syntax.',
         'supported': 'No'},
  'KEYASN': {'description': 'Selects key-assignments mode for the CUSTOM menu.',
             'indirect_allowed': False,
@@ -707,8 +694,7 @@ cmd_list = \
                         'and branching. Parameter: local or global label.',
          'indirect_allowed': False,
          'num_arg_fragments': 1,
-         'suggestion': 'Not Applicable to Python or use built in Python '
-                       'facility',
+         'suggestion': 'Not Applicable, please use native Python.',
          'supported': 'N/A'},
  'LCLBL': {'description': 'Select Local label mode for the CUSTOM menu (to use '
                           'CUSTOM menu assignments to execute local labels '
@@ -810,8 +796,8 @@ cmd_list = \
  'NOT': {'description': 'Logical NOT. Returns NOT(x).',
          'indirect_allowed': False,
          'num_arg_fragments': 0,
-         'suggestion': 'Use built in Python boolean operators instead e.g. not '
-                       'val or val2 and val3',
+         'suggestion': 'Use built in Python boolean operators instead e.g. '
+                       '"not val or val2 and val3"',
          'supported': 'No'},
  'OCTM': {'description': 'Select Octal mode',
           'indirect_allowed': False,
@@ -828,8 +814,7 @@ cmd_list = \
                         '(Equivalent to RCLEL.)',
          'indirect_allowed': False,
          'num_arg_fragments': 0,
-         'suggestion': 'Use Python matrix/list indexing and slicing syntax '
-                       'instead - read help for more info',
+         'suggestion': 'Use Python matrix/list indexing and slicing syntax.',
          'supported': 'No'},
  'ON': {'description': 'Continuous on. Prevent the calculator from '
                        'automatically turning off after ten minutes of '
@@ -841,8 +826,8 @@ cmd_list = \
  'OR': {'description': 'Logical OR. Returns x OR y.',
         'indirect_allowed': False,
         'num_arg_fragments': 0,
-        'suggestion': 'Use built in Python boolean operators instead e.g. not '
-                      'val or val2 and val3',
+        'suggestion': 'Use built in Python boolean operators instead e.g. "not '
+                      'val or val2 and val3"',
         'supported': 'No'},
  'PERM': {'description': 'Permutations of y items taken x at a time. Returns '
                          'y!/(y – x)!',
@@ -959,8 +944,7 @@ cmd_list = \
                          'the indexed matrix beginning at the current element.',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
-          'suggestion': 'Use Python matrix/list indexing and slicing syntax '
-                        'instead - read help for more info',
+          'suggestion': 'Use Python matrix/list indexing and slicing syntax.',
           'supported': 'No'},
  'PWRF': {'description': 'Select the power curve-fitting model.',
           'indirect_allowed': False,
@@ -971,8 +955,7 @@ cmd_list = \
                           'programmable )',
            'indirect_allowed': False,
            'num_arg_fragments': 0,
-           'suggestion': 'Not Applicable to Python or use built in Python '
-                         'facility',
+           'suggestion': 'Not Applicable, please use native Python.',
            'supported': 'N/A'},
  'R/S': {'description': 'Run/stop. Runs a program (beginning at the current '
                         'program line) or stops a running program. In '
@@ -980,14 +963,14 @@ cmd_list = \
                         'the program.',
          'indirect_allowed': False,
          'num_arg_fragments': 0,
-         'suggestion': '',
-         'supported': 'STOP() is supported'},
+         'suggestion': 'Use STOP()',
+         'supported': '✓'},
  'R<>R': {'description': 'Row swap row. Swaps the elements in rows x and y in '
                          'the indexed matrix.',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
           'suggestion': '',
-          'supported': 'Use mymatrix.row_swap(3'},
+          'supported': 'mymatrix.row_swap(3,7)'},
  'RAD': {'description': 'Select Radians angular mode',
          'indirect_allowed': False,
          'num_arg_fragments': 0,
@@ -1002,59 +985,57 @@ cmd_list = \
                         'or variable (indirect allowed)',
          'indirect_allowed': True,
          'num_arg_fragments': 1,
-         'suggestion': 'Use Python variables instead, e.g. myar = 100, myvar '
-                       '+= 1, var2 = myvar or even expressions like myvar *= '
-                       'var3/(2-1)',
+         'suggestion': 'Use Python variables instead, e.g. "myar = 100, myvar '
+                       '+= 1, var2 = myvar" or even expressions like "myvar *= '
+                       'var3/(2-1)"',
          'supported': 'No'},
  'RCL+': {'description': 'Recall addition. Recall data and add it to the '
                          'contents of the x-register. Parameter: register or '
                          'variable (indirect allowed)',
           'indirect_allowed': True,
           'num_arg_fragments': 1,
-          'suggestion': 'Use Python variables instead, e.g. myar = 100, myvar '
-                        '+= 1, var2 = myvar or even expressions like myvar *= '
-                        'var3/(2-1)',
+          'suggestion': 'Use Python variables instead, e.g. "myar = 100, myvar '
+                        '+= 1, var2 = myvar" or even expressions like "myvar '
+                        '*= var3/(2-1)"',
           'supported': 'No'},
  'RCL-': {'description': 'Recall subtraction. Recall data and subtract it from '
                          'the contents of the x-register. Parameter: register '
                          'or variable (indirect allowed)',
           'indirect_allowed': True,
           'num_arg_fragments': 1,
-          'suggestion': 'Use Python variables instead, e.g. myar = 100, myvar '
-                        '+= 1, var2 = myvar or even expressions like myvar *= '
-                        'var3/(2-1)',
+          'suggestion': 'Use Python variables instead, e.g. "myar = 100, myvar '
+                        '+= 1, var2 = myvar" or even expressions like "myvar '
+                        '*= var3/(2-1)"',
           'supported': 'No'},
  'RCLEL': {'description': 'Recall element. Recalls the current matrix element '
                           'from the indexed matrix.',
            'indirect_allowed': False,
            'num_arg_fragments': 0,
-           'suggestion': 'Use Python matrix/list indexing and slicing syntax '
-                         'instead - read help for more info',
+           'suggestion': 'Use Python matrix/list indexing and slicing syntax.',
            'supported': 'No'},
  'RCLIJ': {'description': 'Recall the row- and column-pointer values (I and J) '
                           'for the indexed matrix.',
            'indirect_allowed': False,
            'num_arg_fragments': 0,
-           'suggestion': 'Use Python matrix/list indexing and slicing syntax '
-                         'instead - read help for more info',
+           'suggestion': 'Use Python matrix/list indexing and slicing syntax.',
            'supported': 'No'},
  'RCL×': {'description': 'Recall multiplication. Recall data and multiply it '
                          'by the contents of the x-register. Parameter: '
                          'register or variable (indirect allowed)',
           'indirect_allowed': True,
           'num_arg_fragments': 1,
-          'suggestion': 'Use Python variables instead, e.g. myar = 100, myvar '
-                        '+= 1, var2 = myvar or even expressions like myvar *= '
-                        'var3/(2-1)',
+          'suggestion': 'Use Python variables instead, e.g. "myar = 100, myvar '
+                        '+= 1, var2 = myvar" or even expressions like "myvar '
+                        '*= var3/(2-1)"',
           'supported': 'No'},
  'RCL÷': {'description': 'Recall division. Recall data and divide it into the '
                          'contents of the x-register. Parameter: register or '
                          'variable (indirect allowed)',
           'indirect_allowed': True,
           'num_arg_fragments': 1,
-          'suggestion': 'Use Python variables instead, e.g. myar = 100, myvar '
-                        '+= 1, var2 = myvar or even expressions like myvar *= '
-                        'var3/(2-1)',
+          'suggestion': 'Use Python variables instead, e.g. "myar = 100, myvar '
+                        '+= 1, var2 = myvar" or even expressions like "myvar '
+                        '*= var3/(2-1)"',
           'supported': 'No'},
  'RDX,': {'description': 'Select a comma to be used as the radix mark (decimal '
                          'point).',
@@ -1120,7 +1101,7 @@ cmd_list = \
          'indirect_allowed': False,
          'num_arg_fragments': 0,
          'suggestion': '',
-         'supported': 'Use the Python "return" statement instead'},
+         'supported': 'return'},
  'R↑': {'description': 'Roll up the contents of the four stack registers one '
                        'position.',
         'indirect_allowed': False,
@@ -1207,32 +1188,30 @@ cmd_list = \
                         'allowed)',
          'indirect_allowed': True,
          'num_arg_fragments': 1,
-         'suggestion': 'Use Python variables instead, e.g. myar = 100, myvar '
-                       '+= 1, var2 = myvar or even expressions like myvar *= '
-                       'var3/(2-1)',
+         'suggestion': 'Use Python variables instead, e.g. "myar = 100, myvar '
+                       '+= 1, var2 = myvar" or even expressions like "myvar *= '
+                       'var3/(2-1)"',
          'supported': 'No'},
  'STO+': {'description': 'Store addition. Adds x to an existing register or '
                          'variable. Parameter: register or variable (indirect '
                          'allowed)',
           'indirect_allowed': True,
           'num_arg_fragments': 1,
-          'suggestion': 'Use Python variables instead, e.g. myar = 100, myvar '
-                        '+= 1, var2 = myvar or even expressions like myvar *= '
-                        'var3/(2-1)',
+          'suggestion': 'Use Python variables instead, e.g. "myar = 100, myvar '
+                        '+= 1, var2 = myvar" or even expressions like "myvar '
+                        '*= var3/(2-1)"',
           'supported': 'No'},
  'STOEL': {'description': 'Store element. Stores a copy of x into the current '
                           'element of the indexed matrix.',
            'indirect_allowed': False,
            'num_arg_fragments': 0,
-           'suggestion': 'Use Python matrix/list indexing and slicing syntax '
-                         'instead - read help for more info',
+           'suggestion': 'Use Python matrix/list indexing and slicing syntax.',
            'supported': 'No'},
  'STOIJ': {'description': 'Moves the row- and column-pointers to I = x and J = '
                           'y in the indexed matrix.',
            'indirect_allowed': False,
            'num_arg_fragments': 0,
-           'suggestion': 'Use Python matrix/list indexing and slicing syntax '
-                         'instead - read help for more info',
+           'suggestion': 'Use Python matrix/list indexing and slicing syntax.',
            'supported': 'No'},
  'STOP': {'description': 'Stop program execution. (R/S in program entry mode).',
           'indirect_allowed': False,
@@ -1244,27 +1223,27 @@ cmd_list = \
                          'variable (indirect allowed)',
           'indirect_allowed': True,
           'num_arg_fragments': 1,
-          'suggestion': 'Use Python variables instead, e.g. myar = 100, myvar '
-                        '+= 1, var2 = myvar or even expressions like myvar *= '
-                        'var3/(2-1)',
+          'suggestion': 'Use Python variables instead, e.g. "myar = 100, myvar '
+                        '+= 1, var2 = myvar" or even expressions like "myvar '
+                        '*= var3/(2-1)"',
           'supported': 'No'},
  'STO÷': {'description': 'Store division. Divides an existing register or '
                          'variable by x. Parameter: register or variable '
                          '(indirect allowed)',
           'indirect_allowed': True,
           'num_arg_fragments': 1,
-          'suggestion': 'Use Python variables instead, e.g. myar = 100, myvar '
-                        '+= 1, var2 = myvar or even expressions like myvar *= '
-                        'var3/(2-1)',
+          'suggestion': 'Use Python variables instead, e.g. "myar = 100, myvar '
+                        '+= 1, var2 = myvar" or even expressions like "myvar '
+                        '*= var3/(2-1)"',
           'supported': 'No'},
  'STO–': {'description': 'Store subtraction. Subtracts x from an existing '
                          'register or variable. Parameter: register or '
                          'variable (indirect allowed)',
           'indirect_allowed': True,
           'num_arg_fragments': 1,
-          'suggestion': 'Use Python variables instead, e.g. myar = 100, myvar '
-                        '+= 1, var2 = myvar or even expressions like myvar *= '
-                        'var3/(2-1)',
+          'suggestion': 'Use Python variables instead, e.g. "myar = 100, myvar '
+                        '+= 1, var2 = myvar" or even expressions like "myvar '
+                        '*= var3/(2-1)"',
           'supported': 'No'},
  'STR?': {'description': 'If the x-register contains an Alpha string, execute '
                          'the next program line; if the x-register does not '
@@ -1318,9 +1297,9 @@ cmd_list = \
                             'global program label. (indirect allowed)',
              'indirect_allowed': True,
              'num_arg_fragments': 1,
-             'suggestion': '',
-             'supported': 'yes though also look at extra fancy varmenu() '
-                          'command in help'},
+             'suggestion': 'Also check out the new advanced Python function '
+                           'varmenu()',
+             'supported': '✓'},
  'VIEW': {'description': 'View the contents of a register or variable. '
                          'Parameter: register or variable (indirect allowed)',
           'indirect_allowed': True,
@@ -1337,14 +1316,13 @@ cmd_list = \
                          'from growing.',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
-          'suggestion': 'Use Python matrix/list indexing and slicing syntax '
-                        'instead - read help for more info',
+          'suggestion': 'Use Python matrix/list indexing and slicing syntax.',
           'supported': 'No'},
  'X<0?': {'description': ' X less than zero test. If true, execute the next '
                          'program line; if false, skip the next program line',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
-          'suggestion': 'Use Python "if" statements instead',
+          'suggestion': 'Use Python "if" statements instead.',
           'supported': 'No'},
  'X<>': {'description': 'Swaps the contents of the x-register with another '
                         'register or variable. Parameter: register or variable '
@@ -1362,31 +1340,31 @@ cmd_list = \
                          'program line; if false, skip the next program line',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
-          'suggestion': 'Use Python "if" statements instead',
+          'suggestion': 'Use Python "if" statements instead.',
           'supported': 'No'},
  'X=0?': {'description': ' X equal to zero test. If true, execute the next '
                          'program line; if false, skip the next program line',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
-          'suggestion': 'Use Python "if" statements instead',
+          'suggestion': 'Use Python "if" statements instead.',
           'supported': 'No'},
  'X=Y?': {'description': ' X equal to y test. If true, execute the next '
                          'program line; if false, skip the next program line',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
-          'suggestion': 'Use Python "if" statements instead',
+          'suggestion': 'Use Python "if" statements instead.',
           'supported': 'No'},
  'X>0?': {'description': 'X greater than zero test. If true, execute the next '
                          'program line; if false, skip the next program line',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
-          'suggestion': 'Use Python "if" statements instead',
+          'suggestion': 'Use Python "if" statements instead.',
           'supported': 'No'},
  'X>Y?': {'description': 'X greater than y test. If true, execute the next '
                          'program line; if false, skip the next program line',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
-          'suggestion': 'Use Python "if" statements instead',
+          'suggestion': 'Use Python "if" statements instead.',
           'supported': 'No'},
  'XEQ': {'description': 'Execute a function or program. Parameter: function or '
                         'label (indirect allowed)',
@@ -1397,8 +1375,8 @@ cmd_list = \
  'XOR': {'description': 'Logical XOR (exclusive OR). Returns x XOR y.',
          'indirect_allowed': False,
          'num_arg_fragments': 0,
-         'suggestion': 'Use built in Python boolean operators instead e.g. not '
-                       'val or val2 and val3',
+         'suggestion': 'Use built in Python boolean operators instead e.g. '
+                       '"not val or val2 and val3"',
          'supported': 'No'},
  'XTOA': {'description': ' X to Alpha. Appends a character (specified by the '
                          'code in the x-register) to the Alpha register. If '
@@ -1412,46 +1390,46 @@ cmd_list = \
          'indirect_allowed': False,
          'num_arg_fragments': 0,
          'suggestion': '',
-         'supported': 'Use y**2 syntax instead'},
+         'supported': 'y**2'},
  'X≠0?': {'description': ' X not equal to zero test. If true, execute the next '
                          'program line; if false, skip the next program line',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
-          'suggestion': 'Use Python "if" statements instead',
+          'suggestion': 'Use Python "if" statements instead.',
           'supported': 'No'},
  'X≠Y?': {'description': 'X not equal to y test. If true, execute the next '
                          'program line; if false, skip the next program line',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
-          'suggestion': 'Use Python "if" statements instead',
+          'suggestion': 'Use Python "if" statements instead.',
           'supported': 'No'},
  'X≤0?': {'description': ' X less than or equal to zero test. If true, execute '
                          'the next program line; if false, skip the next '
                          'program line',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
-          'suggestion': 'Use Python "if" statements instead',
+          'suggestion': 'Use Python "if" statements instead.',
           'supported': 'No'},
  'X≤Y?': {'description': ' X less than or equal to y test. If true, execute '
                          'the next program line; if false, skip the next '
                          'program line',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
-          'suggestion': 'Use Python "if" statements instead',
+          'suggestion': 'Use Python "if" statements instead.',
           'supported': 'No'},
  'X≥0?': {'description': 'X greater than or equal to zero test. If true, '
                          'execute the next program line; if false, skip the '
                          'next program line',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
-          'suggestion': 'Use Python "if" statements instead',
+          'suggestion': 'Use Python "if" statements instead.',
           'supported': 'No'},
  'X≥Y?': {'description': 'X greater than or equal to y test. If true, execute '
                          'the next program line; if false, skip the next '
                          'program line',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
-          'suggestion': 'Use Python "if" statements instead',
+          'suggestion': 'Use Python "if" statements instead.',
           'supported': 'No'},
  'YINT': {'description': 'y-intercept. Returns the y-intercept of the curve '
                          'fitted to the current statistical data.',
@@ -1463,7 +1441,7 @@ cmd_list = \
          'indirect_allowed': False,
          'num_arg_fragments': 0,
          'suggestion': '',
-         'supported': 'Use y**x syntax instead'},
+         'supported': 'y**x'},
  '×': {'description': 'Multiplication. Returns x × y.',
        'indirect_allowed': False,
        'num_arg_fragments': 0,
@@ -1507,20 +1485,17 @@ cmd_list = \
  '←': {'description': 'Move left one element in the indexed matrix.',
        'indirect_allowed': False,
        'num_arg_fragments': 0,
-       'suggestion': 'Use Python matrix/list indexing and slicing syntax '
-                     'instead - read help for more info',
+       'suggestion': 'Use Python matrix/list indexing and slicing syntax.',
        'supported': 'No'},
  '↑': {'description': 'Move up one element in the indexed matrix.',
        'indirect_allowed': False,
        'num_arg_fragments': 0,
-       'suggestion': 'Use Python matrix/list indexing and slicing syntax '
-                     'instead - read help for more info',
+       'suggestion': 'Use Python matrix/list indexing and slicing syntax.',
        'supported': 'No'},
  '→': {'description': 'Move right one element in the indexed matrix.',
        'indirect_allowed': False,
        'num_arg_fragments': 0,
-       'suggestion': 'Use Python matrix/list indexing and slicing syntax '
-                     'instead - read help for more info',
+       'suggestion': 'Use Python matrix/list indexing and slicing syntax.',
        'supported': 'No'},
  '→DEC': {'description': 'To decimal. Converts the octal (base 8) '
                          'representation of a number to decimal (base 10). '
@@ -1583,8 +1558,7 @@ cmd_list = \
  '↓': {'description': 'Move down one element in the indexed matrix.',
        'indirect_allowed': False,
        'num_arg_fragments': 0,
-       'suggestion': 'Use Python matrix/list indexing and slicing syntax '
-                     'instead - read help for more info',
+       'suggestion': 'Use Python matrix/list indexing and slicing syntax.',
        'supported': 'No'},
  '◄': {'description': 'Backspace or clear x-register. In Program entry mode, '
                       'deletes the current program line.',
