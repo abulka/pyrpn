@@ -34,6 +34,7 @@
                 <th>HP42S Command</th>
                 <th>Supported in Python to RPN</th>
                 <th>Comments</th>
+                <th>Parameters</th>
                 <th>Description (original HP42S)</th>
             </tr>
             {% for cmd in cmd_list.keys() %}
@@ -46,6 +47,9 @@
                 </td>
                 <td>
                     {{ cmd_list[cmd]['suggestion'] }}
+                </td>
+                <td>
+                    {{ cmd_list[cmd]['params'] }}
                 </td>
                 <td align="left">
                     {{ cmd_list[cmd]['description'] }}

@@ -1329,7 +1329,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 raise RpnError(f'Unsupported attribute "{node.func.attr}", {source_code_line_info(node)}')
             func_name = self.adjust_function_name(func_name)
             self.check_supported(func_name, node)
-            self.check_cmd_enough_args(func_name, node)
+            self.check_cmd_enough_arg_fragments(func_name, node)
             if func_name == 'varmenu':
                 self.calling_varmenu(node)
             elif func_name in ('MVAR', 'VARMENU', 'STOP', 'EXITALL'):
@@ -1375,9 +1375,25 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         # Process arguments to functions by visiting them.
         if func_name in settings.CMDS_WHO_DISALLOW_STRINGS:
             self.disallow_string_args = True
+
+        self.check_enough_params(func_name, node)
         for item in node.args:
             self.visit(item)
+
         self.disallow_string_args = False
+
+    def check_enough_params(self, func_name, node):
+        # Check the correct number of parameters has been supplied.
+        # If cmd info has -1 then param info has not been specified yet
+        try:
+            cmd_info = cmd_list[func_name]
+        except KeyError:
+            return  # ignore failed lookups cos this code is used by more than just built in RPN commands calls
+        num_params_needed = cmd_info['num_params']
+        if num_params_needed == settings.NUM_PARAMS_UNSPECIFIED:
+            return
+        if len(node.args) != num_params_needed:
+            raise RpnError(f'Not enough parameters supplied to "{func_name}" which needs {num_params_needed} parameters {cmd_info["params"]}. You supplied {len(node.args)} params. {source_code_line_info(node)}')
 
     def calling_for_range(self, node):
         def all_literals(nodes):
@@ -1639,9 +1655,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.scopes.var_to_reg(arg.s, force_reg_name=f'"{arg.s}"')
         self.end(node)
 
-    def check_cmd_enough_args(self, func_name, node):
+    def check_cmd_enough_arg_fragments(self, func_name, node):
         if func_name in cmd_list and len(node.args) == 0:
-            # Check that built in command has been given enough parameters
+            # Check that built in command has been given enough arg fragments
             if cmd_list[func_name]['num_arg_fragments'] > 0:
                 raise RpnError(f'{func_name} requires {cmd_list[func_name]["num_arg_fragments"]} parameters to be supplied, {source_code_line_info(node)}')
             # Check that built in command has been given parameters (anti stack philosophy), even though HP41S spec actually allows params

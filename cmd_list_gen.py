@@ -42,6 +42,7 @@ with open('cmd_list.csv', newline='') as csvfile:
         #     pdb.set_trace()
 
         supported = row[2]
+
         if supported == 'tocheck':
             supported = ''
             suggestion = 'being researched'
@@ -91,12 +92,17 @@ with open('cmd_list.csv', newline='') as csvfile:
             info, suggestion = extract(supported)
             supported = info
 
+        params = row[3].strip()
+        num_params = len(params.split(',')) if params else -1
+
         entry = {
             'description': description,
             'num_arg_fragments': num_arg_fragments,
             'indirect_allowed': '(indirect allowed)' in description,
             'supported': supported,
             'suggestion': suggestion,
+            'params': params,
+            'num_params': num_params,
         }
         data[cmd] = entry
 

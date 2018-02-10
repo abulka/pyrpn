@@ -63,6 +63,7 @@ PYTHON_CMD_TO_RPN = {
 
 }
 RPN_CMD_TO_PYTHON_REPLACEMENT = {v: k for k, v in PYTHON_CMD_TO_RPN.items()}
+NUM_PARAMS_UNSPECIFIED = -1
 
 # Specifications of RPN limitations
 MAX_RPN_LABEL_LENGTH = 7
