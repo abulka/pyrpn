@@ -1501,6 +1501,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             elif isinstance(arg, ast.Num):
                 if func_name == 'TONE':
                     arg_val = f'{arg_val}'
+                elif func_name == 'SIZE':
+                    arg_val = f'{arg_val:04d}'
                 else:
                     arg_val = f'{arg_val:02d}'  # TODO probably need more formats e.g. nnnn
 

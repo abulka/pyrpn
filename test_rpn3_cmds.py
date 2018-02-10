@@ -760,3 +760,11 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.assertRaises(RpnError, self.parse, dedent(src))
 
+    def test_size(self):
+        self.parse(dedent("""
+            SIZE(50)
+            """))
+        expected = dedent("""
+            SIZE 0050
+            """)
+        self.compare(de_comment(expected))

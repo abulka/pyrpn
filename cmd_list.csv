@@ -180,7 +180,7 @@ SF,Set flag nn (00 ≤ nn ≤ 35; 81 ≤ nn ≤ 99). Parameter: flag number (ind
 SIGN,"Sign. Return 1 for x ≥ 0, –1 for x < 0, and 0 for non-numbers. Returns the unit vector of a complex number.",ok,
 SIN,Sine. Returns sin(x).,ok,
 SINH,Hyperbolic sine. Returns sinh(x).,ok,
-SIZE,Set the number of storage registers. Parameter: number of registers.,tocheck,
+SIZE,Set the number of storage registers. Parameter: number of registers.,ok,(num)
 SLOPE,Return the slope of the linear transformation of the current curve-fitting model.,ok,
 SOLVE,Solve for an unknown variable. Parameter: variable name (indirect allowed),ok,(var)
 SQRT,Square root. Returns √x.,ok,
