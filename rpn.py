@@ -1336,6 +1336,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 self.calling_varmenu_mvar(func_name, node)
             elif func_name in ('alpha', 'AVIEW', 'PROMPT', 'PRA'):
                 self.calling_alpha_family(func_name, node)
+            elif func_name in ('INPUT',):
+                self.calling_input(func_name, node)
             elif self.is_built_in_cmd_with_param_fragments(func_name, node) and not self.cmd_st_x_situation(func_name, node):
                 self.calling_builtin_with_fragment_params(func_name, node)
             elif self.for_loop_info and func_name == 'range':
@@ -1497,7 +1499,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 arg_val = register
 
             elif isinstance(arg, ast.Num):
-                arg_val = f'{arg_val:02d}'  # TODO probably need more formats e.g. nnnn
+                if func_name == 'TONE':
+                    arg_val = f'{arg_val}'
+                else:
+                    arg_val = f'{arg_val:02d}'  # TODO probably need more formats e.g. nnnn
 
             args += ' ' if arg_val else ''
             args += arg_val
@@ -1625,6 +1630,22 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.matrix_op_visit_two_args(node)
         self.program.insert('R<>R')
         self.end(node)
+
+    def calling_input(self, func_name, node):
+        # INPUT command needs varname as param - todo possibly handle multiple vars :-)
+        assert func_name in ('INPUT',)
+        if len(node.args) != 1 or not isinstance(node.args[0], ast.Name):
+            raise RpnError(f'Takes one argument, a variable name, {source_code_line_info(node)}')
+        var_name = node.args[0].id
+        register = self.scopes.var_to_reg(var_name, force_named=True)
+        self.program.insert(f'INPUT "{var_name}"')
+
+        # self.error_if_matrix_not_declared(matrix_var_name, node)
+        # assert self.scopes.is_matrix(matrix_var_name)
+        # register = self.scopes.var_to_reg(matrix_var_name)
+        # self.matrix_op_visit_two_args(node)
+        # self.program.insert('R<>R')
+        # self.end(node)
 
     def matrix_op_visit_two_args(self, node):
         if len(node.args) != 2:

@@ -1011,14 +1011,17 @@ class RpnCodeGenTests(BaseTest):
     def test_multi_cmd_one_arg_frag(self):
         """
         multi-part commands that require an arg fragment "parameter" as part of the single rpn command
+        not incuding those who take variables as parameters - these are processed differently e.g. INPUT
         """
         lines = self.parse(dedent("""
-            INPUT("length")
-            INTEG("somevar")
+            SF(00)
+            TONE(7)
+            FIX(2)
             """))
         expected = dedent("""
-            INPUT "length"
-            INTEG "somevar"
+            SF 00
+            TONE 7
+            FIX 02
         """)
         self.compare(de_comment(expected), lines, dump=True)
 

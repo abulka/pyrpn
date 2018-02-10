@@ -53,6 +53,11 @@ class ListDictMatrixTests(BaseTest):
         register = scopes.var_to_reg('X')
         self.assertEqual('"X"', register)
 
+    def test_force_named(self):
+        scopes = Scopes()
+        register = scopes.var_to_reg('x', force_named=True)
+        self.assertEqual('"x"', register)
+
     def test_uppercase_lowercase_varname(self):
         scopes = Scopes()
         register = scopes.var_to_reg('X')

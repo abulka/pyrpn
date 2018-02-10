@@ -42,6 +42,7 @@ class Scopes(object):
 
     def var_to_reg(self, var_name,
                    force_reg_name=None,
+                   force_named=False,
                    is_range_index=False,
                    is_range_index_el=False,
                    is_dict_var=False,
@@ -64,6 +65,7 @@ class Scopes(object):
 
         Now supports 'by reference' for list and dict vars
         Now support 'is_matrix'
+        Now support 'force_named' boolean
 
         :param var_name: python identifier e.g. 'x'
         :param force_reg_name: force the mapping to be to this
@@ -112,7 +114,10 @@ class Scopes(object):
         if force_reg_name:
             register = force_reg_name
             map_it(var_name, register)
-        elif var_name.isupper():
+        elif force_named:
+            register = f'"{var_name[-7:]}"'
+            map_it(var_name, register)
+        elif var_name.isupper() or force_named:
             register = f'"{var_name.upper()[-7:]}"'
             map_it(var_name, register)
         elif is_list_var or is_dict_var or is_matrix_var:  # must be a named register, case doesn't matter
