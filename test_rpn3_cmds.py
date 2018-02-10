@@ -722,7 +722,7 @@ class RpnTests3Cmds(BaseTest):
         expected = dedent("""
             INPUT "fred"
             RCL "fred"
-            1/x
+            1/X
             """)
         self.compare(de_comment(expected))
 
