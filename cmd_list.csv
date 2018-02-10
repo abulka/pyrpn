@@ -6,7 +6,7 @@ AGRAPH,Alpha graphics. Display a graphics image. Each character in the Alpha reg
 AIP,Append Integer part of x to the Alpha register.,ok
 ALENG,Alpha length. Returns the number of characters in the Alpha register.,ok
 ALL,Select the All display format.,ok
-ALLΣ,"Select ALLΣ (All-statistics) mode, which uses 13 summation coefficients.",tocheck
+ALLΣ,"Select ALLΣ (All-statistics) mode, which uses 13 summation coefficients.",remapped
 AND,Logical AND. Returns x AND y.,nobool
 AOFF,Alpha off. Exit from the ALPHA menu.,ok
 AON,Alpha on. Select the ALPHA menu.,ok
@@ -15,7 +15,7 @@ AROT,Alpha rotate. Rotate the Alpha register by the number of characters specifi
 ASHF,Alpha shift. Shifts the six left-most characters out of the Alpha register.,ok
 ASIN,Arc sine. Returns sin–1 x.,ok
 ASINH,Arc hyperbolic sine. Returns sinh–1 x.,ok
-ASSIGN,"Assign a function, program, or variable to a menu key in the CUSTOM menu. Parameter 1: function name, alpha program label, or variable name. Parameter 2: key number (01–18).",tocheck
+ASSIGN,"Assign a function, program, or variable to a menu key in the CUSTOM menu. Parameter 1: function name, alpha program label, or variable name. Parameter 2: key number (01–18).","ok suggestion: ASSIGN("someprog", 18)"
 ASTO,Alpha store. Copy the first six characters in the Alpha register into a register or variable. Parameter: register or variable (indirect allowed),ok
 ATAN,Arc tangent. Returns tan–1 x.,ok
 ATANH,Arc hyperbolic tangent. Returns tanh–1 x.,ok
@@ -43,8 +43,8 @@ CLRG,Clear Registers. Clear all of the numbered storage registers to zero.,ok su
 CLST,Clear Stack. Clear the stack registers to zero.,na
 CLV,Clear a variable from memory. Parameter: variable name (indirect allowed),tocheck
 CLX,"Clear x-register to zero. If digit entry is terminated (no cursor in the display), then  ◄  also executes CLX.",na
-CLZ,Clear statistics. Clear the accumulated statistical data in the summation registers.,tocheck
-COMB,Combinations of y items taken x at a time = y! / [x!(y-x)!],tocheck
+CLZ,Clear statistics. Clear the accumulated statistical data in the summation registers.,ok
+COMB,Combinations of y items taken x at a time = y! / [x!(y-x)!],ok suggestion: As usual pass in two parameters instead of referring to the stack x and y.
 COMPLEX,Convert two real numbers (or matrices) into a complex number (or matrix). Converts a complex number (or matrix) into two real numbers (or matrices).,ok
 CORR,Returns a correlation coefficient using the current statistical data and curve-fitting model.,ok
 COS,Cosine. Returns cos(x).,ok
@@ -70,11 +70,11 @@ ENTER,"Separate two numbers keyed in sequentially; copies x into the y-register,
 EXITALL,Exit all menus.,ok
 EXPF,Select the exponential curve-fitting model.,ok
 E↑X,Natural exponential. Returns ex.,remapped
-E↑X-1,"Natural exponential for values of x which are close to zero. Returns ex–1, which provides a much higher accuracy in the fractional part of the result.",tocheck
+E↑X-1,"Natural exponential for values of x which are close to zero. Returns ex–1, which provides a much higher accuracy in the fractional part of the result.",remapped
 FC?,"Flag clear test. If the specified flag is clear, executes the next program line; if the flag is set, skips the next program line. Parameter: flag number (indirect allowed)",✓ (renamed) suggestion: isFC(nn)
 FC?C,"Flag clear test and clear. If the specified flag is clear, execute the next program line; if the flag is set, skip the next program line. Cleared after the test is complete. (This function can be used only with flags 00 through 35 and 81 through 99.) Parameter: flag number (indirect allowed)",noflag
-FCSTX,Forecasts an x-value given a y-value.,tocheck
-FCSTY,Forecasts a y-value given an x-value.,tocheck
+FCSTX,Forecasts an x-value given a y-value.,ok
+FCSTY,Forecasts a y-value given an x-value.,ok
 FIX,Select Fixed-decimal display format. Parameter: number of digits (indirect allowed),ok
 FNRM,Returns the Frobenius norm of the matrix in the x-register.,ok
 FP,Returns the fractional part of x.,ok
@@ -87,39 +87,39 @@ GRAD,Select Grads angular mode.,ok
 GROW,Select Grow mode. Executing  →  or J+ causes the matrix to grow by one new row if the index pointers are at the last (lower-right) element in the matrix.,No suggestion: To compensate use the new command mymatrix.appendr()
 GTO,"Go to label. From the keyboard, move the program pointer to the specified label. In a running program, cause the program to branch to the specified label. Parameter: local or global label (indirect allowed)",na
 HEXM,Select Hexadecimal mode (base 16).,ok
-HMS+,Add x and y using H.MMSSss (hours-minutes-seconds) format.,tocheck
-HMS–,Subtract x from y using H.MMSSss format.,tocheck
+HMS+,Add x and y using H.MMSSss (hours-minutes-seconds) format.,remapped
+HMS–,Subtract x from y using H.MMSSss format.,remapped
 I+,Increment the row pointer in the indexed matrix.,nomatrix
 I–,Decrement the row pointer in the indexed matrix.,nomatrix
 INDEX,Index a named matrix. Parameter: variable name (indirect allowed),nomatrix
-INPUT,"Recall a register or variable to the x-register, display the name of the register or variable along with the contents of the x-register, and halt program execution. Pressing R/S (or ■SST) stores x into the register or variable; pressing EXIT cancels. (Used only in programs.) Parameter: register or variable (indirect allowed)",tocheck
+INPUT,"Recall a register or variable to the x-register, display the name of the register or variable along with the contents of the x-register, and halt program execution. Pressing R/S (or ■SST) stores x into the register or variable; pressing EXIT cancels. (Used only in programs.) Parameter: register or variable (indirect allowed)",ok
 INSR,Insert a row in the indexed matrix.,mymatrix.insr()
-INTEG,Integrate the selected integration program with respect to the specified variable. Parameter: variable name (indirect allowed),tocheck
+INTEG,Integrate the selected integration program with respect to the specified variable. Parameter: variable name (indirect allowed),ok
 INVRT,Returns the inverse of the matrix in the x-register.,ok
 IP,Returns the integer part of x,ok
 ISG,"Increment, Skip if Greater. Given ccccccc.fffii in a variable or register, increments ccccccc by ii and skips the next program line if ccccccc is now > fff. Parameter: register or variable (indirect allowed)",noloop
 J+,Increment the column pointer in the indexed matrix.,nomatrix
 J–,Decrement the column pointer in the indexed matrix.,nomatrix
-KEYASN,Selects key-assignments mode for the CUSTOM menu.,tocheck
-KEYG,"On menu key, go to. Branch to specified label to when a particular menu key is pressed.  Parameter 1:: Key number (1 through 9), Parameter 2: program label (global or local)",tocheck
+KEYASN,Selects key-assignments mode for the CUSTOM menu.,ok
+KEYG,"On menu key, go to. Branch to specified label to when a particular menu key is pressed.  Parameter 1:: Key number (1 through 9), Parameter 2: program label (global or local)","ok suggestion: KEYG(1, 'somefunc')"
 KEYX,"On menu key, execute. Execute (as a subroutine) specified label when a particular menu key is pressed. Parameter 1:: Key number (1 through 9), Parameter 2: program label (global or local)",nostack
 LASTX,Last x. Recall the last value of x used in a calculation.,nostack
 LBL,Label. Identify programs and routines for execution and branching. Parameter: local or global label.,na
 LCLBL,Select Local label mode for the CUSTOM menu (to use CUSTOM menu assignments to execute local labels within the current program).,tocheck
-LINF,Select the linear curve-fitting model.,tocheck
-LINΣ,"Select Linear statistics mode, which uses six summation coefficients.",tocheck
+LINF,Select the linear curve-fitting model.,ok
+LINΣ,"Select Linear statistics mode, which uses six summation coefficients.",remapped
 LIST,Print a portion of a program listing. (Not programmable.) Parameter: number of lines.,na
 LN,Natural logarithm. Returns ln(x).,ok
-LN1+X,"Natural logarithm for values close to zero. Returns ln(1 + x), which provides a much higher accuracy in the fractional part of the result.",tocheck
+LN1+X,"Natural logarithm for values close to zero. Returns ln(1 + x), which provides a much higher accuracy in the fractional part of the result.",remapped
 LOG,Common logarithm. Returns log10(x).,ok
 LOGF,Select the logarithmic curve-fitting model.,ok
 MAN,Select Manual print mode.,ok
 MAT?,"If the x-register contains a matrix, execute the next program line; if the X-register does not contain a matrix, skip the next program line.",tocheck
 MEAN,Mean. Returns the mean of x-values (Σx / n) and the mean of y-values (Σy / n).,tocheck
-MENU,Select the programmable menu.,tocheck
-MOD,Modulo. Returns the remainder for y / x.,tocheck
-MVAR,Declare a menu variable in a SOLVER program. Parameter: variable name.,tocheck
-N!,Factorial. Returns x!.,tocheck
+MENU,Select the programmable menu.,ok
+MOD,Modulo. Returns the remainder for y / x.,ok
+MVAR,Declare a menu variable in a SOLVER program. Parameter: variable name.,ok suggestion: MVAR("length") etc.
+N!,Factorial. Returns x!.,remapped
 NEWMAT,New matrix. Creates a y × x matrix in the x-register.,ok
 NORM,"Select Normal print mode, which prints a record of keystrokes.",ok
 NOT,Logical NOT. Returns NOT(x).,nobool
@@ -128,7 +128,7 @@ OFF,Turn the calculator off (programmable). (Pressing ■OFF does not execute th
 OLD,Recall the current element from the indexed matrix. (Equivalent to RCLEL.),nomatrix
 ON,Continuous on. Prevent the calculator from automatically turning off after ten minutes of inactivity.,ok
 OR,Logical OR. Returns x OR y.,nobool
-PERM,Permutations of y items taken x at a time. Returns y!/(y – x)!,tocheck
+PERM,Permutations of y items taken x at a time. Returns y!/(y – x)!,ok
 PGMINT,Select a program to integrate. Parameter: global label (indirect allowed),tocheck
 PGMSLV,"Select a program to solve. Parameter: global label (indirect allowed) ,",tocheck
 PIXEL,Turn on a single pixel (dot) in the display y: row (y axis) x: col (x axis),ok
@@ -143,9 +143,9 @@ PRON,Printing on. Sets flags 21 and 55.,ok
 PRP,"Print program. If a label is not specified, print the current program. (Not programmable.)  Parameter: global label (optional)",na
 PRSTK,"Print stack. Print the contents of the stack registers (x, y, z and t).",ok
 PRUSR,Print user variables and programs.,ok
-PRV,Print variable. Parameter: variable name (indirect allowed),tocheck
-PRX,Print x-register.,ok
-PRZ,Print statistics. Prints the contents of the summation registers.,tocheck
+PRV,Print variable. Parameter: variable name (indirect allowed),ok
+PRX,Print x-register.,ok suggestion: Prints any variable to the virtual printer. E.g. PRX(myvar)
+PRZ,Print statistics. Prints the contents of the summation registers.,ok
 PSE,Pause program execution for about 1 second.,ok
 PUTM,Put matrix. Stores the matrix in the X-register into the indexed matrix beginning at the current element.,nomatrix
 PWRF,Select the power curve-fitting model.,ok
@@ -161,27 +161,27 @@ RCLEL,Recall element. Recalls the current matrix element from the indexed matrix
 RCLIJ,Recall the row- and column-pointer values (I and J) for the indexed matrix.,nomatrix
 "RDX,",Select a comma to be used as the radix mark (decimal point).,tocheck
 RDX.,Select a period to be used as the radix mark (decimal point).,tocheck
-REALRES,Real-results. Disables the calculator's ability to return a complex result using real-number inputs.,tocheck
+REALRES,Real-results. Disables the calculator's ability to return a complex result using real-number inputs.,ok
 REAL?,"If the x-register contains a real number, execute the next program line; if the x-register does not contain a real number, skip the next program line.",tocheck
-RECT,Select Rectangular coordinate mode for displaying complex numbers.,tocheck
-RND,Round the number in the x-register using the current display format.,tocheck
-RNRM,Return the row norm of the matrix in the x-register.,tocheck
-ROTXY,Rotate the 36-bit number in the y-register by x bits.,tocheck
+RECT,Select Rectangular coordinate mode for displaying complex numbers.,ok
+RND,Round the number in the x-register using the current display format.,ok
+RNRM,Return the row norm of the matrix in the x-register.,ok
+ROTXY,Rotate the 36-bit number in the y-register by x bits.,ok suggestion: Pass two parameters to this function.
 RSUM,Return the row sum of each row of the matrix in the x-register and returns the sums in a column matrix.,tocheck
 RTN,"Return. In a running program, branches the program pointer back to the line following the most recent XEQ instruction. If there is no matching XEQ instruction, program execution halts. From the keyboard, RTN moves the program pointer to line 00 of the current program.",return
-R<>R,Row swap row. Swaps the elements in rows x and y in the indexed matrix.,"mymatrix.row_swap(3,7)"
+R<>R,Row swap row. Swaps the elements in rows x and y in the indexed matrix.,"mymatrix.row_swap(row,row)"
 R↑,Roll up the contents of the four stack registers one position.,nostack
 R↓,Roll down the contents of the four stack registers one position.,nostack
 R/S,"Run/stop. Runs a program (beginning at the current program line) or stops a running program. In program-entry mode, inserts a STOP instruction into the program.",ok suggestion: Use STOP()
-SCI,Select scientific notation display format. Parameter: number of digits (indirect allowed),tocheck
-SDEV,Standard deviation. Returns sx and sy using the current statistical data.,tocheck
-SEED,Store a seed for the random number generator.,tocheck
+SCI,Select scientific notation display format. Parameter: number of digits (indirect allowed),ok
+SDEV,Standard deviation. Returns sx and sy using the current statistical data.,ok
+SEED,Store a seed for the random number generator.,ok
 SF,Set flag nn (00 ≤ nn ≤ 35; 81 ≤ nn ≤ 99). Parameter: flag number (indirect allowed),ok
-SIGN,"Sign. Return 1 for x ≥ 0, –1 for x < 0, and 0 for non-numbers. Returns the unit vector of a complex number.",tocheck
+SIGN,"Sign. Return 1 for x ≥ 0, –1 for x < 0, and 0 for non-numbers. Returns the unit vector of a complex number.",ok
 SIN,Sine. Returns sin(x).,ok
 SINH,Hyperbolic sine. Returns sinh(x).,ok
 SIZE,Set the number of storage registers. Parameter: number of registers.,tocheck
-SLOPE,Return the slope of the linear transformation of the current curve-fitting model.,tocheck
+SLOPE,Return the slope of the linear transformation of the current curve-fitting model.,ok
 SOLVE,Solve for an unknown variable. Parameter: variable name (indirect allowed),tocheck
 SQRT,Square root. Returns √x.,ok
 SST,Single step. Moves the program pointer to the next program line. (Not programmable.),na
@@ -194,7 +194,7 @@ STOEL,Store element. Stores a copy of x into the current element of the indexed 
 STOIJ,Moves the row- and column-pointers to I = x and J = y in the indexed matrix.,nomatrix
 STOP,Stop program execution. (R/S in program entry mode).,ok
 STR?,"If the x-register contains an Alpha string, execute the next program line; if the x-register does not contain an Alpha string, skip the next program line.",tocheck
-SUM,Returns the sums Σx and Σy into the x- and y-registers.,tocheck
+SUM,Returns the sums Σx and Σy into the x- and y-registers.,"ok suggestion: SUM(var1, var2)"
 TAN,Tangent. Returns tan(x).,ok
 TANH,Hyperbolic tangent. Returns tanh(x).,ok
 TONE,Sounds a tone. Parameter: tone number (0–9) (indirect allowed),ok
@@ -222,32 +222,32 @@ X≥Y?,"X greater than or equal to y test. If true, execute the next program lin
 XEQ,Execute a function or program. Parameter: function or label (indirect allowed),na suggestion: Just call a function e.g. myfunc()
 XOR,Logical XOR (exclusive OR). Returns x XOR y.,nobool
 XTOA," X to Alpha. Appends a character (specified by the code in the x-register) to the Alpha register. If the x-register contains an Alpha string, appends the entire string.",tocheck
-X↑2,Square. Returns x2.,y**2
-YINT,y-intercept. Returns the y-intercept of the curve fitted to the current statistical data.,tocheck
-Y↑X,Power. Returns yx.,y**x
-1/x,Reciprocal. Returns 1/x.,tocheck
-10↑X,Common exponential. Returns 10x.,tocheck
+X↑2,Square. Returns x2.,✓ (renamed) suggestion: y**2
+YINT,y-intercept. Returns the y-intercept of the curve fitted to the current statistical data.,ok
+Y↑X,Power. Returns yx.,✓ (renamed) suggestion: y**x
+1/x,Reciprocal. Returns 1/x.,remapped
+10↑X,Common exponential. Returns 10x.,remapped
 +,Addition. Returns y + x.,ok
 –,Subtraction. Returns y – x.,ok
 ×,Multiplication. Returns x × y.,ok
 ÷,Division. Returns y / x.,ok
 +/–,"Change the sign of the number in the x-register. While entering an exponent, can also be used to change the sign of the exponent.",na
-Σ+,Summation plus. Accumulate a pair of x- and y values into the summation registers.,tocheck
-Σ–,Summation minus. Subtract a pair of x- and y-values from the summation registers.,tocheck
-ΣREG,Summation registers. Defines which storage register begins the block of summation registers. Parameter: register number (indirect allowed),tocheck
-ΣREG?,Return the register number of the first summation register.,tocheck
-→DEC,To decimal. Converts the octal (base 8) representation of a number to decimal (base 10). Note: This function is included to provide program compatibility with the HP-41 (which uses the function name DEC).,tocheck
-→DEG,To degrees. Convert an angle-value from radians to degrees. Returns x×(180/π).,tocheck
-→HMS,"To hours, minutes, and seconds. Convert x from a decimal fraction to a minutes-seconds format.",tocheck
-→HR,To hours. Converts x from a minutes-seconds format to a decimal fraction.,tocheck
-→OCT,To octal. Converts a decimal number to the octal representation. Note: This function is included to provide program compatibility with the HP-41 (which uses the function name OCT).,tocheck
-→POL,"To polar. Converts x and y to the corresponding polar coordinates r and θ. If the x-register contains a complex number, converts the two parts of the number to polar values.",tocheck
-→RAD,To radians. Converts a angle value in degrees to radians. Returns x×(π/180).,tocheck
-→REC,"To rectangular. Converts r (in the x-register) and θ (in the y-register) to the corresponding rectangular coordinates, x and y. If the X-register contains a complex number, converts the two parts of the number to rectangular values.",tocheck
+Σ+,Summation plus. Accumulate a pair of x- and y values into the summation registers.,remapped
+Σ-,Summation minus. Subtract a pair of x- and y-values from the summation registers.,remapped
+ΣREG,Summation registers. Defines which storage register begins the block of summation registers. Parameter: register number (indirect allowed),remapped
+ΣREG?,Return the register number of the first summation register.,remapped
+→DEC,To decimal. Converts the octal (base 8) representation of a number to decimal (base 10). Note: This function is included to provide program compatibility with the HP-41 (which uses the function name DEC).,remapped
+→DEG,To degrees. Convert an angle-value from radians to degrees. Returns x×(180/π).,remapped
+→HMS,"To hours, minutes, and seconds. Convert x from a decimal fraction to a minutes-seconds format.",remapped
+→HR,To hours. Converts x from a minutes-seconds format to a decimal fraction.,remapped
+→OCT,To octal. Converts a decimal number to the octal representation. Note: This function is included to provide program compatibility with the HP-41 (which uses the function name OCT).,remapped
+→POL,"To polar. Converts x and y to the corresponding polar coordinates r and θ. If the x-register contains a complex number, converts the two parts of the number to polar values.",remapped
+→RAD,To radians. Converts a angle value in degrees to radians. Returns x×(π/180).,remapped
+→REC,"To rectangular. Converts r (in the x-register) and θ (in the y-register) to the corresponding rectangular coordinates, x and y. If the X-register contains a complex number, converts the two parts of the number to rectangular values.",remapped
 ◄,"Backspace or clear x-register. In Program entry mode, deletes the current program line.",not programmable
 ←,Move left one element in the indexed matrix.,nomatrix
 ↑,Move up one element in the indexed matrix.,nomatrix
 ↓,Move down one element in the indexed matrix.,nomatrix
 →,Move right one element in the indexed matrix.,nomatrix
-%,Percent. Returns (x × y) / 100. (Leaves the y value in the y-register.),tocheck
-%CH,Percent change. Returns (x – y)×(100 / y).,tocheck
+%,Percent. Returns (x × y) / 100. (Leaves the y value in the y-register.),remapped
+%CH,Percent change. Returns (x – y)×(100 / y).,remapped

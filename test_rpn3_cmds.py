@@ -678,7 +678,7 @@ class RpnTests3Cmds(BaseTest):
     def test_cmd_EtoX(self):
         # Converting a Complex Matrix to Real again
         self.parse(dedent("""
-            EtoX(10)
+            Eto(10)
             """))
         expected = dedent("""
             10

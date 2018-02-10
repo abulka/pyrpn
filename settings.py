@@ -27,11 +27,35 @@ LIST_UNSUPPORTED = ('cmp', 'index', 'count', 'extend', 'insert', 'remove', 'reve
 DICT_UNSUPPORTED = ('clear', 'copy', 'fromkeys', 'get', 'items', 'setdefault', 'update', 'values')
 MATRIX_UNSUPPORTED = ('INDEX', 'STOIJ', 'RCLIJ', 'PUTM', 'GETM', 'INSR', 'DELR', 'DIM', 'GROW', 'WRAP', 'SIMQ', 'GROW', 'WRAP')
 PYTHON_CMD_TO_RPN = {
-    'isFS':  'pFS',
-    'isFC':  'pFC',
-    'len':   'pMxLen',
-    'print': 'AVIEW',
-    'EtoX':  'E↑X',
+    'isFS':         'pFS',
+    'isFC':         'pFC',
+    'len':          'pMxLen',
+    'print':        'AVIEW',
+    'Eto':          'E↑X',
+    'EtoMinus1':    'E↑X-1',
+    'LN1plus':      'LN1+X',
+    'Reciprocal':   '1/x',
+    'CommonExp':    '10↑X',
+    'toDEC':        '→DEC',
+    'toDEG':        '→DEG',
+    'toHMS':        '→HMS',
+    'toHR':         '→HR',
+    'toOCT':        '→OCT',
+    'toPOL':        '→POL',
+    'toRAD':        '→RAD',
+    'toREC':        '→REC',
+    'Percent':      '%',
+    'PercentCH':    '%CH',
+    'ALLStat':      'ALLΣ',
+    'LINStat':      'LINΣ',
+    'StatPlus':     'Σ+',
+    'StatMinus':    'Σ-',
+    'StatREG':      'ΣREG',
+    'StatWhichREG': 'ΣREG?',
+    'HMSplus':      'HMS+',
+    'HMSminus':     'HMS–',
+    'Factorial':    'N!',
+
 }
 RPN_CMD_TO_PYTHON_REPLACEMENT = {v: k for k, v in PYTHON_CMD_TO_RPN.items()}
 
