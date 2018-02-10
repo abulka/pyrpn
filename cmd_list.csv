@@ -2,7 +2,7 @@ ABS,Absolute value. Returns |x|.,ok
 ACOS,Arc cosine. Returns cos–1 x.,ok
 ACOSH,Arc hyperbolic cosine. Returns cosh–1 x.,ok
 ADV,Advance the printer paper one line,ok
-AGRAPH,Alpha graphics. Display a graphics image. Each character in the Alpha register specifies an 8-dot column pattern. The x- and y-registers specify the pixel location of the image.,tocheck
+AGRAPH,Alpha graphics. Display a graphics image. Each character in the Alpha register specifies an 8-dot column pattern. The x- and y-registers specify the pixel location of the image.,ok
 AIP,Append Integer part of x to the Alpha register.,ok
 ALENG,Alpha length. Returns the number of characters in the Alpha register.,ok
 ALL,Select the All display format.,ok
@@ -20,7 +20,7 @@ ASTO,Alpha store. Copy the first six characters in the Alpha register into a reg
 ATAN,Arc tangent. Returns tan–1 x.,ok
 ATANH,Arc hyperbolic tangent. Returns tanh–1 x.,ok
 ATOX,Alpha to X. Convert the left-most character in the Alpha register to its character code (returned to the x-register) and delete the character.,tocheck
-AVIEW,Alpha view. Display the Alpha register.,ok
+AVIEW,Alpha view. Display the Alpha register.,ok suggestion: Use the new alpha() function to build up strings of any length in the alpha register.
 BASE+,Base addition. Returns the 36-bit sum of y + x.,remapped
 BASE–,Base subtraction. Returns the 36-bit difference of y – x.,remapped
 BASEx,Base multiplication. Returns the 36-bit product of y x x.,remapped
@@ -92,7 +92,7 @@ HMS–,Subtract x from y using H.MMSSss format.,remapped
 I+,Increment the row pointer in the indexed matrix.,nomatrix
 I–,Decrement the row pointer in the indexed matrix.,nomatrix
 INDEX,Index a named matrix. Parameter: variable name (indirect allowed),nomatrix
-INPUT,"Recall a register or variable to the x-register, display the name of the register or variable along with the contents of the x-register, and halt program execution. Pressing R/S (or ■SST) stores x into the register or variable; pressing EXIT cancels. (Used only in programs.) Parameter: register or variable (indirect allowed)",ok
+INPUT,"Recall a register or variable to the x-register, display the name of the register or variable along with the contents of the x-register, and halt program execution. Pressing R/S (or ■SST) stores x into the register or variable; pressing EXIT cancels. (Used only in programs.) Parameter: register or variable (indirect allowed)",✓ (re-imagined) suggestion: Now takes any normal Python variable as a parameter - does not need to have that variable in quotes. Specifying registers not supported.
 INSR,Insert a row in the indexed matrix.,mymatrix.insr()
 INTEG,Integrate the selected integration program with respect to the specified variable. Parameter: variable name (indirect allowed),ok
 INVRT,Returns the inverse of the matrix in the x-register.,ok

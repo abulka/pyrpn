@@ -58,8 +58,8 @@ cmd_list = \
                            'pixel location of the image.',
             'indirect_allowed': False,
             'num_arg_fragments': 0,
-            'suggestion': 'being researched',
-            'supported': ''},
+            'suggestion': '',
+            'supported': '✓'},
  'AIP': {'description': 'Append Integer part of x to the Alpha register.',
          'indirect_allowed': False,
          'num_arg_fragments': 0,
@@ -167,7 +167,8 @@ cmd_list = \
  'AVIEW': {'description': 'Alpha view. Display the Alpha register.',
            'indirect_allowed': False,
            'num_arg_fragments': 0,
-           'suggestion': '',
+           'suggestion': 'Use the new alpha() function to build up strings of '
+                         'any length in the alpha register.',
            'supported': '✓'},
  'BASE+': {'description': 'Base addition. Returns the 36-bit sum of y + x.',
            'indirect_allowed': False,
@@ -615,8 +616,10 @@ cmd_list = \
                           'register or variable (indirect allowed)',
            'indirect_allowed': True,
            'num_arg_fragments': 1,
-           'suggestion': '',
-           'supported': '✓'},
+           'suggestion': 'Now takes any normal Python variable as a parameter '
+                         '- does not need to have that variable in quotes. '
+                         'Specifying registers not supported.',
+           'supported': '✓ (re-imagined)'},
  'INSR': {'description': 'Insert a row in the indexed matrix.',
           'indirect_allowed': False,
           'num_arg_fragments': 0,

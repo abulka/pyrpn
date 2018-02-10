@@ -37,6 +37,10 @@ with open('cmd_list.csv', newline='') as csvfile:
         else:
             num_arg_fragments = 0
 
+        # if cmd == 'INPUT':
+        #     import pdb;
+        #     pdb.set_trace()
+
         supported = row[2]
         if supported == 'tocheck':
             supported = ''
@@ -77,10 +81,10 @@ with open('cmd_list.csv', newline='') as csvfile:
         elif supported == 'remapped':
             supported = '✓ (renamed)'
             suggestion = f'{settings.RPN_CMD_TO_PYTHON_REPLACEMENT[cmd]}()'
-        elif 'No' in supported:
+        elif supported[0:2] == 'No':
             info, suggestion = extract(supported)
             supported = 'No'
-        elif 'ok' in supported:
+        elif supported[0:2] == 'ok':
             info, suggestion = extract(supported)
             supported = '✓'
         else:

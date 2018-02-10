@@ -673,7 +673,7 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    # Misc remapped commands
+    # Cmd mapping
 
     def test_cmd_EtoX(self):
         # Converting a Complex Matrix to Real again
@@ -685,4 +685,65 @@ class RpnTests3Cmds(BaseTest):
             E↑X
             """)
         self.compare(de_comment(expected))
+
+    # command num args enforcement
+
+    def test_agraph(self):
+        # Puts alpha chars into pixels at row col coords
+        self.parse(dedent("""
+            AGRAPH(1,1)
+            """))
+        expected = dedent("""
+            1
+            1
+            AGRAPH
+            """)
+        self.compare(de_comment(expected))
+
+    def test_agraph_no_params(self):
+        src = dedent("""
+            AGRAPH()
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    def test_agraph_not_enough_params(self):
+        src = dedent("""
+            AGRAPH(1)
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    # INPUT named variables
+
+    def test_input(self):
+        self.parse(dedent("""
+            INPUT(fred)
+            Reciprocal(fred)
+            """))
+        expected = dedent("""
+            INPUT "fred"
+            RCL "fred"
+            1/x
+            """)
+        self.compare(de_comment(expected))
+
+    def test_input_str(self):
+        # Although this is the original syntax, its not allowed
+        src = dedent("""
+            INPUT("fred")
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    def test_input_no_args(self):
+        # Although this is the original syntax, its not allowed
+        src = dedent("""
+            INPUT()
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    def test_input_regs_not_allowed(self):
+        # Although specifying registers is in the original syntax, its not allowed
+        src = dedent("""
+            INPUT(00)
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
 
