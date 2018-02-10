@@ -726,6 +726,17 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+    def test_input_integ(self):
+        self.parse(dedent("""
+            INPUT(fred)
+            INTEG(mary)
+            """))
+        expected = dedent("""
+            INPUT "fred"
+            INTEG "mary"
+            """)
+        self.compare(de_comment(expected))
+
     def test_input_str(self):
         # Although this is the original syntax, its not allowed
         src = dedent("""

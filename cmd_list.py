@@ -816,10 +816,10 @@ cmd_list = \
            'num_arg_fragments': 1,
            'num_params': 1,
            'params': '(var)',
-           'suggestion': 'Now takes any normal Python variable as a parameter '
-                         '- does not need to have that variable in quotes. '
-                         'Specifying registers not supported.',
-           'supported': '✓ (re-imagined)'},
+           'suggestion': 'Now takes a normal Python variable as a parameter - '
+                         'do not put variable in quotes. Specifying registers '
+                         'not supported.',
+           'supported': '✓'},
  'INSR': {'description': 'Insert a row in the indexed matrix.',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
@@ -832,9 +832,11 @@ cmd_list = \
                           'variable name (indirect allowed)',
            'indirect_allowed': True,
            'num_arg_fragments': 1,
-           'num_params': -1,
-           'params': '',
-           'suggestion': '',
+           'num_params': 1,
+           'params': '(var)',
+           'suggestion': 'Now takes a normal Python variable as a parameter - '
+                         'do not put variable in quotes. Specifying registers '
+                         'not supported.',
            'supported': '✓'},
  'INVRT': {'description': 'Returns the inverse of the matrix in the '
                           'x-register.',

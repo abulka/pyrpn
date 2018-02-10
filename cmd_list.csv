@@ -92,9 +92,9 @@ HMS–,Subtract x from y using H.MMSSss format.,remapped,
 I+,Increment the row pointer in the indexed matrix.,nomatrix,
 I–,Decrement the row pointer in the indexed matrix.,nomatrix,
 INDEX,Index a named matrix. Parameter: variable name (indirect allowed),nomatrix,
-INPUT,"Recall a register or variable to the x-register, display the name of the register or variable along with the contents of the x-register, and halt program execution. Pressing R/S (or ■SST) stores x into the register or variable; pressing EXIT cancels. (Used only in programs.) Parameter: register or variable (indirect allowed)",✓ (re-imagined) suggestion: Now takes any normal Python variable as a parameter - does not need to have that variable in quotes. Specifying registers not supported.,(var)
+INPUT,"Recall a register or variable to the x-register, display the name of the register or variable along with the contents of the x-register, and halt program execution. Pressing R/S (or ■SST) stores x into the register or variable; pressing EXIT cancels. (Used only in programs.) Parameter: register or variable (indirect allowed)",✓ suggestion: Now takes a normal Python variable as a parameter - do not put variable in quotes. Specifying registers not supported.,(var)
 INSR,Insert a row in the indexed matrix.,mymatrix.insr(),
-INTEG,Integrate the selected integration program with respect to the specified variable. Parameter: variable name (indirect allowed),ok,
+INTEG,Integrate the selected integration program with respect to the specified variable. Parameter: variable name (indirect allowed),✓ suggestion: Now takes a normal Python variable as a parameter - do not put variable in quotes. Specifying registers not supported.,(var)
 INVRT,Returns the inverse of the matrix in the x-register.,ok,
 IP,Returns the integer part of x,ok,
 ISG,"Increment, Skip if Greater. Given ccccccc.fffii in a variable or register, increments ccccccc by ii and skips the next program line if ccccccc is now > fff. Parameter: register or variable (indirect allowed)",noloop,
