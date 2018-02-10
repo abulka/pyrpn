@@ -1336,7 +1336,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 self.calling_varmenu_mvar(func_name, node)
             elif func_name in ('alpha', 'AVIEW', 'PROMPT', 'PRA'):
                 self.calling_alpha_family(func_name, node)
-            elif func_name in ('INPUT', 'INTEG'):
+            elif func_name in ('INPUT', 'INTEG', 'PRV', 'CLV', 'SOLVE'):
                 self.calling_builtin_param_is_variable(func_name, node)
             elif self.is_built_in_cmd_with_param_fragments(func_name, node) and not self.cmd_st_x_situation(func_name, node):
                 self.calling_builtin_with_fragment_params(func_name, node)

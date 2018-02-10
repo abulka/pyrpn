@@ -726,14 +726,16 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    def test_input_integ(self):
+    def test_input_integ_prv(self):
         self.parse(dedent("""
             INPUT(fred)
             INTEG(mary)
+            PRV(sam)
             """))
         expected = dedent("""
             INPUT "fred"
             INTEG "mary"
+            PRV "sam"
             """)
         self.compare(de_comment(expected))
 
