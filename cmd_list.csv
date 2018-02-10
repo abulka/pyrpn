@@ -225,7 +225,7 @@ XTOA," X to Alpha. Appends a character (specified by the code in the x-register)
 X↑2,Square. Returns x2.,✓ (renamed) suggestion: y**2,
 YINT,y-intercept. Returns the y-intercept of the curve fitted to the current statistical data.,ok,
 Y↑X,Power. Returns yx.,✓ (renamed) suggestion: y**x,
-1/x,Reciprocal. Returns 1/x.,remapped,
+1/X,Reciprocal. Returns 1/x.,remapped,
 10↑X,Common exponential. Returns 10x.,remapped,
 +,Addition. Returns y + x.,ok,
 –,Subtraction. Returns y – x.,ok,

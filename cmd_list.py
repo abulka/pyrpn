@@ -30,7 +30,7 @@ cmd_list = \
          'params': '',
          'suggestion': 'Not Applicable, please use native Python.',
          'supported': 'N/A'},
- '1/x': {'description': 'Reciprocal. Returns 1/x.',
+ '1/X': {'description': 'Reciprocal. Returns 1/x.',
          'indirect_allowed': False,
          'num_arg_fragments': 0,
          'num_params': -1,

@@ -34,7 +34,7 @@ PYTHON_CMD_TO_RPN = {
     'Eto':          'E↑X',
     'EtoMinus1':    'E↑X-1',
     'LN1plus':      'LN1+X',
-    'Reciprocal':   '1/x',
+    'Reciprocal':   '1/X',
     'CommonExp':    '10↑X',
     'toDEC':        '→DEC',
     'toDEG':        '→DEG',

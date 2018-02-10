@@ -1,0 +1,8 @@
+{
+    "description": "<p>To generate the HP42S command 1/X use function Reciprocal.&nbsp; This renaming was necessary because Python does not accept / and many other symbols as part of function names.&nbsp; There are a few other renamed function - for a complete list click on help and then click on RPN command reference.</p>",
+    "public": "yes",
+    "sortnum": 0,
+    "source": "def input_reciprocal():\r\n  INPUT(weight)\r\n  print(\"1/weight of\", weight, \"is\", Reciprocal(weight))",
+    "tags": "Algorithms",
+    "title": "Reciprocal"
+}
