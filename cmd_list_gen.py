@@ -43,6 +43,8 @@ with open('cmd_list.csv', newline='') as csvfile:
 
         supported = row[2]
 
+        css_class = ''
+
         if supported == 'tocheck':
             supported = ''
             suggestion = 'being researched'
@@ -99,6 +101,16 @@ with open('cmd_list.csv', newline='') as csvfile:
             params_no_brackets = params[1:-1]
         num_params = len(params_no_brackets.split(',')) if params else -1
 
+        if supported == "No":
+            css_class = 'no'
+        elif supported == "N/A":
+            css_class = 'na'
+        elif supported == "Not programmable":
+            css_class = 'na'
+            # css_class = 'not-programmable'
+        elif suggestion == "being researched":
+            css_class = 'tocheck'
+
         entry = {
             'description': description,
             'num_arg_fragments': num_arg_fragments,
@@ -107,6 +119,7 @@ with open('cmd_list.csv', newline='') as csvfile:
             'suggestion': suggestion,
             'params': params,
             'num_params': num_params,
+            'class': css_class,
         }
         data[cmd] = entry
 

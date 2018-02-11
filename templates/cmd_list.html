@@ -38,7 +38,7 @@
                 <th>Description (original HP42S)</th>
             </tr>
             {% for cmd in cmd_list.keys() %}
-            <tr>
+            <tr class="{{cmd_list[cmd]['class']}}">
                 <td>
                     {{ cmd }}
                 </td>

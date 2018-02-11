@@ -118,3 +118,16 @@ span.examples_action_link {
 table.cmd_list th {
     text-align: center;
 }
+
+table.cmd_list tr.no {
+    background-color: lightgray;
+}
+table.cmd_list tr.na {
+    background-color: #ce8413;
+}
+/*table.cmd_list tr.not-programmable {*/
+    /*background-color: grey;*/
+/*}*/
+table.cmd_list tr.tocheck {
+    background-color: yellow;
+}
