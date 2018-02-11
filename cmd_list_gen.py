@@ -93,6 +93,10 @@ with open('cmd_list.csv', newline='') as csvfile:
             supported = info
 
         params = row[3].strip()
+        if params:
+            assert params[0] == '('
+            assert params[-1] == ')'
+            params = params[1:-1]
         num_params = len(params.split(',')) if params else -1
 
         entry = {

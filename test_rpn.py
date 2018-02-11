@@ -968,15 +968,17 @@ class RpnCodeGenTests(BaseTest):
         lines = self.parse(dedent("""
             fred = 1
             FIX(2)
-            FP()
-            IP()
+            FP(2.2)
+            IP(2.2)
             GRAD()
             """))
         expected = dedent("""
             1
             STO 00
             FIX 02
+            2.2
             FP
+            2.2
             IP
             GRAD
         """)
