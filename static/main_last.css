@@ -112,3 +112,9 @@ span.examples_action_link {
     margin-right: 1em;
     font-size: smaller;
 }
+
+/* cmd_list table */
+
+table.cmd_list th {
+    text-align: center;
+}

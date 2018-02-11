@@ -29,7 +29,7 @@
             accordingly.  For example a references to stack x can often be substituted with a reference to a Python variable.
             E.g. SIN which acts on stack x is simply SIN(myvar) when accessed via Python.
         </p>
-        <table border=1 class="cmd_list_table">
+        <table border=1 class="cmd_list">
             <tr>
                 <th>HP42S Command</th>
                 <th>Supported in Python to RPN</th>
@@ -48,7 +48,7 @@
                 <td>
                     {{ cmd_list[cmd]['suggestion'] }}
                 </td>
-                <td>
+                <td style="font-family: monospace">
                     {{ cmd_list[cmd]['params'] }}
                 </td>
                 <td align="left">
