@@ -165,9 +165,9 @@ REALRES,Real-results. Disables the calculator's ability to return a complex resu
 REAL?,"If the x-register contains a real number, execute the next program line; if the x-register does not contain a real number, skip the next program line.",tocheck,
 RECT,Select Rectangular coordinate mode for displaying complex numbers.,ok,()
 RND,Round the number in the x-register using the current display format.,ok,(n)
-RNRM,Return the row norm of the matrix in the x-register.,ok,(m)
+RNRM,Return the row norm of the matrix in the x-register.,ok,(mvar)
 ROTXY,Rotate the 36-bit number in the y-register by x bits.,ok suggestion: Pass two parameters to this function.,"(y,x)"
-RSUM,Return the row sum of each row of the matrix in the x-register and returns the sums in a column matrix.,tocheck,
+RSUM,Return the row sum of each row of the matrix in the x-register and returns the sums in a column matrix.,ok,(mvar)
 RTN,"Return. In a running program, branches the program pointer back to the line following the most recent XEQ instruction. If there is no matching XEQ instruction, program execution halts. From the keyboard, RTN moves the program pointer to line 00 of the current program.",return,
 R<>R,Row swap row. Swaps the elements in rows x and y in the indexed matrix.,"mymatrix.row_swap(row,row)",
 R↑,Roll up the contents of the four stack registers one position.,nostack,
@@ -199,7 +199,7 @@ TAN,Tangent. Returns tan(x).,ok,(n)
 TANH,Hyperbolic tangent. Returns tanh(x).,ok,(n)
 TONE,Sounds a tone. Parameter: tone number (0–9) (indirect allowed),ok,(n)
 TRACE,"Select Trace printing mode, which prints a record of keystrokes and results.",ok,()
-TRANS,Return the transpose of the matrix in the x-register.,ok,(m)
+TRANS,Return the transpose of the matrix in the x-register.,ok,(mvar)
 UVEC,Unit vector. Return the unit vector for the matrix or complex number in the x-register.,ok,(n)
 VARMENU,Create a variable menu using MVAR instructions following the specified global label. Parameter: global program label. (indirect allowed),ok suggestion: Also check out the new advanced Python function varmenu(),
 VIEW,View the contents of a register or variable. Parameter: register or variable (indirect allowed),ok,(var)

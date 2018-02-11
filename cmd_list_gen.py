@@ -19,6 +19,16 @@ def extract(supported):
         suggestion = ''
     return info, suggestion
 
+def calc_num_params(params):
+    if params:
+        assert params[0] == '('
+        assert params[-1] == ')'
+        params_no_brackets = params[1:-1]
+        num_params = len(params_no_brackets.split(',')) if params_no_brackets else -1
+    else:
+        num_params = 0
+    return num_params
+
 with open('cmd_list.csv', newline='') as csvfile:
     myreader = csv.reader(csvfile)
     for row in myreader:
@@ -95,11 +105,7 @@ with open('cmd_list.csv', newline='') as csvfile:
             supported = info
 
         params = row[3].strip()
-        if params:
-            assert params[0] == '('
-            assert params[-1] == ')'
-            params_no_brackets = params[1:-1]
-        num_params = len(params_no_brackets.split(',')) if params else -1
+        num_params = calc_num_params(params)
 
         if supported == "No":
             css_class = 'no'
