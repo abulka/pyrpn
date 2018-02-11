@@ -172,7 +172,7 @@ RTN,"Return. In a running program, branches the program pointer back to the line
 R<>R,Row swap row. Swaps the elements in rows x and y in the indexed matrix.,"mymatrix.row_swap(row,row)",
 R↑,Roll up the contents of the four stack registers one position.,nostack,
 R↓,Roll down the contents of the four stack registers one position.,nostack,
-R/S,"Run/stop. Runs a program (beginning at the current program line) or stops a running program. In program-entry mode, inserts a STOP instruction into the program.",ok suggestion: Use STOP(),
+R/S,"Run/stop. Runs a program (beginning at the current program line) or stops a running program. In program-entry mode, inserts a STOP instruction into the program.",ok suggestion: Use STOP(),()
 SCI,Select scientific notation display format. Parameter: number of digits (indirect allowed),ok,(digits)
 SDEV,Standard deviation. Returns sx and sy using the current statistical data.,ok,()
 SEED,Store a seed for the random number generator.,ok,(n)

@@ -47,7 +47,7 @@ with open('cmd_list.csv', newline='') as csvfile:
             supported = ''
             suggestion = 'being researched'
         elif supported[0:2] == 'na':
-            if "(Not programmable.)" in description:
+            if "Not programmable" in description:
                 supported = "Not programmable"
                 suggestion = ''
             else:
@@ -96,8 +96,8 @@ with open('cmd_list.csv', newline='') as csvfile:
         if params:
             assert params[0] == '('
             assert params[-1] == ')'
-            params = params[1:-1]
-        num_params = len(params.split(',')) if params else -1
+            params_no_brackets = params[1:-1]
+        num_params = len(params_no_brackets.split(',')) if params else -1
 
         entry = {
             'description': description,
