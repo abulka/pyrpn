@@ -66,7 +66,7 @@ with open('cmd_list.csv', newline='') as csvfile:
                 info, suggestion = extract(supported)
                 supported = "N/A"
                 if not suggestion:
-                    suggestion = 'Not Applicable, please use native Python.'
+                    suggestion = 'Not applicable, please use native Python.'
         elif supported == 'noflow':
             supported = "No"
             suggestion = 'Use Python "if" statements instead. E.g. "if var1 == var2 or (var3 >= var4):"...'

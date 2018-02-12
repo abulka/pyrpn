@@ -232,8 +232,8 @@ Y↑X,Power. Returns yx.,✓ (renamed) suggestion: y**x,(n)
 ×,Multiplication. Returns x × y.,ok,
 ÷,Division. Returns y / x.,ok,
 +/–,"Change the sign of the number in the x-register. While entering an exponent, can also be used to change the sign of the exponent.",na,
-Σ+,Summation plus. Accumulate a pair of x- and y values into the summation registers.,remapped,"(x,y)"
-Σ-,Summation minus. Subtract a pair of x- and y-values from the summation registers.,remapped,"(x,y)"
+Σ+,Summation plus. Accumulate a pair of x- and y values into the summation registers.,remapped,"(y,x)"
+Σ-,Summation minus. Subtract a pair of x- and y-values from the summation registers.,remapped,"(y,x)"
 ΣREG,Summation registers. Defines which storage register begins the block of summation registers. Parameter: register number (indirect allowed),remapped,(n)
 ΣREG?,Return the register number of the first summation register.,remapped,()
 →DEC,To decimal. Converts the octal (base 8) representation of a number to decimal (base 10). Note: This function is included to provide program compatibility with the HP-41 (which uses the function name DEC).,remapped,(n)
@@ -250,4 +250,4 @@ Y↑X,Power. Returns yx.,✓ (renamed) suggestion: y**x,(n)
 ↓,Move down one element in the indexed matrix.,nomatrix,
 →,Move right one element in the indexed matrix.,nomatrix,
 %,Percent. Returns (x × y) / 100. (Leaves the y value in the y-register.),remapped,"(num,percent)"
-%CH,Percent change. Returns (x – y)×(100 / y).,remapped,"(x,y)"
+%CH,Percent change. Returns (x – y)×(100 / y).,remapped,"(y,x)"

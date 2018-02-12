@@ -123,7 +123,7 @@ table.cmd_list tr.no {
     background-color: lightgray;
 }
 table.cmd_list tr.na {
-    background-color: #ce8413;
+    background-color: rgba(197, 63, 35, 0.83);
 }
 /*table.cmd_list tr.not-programmable {*/
     /*background-color: grey;*/

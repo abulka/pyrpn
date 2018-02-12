@@ -13,7 +13,7 @@ cmd_list = \
          'indirect_allowed': False,
          'num_arg_fragments': 0,
          'num_params': 2,
-         'params': '(x,y)',
+         'params': '(y,x)',
          'suggestion': 'PercentCH()',
          'supported': '✓ (renamed)'},
  '+': {'class': '',
@@ -32,7 +32,7 @@ cmd_list = \
          'num_arg_fragments': 0,
          'num_params': 0,
          'params': '',
-         'suggestion': 'Not Applicable, please use native Python.',
+         'suggestion': 'Not applicable, please use native Python.',
          'supported': 'N/A'},
  '1/X': {'class': '',
          'description': 'Reciprocal. Returns 1/x.',
@@ -372,7 +372,7 @@ cmd_list = \
            'num_arg_fragments': 0,
            'num_params': 0,
            'params': '',
-           'suggestion': 'Not Applicable, please use native Python.',
+           'suggestion': 'Not applicable, please use native Python.',
            'supported': 'N/A'},
  'CLD': {'class': '',
          'description': 'Clear display. Clear a message from the display.',
@@ -433,7 +433,7 @@ cmd_list = \
           'num_arg_fragments': 0,
           'num_params': 0,
           'params': '',
-          'suggestion': 'Not Applicable, please use native Python.',
+          'suggestion': 'Not applicable, please use native Python.',
           'supported': 'N/A'},
  'CLV': {'class': '',
          'description': 'Clear a variable from memory. Parameter: variable '
@@ -452,7 +452,7 @@ cmd_list = \
          'num_arg_fragments': 0,
          'num_params': 0,
          'params': '',
-         'suggestion': 'Not Applicable, please use native Python.',
+         'suggestion': 'Not applicable, please use native Python.',
          'supported': 'N/A'},
  'CLZ': {'class': '',
          'description': 'Clear statistics. Clear the accumulated statistical '
@@ -658,7 +658,7 @@ cmd_list = \
          'num_arg_fragments': 0,
          'num_params': 0,
          'params': '',
-         'suggestion': 'Not Applicable, please use native Python.',
+         'suggestion': 'Not applicable, please use native Python.',
          'supported': 'N/A'},
  'ENG': {'class': '',
          'description': 'Select Engineering display format. Parameter: number '
@@ -865,7 +865,7 @@ cmd_list = \
          'num_arg_fragments': 1,
          'num_params': 0,
          'params': '',
-         'suggestion': 'Not Applicable, please use native Python.',
+         'suggestion': 'Not applicable, please use native Python.',
          'supported': 'N/A'},
  'HEXM': {'class': '',
           'description': 'Select Hexadecimal mode (base 16).',
@@ -1050,7 +1050,7 @@ cmd_list = \
          'num_arg_fragments': 1,
          'num_params': 0,
          'params': '',
-         'suggestion': 'Not Applicable, please use native Python.',
+         'suggestion': 'Not applicable, please use native Python.',
          'supported': 'N/A'},
  'LCLBL': {'class': 'tocheck',
            'description': 'Select Local label mode for the CUSTOM menu (to use '
@@ -1989,7 +1989,7 @@ cmd_list = \
           'num_arg_fragments': 0,
           'num_params': 0,
           'params': '',
-          'suggestion': 'Use Python "if" statements instead. E.g. "if var1 != '
+          'suggestion': 'Use Python "if" statements instead. E.g. "if var1 == '
                         'var2 or (var3 >= var4):"...',
           'supported': 'No'},
  'X<>': {'class': 'no',
@@ -2019,7 +2019,7 @@ cmd_list = \
           'num_arg_fragments': 0,
           'num_params': 0,
           'params': '',
-          'suggestion': 'Use Python "if" statements instead. E.g. "if var1 != '
+          'suggestion': 'Use Python "if" statements instead. E.g. "if var1 == '
                         'var2 or (var3 >= var4):"...',
           'supported': 'No'},
  'X=0?': {'class': 'no',
@@ -2030,7 +2030,7 @@ cmd_list = \
           'num_arg_fragments': 0,
           'num_params': 0,
           'params': '',
-          'suggestion': 'Use Python "if" statements instead. E.g. "if var1 != '
+          'suggestion': 'Use Python "if" statements instead. E.g. "if var1 == '
                         'var2 or (var3 >= var4):"...',
           'supported': 'No'},
  'X=Y?': {'class': 'no',
@@ -2041,7 +2041,7 @@ cmd_list = \
           'num_arg_fragments': 0,
           'num_params': 0,
           'params': '',
-          'suggestion': 'Use Python "if" statements instead. E.g. "if var1 != '
+          'suggestion': 'Use Python "if" statements instead. E.g. "if var1 == '
                         'var2 or (var3 >= var4):"...',
           'supported': 'No'},
  'X>0?': {'class': 'no',
@@ -2052,7 +2052,7 @@ cmd_list = \
           'num_arg_fragments': 0,
           'num_params': 0,
           'params': '',
-          'suggestion': 'Use Python "if" statements instead. E.g. "if var1 != '
+          'suggestion': 'Use Python "if" statements instead. E.g. "if var1 == '
                         'var2 or (var3 >= var4):"...',
           'supported': 'No'},
  'X>Y?': {'class': 'no',
@@ -2063,7 +2063,7 @@ cmd_list = \
           'num_arg_fragments': 0,
           'num_params': 0,
           'params': '',
-          'suggestion': 'Use Python "if" statements instead. E.g. "if var1 != '
+          'suggestion': 'Use Python "if" statements instead. E.g. "if var1 == '
                         'var2 or (var3 >= var4):"...',
           'supported': 'No'},
  'XEQ': {'class': 'na',
@@ -2112,7 +2112,7 @@ cmd_list = \
           'num_arg_fragments': 0,
           'num_params': 0,
           'params': '',
-          'suggestion': 'Use Python "if" statements instead. E.g. "if var1 != '
+          'suggestion': 'Use Python "if" statements instead. E.g. "if var1 == '
                         'var2 or (var3 >= var4):"...',
           'supported': 'No'},
  'X≠Y?': {'class': 'no',
@@ -2123,7 +2123,7 @@ cmd_list = \
           'num_arg_fragments': 0,
           'num_params': 0,
           'params': '',
-          'suggestion': 'Use Python "if" statements instead. E.g. "if var1 != '
+          'suggestion': 'Use Python "if" statements instead. E.g. "if var1 == '
                         'var2 or (var3 >= var4):"...',
           'supported': 'No'},
  'X≤0?': {'class': 'no',
@@ -2134,7 +2134,7 @@ cmd_list = \
           'num_arg_fragments': 0,
           'num_params': 0,
           'params': '',
-          'suggestion': 'Use Python "if" statements instead. E.g. "if var1 != '
+          'suggestion': 'Use Python "if" statements instead. E.g. "if var1 == '
                         'var2 or (var3 >= var4):"...',
           'supported': 'No'},
  'X≤Y?': {'class': 'no',
@@ -2145,7 +2145,7 @@ cmd_list = \
           'num_arg_fragments': 0,
           'num_params': 0,
           'params': '',
-          'suggestion': 'Use Python "if" statements instead. E.g. "if var1 != '
+          'suggestion': 'Use Python "if" statements instead. E.g. "if var1 == '
                         'var2 or (var3 >= var4):"...',
           'supported': 'No'},
  'X≥0?': {'class': 'no',
@@ -2156,7 +2156,7 @@ cmd_list = \
           'num_arg_fragments': 0,
           'num_params': 0,
           'params': '',
-          'suggestion': 'Use Python "if" statements instead. E.g. "if var1 != '
+          'suggestion': 'Use Python "if" statements instead. E.g. "if var1 == '
                         'var2 or (var3 >= var4):"...',
           'supported': 'No'},
  'X≥Y?': {'class': 'no',
@@ -2167,7 +2167,7 @@ cmd_list = \
           'num_arg_fragments': 0,
           'num_params': 0,
           'params': '',
-          'suggestion': 'Use Python "if" statements instead. E.g. "if var1 != '
+          'suggestion': 'Use Python "if" statements instead. E.g. "if var1 == '
                         'var2 or (var3 >= var4):"...',
           'supported': 'No'},
  'YINT': {'class': '',
@@ -2209,7 +2209,7 @@ cmd_list = \
         'indirect_allowed': False,
         'num_arg_fragments': 0,
         'num_params': 2,
-        'params': '(x,y)',
+        'params': '(y,x)',
         'suggestion': 'StatPlus()',
         'supported': '✓ (renamed)'},
  'Σ-': {'class': '',
@@ -2218,7 +2218,7 @@ cmd_list = \
         'indirect_allowed': False,
         'num_arg_fragments': 0,
         'num_params': 2,
-        'params': '(x,y)',
+        'params': '(y,x)',
         'suggestion': 'StatMinus()',
         'supported': '✓ (renamed)'},
  'ΣREG': {'class': '',

@@ -14,22 +14,63 @@
 
     <div class="andy_content">
 
-        <del>dsfjsdlkfj sldkfjlsd fjlsd kfjs ldkfj</del>
         <p>The intention is to provide access to all HP42S RPN commands or to provide an equivalent.
-        Where it makes overwhelming sense, a more modern, time saving or Pythonic alternative is provided e.g. matrix
-        access via indexing and slicing syntax - see the help file for information and tutorials.
         </p>
+        <ul>
+            <li>
+                HP42S commands which include symbols like <code>?!,.<>+-×÷≤≠↑Σ→</code>
+                <i>etc.</i> are not valid Python syntax, so alternative names have been invented.
+                Something like <code>FS?</code> is exposed as e.g. <code>isFS()</code>.
+                The table below lists all renamed commands.
+            </li>
+            <li>
+                Where it makes overwhelming sense, a more modern, time saving or Pythonic alternative is provided. For
+                example
+                matrix access is more easily done using natural Python (and NumPy) indexing and slicing syntax -
+                see the help page for full information and tutorials.
+            </li>
+            <li>
+                Commands that:
+                <ul>
+                    <li>
+                        Operate on the stack
+                    </li>
+                    <li>
+                        Use GTO
+                    </li>
+                    <li>
+                        Which test and jump e.g. X<0?
+                    </li>
+                </ul>
+                are not applicable to Python.
+                Use <b>natural Python syntax</b> instead e.g. use <code>if var < 0:</code> instead of <code>X<0?</code>
+            </li>
+        </ul>
         <p>
-        Commands that operate on the stack, that use GTO, or which test and jump e.g. X<0? are not applicable in Python.
-        And often it is simply that the symbols like ? in the RPN commands are not allowed in Python syntax, so
-        something like FS? needs to be exposed as e.g. isFS().
+            The description column in the table below is the original "pure" HP42S command description,
+            which
+            will often refer to the stack. The stack is not exposed to the user in Python so please translate these
+            descriptions
+            as follows:
         </p>
-        <p>
-        <b>Warning:</b> The description column in the table below is the original "pure" HP42S command description, which
-            will often refer to the stack.  The stack is not used in Python so translate these descriptions
-            accordingly.  For example a references to stack x can often be substituted with a reference to a Python variable.
-            E.g. SIN which acts on stack x is simply SIN(myvar) when accessed via Python.
-        </p>
+        <ul>
+            <li>
+                A reference to <b>x</b> from the Python point of view means a single variable needs to be passed in as a
+                parameter.
+                E.g. <code>SIN</code> which acts on stack x is simply <code>SIN(var)</code> when accessed via Python.
+            </li>
+            <li>
+                If both <b>x</b> and <b>y</b> are needed, then from the Python point of view two parameters are
+                needed <code>(y,x)</code>. Notice
+                that y goes first because during conversion to RPN,
+                Python parameters are pushed onto the the stack from <i>left to right</i>, so the first parameter
+                ends up in the y stack position and the second parameter ends up in the x stack position.
+            </li>
+        </ul>
+        <p>An attempt has been made to redact material in the original "pure" HP42S command description column
+            which might be misleading.  The text is <del>struck out</del> but remains, so that the original intent of the command
+            is visible, which may aid programming.</p>
+        <br>
         <table border=1 class="cmd_list">
             <tr>
                 <th>HP42S Command</th>
