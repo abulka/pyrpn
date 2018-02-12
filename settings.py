@@ -60,6 +60,8 @@ PYTHON_CMD_TO_RPN = {
     'BASEtimes':    'BASEx',
     'BASEdivide':   'BASE÷',
     'BASEplusMinus':'BASE+/–',
+    'RDXcomma':'RDX,',
+    'RDXperiod':'RDX.',
 
 }
 RPN_CMD_TO_PYTHON_REPLACEMENT = {v: k for k, v in PYTHON_CMD_TO_RPN.items()}

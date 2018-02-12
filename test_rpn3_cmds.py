@@ -768,3 +768,14 @@ class RpnTests3Cmds(BaseTest):
             SIZE 0050
             """)
         self.compare(de_comment(expected))
+
+    def test_rdx(self):
+        self.parse(dedent("""
+            RDXcomma()
+            RDXperiod()
+            """))
+        expected = dedent("""
+            RDX,
+            RDX.
+            """)
+        self.compare(de_comment(expected))

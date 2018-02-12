@@ -159,8 +159,8 @@ RCL×,Recall multiplication. Recall data and multiply it by the contents of the 
 RCL÷,Recall division. Recall data and divide it into the contents of the x-register. Parameter: register or variable (indirect allowed),noregs,
 RCLEL,Recall element. Recalls the current matrix element from the indexed matrix.,nomatrix,
 RCLIJ,Recall the row- and column-pointer values (I and J) for the indexed matrix.,nomatrix,
-"RDX,",Select a comma to be used as the radix mark (decimal point).,tocheck,
-RDX.,Select a period to be used as the radix mark (decimal point).,tocheck,
+"RDX,",Select a comma to be used as the radix mark (decimal point).,remapped,()
+RDX.,Select a period to be used as the radix mark (decimal point).,remapped,()
 REALRES,Real-results. Disables the calculator's ability to return a complex result using real-number inputs.,ok,()
 REAL?,"If the x-register contains a real number, execute the next program line; if the x-register does not contain a real number, skip the next program line.",tocheck,
 RECT,Select Rectangular coordinate mode for displaying complex numbers.,ok,()
