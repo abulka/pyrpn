@@ -1097,6 +1097,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.begin(node)
         self.visit(node.test)
         self.program.insert_xeq('pAssert', comment='Python assert')
+        self.pending_stack_args = []  # they seem to accumulate here, so clear them
         self.end(node)
 
     def visit_If(self, node):
