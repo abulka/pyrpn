@@ -509,7 +509,7 @@ cmd_list = \
           'params': '(n)',
           'suggestion': '',
           'supported': '✓'},
- 'CPX?': {'class': 'tocheck',
+ 'CPX?': {'class': '',
           'description': 'If the x-register contains a complex number, '
                          '<del>execute the next program line</del>; if the '
                          'x-register does not contain a complex number, '
@@ -518,8 +518,8 @@ cmd_list = \
           'num_arg_fragments': 0,
           'num_params': 1,
           'params': '(n)',
-          'suggestion': 'being researched',
-          'supported': ''},
+          'suggestion': 'isCPX()',
+          'supported': '✓ (renamed)'},
  'CPXRES': {'class': '',
             'description': 'Complex-results. Enable the calculator to return a '
                            'complex result, even if the inputs are real '

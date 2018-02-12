@@ -369,7 +369,7 @@ class RpnTemplates:
         RTN    
         """)
 
-    # Misc Tests - Real?, Bit?, Matrix?, ...
+    # Misc Tests - Real?, Bit?, Complex?, Matrix?, ...
 
     pREAL = dedent("""
         LBL "pREAL"  // Is real number? (n) -> boolean
@@ -390,6 +390,19 @@ class RpnTemplates:
         BIT?
         SF 00
         RDN
+        RDN
+        FS? 00
+        1
+        FC? 00
+        0
+        RTN    
+        """)
+
+    pCPX = dedent("""
+        LBL "pCPX"  // Is a complex number? (n) -> boolean
+        CF 00
+        CPX?
+        SF 00
         RDN
         FS? 00
         1

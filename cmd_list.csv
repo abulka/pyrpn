@@ -50,7 +50,7 @@ CORR,Returns a correlation coefficient using the current statistical data and cu
 COS,Cosine. Returns cos(x).,ok,(n)
 COSH,Hyperbolic cosine. Returns cosh(x).,ok,(n)
 CPXRES,"Complex-results. Enable the calculator to return a complex result, even if the inputs are real numbers.",ok,()
-CPX?,"If the x-register contains a complex number, execute the next program line; if the x-register does not contain a complex number, skip the next program line.",tocheck,(n)
+CPX?,"If the x-register contains a complex number, execute the next program line; if the x-register does not contain a complex number, skip the next program line.",remapped,(n)
 CROSS,Returns the cross product of two vectors (matrices or complex numbers).,ok,"(m,m)"
 DECM,Selects Decimal mode (base 10).,ok,()
 DEG,Select the Degrees angular mode.,ok,()

@@ -822,3 +822,13 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.assertRaises(RpnError, self.parse, dedent(src))
 
+    def test_cpx(self):
+        self.parse(dedent("""
+            isCPX(20)
+            """))
+        expected = dedent("""
+            20
+            XEQ "pCPX"
+            """)
+        self.compare(de_comment(expected))
+
