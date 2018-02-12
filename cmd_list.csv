@@ -241,9 +241,9 @@ Y↑X,Power. Returns yx.,✓ (renamed) suggestion: y**x,(n)
 →HMS,"To hours, minutes, and seconds. Convert x from a decimal fraction to a minutes-seconds format.",remapped,(n)
 →HR,To hours. Converts x from a minutes-seconds format to a decimal fraction.,remapped,(n)
 →OCT,To octal. Converts a decimal number to the octal representation. Note: This function is included to provide program compatibility with the HP-41 (which uses the function name OCT).,remapped,(n)
-→POL,"To polar. Converts x and y to the corresponding polar coordinates r and θ. If the x-register contains a complex number, converts the two parts of the number to polar values.",remapped,(n)
+→POL,"To polar. Converts x and y to the corresponding polar coordinates r and θ. If the x-register contains a complex number, converts the two parts of the number to polar values.",tocheck,"(n,n)"
 →RAD,To radians. Converts a angle value in degrees to radians. Returns x×(π/180).,remapped,(n)
-→REC,"To rectangular. Converts r (in the x-register) and θ (in the y-register) to the corresponding rectangular coordinates, x and y. If the X-register contains a complex number, converts the two parts of the number to rectangular values.",remapped,"(θ,r)"
+→REC,"To rectangular. Converts r (in the x-register) and θ (in the y-register) to the corresponding rectangular coordinates, x and y. If the X-register contains a complex number, converts the two parts of the number to rectangular values.",tocheck,"(θ,r)"
 ◄,"Backspace or clear x-register. In Program entry mode, deletes the current program line. Not programmable",na,
 ←,Move left one element in the indexed matrix.,nomatrix,
 ↑,Move up one element in the indexed matrix.,nomatrix,

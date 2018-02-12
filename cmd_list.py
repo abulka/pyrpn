@@ -2327,17 +2327,17 @@ cmd_list = \
           'params': '(n)',
           'suggestion': 'toOCT()',
           'supported': '✓ (renamed)'},
- '→POL': {'class': '',
+ '→POL': {'class': 'tocheck',
           'description': 'To polar. Converts x and y to the corresponding '
                          'polar coordinates r and θ. If the x-register '
                          'contains a complex number, converts the two parts of '
                          'the number to polar values.',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
-          'num_params': 1,
-          'params': '(n)',
-          'suggestion': 'toPOL()',
-          'supported': '✓ (renamed)'},
+          'num_params': 2,
+          'params': '(n,n)',
+          'suggestion': 'being researched',
+          'supported': ''},
  '→RAD': {'class': '',
           'description': 'To radians. Converts a angle value in degrees to '
                          'radians. Returns x×(π/180).',
@@ -2347,7 +2347,7 @@ cmd_list = \
           'params': '(n)',
           'suggestion': 'toRAD()',
           'supported': '✓ (renamed)'},
- '→REC': {'class': '',
+ '→REC': {'class': 'tocheck',
           'description': 'To rectangular. Converts r (in the x-register) and θ '
                          '(in the y-register) to the corresponding rectangular '
                          'coordinates, x and y. If the X-register contains a '
@@ -2357,8 +2357,8 @@ cmd_list = \
           'num_arg_fragments': 0,
           'num_params': 2,
           'params': '(θ,r)',
-          'suggestion': 'toREC()',
-          'supported': '✓ (renamed)'},
+          'suggestion': 'being researched',
+          'supported': ''},
  '↓': {'class': 'no',
        'description': '<del>Move down one element in the indexed matrix.</del>',
        'indirect_allowed': False,
