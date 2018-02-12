@@ -35,6 +35,7 @@ RPN_TO_RPNLIB_SPECIAL = {
     'BIT?':         'testBIT',
     'CPX?':         'isCPX',
     'MAT?':         'isMAT',
+    'STR?':         'isSTR',
 }
 
 # So that converter knows that these are not user functions - cos these don't exist in PYTHON_CMD_TO_RPN
@@ -45,6 +46,7 @@ PYLIB_INSERTABLE_WHEN_ORIGINAL_REMAPPED = {
     'pBIT': {'description': 'test the xth bit of y.'},
     'pCPX': {'description': 'is complex number?'},
     'pMAT': {'description': 'is matrix?'},
+    'pSTR': {'description': 'is string?'},
 
     'pMxLen': {'description': 'length of list or dict'},
 }
@@ -58,6 +60,7 @@ PYTHON_CMD_TO_RPN = {
     'testBIT':      'pBIT',
     'isCPX':        'pCPX',
     'isMAT':        'pMAT',
+    'isSTR':        'pSTR',
 
     'len':          'pMxLen',
 

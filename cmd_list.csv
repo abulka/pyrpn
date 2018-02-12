@@ -193,7 +193,7 @@ STO÷,Store division. Divides an existing register or variable by x. Parameter: 
 STOEL,Store element. Stores a copy of x into the current element of the indexed matrix.,nomatrix,
 STOIJ,Moves the row- and column-pointers to I = x and J = y in the indexed matrix.,nomatrix,
 STOP,Stop program execution. (R/S in program entry mode).,ok,()
-STR?,"If the x-register contains an Alpha string, execute the next program line; if the x-register does not contain an Alpha string, skip the next program line.",tocheck,
+STR?,"If the x-register contains an Alpha string, execute the next program line; if the x-register does not contain an Alpha string, skip the next program line.",remapped,(x)
 SUM,Returns the sums Σx and Σy into the x- and y-registers.,tocheck,
 TAN,Tangent. Returns tan(x).,ok,(n)
 TANH,Hyperbolic tangent. Returns tanh(x).,ok,(n)

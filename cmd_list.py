@@ -1871,17 +1871,17 @@ cmd_list = \
                         '+= 1, var2 = myvar" or even expressions like "myvar '
                         '*= var3/(2-1)"',
           'supported': 'No'},
- 'STR?': {'class': 'tocheck',
+ 'STR?': {'class': '',
           'description': 'If the x-register contains an Alpha string, '
                          '<del>execute the next program line</del>; if the '
                          'x-register does not contain an Alpha string, '
                          '<del>skip the next program line</del>.',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
-          'num_params': 0,
-          'params': '',
-          'suggestion': 'being researched',
-          'supported': ''},
+          'num_params': 1,
+          'params': '(x)',
+          'suggestion': 'isSTR()',
+          'supported': '✓ (renamed)'},
  'SUM': {'class': 'tocheck',
          'description': 'Returns the sums Σx and Σy into the x- and '
                         'y-registers.',
