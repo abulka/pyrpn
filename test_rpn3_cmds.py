@@ -893,8 +893,59 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+    # multiple return values
+
+    def test_multiple_return(self):
+        self.parse(dedent("""
+            def multret():
+                a, b = calc(1, 2)
+                assert a == 100
+                assert b == 3
+                
+            def calc(a,b):
+                c = a * 100
+                return c, b+1
+            """))
+        expected = dedent("""
+            LBL "multret"
+            1
+            2
+            XEQ A           // calc()
+            STO 00          // a
+            RDN
+            STO 01          // b
+            
+            RCL 00
+            100
+            XEQ "pEQ"
+            XEQ "pAssert"
+            RCL 01
+            3
+            XEQ "pEQ"
+            XEQ "pAssert"
+            RTN
+            
+            LBL A
+            XEQ "p2Param"
+            STO 02
+            RDN
+            STO 03
+            RDN
+            RCL 02
+            100
+            *
+            STO 04
+            RCL 03
+            1
+            +
+            RCL 04
+            RTN
+            """)
+        self.compare(de_comment(expected))
+
     # @unittest.skip('multiple params')
     def test_toPOL(self):
+        # multiple return values used here for the first time
         self.parse(dedent("""
             a, b = toPOL(1, 2)
             """))

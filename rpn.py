@@ -484,9 +484,42 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         """
         Child nodes are:
             - node.value
+
+        when a function returns one thing:
+              Return(value=Name(
+                id='c',
+                ctx=Load()))],
+
+        when a function returns multiple things:
+              Return(value=Tuple(
+                elts=[
+                  Name(
+                    id='c',
+                    ctx=Load()),
+                  BinOp(
+                    left=Name(
+                      id='b',
+                      ctx=Load()),
+                    op=Add(),
+                    right=Num(n=1))],
+                ctx=Load()))],
+
+        if its not a tuple - do normal visit of children
+        if it is a tuple
+            - Loop through the tuple elements
+            - We need to loop in reverse order because of RPN stack parameter assignment - better than
+              assigning things in reverse order I guess.
+            - Could have flaged that are doing a return and allow visit_tuples to do the reversing
+              work for us but easier to do it here and not introduce any more flags.
         """
         self.begin(node)
-        self.visit_children(node)
+
+        if isinstance(node.value, ast.Tuple):
+            for elt in reversed(node.value.elts):
+                self.visit(elt)
+        else:
+            self.visit_children(node)
+
         self.astox()
         self.program.insert(f'RTN', comment='return')
         self.end(node)
@@ -932,6 +965,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         """
         visit a Tuple node
             - elts (list of elements)
+
+        Interestingly, matrix subscripts seem to be treated as tuples and are parsed here.
+        Returning multiple values is also treated as a tuple - however that use case is intercepted
+            in visit_Return because we need those return values pushed onto the RPN stack in
+            reverse order - viz. "for elt in reversed(node.elts)" as opposed to normal ordering,
+            here (which matrix subscripts need)
         """
         self.begin(node)
         if isinstance(node.ctx, ast.Store):

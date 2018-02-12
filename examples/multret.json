@@ -1,0 +1,8 @@
+{
+    "description": "<p>Traditionally in RPN you can return multiple values from a subroutine by pushing those values onto the stack.</p>\r\n<p>In Python you can return multiple values from a function using the return statement e.g. <code>return c, b+1</code>.&nbsp; These values can then be assigned to multiple variables e.g. <code>a, b = calc(1, 2)</code>.&nbsp;</p>\r\n<p>Various HP42S commands return multiple values and to access those values you will need to use this Python tuple syntax.&nbsp; For example the <code>&rarr;POL</code> command which is accessed from Python using <code>toPOL()</code> is called like this:</p>\r\n<pre class=\"language-python\"><code>a, b = toPOL(1, 2)</code></pre>\r\n<p>&nbsp;</p>",
+    "public": "yes",
+    "sortnum": 0,
+    "source": "def multret():\r\n    a, b = calc(1, 2)\r\n    assert a == 100\r\n    assert b == 3\r\n    print(\"multiple return values works ok\")\r\n    \r\ndef calc(a,b):\r\n    c = a * 100\r\n    return c, b+1",
+    "tags": "Advanced",
+    "title": "Multiple return values"
+}
