@@ -877,3 +877,34 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+    def test_edit_matrix(self):
+        # map edit to editn - same thing
+        self.parse(dedent("""
+            m = NEWMAT(1,4)
+            EDIT(m)
+            """))
+        expected = dedent("""
+            1
+            4
+            NEWMAT
+            STO "m"
+
+            EDITN "m"
+            """)
+        self.compare(de_comment(expected))
+
+    @unittest.skip('multiple params')
+    def test_toPOL(self):
+        self.parse(dedent("""
+            a, b = toPOL(1, 2)
+            """))
+        expected = dedent("""
+            1
+            2
+            →POL
+            STO 00
+            RDN
+            STO 01
+            """)
+        self.compare(de_comment(expected))
+

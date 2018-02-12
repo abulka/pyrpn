@@ -62,7 +62,7 @@ DIM,"Dimension a matrix to x columns and y rows. If the matrix does not exist, D
 DIM?,Returns the dimensions of the matrix in the x-register (rows to the y-register and columns to the x-register).,len(mymatrix) suggestion: Currently len(mymatrix) to get the length. TODO Still working on mymatrix.shape(),
 DOT,Dot Product.  Returns the dot product of two vectors (matrices or complex numbers).,ok,"(n,n)"
 DSE,"Decrement, Skip if (less than or) Equal. Given ccccccc.fflii in a variable or register, decrements ccccccc by ii and skips the next program line if ccccccc is now ≤  fff. Parameter: register or variable (indirect allowed)",noloop,
-EDIT,Edit a matrix in the x-register.,tocheck,
+EDIT,Edit a matrix in the x-register.,ok suggestion: Exactly the same as EDITN - pass in the variable containing the matrix to edit.,(mvar)
 EDITN,Edit a named matrix. Parameter: variable name (indirect allowed),ok,(mvar)
 END,End of a program.,na,
 ENG,Select Engineering display format. Parameter: number of digits (indirect allowed),ok,(digits)

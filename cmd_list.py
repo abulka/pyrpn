@@ -635,14 +635,15 @@ cmd_list = \
          'suggestion': 'Use native Python for...range() or while... for '
                        'looping.',
          'supported': 'No'},
- 'EDIT': {'class': 'tocheck',
+ 'EDIT': {'class': '',
           'description': 'Edit a matrix in the x-register.',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
-          'num_params': 0,
-          'params': '',
-          'suggestion': 'being researched',
-          'supported': ''},
+          'num_params': 1,
+          'params': '(mvar)',
+          'suggestion': 'Exactly the same as EDITN - pass in the variable '
+                        'containing the matrix to edit.',
+          'supported': '✓'},
  'EDITN': {'class': '',
            'description': 'Edit a named matrix. Parameter: variable name '
                           '<del>(indirect allowed)</del>',

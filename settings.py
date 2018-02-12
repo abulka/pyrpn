@@ -97,6 +97,8 @@ PYTHON_CMD_TO_RPN = {
     'RDXcomma':     'RDX,',
     'RDXperiod':    'RDX.',
 
+    'EDIT':         'EDITN',
+
 }
 # backward lookup so that cmd list gen can show the Python substitute in cmd list table
 RPN_CMD_TO_PYTHON_REPLACEMENT = {v: k for k, v in PYTHON_CMD_TO_RPN.items()}
