@@ -2349,7 +2349,7 @@ cmd_list = \
           'params': '(n)',
           'suggestion': 'toRAD()',
           'supported': '✓ (renamed)'},
- '→REC': {'class': 'tocheck',
+ '→REC': {'class': '',
           'description': 'To rectangular. Converts r (in the x-register) and θ '
                          '(in the y-register) to the corresponding rectangular '
                          'coordinates, x and y. If the X-register contains a '
@@ -2359,8 +2359,9 @@ cmd_list = \
           'num_arg_fragments': 0,
           'num_params': 2,
           'params': '(θ,r)',
-          'suggestion': 'being researched',
-          'supported': ''},
+          'suggestion': "Assign the two return values into variables e.g. 'a, "
+                        "b = toREC(1, 2)'",
+          'supported': '✓'},
  '↓': {'class': 'no',
        'description': '<del>Move down one element in the indexed matrix.</del>',
        'indirect_allowed': False,
