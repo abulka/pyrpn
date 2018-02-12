@@ -19,7 +19,7 @@ ASSIGN,"Assign a function, program, or variable to a menu key in the CUSTOM menu
 ASTO,Alpha store. Copy the first six characters in the Alpha register into a register or variable. Parameter: register or variable (indirect allowed),ok,(var)
 ATAN,Arc tangent. Returns tan–1 x.,ok,(n)
 ATANH,Arc hyperbolic tangent. Returns tanh–1 x.,ok,(n)
-ATOX,Alpha to X. Convert the left-most character in the Alpha register to its character code (returned to the x-register) and delete the character.,tocheck,
+ATOX,Alpha to X. Convert the left-most character in the Alpha register to its character code (returned to the x-register) and delete the character.,ok,()
 AVIEW,Alpha view. Display the Alpha register.,ok suggestion: Use the new alpha() function to build up strings of any length in the alpha register.,(...)
 BASE+,Base addition. Returns the 36-bit sum of y + x.,remapped,"(y,x)"
 BASE–,Base subtraction. Returns the 36-bit difference of y – x.,remapped,"(y,x)"

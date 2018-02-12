@@ -66,10 +66,20 @@
                 Python parameters are pushed onto the the stack from <i>left to right</i>, so the first parameter
                 ends up in the y stack position and the second parameter ends up in the x stack position.
             </li>
+            <li>
+                Anything "returned to the x-register" should be assigned to a variable. For example
+                the 42S command <code>ATOX</code> which leaves a
+                <i>character code (returned to the x-register)</i>
+                should be used in Python like this e.g.: <code>mychar = ATOX()</code>.
+                <br>
+                Of course, you may choose <i>not to assign</i> the result of a command which returns a result,
+                to a variable. For example your Python code line may simply be: <code>ATOX()</code>.
+                This is perfectly OK in Python.  You just cannot get access to the result later, that's all.
+            </li>
         </ul>
         <p>An attempt has been made to redact material in the original "pure" HP42S command description column
             which might be misleading.  The text is <del>struck out</del> but remains, so that the original intent of the command
-            is visible, which may aid programming.</p>
+            is visible, which may aid understanding and programming.</p>
         <br>
         <table border=1 class="cmd_list">
             <tr>
