@@ -1052,16 +1052,17 @@ cmd_list = \
          'params': '',
          'suggestion': 'Not applicable, please use native Python.',
          'supported': 'N/A'},
- 'LCLBL': {'class': 'tocheck',
+ 'LCLBL': {'class': '',
            'description': 'Select Local label mode for the CUSTOM menu (to use '
-                          'CUSTOM menu assignments to execute local labels '
-                          'within the current program).',
+                          'CUSTOM menu assignments to execute local Alpha '
+                          'labels within the current program).',
            'indirect_allowed': False,
            'num_arg_fragments': 0,
-           'num_params': 0,
-           'params': '',
-           'suggestion': 'being researched',
-           'supported': ''},
+           'num_params': -1,
+           'params': '()',
+           'suggestion': 'In a RPN program generated from Python local alpha '
+                         'labels represent the user defined Python functions.',
+           'supported': '✓'},
  'LINF': {'class': '',
           'description': 'Select the linear curve-fitting model.',
           'indirect_allowed': False,

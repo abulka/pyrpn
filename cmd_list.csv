@@ -105,7 +105,7 @@ KEYG,"On menu key, go to. Branch to specified label to when a particular menu ke
 KEYX,"On menu key, execute. Execute (as a subroutine) specified label when a particular menu key is pressed. Parameter 1:: Key number (1 through 9), Parameter 2: program label (global or local)",nostack,
 LASTX,Last x. Recall the last value of x used in a calculation.,nostack,
 LBL,Label. Identify programs and routines for execution and branching. Parameter: local or global label.,na,
-LCLBL,Select Local label mode for the CUSTOM menu (to use CUSTOM menu assignments to execute local labels within the current program).,tocheck,
+LCLBL,Select Local label mode for the CUSTOM menu (to use CUSTOM menu assignments to execute local Alpha labels within the current program).,ok suggestion: In a RPN program generated from Python local alpha labels represent the user defined Python functions.,()
 LINF,Select the linear curve-fitting model.,ok,()
 LINΣ,"Select Linear statistics mode, which uses six summation coefficients.",remapped,()
 LIST,Print a portion of a program listing. (Not programmable.) Parameter: number of lines.,na,
