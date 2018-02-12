@@ -1,0 +1,8 @@
+{
+    "description": "<p>Creates a matrix and then calls up the built in HP42S matrix editor.&nbsp; In the editor, you can navigate to all the cells and also modify cell values.</p>\r\n<p>When you exit the editor by hitting the EXIT&nbsp;key on your calculator or Free42, the program will end.&nbsp;</p>\r\n<p><strong>Tip:</strong> If you want program execution to resume after editing your matrix, you will need to call EDITN inside a RPN program with an outer menu structure, so that when you hit the EXIT&nbsp;key you will return to the main menu, and then can hit another menu key to continue some processing.</p>\r\n<p>Here is part of an example from the manual \"HP42S Programming Examples and Techniques\" p.158 pure RPN code.</p>\r\n<pre class=\"language-markup\"><code>...\r\n...     \r\nEXITALL\r\nCLMENU\r\n\"P\"\r\nKEY 1 GTO 1\r\n\"T\"\r\nKEY 2 XEQ 02\r\nMENU\r\nSTOP\r\n...\r\n...\r\nLBL 1\r\n...\r\nEDITN \"mymatr\"\r\n...\r\n</code></pre>\r\n<p>TODO: convert the above example into Python.</p>",
+    "public": "yes",
+    "sortnum": 0,
+    "source": "def edit_matrix():\r\n  m = NEWMAT(1,4)\r\n  EDITN(m)",
+    "tags": "Matrices",
+    "title": "Edit a matrix"
+}

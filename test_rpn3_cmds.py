@@ -862,3 +862,18 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+    def test_editn_matrix(self):
+        self.parse(dedent("""
+            m = NEWMAT(1,4)
+            EDITN(m)
+            """))
+        expected = dedent("""
+            1
+            4
+            NEWMAT
+            STO "m"
+
+            EDITN "m"
+            """)
+        self.compare(de_comment(expected))
+

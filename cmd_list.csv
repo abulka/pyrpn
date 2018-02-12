@@ -63,7 +63,7 @@ DIM?,Returns the dimensions of the matrix in the x-register (rows to the y-regis
 DOT,Dot Product.  Returns the dot product of two vectors (matrices or complex numbers).,ok,"(n,n)"
 DSE,"Decrement, Skip if (less than or) Equal. Given ccccccc.fflii in a variable or register, decrements ccccccc by ii and skips the next program line if ccccccc is now ≤  fff. Parameter: register or variable (indirect allowed)",noloop,
 EDIT,Edit a matrix in the x-register.,tocheck,
-EDITN,Edit a named matrix. Parameter: variable name (indirect allowed),tocheck,
+EDITN,Edit a named matrix. Parameter: variable name (indirect allowed),ok,(mvar)
 END,End of a program.,na,
 ENG,Select Engineering display format. Parameter: number of digits (indirect allowed),ok,(digits)
 ENTER,"Separate two numbers keyed in sequentially; copies x into the y-register, y into the z-register, and z into the t-register, and loses t.",nostack,
