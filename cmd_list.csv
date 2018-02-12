@@ -115,7 +115,7 @@ LOG,Common logarithm. Returns log10(x).,ok,(n)
 LOGF,Select the logarithmic curve-fitting model.,ok,(n)
 MAN,Select Manual print mode.,ok,()
 MAT?,"If the x-register contains a matrix, execute the next program line; if the X-register does not contain a matrix, skip the next program line.",remapped,(x)
-MEAN,Mean. Returns the mean of x-values (Σx / n) and the mean of y-values (Σy / n) that have been stored with Σ+. The mean of x is returned to the X-register and the mean of y is returned to the Y-register.,tocheck,()
+MEAN,Mean. Returns the mean of x-values (Σx / n) and the mean of y-values (Σy / n) that have been stored with Σ+. The mean of x is returned to the X-register and the mean of y is returned to the Y-register.,"ok suggestion: Assign the two return values into variables e.g. 'a, b = MEAN()'",()
 MENU,Select the programmable menu.,ok,()
 MOD,Modulo. Returns the remainder for y / x.,ok,"(y,x)"
 MVAR,Declare a menu variable in a SOLVER program. Parameter: variable name.,ok suggestion: MVAR("length") etc.,
@@ -194,7 +194,7 @@ STOEL,Store element. Stores a copy of x into the current element of the indexed 
 STOIJ,Moves the row- and column-pointers to I = x and J = y in the indexed matrix.,nomatrix,
 STOP,Stop program execution. (R/S in program entry mode).,ok,()
 STR?,"If the x-register contains an Alpha string, execute the next program line; if the x-register does not contain an Alpha string, skip the next program line.",remapped,(x)
-SUM,Returns the sums Σx and Σy into the x- and y-registers.,tocheck,
+SUM,Returns the sums Σx and Σy into the x- and y-registers.,"ok suggestion: Assign the two return values into variables e.g. 'a, b = SUM()'",()
 TAN,Tangent. Returns tan(x).,ok,(n)
 TANH,Hyperbolic tangent. Returns tanh(x).,ok,(n)
 TONE,Sounds a tone. Parameter: tone number (0–9) (indirect allowed),ok,(n)

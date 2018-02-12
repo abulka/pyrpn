@@ -1143,7 +1143,7 @@ cmd_list = \
           'params': '(x)',
           'suggestion': 'isMAT()',
           'supported': '✓ (renamed)'},
- 'MEAN': {'class': 'tocheck',
+ 'MEAN': {'class': '',
           'description': 'Mean. Returns the mean of x-values (Σx / n) and the '
                          'mean of y-values (Σy / n) that have been stored with '
                          'Σ+. The mean of x is returned to the X-register and '
@@ -1152,8 +1152,9 @@ cmd_list = \
           'num_arg_fragments': 0,
           'num_params': -1,
           'params': '()',
-          'suggestion': 'being researched',
-          'supported': ''},
+          'suggestion': "Assign the two return values into variables e.g. 'a, "
+                        "b = MEAN()'",
+          'supported': '✓'},
  'MENU': {'class': '',
           'description': 'Select the programmable menu.',
           'indirect_allowed': False,
@@ -1884,15 +1885,16 @@ cmd_list = \
           'params': '(x)',
           'suggestion': 'isSTR()',
           'supported': '✓ (renamed)'},
- 'SUM': {'class': 'tocheck',
+ 'SUM': {'class': '',
          'description': 'Returns the sums Σx and Σy into the x- and '
                         'y-registers.',
          'indirect_allowed': False,
          'num_arg_fragments': 0,
-         'num_params': 0,
-         'params': '',
-         'suggestion': 'being researched',
-         'supported': ''},
+         'num_params': -1,
+         'params': '()',
+         'suggestion': "Assign the two return values into variables e.g. 'a, b "
+                       "= SUM()'",
+         'supported': '✓'},
  'TAN': {'class': '',
          'description': 'Tangent. Returns tan(x).',
          'indirect_allowed': False,
