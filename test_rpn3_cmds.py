@@ -789,3 +789,36 @@ class RpnTests3Cmds(BaseTest):
             XEQ "pREAL"
             """)
         self.compare(de_comment(expected))
+
+    def test_bit(self):
+        self.parse(dedent("""
+            testBIT(20,2)
+            """))
+        expected = dedent("""
+            20
+            2
+            XEQ "pBIT"
+            """)
+        self.compare(de_comment(expected))
+
+    @unittest.skip('no param checking yet for remapped commands')
+    def test_bit_no_args(self):
+        src = dedent("""
+            testBIT()
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    @unittest.skip('no param checking yet for remapped commands')
+    def test_bit_not_enough_args(self):
+        src = dedent("""
+            testBIT(1)
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    @unittest.skip('no param checking yet for remapped commands')
+    def test_bit_too_many_args(self):
+        src = dedent("""
+            testBIT(1,2,3,4)
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
+

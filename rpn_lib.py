@@ -369,13 +369,27 @@ class RpnTemplates:
         RTN    
         """)
 
-    # Misc Tests - Real, Matrix...
+    # Misc Tests - Real?, Bit?, Matrix?, ...
 
     pREAL = dedent("""
         LBL "pREAL"  // Is real number? (n) -> boolean
         CF 00
         REAL?
         SF 00
+        RDN
+        FS? 00
+        1
+        FC? 00
+        0
+        RTN    
+        """)
+
+    pBIT = dedent("""
+        LBL "pBIT"  // Test the xth bit of y. (y,x) -> boolean
+        CF 00
+        BIT?
+        SF 00
+        RDN
         RDN
         FS? 00
         1

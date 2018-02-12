@@ -327,16 +327,16 @@ cmd_list = \
           'params': '()',
           'suggestion': '',
           'supported': '✓'},
- 'BIT?': {'class': 'tocheck',
+ 'BIT?': {'class': '',
           'description': 'Test the xth bit of y. If the bit is set (1), '
                          '<del>execute the next program line</del>; if the bit '
                          'is clear (0), <del>skip the next program line</del>.',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
-          'num_params': 0,
-          'params': '',
-          'suggestion': 'being researched',
-          'supported': ''},
+          'num_params': 2,
+          'params': '(y,xth_bit)',
+          'suggestion': 'testBIT()',
+          'supported': '✓ (renamed)'},
  'BST': {'class': 'na',
          'description': 'Back step. Move the program pointer to the previous '
                         'program line. (Not programmable.)',

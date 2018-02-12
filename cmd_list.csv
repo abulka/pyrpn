@@ -29,7 +29,7 @@ BASE+/–,Base change sign. Returns the 36-bit 2's complement of x.,remapped,"(y
 BEEP,Sound a sequence of four tones.,ok,()
 BEST,Select the best curve-fitting model for the current statistical data.,ok,()
 BINM,Select Binary mode (base 2),ok,()
-BIT?,"Test the xth bit of y. If the bit is set (1), execute the next program line; if the bit is clear (0), skip the next program line.",tocheck,
+BIT?,"Test the xth bit of y. If the bit is set (1), execute the next program line; if the bit is clear (0), skip the next program line.",remapped,"(y,xth_bit)"
 BST,Back step. Move the program pointer to the previous program line. (Not programmable.),na,
 CF,Clear flag nn (00 ≤  nn ≤ 35 or 81 ≤  nn ≤ 99). Parameter: flag number (indirect allowed),ok,(flag)
 CLA,"Clear Alpha register. If Alpha mode is on and character entry is terminated (no cursor displayed), then  ◄  also executes the CLA function.",ok,()
