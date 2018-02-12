@@ -713,7 +713,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                         'GETM' in self.program.last_line.text
         by_ref_to_rhs_var = node.value.id if rhs_is_list_var or rhs_is_dict_var else ''
 
-        for target in node.targets:
+        targets = node.targets[0].elts if isinstance(node.targets[0], ast.Tuple) else node.targets
+        for index, target in enumerate(targets):
             lhs_is_subscript = isinstance(target, ast.Subscript)
             if lhs_is_subscript:
                 self.subscript_is_on_lhs_thus_assign(target)
@@ -725,6 +726,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 self.scopes.ensure_is_named_matrix_register(var_name=target.id, node=node)
             elif lhs_is_subscript:
                 self.scopes.ensure_is_named_matrix_register(var_name=target.value.id, node=node)  # drill into subscript node to get list or dict name
+
+            # pop the stack so that each value on the stack is assigned into a different var
+            if len(targets) > 1 and index < len(targets) - 1:
+                self.program.insert('RDN')
 
         self.pending_stack_args = []  # must have, cos could just be assigning single values, not BinOp and not Expr
         self.end(node)

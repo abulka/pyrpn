@@ -893,7 +893,7 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    @unittest.skip('multiple params')
+    # @unittest.skip('multiple params')
     def test_toPOL(self):
         self.parse(dedent("""
             a, b = toPOL(1, 2)

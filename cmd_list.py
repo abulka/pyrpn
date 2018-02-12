@@ -2328,7 +2328,7 @@ cmd_list = \
           'params': '(n)',
           'suggestion': 'toOCT()',
           'supported': '✓ (renamed)'},
- '→POL': {'class': 'tocheck',
+ '→POL': {'class': '',
           'description': 'To polar. Converts x and y to the corresponding '
                          'polar coordinates r and θ. If the x-register '
                          'contains a complex number, converts the two parts of '
@@ -2337,8 +2337,9 @@ cmd_list = \
           'num_arg_fragments': 0,
           'num_params': 2,
           'params': '(n,n)',
-          'suggestion': 'being researched',
-          'supported': ''},
+          'suggestion': "Assign the two return values into variables e.g. 'a, "
+                        "b = toPOL(1, 2)'",
+          'supported': '✓'},
  '→RAD': {'class': '',
           'description': 'To radians. Converts a angle value in degrees to '
                          'radians. Returns x×(π/180).',
