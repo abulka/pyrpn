@@ -1965,15 +1965,16 @@ cmd_list = \
           'params': '(var)',
           'suggestion': '',
           'supported': '✓'},
- 'WMEAN': {'class': 'tocheck',
+ 'WMEAN': {'class': '',
            'description': 'Weighted mean. Return the mean of x-values weighted '
-                          'by the y-values  Σxy / Σ y',
+                          'by the y-values Σxy / Σy that have been stored with '
+                          'Σ+.',
            'indirect_allowed': False,
            'num_arg_fragments': 0,
-           'num_params': 0,
-           'params': '',
-           'suggestion': 'being researched',
-           'supported': ''},
+           'num_params': -1,
+           'params': '()',
+           'suggestion': '',
+           'supported': '✓'},
  'WRAP': {'class': 'no',
           'description': '<del>Select Wrap mode, which prevents the indexed '
                          'matrix from growing.</del>',
