@@ -25,9 +25,9 @@ cmd_list = \
        'suggestion': '',
        'supported': '✓'},
  '+/–': {'class': 'na',
-         'description': 'Change the sign of the number in the x-register. '
+         'description': '<del>Change the sign of the number in the x-register. '
                         'While entering an exponent, can also be used to '
-                        'change the sign of the exponent.',
+                        'change the sign of the exponent.</del>',
          'indirect_allowed': False,
          'num_arg_fragments': 0,
          'num_params': 0,
@@ -128,7 +128,7 @@ cmd_list = \
           'suggestion': 'ALLStat()',
           'supported': '✓ (renamed)'},
  'AND': {'class': 'no',
-         'description': 'Logical AND. Returns x AND y.',
+         'description': '<del>Logical AND. Returns x AND y.</del>',
          'indirect_allowed': False,
          'num_arg_fragments': 0,
          'num_params': 0,
@@ -153,11 +153,11 @@ cmd_list = \
          'suggestion': '',
          'supported': '✓'},
  'ARCL': {'class': 'no',
-          'description': 'Alpha recall. Copy data into the Alpha register, '
-                         'appending it to the current contents. Numbers are '
-                         'formatted using the current display format.  '
-                         'Parameter: register or variable.   (indirect '
-                         'allowed)',
+          'description': '<del>Alpha recall. Copy data into the Alpha '
+                         'register, appending it to the current contents. '
+                         'Numbers are formatted using the current display '
+                         'format.  Parameter: register or variable.   '
+                         '(indirect allowed)</del>',
           'indirect_allowed': True,
           'num_arg_fragments': 1,
           'num_params': 1,
@@ -215,7 +215,8 @@ cmd_list = \
  'ASTO': {'class': '',
           'description': 'Alpha store. Copy the first six characters in the '
                          'Alpha register into a register or variable. '
-                         'Parameter: register or variable (indirect allowed)',
+                         'Parameter: register or variable <del>(indirect '
+                         'allowed)</del>',
           'indirect_allowed': True,
           'num_arg_fragments': 1,
           'num_params': 1,
@@ -328,8 +329,8 @@ cmd_list = \
           'supported': '✓'},
  'BIT?': {'class': 'tocheck',
           'description': 'Test the xth bit of y. If the bit is set (1), '
-                         'execute the next program line; if the bit is clear '
-                         '(0), skip the next program line.',
+                         '<del>execute the next program line</del>; if the bit '
+                         'is clear (0), <del>skip the next program line</del>.',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
           'num_params': 0,
@@ -347,7 +348,7 @@ cmd_list = \
          'supported': 'Not programmable'},
  'CF': {'class': '',
         'description': 'Clear flag nn (00 ≤  nn ≤ 35 or 81 ≤  nn ≤ 99). '
-                       'Parameter: flag number (indirect allowed)',
+                       'Parameter: flag number <del>(indirect allowed)</del>',
         'indirect_allowed': True,
         'num_arg_fragments': 1,
         'num_params': 1,
@@ -365,8 +366,8 @@ cmd_list = \
          'suggestion': '',
          'supported': '✓'},
  'CLALL': {'class': 'na',
-           'description': 'Clear all. Clear all stored programs and data.(Not '
-                          'Programmable.)',
+           'description': '<del>Clear all. Clear all stored programs and '
+                          'data.(Not Programmable.)</del>',
            'indirect_allowed': False,
            'num_arg_fragments': 0,
            'num_params': 0,
@@ -426,7 +427,8 @@ cmd_list = \
                         'variables) - use with care.',
           'supported': '✓'},
  'CLST': {'class': 'na',
-          'description': 'Clear Stack. Clear the stack registers to zero.',
+          'description': '<del>Clear Stack. Clear the stack registers to '
+                         'zero.</del>',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
           'num_params': 0,
@@ -435,7 +437,7 @@ cmd_list = \
           'supported': 'N/A'},
  'CLV': {'class': '',
          'description': 'Clear a variable from memory. Parameter: variable '
-                        'name (indirect allowed)',
+                        'name <del>(indirect allowed)</del>',
          'indirect_allowed': True,
          'num_arg_fragments': 1,
          'num_params': 1,
@@ -443,9 +445,9 @@ cmd_list = \
          'suggestion': '',
          'supported': '✓'},
  'CLX': {'class': 'na',
-         'description': 'Clear x-register to zero. If digit entry is '
+         'description': '<del>Clear x-register to zero. If digit entry is '
                         'terminated (no cursor in the display), then  ◄  also '
-                        'executes CLX.',
+                        'executes CLX.</del>',
          'indirect_allowed': False,
          'num_arg_fragments': 0,
          'num_params': 0,
@@ -508,10 +510,10 @@ cmd_list = \
           'suggestion': '',
           'supported': '✓'},
  'CPX?': {'class': 'tocheck',
-          'description': 'If the x-register contains a complex number, execute '
-                         'the next program line; if the x-register does not '
-                         'contain a complex number, skip the next program '
-                         'line.',
+          'description': 'If the x-register contains a complex number, '
+                         '<del>execute the next program line</del>; if the '
+                         'x-register does not contain a complex number, '
+                         '<del>skip the next program line</del>.',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
           'num_params': 1,
@@ -592,7 +594,7 @@ cmd_list = \
  'DIM': {'class': '',
          'description': 'Dimension a matrix to x columns and y rows. If the '
                         'matrix does not exist, DIM creates it. Parameter: '
-                        'variable name (indirect allowed)',
+                        'variable name <del>(indirect allowed)</del>',
          'indirect_allowed': True,
          'num_arg_fragments': 1,
          'num_params': 0,
@@ -621,11 +623,11 @@ cmd_list = \
          'suggestion': '',
          'supported': '✓'},
  'DSE': {'class': 'no',
-         'description': 'Decrement, Skip if (less than or) Equal. Given '
+         'description': '<del>Decrement, Skip if (less than or) Equal. Given '
                         'ccccccc.fflii in a variable or register, decrements '
                         'ccccccc by ii and skips the next program line if '
                         'ccccccc is now ≤  fff. Parameter: register or '
-                        'variable (indirect allowed)',
+                        'variable (indirect allowed)</del>',
          'indirect_allowed': True,
          'num_arg_fragments': 1,
          'num_params': 0,
@@ -643,7 +645,7 @@ cmd_list = \
           'supported': ''},
  'EDITN': {'class': 'tocheck',
            'description': 'Edit a named matrix. Parameter: variable name '
-                          '(indirect allowed)',
+                          '<del>(indirect allowed)</del>',
            'indirect_allowed': True,
            'num_arg_fragments': 1,
            'num_params': 0,
@@ -651,7 +653,7 @@ cmd_list = \
            'suggestion': 'being researched',
            'supported': ''},
  'END': {'class': 'na',
-         'description': 'End of a program.',
+         'description': '<del>End of a program.</del>',
          'indirect_allowed': False,
          'num_arg_fragments': 0,
          'num_params': 0,
@@ -660,7 +662,7 @@ cmd_list = \
          'supported': 'N/A'},
  'ENG': {'class': '',
          'description': 'Select Engineering display format. Parameter: number '
-                        'of digits (indirect allowed)',
+                        'of digits <del>(indirect allowed)</del>',
          'indirect_allowed': True,
          'num_arg_fragments': 1,
          'num_params': 1,
@@ -668,9 +670,10 @@ cmd_list = \
          'suggestion': '',
          'supported': '✓'},
  'ENTER': {'class': 'no',
-           'description': 'Separate two numbers keyed in sequentially; copies '
-                          'x into the y-register, y into the z-register, and z '
-                          'into the t-register, and loses t.',
+           'description': '<del>Separate two numbers keyed in sequentially; '
+                          'copies x into the y-register, y into the '
+                          'z-register, and z into the t-register, and loses '
+                          't.</del>',
            'indirect_allowed': False,
            'num_arg_fragments': 0,
            'num_params': 0,
@@ -713,22 +716,22 @@ cmd_list = \
            'supported': '✓ (renamed)'},
  'FC?': {'class': '',
          'description': 'Flag clear test. If the specified flag is clear, '
-                        'executes the next program line; if the flag is set, '
-                        'skips the next program line. Parameter: flag number '
-                        '(indirect allowed)',
+                        '<del>executes the next program line</del>; if the '
+                        'flag is set, <del>skips the next program line</del>. '
+                        'Parameter: flag number <del>(indirect allowed)</del>',
          'indirect_allowed': True,
          'num_arg_fragments': 1,
          'num_params': 1,
          'params': '(flag)',
-         'suggestion': 'isFC(nn)',
+         'suggestion': 'isFC()',
          'supported': '✓ (renamed)'},
  'FC?C': {'class': 'no',
-          'description': 'Flag clear test and clear. If the specified flag is '
-                         'clear, execute the next program line; if the flag is '
-                         'set, skip the next program line. Cleared after the '
-                         'test is complete. (This function can be used only '
-                         'with flags 00 through 35 and 81 through 99.) '
-                         'Parameter: flag number (indirect allowed)',
+          'description': '<del>Flag clear test and clear. If the specified '
+                         'flag is clear, execute the next program line; if the '
+                         'flag is set, skip the next program line. Cleared '
+                         'after the test is complete. (This function can be '
+                         'used only with flags 00 through 35 and 81 through '
+                         '99.) Parameter: flag number (indirect allowed)</del>',
           'indirect_allowed': True,
           'num_arg_fragments': 1,
           'num_params': 0,
@@ -754,7 +757,7 @@ cmd_list = \
            'supported': '✓'},
  'FIX': {'class': '',
          'description': 'Select Fixed-decimal display format. Parameter: '
-                        'number of digits (indirect allowed)',
+                        'number of digits <del>(indirect allowed)</del>',
          'indirect_allowed': True,
          'num_arg_fragments': 1,
          'num_params': 1,
@@ -779,10 +782,10 @@ cmd_list = \
         'suggestion': '',
         'supported': '✓'},
  'FS?': {'class': '',
-         'description': 'Flag set test. If the specified flag is set, execute '
-                        'the next program line; if the flag is clear, skip the '
-                        'next program line. Parameter: flag number (indirect '
-                        'allowed)',
+         'description': 'Flag set test. If the specified flag is set, '
+                        '<del>execute the next program line</del>; if the flag '
+                        'is clear, <del>skip the next program line</del>. '
+                        'Parameter: flag number <del>(indirect allowed)</del>',
          'indirect_allowed': True,
          'num_arg_fragments': 1,
          'num_params': 1,
@@ -790,12 +793,12 @@ cmd_list = \
          'suggestion': 'isFS()',
          'supported': '✓ (renamed)'},
  'FS?C': {'class': 'no',
-          'description': 'Flag set test and clear. If the specified flag is '
-                         'set, execute the next program line; if the flag is '
-                         'clear, skip the next program line. Clear the flag '
+          'description': '<del>Flag set test and clear. If the specified flag '
+                         'is set, execute the next program line; if the flag '
+                         'is clear, skip the next program line. Clear the flag '
                          'after the test is complete. (This function can be '
                          'used only with flags 00 through 35 and 81 through '
-                         '99.) Parameter: flag number (indirect allowed)',
+                         '99.) Parameter: flag number (indirect allowed)</del>',
           'indirect_allowed': True,
           'num_arg_fragments': 1,
           'num_params': 0,
@@ -825,8 +828,8 @@ cmd_list = \
             'suggestion': '',
             'supported': '✓'},
  'GETM': {'class': 'no',
-          'description': 'Get matrix. Copy a submatrix into the x-register '
-                         'from the indexed matrix.',
+          'description': '<del>Get matrix. Copy a submatrix into the '
+                         'x-register from the indexed matrix.</del>',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
           'num_params': 0,
@@ -842,9 +845,10 @@ cmd_list = \
           'suggestion': '',
           'supported': '✓'},
  'GROW': {'class': 'no',
-          'description': 'Select Grow mode. Executing  →  or J+ causes the '
-                         'matrix to grow by one new row if the index pointers '
-                         'are at the last (lower-right) element in the matrix.',
+          'description': '<del>Select Grow mode. Executing  →  or J+ causes '
+                         'the matrix to grow by one new row if the index '
+                         'pointers are at the last (lower-right) element in '
+                         'the matrix.</del>',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
           'num_params': 0,
@@ -852,10 +856,11 @@ cmd_list = \
           'suggestion': 'To compensate use the new command mymatrix.appendr()',
           'supported': 'No'},
  'GTO': {'class': 'na',
-         'description': 'Go to label. From the keyboard, move the program '
+         'description': '<del>Go to label. From the keyboard, move the program '
                         'pointer to the specified label. In a running program, '
                         'cause the program to branch to the specified label. '
-                        'Parameter: local or global label (indirect allowed)',
+                        'Parameter: local or global label (indirect '
+                        'allowed)</del>',
          'indirect_allowed': True,
          'num_arg_fragments': 1,
          'num_params': 0,
@@ -888,7 +893,8 @@ cmd_list = \
           'suggestion': 'HMSminus()',
           'supported': '✓ (renamed)'},
  'I+': {'class': 'no',
-        'description': 'Increment the row pointer in the indexed matrix.',
+        'description': '<del>Increment the row pointer in the indexed '
+                       'matrix.</del>',
         'indirect_allowed': False,
         'num_arg_fragments': 0,
         'num_params': 0,
@@ -896,8 +902,8 @@ cmd_list = \
         'suggestion': 'Use Python matrix/list indexing and slicing syntax.',
         'supported': 'No'},
  'INDEX': {'class': 'no',
-           'description': 'Index a named matrix. Parameter: variable name '
-                          '(indirect allowed)',
+           'description': '<del>Index a named matrix. Parameter: variable name '
+                          '(indirect allowed)</del>',
            'indirect_allowed': True,
            'num_arg_fragments': 1,
            'num_params': 0,
@@ -911,7 +917,7 @@ cmd_list = \
                           'program execution. Pressing R/S (or ■SST) stores x '
                           'into the register or variable; pressing EXIT '
                           'cancels. (Used only in programs.) Parameter: '
-                          'register or variable (indirect allowed)',
+                          'register or variable <del>(indirect allowed)</del>',
            'indirect_allowed': True,
            'num_arg_fragments': 1,
            'num_params': 1,
@@ -931,7 +937,7 @@ cmd_list = \
  'INTEG': {'class': '',
            'description': 'Integrate the selected integration program with '
                           'respect to the specified variable. Parameter: '
-                          'variable name (indirect allowed)',
+                          'variable name <del>(indirect allowed)</del>',
            'indirect_allowed': True,
            'num_arg_fragments': 1,
            'num_params': 1,
@@ -958,10 +964,11 @@ cmd_list = \
         'suggestion': '',
         'supported': '✓'},
  'ISG': {'class': 'no',
-         'description': 'Increment, Skip if Greater. Given ccccccc.fffii in a '
-                        'variable or register, increments ccccccc by ii and '
-                        'skips the next program line if ccccccc is now > fff. '
-                        'Parameter: register or variable (indirect allowed)',
+         'description': '<del>Increment, Skip if Greater. Given ccccccc.fffii '
+                        'in a variable or register, increments ccccccc by ii '
+                        'and skips the next program line if ccccccc is now > '
+                        'fff. Parameter: register or variable (indirect '
+                        'allowed)</del>',
          'indirect_allowed': True,
          'num_arg_fragments': 1,
          'num_params': 0,
@@ -970,7 +977,8 @@ cmd_list = \
                        'looping.',
          'supported': 'No'},
  'I–': {'class': 'no',
-        'description': 'Decrement the row pointer in the indexed matrix.',
+        'description': '<del>Decrement the row pointer in the indexed '
+                       'matrix.</del>',
         'indirect_allowed': False,
         'num_arg_fragments': 0,
         'num_params': 0,
@@ -978,7 +986,8 @@ cmd_list = \
         'suggestion': 'Use Python matrix/list indexing and slicing syntax.',
         'supported': 'No'},
  'J+': {'class': 'no',
-        'description': 'Increment the column pointer in the indexed matrix.',
+        'description': '<del>Increment the column pointer in the indexed '
+                       'matrix.</del>',
         'indirect_allowed': False,
         'num_arg_fragments': 0,
         'num_params': 0,
@@ -986,7 +995,8 @@ cmd_list = \
         'suggestion': 'Use Python matrix/list indexing and slicing syntax.',
         'supported': 'No'},
  'J–': {'class': 'no',
-        'description': 'Decrement the column pointer in the indexed matrix.',
+        'description': '<del>Decrement the column pointer in the indexed '
+                       'matrix.</del>',
         'indirect_allowed': False,
         'num_arg_fragments': 0,
         'num_params': 0,
@@ -1013,10 +1023,10 @@ cmd_list = \
           'suggestion': "KEYG(1, 'somefunc')",
           'supported': '✓'},
  'KEYX': {'class': 'no',
-          'description': 'On menu key, execute. Execute (as a subroutine) '
+          'description': '<del>On menu key, execute. Execute (as a subroutine) '
                          'specified label when a particular menu key is '
                          'pressed. Parameter 1:: Key number (1 through 9), '
-                         'Parameter 2: program label (global or local)',
+                         'Parameter 2: program label (global or local)</del>',
           'indirect_allowed': False,
           'num_arg_fragments': 2,
           'num_params': 0,
@@ -1024,8 +1034,8 @@ cmd_list = \
           'suggestion': 'Use Python variables',
           'supported': 'No'},
  'LASTX': {'class': 'no',
-           'description': 'Last x. Recall the last value of x used in a '
-                          'calculation.',
+           'description': '<del>Last x. Recall the last value of x used in a '
+                          'calculation.</del>',
            'indirect_allowed': False,
            'num_arg_fragments': 0,
            'num_params': 0,
@@ -1033,8 +1043,9 @@ cmd_list = \
            'suggestion': 'Use Python variables',
            'supported': 'No'},
  'LBL': {'class': 'na',
-         'description': 'Label. Identify programs and routines for execution '
-                        'and branching. Parameter: local or global label.',
+         'description': '<del>Label. Identify programs and routines for '
+                        'execution and branching. Parameter: local or global '
+                        'label.</del>',
          'indirect_allowed': False,
          'num_arg_fragments': 1,
          'num_params': 0,
@@ -1120,9 +1131,10 @@ cmd_list = \
          'suggestion': '',
          'supported': '✓'},
  'MAT?': {'class': 'tocheck',
-          'description': 'If the x-register contains a matrix, execute the '
-                         'next program line; if the X-register does not '
-                         'contain a matrix, skip the next program line.',
+          'description': 'If the x-register contains a matrix, <del>execute '
+                         'the next program line</del>; if the X-register does '
+                         'not contain a matrix, <del>skip the next program '
+                         'line</del>.',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
           'num_params': 0,
@@ -1190,7 +1202,7 @@ cmd_list = \
           'suggestion': '',
           'supported': '✓'},
  'NOT': {'class': 'no',
-         'description': 'Logical NOT. Returns NOT(x).',
+         'description': '<del>Logical NOT. Returns NOT(x).</del>',
          'indirect_allowed': False,
          'num_arg_fragments': 0,
          'num_params': 0,
@@ -1216,8 +1228,8 @@ cmd_list = \
          'suggestion': '',
          'supported': '✓'},
  'OLD': {'class': 'no',
-         'description': 'Recall the current element from the indexed matrix. '
-                        '(Equivalent to RCLEL.)',
+         'description': '<del>Recall the current element from the indexed '
+                        'matrix. (Equivalent to RCLEL.)</del>',
          'indirect_allowed': False,
          'num_arg_fragments': 0,
          'num_params': 0,
@@ -1235,7 +1247,7 @@ cmd_list = \
         'suggestion': '',
         'supported': '✓'},
  'OR': {'class': 'no',
-        'description': 'Logical OR. Returns x OR y.',
+        'description': '<del>Logical OR. Returns x OR y.</del>',
         'indirect_allowed': False,
         'num_arg_fragments': 0,
         'num_params': 0,
@@ -1254,7 +1266,7 @@ cmd_list = \
           'supported': '✓'},
  'PGMINT': {'class': 'tocheck',
             'description': 'Select a program to integrate. Parameter: global '
-                           'label (indirect allowed)',
+                           'label <del>(indirect allowed)</del>',
             'indirect_allowed': True,
             'num_arg_fragments': 1,
             'num_params': 0,
@@ -1263,7 +1275,7 @@ cmd_list = \
             'supported': ''},
  'PGMSLV': {'class': 'tocheck',
             'description': 'Select a program to solve. Parameter: global label '
-                           '(indirect allowed) ,',
+                           '<del>(indirect allowed)</del> ,',
             'indirect_allowed': True,
             'num_arg_fragments': 1,
             'num_params': 0,
@@ -1378,8 +1390,8 @@ cmd_list = \
            'suggestion': '',
            'supported': '✓'},
  'PRV': {'class': '',
-         'description': 'Print variable. Parameter: variable name (indirect '
-                        'allowed)',
+         'description': 'Print variable. Parameter: variable name '
+                        '<del>(indirect allowed)</del>',
          'indirect_allowed': True,
          'num_arg_fragments': 1,
          'num_params': 1,
@@ -1413,8 +1425,9 @@ cmd_list = \
          'suggestion': '',
          'supported': '✓'},
  'PUTM': {'class': 'no',
-          'description': 'Put matrix. Stores the matrix in the X-register into '
-                         'the indexed matrix beginning at the current element.',
+          'description': '<del>Put matrix. Stores the matrix in the X-register '
+                         'into the indexed matrix beginning at the current '
+                         'element.</del>',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
           'num_params': 0,
@@ -1475,8 +1488,8 @@ cmd_list = \
          'suggestion': '',
          'supported': '✓'},
  'RCL': {'class': 'no',
-         'description': 'Recall data into the x-register. Parameter: register '
-                        'or variable (indirect allowed)',
+         'description': '<del>Recall data into the x-register. Parameter: '
+                        'register or variable (indirect allowed)</del>',
          'indirect_allowed': True,
          'num_arg_fragments': 1,
          'num_params': 0,
@@ -1486,9 +1499,9 @@ cmd_list = \
                        'var3/(2-1)"',
          'supported': 'No'},
  'RCL+': {'class': 'no',
-          'description': 'Recall addition. Recall data and add it to the '
+          'description': '<del>Recall addition. Recall data and add it to the '
                          'contents of the x-register. Parameter: register or '
-                         'variable (indirect allowed)',
+                         'variable (indirect allowed)</del>',
           'indirect_allowed': True,
           'num_arg_fragments': 1,
           'num_params': 0,
@@ -1498,9 +1511,9 @@ cmd_list = \
                         '*= var3/(2-1)"',
           'supported': 'No'},
  'RCL-': {'class': 'no',
-          'description': 'Recall subtraction. Recall data and subtract it from '
-                         'the contents of the x-register. Parameter: register '
-                         'or variable (indirect allowed)',
+          'description': '<del>Recall subtraction. Recall data and subtract it '
+                         'from the contents of the x-register. Parameter: '
+                         'register or variable (indirect allowed)</del>',
           'indirect_allowed': True,
           'num_arg_fragments': 1,
           'num_params': 0,
@@ -1510,8 +1523,8 @@ cmd_list = \
                         '*= var3/(2-1)"',
           'supported': 'No'},
  'RCLEL': {'class': 'no',
-           'description': 'Recall element. Recalls the current matrix element '
-                          'from the indexed matrix.',
+           'description': '<del>Recall element. Recalls the current matrix '
+                          'element from the indexed matrix.</del>',
            'indirect_allowed': False,
            'num_arg_fragments': 0,
            'num_params': 0,
@@ -1519,8 +1532,8 @@ cmd_list = \
            'suggestion': 'Use Python matrix/list indexing and slicing syntax.',
            'supported': 'No'},
  'RCLIJ': {'class': 'no',
-           'description': 'Recall the row- and column-pointer values (I and J) '
-                          'for the indexed matrix.',
+           'description': '<del>Recall the row- and column-pointer values (I '
+                          'and J) for the indexed matrix.</del>',
            'indirect_allowed': False,
            'num_arg_fragments': 0,
            'num_params': 0,
@@ -1528,9 +1541,9 @@ cmd_list = \
            'suggestion': 'Use Python matrix/list indexing and slicing syntax.',
            'supported': 'No'},
  'RCL×': {'class': 'no',
-          'description': 'Recall multiplication. Recall data and multiply it '
-                         'by the contents of the x-register. Parameter: '
-                         'register or variable (indirect allowed)',
+          'description': '<del>Recall multiplication. Recall data and multiply '
+                         'it by the contents of the x-register. Parameter: '
+                         'register or variable (indirect allowed)</del>',
           'indirect_allowed': True,
           'num_arg_fragments': 1,
           'num_params': 0,
@@ -1540,9 +1553,9 @@ cmd_list = \
                         '*= var3/(2-1)"',
           'supported': 'No'},
  'RCL÷': {'class': 'no',
-          'description': 'Recall division. Recall data and divide it into the '
-                         'contents of the x-register. Parameter: register or '
-                         'variable (indirect allowed)',
+          'description': '<del>Recall division. Recall data and divide it into '
+                         'the contents of the x-register. Parameter: register '
+                         'or variable (indirect allowed)</del>',
           'indirect_allowed': True,
           'num_arg_fragments': 1,
           'num_params': 0,
@@ -1570,9 +1583,10 @@ cmd_list = \
           'suggestion': 'RDXperiod()',
           'supported': '✓ (renamed)'},
  'REAL?': {'class': '',
-           'description': 'If the x-register contains a real number, execute '
-                          'the next program line; if the x-register does not '
-                          'contain a real number, skip the next program line.',
+           'description': 'If the x-register contains a real number, '
+                          '<del>execute the next program line</del>; if the '
+                          'x-register does not contain a real number, '
+                          '<del>skip the next program line</del>.',
            'indirect_allowed': False,
            'num_arg_fragments': 0,
            'num_params': 1,
@@ -1647,8 +1661,8 @@ cmd_list = \
          'suggestion': '',
          'supported': 'return'},
  'R↑': {'class': 'no',
-        'description': 'Roll up the contents of the four stack registers one '
-                       'position.',
+        'description': '<del>Roll up the contents of the four stack registers '
+                       'one position.</del>',
         'indirect_allowed': False,
         'num_arg_fragments': 0,
         'num_params': 0,
@@ -1656,8 +1670,8 @@ cmd_list = \
         'suggestion': 'Use Python variables',
         'supported': 'No'},
  'R↓': {'class': 'no',
-        'description': 'Roll down the contents of the four stack registers one '
-                       'position.',
+        'description': '<del>Roll down the contents of the four stack '
+                       'registers one position.</del>',
         'indirect_allowed': False,
         'num_arg_fragments': 0,
         'num_params': 0,
@@ -1666,7 +1680,7 @@ cmd_list = \
         'supported': 'No'},
  'SCI': {'class': '',
          'description': 'Select scientific notation display format. Parameter: '
-                        'number of digits (indirect allowed)',
+                        'number of digits <del>(indirect allowed)</del>',
          'indirect_allowed': True,
          'num_arg_fragments': 1,
          'num_params': 1,
@@ -1692,7 +1706,7 @@ cmd_list = \
           'supported': '✓'},
  'SF': {'class': '',
         'description': 'Set flag nn (00 ≤ nn ≤ 35; 81 ≤ nn ≤ 99). Parameter: '
-                       'flag number (indirect allowed)',
+                       'flag number <del>(indirect allowed)</del>',
         'indirect_allowed': True,
         'num_arg_fragments': 1,
         'num_params': 1,
@@ -1745,7 +1759,7 @@ cmd_list = \
            'supported': '✓'},
  'SOLVE': {'class': '',
            'description': 'Solve for an unknown variable. Parameter: variable '
-                          'name (indirect allowed)',
+                          'name <del>(indirect allowed)</del>',
            'indirect_allowed': True,
            'num_arg_fragments': 1,
            'num_params': 1,
@@ -1770,9 +1784,9 @@ cmd_list = \
          'suggestion': '',
          'supported': 'Not programmable'},
  'STO': {'class': 'no',
-         'description': 'Store a copy of x into a destination register or '
+         'description': '<del>Store a copy of x into a destination register or '
                         'variable. Parameter: register or variable (indirect '
-                        'allowed)',
+                        'allowed)</del>',
          'indirect_allowed': True,
          'num_arg_fragments': 1,
          'num_params': 0,
@@ -1782,9 +1796,9 @@ cmd_list = \
                        'var3/(2-1)"',
          'supported': 'No'},
  'STO+': {'class': 'no',
-          'description': 'Store addition. Adds x to an existing register or '
-                         'variable. Parameter: register or variable (indirect '
-                         'allowed)',
+          'description': '<del>Store addition. Adds x to an existing register '
+                         'or variable. Parameter: register or variable '
+                         '(indirect allowed)</del>',
           'indirect_allowed': True,
           'num_arg_fragments': 1,
           'num_params': 0,
@@ -1794,8 +1808,8 @@ cmd_list = \
                         '*= var3/(2-1)"',
           'supported': 'No'},
  'STOEL': {'class': 'no',
-           'description': 'Store element. Stores a copy of x into the current '
-                          'element of the indexed matrix.',
+           'description': '<del>Store element. Stores a copy of x into the '
+                          'current element of the indexed matrix.</del>',
            'indirect_allowed': False,
            'num_arg_fragments': 0,
            'num_params': 0,
@@ -1803,8 +1817,8 @@ cmd_list = \
            'suggestion': 'Use Python matrix/list indexing and slicing syntax.',
            'supported': 'No'},
  'STOIJ': {'class': 'no',
-           'description': 'Moves the row- and column-pointers to I = x and J = '
-                          'y in the indexed matrix.',
+           'description': '<del>Moves the row- and column-pointers to I = x '
+                          'and J = y in the indexed matrix.</del>',
            'indirect_allowed': False,
            'num_arg_fragments': 0,
            'num_params': 0,
@@ -1820,9 +1834,9 @@ cmd_list = \
           'suggestion': '',
           'supported': '✓'},
  'STO×': {'class': 'no',
-          'description': 'Store multiplication. Multiplies an existing '
+          'description': '<del>Store multiplication. Multiplies an existing '
                          'register or variable by x. Parameter: register or '
-                         'variable (indirect allowed)',
+                         'variable (indirect allowed)</del>',
           'indirect_allowed': True,
           'num_arg_fragments': 1,
           'num_params': 0,
@@ -1832,9 +1846,9 @@ cmd_list = \
                         '*= var3/(2-1)"',
           'supported': 'No'},
  'STO÷': {'class': 'no',
-          'description': 'Store division. Divides an existing register or '
+          'description': '<del>Store division. Divides an existing register or '
                          'variable by x. Parameter: register or variable '
-                         '(indirect allowed)',
+                         '(indirect allowed)</del>',
           'indirect_allowed': True,
           'num_arg_fragments': 1,
           'num_params': 0,
@@ -1844,9 +1858,9 @@ cmd_list = \
                         '*= var3/(2-1)"',
           'supported': 'No'},
  'STO–': {'class': 'no',
-          'description': 'Store subtraction. Subtracts x from an existing '
+          'description': '<del>Store subtraction. Subtracts x from an existing '
                          'register or variable. Parameter: register or '
-                         'variable (indirect allowed)',
+                         'variable (indirect allowed)</del>',
           'indirect_allowed': True,
           'num_arg_fragments': 1,
           'num_params': 0,
@@ -1856,9 +1870,10 @@ cmd_list = \
                         '*= var3/(2-1)"',
           'supported': 'No'},
  'STR?': {'class': 'tocheck',
-          'description': 'If the x-register contains an Alpha string, execute '
-                         'the next program line; if the x-register does not '
-                         'contain an Alpha string, skip the next program line.',
+          'description': 'If the x-register contains an Alpha string, '
+                         '<del>execute the next program line</del>; if the '
+                         'x-register does not contain an Alpha string, '
+                         '<del>skip the next program line</del>.',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
           'num_params': 0,
@@ -1892,7 +1907,7 @@ cmd_list = \
           'supported': '✓'},
  'TONE': {'class': '',
           'description': 'Sounds a tone. Parameter: tone number (0–9) '
-                         '(indirect allowed)',
+                         '<del>(indirect allowed)</del>',
           'indirect_allowed': True,
           'num_arg_fragments': 1,
           'num_params': 1,
@@ -1929,7 +1944,8 @@ cmd_list = \
  'VARMENU': {'class': '',
              'description': 'Create a variable menu using MVAR instructions '
                             'following the specified global label. Parameter: '
-                            'global program label. (indirect allowed)',
+                            'global program label. <del>(indirect '
+                            'allowed)</del>',
              'indirect_allowed': True,
              'num_arg_fragments': 1,
              'num_params': 0,
@@ -1939,7 +1955,8 @@ cmd_list = \
              'supported': '✓'},
  'VIEW': {'class': '',
           'description': 'View the contents of a register or variable. '
-                         'Parameter: register or variable (indirect allowed)',
+                         'Parameter: register or variable <del>(indirect '
+                         'allowed)</del>',
           'indirect_allowed': True,
           'num_arg_fragments': 1,
           'num_params': 1,
@@ -1956,8 +1973,8 @@ cmd_list = \
            'suggestion': 'being researched',
            'supported': ''},
  'WRAP': {'class': 'no',
-          'description': 'Select Wrap mode, which prevents the indexed matrix '
-                         'from growing.',
+          'description': '<del>Select Wrap mode, which prevents the indexed '
+                         'matrix from growing.</del>',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
           'num_params': 0,
@@ -1965,18 +1982,20 @@ cmd_list = \
           'suggestion': 'Use Python matrix/list indexing and slicing syntax.',
           'supported': 'No'},
  'X<0?': {'class': 'no',
-          'description': ' X less than zero test. If true, execute the next '
-                         'program line; if false, skip the next program line',
+          'description': '<del> X less than zero test. If true, execute the '
+                         'next program line; if false, skip the next program '
+                         'line</del>',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
           'num_params': 0,
           'params': '',
-          'suggestion': 'Use Python "if" statements instead.',
+          'suggestion': 'Use Python "if" statements instead. E.g. "if var1 != '
+                        'var2 or (var3 >= var4):"...',
           'supported': 'No'},
  'X<>': {'class': 'no',
-         'description': 'Swaps the contents of the x-register with another '
-                        'register or variable. Parameter: register or variable '
-                        '(indirect allowed)',
+         'description': '<del>Swaps the contents of the x-register with '
+                        'another register or variable. Parameter: register or '
+                        'variable (indirect allowed)</del>',
          'indirect_allowed': True,
          'num_arg_fragments': 1,
          'num_params': 0,
@@ -1984,7 +2003,8 @@ cmd_list = \
          'suggestion': 'Use Python variables',
          'supported': 'No'},
  'X<>Y': {'class': 'no',
-          'description': 'Swaps the contents of the x- and y-registers.',
+          'description': '<del>Swaps the contents of the x- and '
+                         'y-registers.</del>',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
           'num_params': 0,
@@ -1992,53 +2012,63 @@ cmd_list = \
           'suggestion': 'Use Python variables',
           'supported': 'No'},
  'X<Y?': {'class': 'no',
-          'description': ' X less than y test. If true, execute the next '
-                         'program line; if false, skip the next program line',
+          'description': '<del> X less than y test. If true, execute the next '
+                         'program line; if false, skip the next program '
+                         'line</del>',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
           'num_params': 0,
           'params': '',
-          'suggestion': 'Use Python "if" statements instead.',
+          'suggestion': 'Use Python "if" statements instead. E.g. "if var1 != '
+                        'var2 or (var3 >= var4):"...',
           'supported': 'No'},
  'X=0?': {'class': 'no',
-          'description': ' X equal to zero test. If true, execute the next '
-                         'program line; if false, skip the next program line',
+          'description': '<del> X equal to zero test. If true, execute the '
+                         'next program line; if false, skip the next program '
+                         'line</del>',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
           'num_params': 0,
           'params': '',
-          'suggestion': 'Use Python "if" statements instead.',
+          'suggestion': 'Use Python "if" statements instead. E.g. "if var1 != '
+                        'var2 or (var3 >= var4):"...',
           'supported': 'No'},
  'X=Y?': {'class': 'no',
-          'description': ' X equal to y test. If true, execute the next '
-                         'program line; if false, skip the next program line',
+          'description': '<del> X equal to y test. If true, execute the next '
+                         'program line; if false, skip the next program '
+                         'line</del>',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
           'num_params': 0,
           'params': '',
-          'suggestion': 'Use Python "if" statements instead.',
+          'suggestion': 'Use Python "if" statements instead. E.g. "if var1 != '
+                        'var2 or (var3 >= var4):"...',
           'supported': 'No'},
  'X>0?': {'class': 'no',
-          'description': 'X greater than zero test. If true, execute the next '
-                         'program line; if false, skip the next program line',
+          'description': '<del>X greater than zero test. If true, execute the '
+                         'next program line; if false, skip the next program '
+                         'line</del>',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
           'num_params': 0,
           'params': '',
-          'suggestion': 'Use Python "if" statements instead.',
+          'suggestion': 'Use Python "if" statements instead. E.g. "if var1 != '
+                        'var2 or (var3 >= var4):"...',
           'supported': 'No'},
  'X>Y?': {'class': 'no',
-          'description': 'X greater than y test. If true, execute the next '
-                         'program line; if false, skip the next program line',
+          'description': '<del>X greater than y test. If true, execute the '
+                         'next program line; if false, skip the next program '
+                         'line</del>',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
           'num_params': 0,
           'params': '',
-          'suggestion': 'Use Python "if" statements instead.',
+          'suggestion': 'Use Python "if" statements instead. E.g. "if var1 != '
+                        'var2 or (var3 >= var4):"...',
           'supported': 'No'},
  'XEQ': {'class': 'na',
-         'description': 'Execute a function or program. Parameter: function or '
-                        'label (indirect allowed)',
+         'description': '<del>Execute a function or program. Parameter: '
+                        'function or label (indirect allowed)</del>',
          'indirect_allowed': True,
          'num_arg_fragments': 1,
          'num_params': 0,
@@ -2046,7 +2076,8 @@ cmd_list = \
          'suggestion': 'Just call a function e.g. myfunc()',
          'supported': 'N/A'},
  'XOR': {'class': 'no',
-         'description': 'Logical XOR (exclusive OR). Returns x XOR y.',
+         'description': '<del>Logical XOR (exclusive OR). Returns x XOR '
+                        'y.</del>',
          'indirect_allowed': False,
          'num_arg_fragments': 0,
          'num_params': 0,
@@ -2074,62 +2105,70 @@ cmd_list = \
          'suggestion': 'y**2',
          'supported': '✓ (renamed)'},
  'X≠0?': {'class': 'no',
-          'description': ' X not equal to zero test. If true, execute the next '
-                         'program line; if false, skip the next program line',
+          'description': '<del> X not equal to zero test. If true, execute the '
+                         'next program line; if false, skip the next program '
+                         'line</del>',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
           'num_params': 0,
           'params': '',
-          'suggestion': 'Use Python "if" statements instead.',
+          'suggestion': 'Use Python "if" statements instead. E.g. "if var1 != '
+                        'var2 or (var3 >= var4):"...',
           'supported': 'No'},
  'X≠Y?': {'class': 'no',
-          'description': 'X not equal to y test. If true, execute the next '
-                         'program line; if false, skip the next program line',
+          'description': '<del>X not equal to y test. If true, execute the '
+                         'next program line; if false, skip the next program '
+                         'line</del>',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
           'num_params': 0,
           'params': '',
-          'suggestion': 'Use Python "if" statements instead.',
+          'suggestion': 'Use Python "if" statements instead. E.g. "if var1 != '
+                        'var2 or (var3 >= var4):"...',
           'supported': 'No'},
  'X≤0?': {'class': 'no',
-          'description': ' X less than or equal to zero test. If true, execute '
-                         'the next program line; if false, skip the next '
-                         'program line',
+          'description': '<del> X less than or equal to zero test. If true, '
+                         'execute the next program line; if false, skip the '
+                         'next program line</del>',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
           'num_params': 0,
           'params': '',
-          'suggestion': 'Use Python "if" statements instead.',
+          'suggestion': 'Use Python "if" statements instead. E.g. "if var1 != '
+                        'var2 or (var3 >= var4):"...',
           'supported': 'No'},
  'X≤Y?': {'class': 'no',
-          'description': ' X less than or equal to y test. If true, execute '
-                         'the next program line; if false, skip the next '
-                         'program line',
+          'description': '<del> X less than or equal to y test. If true, '
+                         'execute the next program line; if false, skip the '
+                         'next program line</del>',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
           'num_params': 0,
           'params': '',
-          'suggestion': 'Use Python "if" statements instead.',
+          'suggestion': 'Use Python "if" statements instead. E.g. "if var1 != '
+                        'var2 or (var3 >= var4):"...',
           'supported': 'No'},
  'X≥0?': {'class': 'no',
-          'description': 'X greater than or equal to zero test. If true, '
+          'description': '<del>X greater than or equal to zero test. If true, '
                          'execute the next program line; if false, skip the '
-                         'next program line',
+                         'next program line</del>',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
           'num_params': 0,
           'params': '',
-          'suggestion': 'Use Python "if" statements instead.',
+          'suggestion': 'Use Python "if" statements instead. E.g. "if var1 != '
+                        'var2 or (var3 >= var4):"...',
           'supported': 'No'},
  'X≥Y?': {'class': 'no',
-          'description': 'X greater than or equal to y test. If true, execute '
-                         'the next program line; if false, skip the next '
-                         'program line',
+          'description': '<del>X greater than or equal to y test. If true, '
+                         'execute the next program line; if false, skip the '
+                         'next program line</del>',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
           'num_params': 0,
           'params': '',
-          'suggestion': 'Use Python "if" statements instead.',
+          'suggestion': 'Use Python "if" statements instead. E.g. "if var1 != '
+                        'var2 or (var3 >= var4):"...',
           'supported': 'No'},
  'YINT': {'class': '',
           'description': 'y-intercept. Returns the y-intercept of the curve '
@@ -2185,7 +2224,7 @@ cmd_list = \
  'ΣREG': {'class': '',
           'description': 'Summation registers. Defines which storage register '
                          'begins the block of summation registers. Parameter: '
-                         'register number (indirect allowed)',
+                         'register number <del>(indirect allowed)</del>',
           'indirect_allowed': True,
           'num_arg_fragments': 1,
           'num_params': 1,
@@ -2210,7 +2249,7 @@ cmd_list = \
        'suggestion': '',
        'supported': '✓'},
  '←': {'class': 'no',
-       'description': 'Move left one element in the indexed matrix.',
+       'description': '<del>Move left one element in the indexed matrix.</del>',
        'indirect_allowed': False,
        'num_arg_fragments': 0,
        'num_params': 0,
@@ -2218,7 +2257,7 @@ cmd_list = \
        'suggestion': 'Use Python matrix/list indexing and slicing syntax.',
        'supported': 'No'},
  '↑': {'class': 'no',
-       'description': 'Move up one element in the indexed matrix.',
+       'description': '<del>Move up one element in the indexed matrix.</del>',
        'indirect_allowed': False,
        'num_arg_fragments': 0,
        'num_params': 0,
@@ -2226,7 +2265,8 @@ cmd_list = \
        'suggestion': 'Use Python matrix/list indexing and slicing syntax.',
        'supported': 'No'},
  '→': {'class': 'no',
-       'description': 'Move right one element in the indexed matrix.',
+       'description': '<del>Move right one element in the indexed '
+                      'matrix.</del>',
        'indirect_allowed': False,
        'num_arg_fragments': 0,
        'num_params': 0,
@@ -2316,7 +2356,7 @@ cmd_list = \
           'suggestion': 'toREC()',
           'supported': '✓ (renamed)'},
  '↓': {'class': 'no',
-       'description': 'Move down one element in the indexed matrix.',
+       'description': '<del>Move down one element in the indexed matrix.</del>',
        'indirect_allowed': False,
        'num_arg_fragments': 0,
        'num_params': 0,

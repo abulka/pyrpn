@@ -69,7 +69,7 @@ with open('cmd_list.csv', newline='') as csvfile:
                     suggestion = 'Not Applicable, please use native Python.'
         elif supported == 'noflow':
             supported = "No"
-            suggestion = 'Use Python "if" statements instead.'
+            suggestion = 'Use Python "if" statements instead. E.g. "if var1 == var2 or (var3 >= var4):"...'
         elif supported == 'noloop':
             supported = "No"
             suggestion = 'Use native Python for...range() or while... for looping.'
@@ -113,6 +113,7 @@ with open('cmd_list.csv', newline='') as csvfile:
         params = row[3].strip()
         num_params = calc_num_params(params)
 
+        # Highlight table lines with css
         if supported == "No":
             css_class = 'no'
         elif supported == "N/A":
@@ -122,6 +123,20 @@ with open('cmd_list.csv', newline='') as csvfile:
             # css_class = 'not-programmable'
         elif suggestion == "being researched":
             css_class = 'tocheck'
+
+        # Remove misleading fragments of text from descriptions
+        if supported in ('No', 'N/A'):
+            description = f'<del>{description}</del>'
+        else:
+            for phrase in (
+                'skip the next program line',
+                'skips the next program line',
+                'execute the next program line',
+                'executes the next program line',
+                '(indirect allowed)',
+            ):
+                description = description.replace(phrase, f'<del>{phrase}</del>')
+
 
         entry = {
             'description': description,
@@ -135,7 +150,7 @@ with open('cmd_list.csv', newline='') as csvfile:
         }
         data[cmd] = entry
 
-pprint.pprint(data)
+# pprint.pprint(data)
 # print(data)
 
 with open('cmd_list.py', 'w') as f:

@@ -14,6 +14,7 @@
 
     <div class="andy_content">
 
+        <del>dsfjsdlkfj sldkfjlsd fjlsd kfjs ldkfj</del>
         <p>The intention is to provide access to all HP42S RPN commands or to provide an equivalent.
         Where it makes overwhelming sense, a more modern, time saving or Pythonic alternative is provided e.g. matrix
         access via indexing and slicing syntax - see the help file for information and tutorials.
@@ -52,7 +53,7 @@
                     {{ cmd_list[cmd]['params'] }}
                 </td>
                 <td align="left">
-                    {{ cmd_list[cmd]['description'] }}
+                    {{ cmd_list[cmd]['description'] | safe }}
                 </td>
             </tr>
             {% endfor %}
