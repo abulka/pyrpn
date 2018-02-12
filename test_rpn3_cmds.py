@@ -842,3 +842,13 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+    def test_posa(self):
+        self.parse(dedent("""
+            POSA("C")
+            """))
+        expected = dedent("""
+            "C"
+            POSA
+            """)
+        self.compare(de_comment(expected))
+

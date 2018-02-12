@@ -134,7 +134,7 @@ PGMSLV,"Select a program to solve. Parameter: global label (indirect allowed) ,"
 PIXEL,Turn on a single pixel (dot) in the display y: row (y axis) x: col (x axis),ok,"(row, col)"
 PI,Put an approximation of π into the x-register (3.14159265359).,ok,()
 POLAR,Select polar coordinate mode for displaying complex numbers.,ok,()
-POSA,"Position in Alpha. Searches the Alpha register for the target specified in the x-register. If found, returns the character position; if not found, returns -1.",tocheck,
+POSA,"Position in Alpha. Searches the Alpha register for the target specified in the x-register. If found, returns the character position; if not found, returns -1.",ok,(char)
 PRA,Print Alpha register.,ok,()
 PRLCD,Print LCD (liquid crystal display). Prints the entire display.,ok,()
 PROFF,Printing off. Clears flags 21 and 55.,ok,()

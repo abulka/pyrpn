@@ -1311,17 +1311,17 @@ cmd_list = \
            'params': '()',
            'suggestion': '',
            'supported': '✓'},
- 'POSA': {'class': 'tocheck',
+ 'POSA': {'class': '',
           'description': 'Position in Alpha. Searches the Alpha register for '
                          'the target specified in the x-register. If found, '
                          'returns the character position; if not found, '
                          'returns -1.',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
-          'num_params': 0,
-          'params': '',
-          'suggestion': 'being researched',
-          'supported': ''},
+          'num_params': 1,
+          'params': '(char)',
+          'suggestion': '',
+          'supported': '✓'},
  'PRA': {'class': '',
          'description': 'Print Alpha register.',
          'indirect_allowed': False,
