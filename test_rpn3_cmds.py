@@ -832,3 +832,13 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+    def test_matrix(self):
+        self.parse(dedent("""
+            isMAT(20)
+            """))
+        expected = dedent("""
+            20
+            XEQ "pMAT"
+            """)
+        self.compare(de_comment(expected))
+

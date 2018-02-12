@@ -411,6 +411,19 @@ class RpnTemplates:
         RTN    
         """)
 
+    pCPX = dedent("""
+        LBL "pCPX"  // Is matrix? (n) -> boolean
+        CF 00
+        MAT?
+        SF 00
+        RDN
+        FS? 00
+        1
+        FC? 00
+        0
+        RTN    
+        """)
+
     # Param reordering - needed cos users push args from left to right, which puts early params in the wrong order when parsing params for RDN, STO nn
 
     p2Param = dedent("""

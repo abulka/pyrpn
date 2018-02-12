@@ -114,8 +114,8 @@ LN1+X,"Natural logarithm for values close to zero. Returns ln(1 + x), which prov
 LOG,Common logarithm. Returns log10(x).,ok,(n)
 LOGF,Select the logarithmic curve-fitting model.,ok,(n)
 MAN,Select Manual print mode.,ok,()
-MAT?,"If the x-register contains a matrix, execute the next program line; if the X-register does not contain a matrix, skip the next program line.",tocheck,
-MEAN,Mean. Returns the mean of x-values (Σx / n) and the mean of y-values (Σy / n).,tocheck,(n)
+MAT?,"If the x-register contains a matrix, execute the next program line; if the X-register does not contain a matrix, skip the next program line.",remapped,(x)
+MEAN,Mean. Returns the mean of x-values (Σx / n) and the mean of y-values (Σy / n) that have been stored with Σ+. The mean of x is returned to the X-register and the mean of y is returned to the Y-register.,tocheck,()
 MENU,Select the programmable menu.,ok,()
 MOD,Modulo. Returns the remainder for y / x.,ok,"(y,x)"
 MVAR,Declare a menu variable in a SOLVER program. Parameter: variable name.,ok suggestion: MVAR("length") etc.,

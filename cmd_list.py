@@ -1130,24 +1130,26 @@ cmd_list = \
          'params': '()',
          'suggestion': '',
          'supported': '✓'},
- 'MAT?': {'class': 'tocheck',
+ 'MAT?': {'class': '',
           'description': 'If the x-register contains a matrix, <del>execute '
                          'the next program line</del>; if the X-register does '
                          'not contain a matrix, <del>skip the next program '
                          'line</del>.',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
-          'num_params': 0,
-          'params': '',
-          'suggestion': 'being researched',
-          'supported': ''},
+          'num_params': 1,
+          'params': '(x)',
+          'suggestion': 'isMAT()',
+          'supported': '✓ (renamed)'},
  'MEAN': {'class': 'tocheck',
           'description': 'Mean. Returns the mean of x-values (Σx / n) and the '
-                         'mean of y-values (Σy / n).',
+                         'mean of y-values (Σy / n) that have been stored with '
+                         'Σ+. The mean of x is returned to the X-register and '
+                         'the mean of y is returned to the Y-register.',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
-          'num_params': 1,
-          'params': '(n)',
+          'num_params': -1,
+          'params': '()',
           'suggestion': 'being researched',
           'supported': ''},
  'MENU': {'class': '',
