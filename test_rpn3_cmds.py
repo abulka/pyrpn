@@ -779,3 +779,13 @@ class RpnTests3Cmds(BaseTest):
             RDX.
             """)
         self.compare(de_comment(expected))
+
+    def test_real(self):
+        self.parse(dedent("""
+            isREAL(20)
+            """))
+        expected = dedent("""
+            20
+            XEQ "pREAL"
+            """)
+        self.compare(de_comment(expected))

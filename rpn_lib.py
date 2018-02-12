@@ -369,6 +369,21 @@ class RpnTemplates:
         RTN    
         """)
 
+    # Misc Tests - Real, Matrix...
+
+    pREAL = dedent("""
+        LBL "pREAL"  // Is real number? (n) -> boolean
+        CF 00
+        REAL?
+        SF 00
+        RDN
+        FS? 00
+        1
+        FC? 00
+        0
+        RTN    
+        """)
+
     # Param reordering - needed cos users push args from left to right, which puts early params in the wrong order when parsing params for RDN, STO nn
 
     p2Param = dedent("""
@@ -680,17 +695,6 @@ class RpnTemplates:
         _attrs_public = [a for a in _attrs_all if not (a[0].startswith('__') and a[0].endswith('__'))]
         names = [tup[0] for tup in _attrs_public]  # we just want the names not the tuples of (name, value)
         return names
-
-    def get_user_insertable_pyrpn_cmds(self):
-        """
-        These are the commands that are exposed to the user and which can be inserted into.
-        """
-        return {
-            'pFS': {'description': 'is flag set?'},
-            'pFC': {'description': 'is flag clear?'},
-            # 'pAssert': {'description': 'is param True?'},  # not user callable anymore.
-            'pMxLen': {'description': 'length of list or dict'},
-        }
 
     def _create_local_labels(self):
         """

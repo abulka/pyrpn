@@ -91,9 +91,15 @@ with open('cmd_list.csv', newline='') as csvfile:
         elif supported == 'alpha':
             supported = "No"
             suggestion = 'Use the alpha() function to build up strings in the alpha register, specifying literal strings of any length, and multiple variables. See help for more details'
+
         elif supported == 'remapped':
             supported = '✓ (renamed)'
-            suggestion = f'{settings.RPN_CMD_TO_PYTHON_REPLACEMENT[cmd]}()'
+
+            try:
+                suggestion = f'{settings.RPN_CMD_TO_PYTHON_REPLACEMENT[cmd]}()'
+            except KeyError:
+                suggestion = f'{settings.RPN_TO_RPNLIB_SPECIAL[cmd]}()'
+
         elif supported[0:2] == 'No':
             info, suggestion = extract(supported)
             supported = 'No'

@@ -26,11 +26,33 @@ RPN_UNSUPPORTED = ['NOT', 'OR', 'AND', 'CLST', 'CLX']
 LIST_UNSUPPORTED = ('cmp', 'index', 'count', 'extend', 'insert', 'remove', 'reverse', 'sort')
 DICT_UNSUPPORTED = ('clear', 'copy', 'fromkeys', 'get', 'items', 'setdefault', 'update', 'values')
 MATRIX_UNSUPPORTED = ('INDEX', 'STOIJ', 'RCLIJ', 'PUTM', 'GETM', 'INSR', 'DELR', 'DIM', 'GROW', 'WRAP', 'SIMQ', 'GROW', 'WRAP')
+
+# Original HP42S commands to Python replacement (only used by cmd list gen)
+RPN_TO_RPNLIB_SPECIAL = {
+    'FS?':          'isFS',
+    'FC?':          'isFC',
+    'REAL?':        'isREAL',
+}
+
+# So that converter knows that these are not user functions - cos these don't exist in PYTHON_CMD_TO_RPN
+PYLIB_INSERTABLE_WHEN_ORIGINAL_REMAPPED = {
+    'pFS': {'description': 'is flag set?'},
+    'pFC': {'description': 'is flag clear?'},
+    'pREAL': {'description': 'is Real?'},
+
+    'pMxLen': {'description': 'length of list or dict'},
+}
+
+# Python replacements for native HP42S commands which cannot be entered due to strange symbols
+# The converter maps the new Python name to the original name, or to a rpnlib function and inserts it.
 PYTHON_CMD_TO_RPN = {
-    'isFS':         'pFS',
+    'isFS':         'pFS',      # mapped to replacement rpnlib functions
     'isFC':         'pFC',
+    'isREAL':       'pREAL',
+
     'len':          'pMxLen',
-    'print':        'AVIEW',
+
+    'print':        'AVIEW',    # mapped to original HP42S commands
     'Eto':          'E↑X',
     'EtoMinus1':    'E↑X-1',
     'LN1plus':      'LN1+X',
@@ -60,11 +82,13 @@ PYTHON_CMD_TO_RPN = {
     'BASEtimes':    'BASEx',
     'BASEdivide':   'BASE÷',
     'BASEplusMinus':'BASE+/–',
-    'RDXcomma':'RDX,',
-    'RDXperiod':'RDX.',
+    'RDXcomma':     'RDX,',
+    'RDXperiod':    'RDX.',
 
 }
+# backward lookup so that cmd list gen can show the Python substitute in cmd list table
 RPN_CMD_TO_PYTHON_REPLACEMENT = {v: k for k, v in PYTHON_CMD_TO_RPN.items()}
+
 NUM_PARAMS_UNSPECIFIED = -1
 
 # Specifications of RPN limitations
@@ -110,7 +134,8 @@ LIST_CLIST = 59
 LOCAL_LABEL_START_FOR_Py = 60  # .. 99
 
 # Flags
-FLAG_PYTHON_USE_1 = 99
-FLAG_PYTHON_USE_2 = 98
+FLAG_PYTHON_RPNLIB_GENERAL_PURPOSE = '00'
 FLAG_LIST_1D_2D_MODE = '01'
 FLAG_LIST_AUTO_CREATE_IF_KEY_NOT_FOUND = '02'
+FLAG_PYTHON_USE_1 = 99
+FLAG_PYTHON_USE_2 = 98

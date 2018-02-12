@@ -1569,16 +1569,16 @@ cmd_list = \
           'params': '()',
           'suggestion': 'RDXperiod()',
           'supported': '✓ (renamed)'},
- 'REAL?': {'class': 'tocheck',
+ 'REAL?': {'class': '',
            'description': 'If the x-register contains a real number, execute '
                           'the next program line; if the x-register does not '
                           'contain a real number, skip the next program line.',
            'indirect_allowed': False,
            'num_arg_fragments': 0,
-           'num_params': 0,
-           'params': '',
-           'suggestion': 'being researched',
-           'supported': ''},
+           'num_params': 1,
+           'params': '(n)',
+           'suggestion': 'isREAL()',
+           'supported': '✓ (renamed)'},
  'REALRES': {'class': '',
              'description': "Real-results. Disables the calculator's ability "
                             'to return a complex result using real-number '

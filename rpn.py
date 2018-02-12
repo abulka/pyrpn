@@ -1301,7 +1301,6 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 Manually looped through and visited.  Each visit emits a register rcl or literal onto the stack.
         """
         self.begin(node)
-        done = False
         self.inside_calculation = True
         err_msg = lambda s : f'The built-in Python {s} command "{node.func.attr}" is not supported yet, sorry. If you are willing to handcraft an algorithm in RPN that implements this functionality please submit to Andy. {source_code_line_info(node)}'
 
