@@ -630,6 +630,19 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+    def test_complex_create_pythonic_minus(self):
+        self.parse(dedent("""
+            x = 7 - 9j
+            """))
+        expected = dedent("""
+            7
+            9
+            +/-
+            COMPLEX        
+            STO 00
+            """)
+        self.compare(de_comment(expected))
+
     @unittest.skip('complex matrix')
     def test_complex_matrix(self):
         self.parse(dedent("""

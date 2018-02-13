@@ -1095,6 +1095,11 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.pending_ops[-1] = 'COMPLEX'
             imaginary_part = self.program.last_line.text
             self.program.last_line.text = imaginary_part.replace('j', '')  # strip the 'j'
+        elif self.pending_ops[-1] == '-' and self.program.last_line.text[-1] == 'j':
+            self.pending_ops[-1] = 'COMPLEX'
+            imaginary_part = self.program.last_line.text
+            self.program.last_line.text = imaginary_part.replace('j', '')  # strip the 'j'
+            self.program.insert('+/-')
 
     def visit_Compare(self, node):
         """
