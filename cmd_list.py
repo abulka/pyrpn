@@ -408,14 +408,15 @@ cmd_list = \
             'params': '()',
             'suggestion': '',
             'supported': '✓'},
- 'CLP': {'class': 'tocheck',
+ 'CLP': {'class': '',
          'description': 'Clear a program from memory. Parameter: global label',
          'indirect_allowed': False,
          'num_arg_fragments': 1,
          'num_params': 0,
          'params': '',
-         'suggestion': 'being researched',
-         'supported': ''},
+         'suggestion': 'Pass in the name of the function as a string e.g. '
+                       "CLP('myfunc')",
+         'supported': '✓'},
  'CLRG': {'class': '',
           'description': 'Clear Registers. Clear all of the numbered storage '
                          'registers to zero.',

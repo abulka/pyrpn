@@ -38,7 +38,7 @@ CLD,Clear display. Clear a message from the display.,ok,()
 CLKEYS,Clear all CUSTOM menu key assignments.,ok,()
 CLLCD,Clear LCD (liquid crystal display). Blanks the entire display.,ok,()
 CLMENU,Clear MENU. Deletes all menu key definitions for the programmable menu.,ok,()
-CLP,Clear a program from memory. Parameter: global label,tocheck,
+CLP,Clear a program from memory. Parameter: global label,ok suggestion: Pass in the name of the function as a string e.g. CLP('myfunc'),
 CLRG,Clear Registers. Clear all of the numbered storage registers to zero.,ok suggestion: Will clear all Python variables (but not named variables) - use with care.,()
 CLST,Clear Stack. Clear the stack registers to zero.,na,
 CLV,Clear a variable from memory. Parameter: variable name (indirect allowed),ok,(var)

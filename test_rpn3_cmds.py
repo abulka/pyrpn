@@ -675,7 +675,7 @@ class RpnTests3Cmds(BaseTest):
 
     # Cmd mapping
 
-    def test_cmd_EtoX(self):
+    def test_cmd_cmd_EtoX(self):
         # Converting a Complex Matrix to Real again
         self.parse(dedent("""
             Eto(10)
@@ -688,7 +688,7 @@ class RpnTests3Cmds(BaseTest):
 
     # command num args enforcement
 
-    def test_agraph(self):
+    def test_cmd_agraph(self):
         # Puts alpha chars into pixels at row col coords
         self.parse(dedent("""
             AGRAPH(1,1)
@@ -700,13 +700,13 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    def test_agraph_no_params(self):
+    def test_cmd_agraph_no_params(self):
         src = dedent("""
             AGRAPH()
             """)
         self.assertRaises(RpnError, self.parse, dedent(src))
 
-    def test_agraph_not_enough_params(self):
+    def test_cmd_agraph_not_enough_params(self):
         src = dedent("""
             AGRAPH(1)
             """)
@@ -714,7 +714,7 @@ class RpnTests3Cmds(BaseTest):
 
     # INPUT named variables
 
-    def test_input(self):
+    def test_cmd_input(self):
         self.parse(dedent("""
             INPUT(fred)
             Reciprocal(fred)
@@ -726,7 +726,7 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    def test_input_integ_prv(self):
+    def test_cmd_input_integ_prv(self):
         self.parse(dedent("""
             INPUT(fred)
             INTEG(mary)
@@ -739,28 +739,28 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    def test_input_str(self):
+    def test_cmd_input_str(self):
         # Although this is the original syntax, its not allowed
         src = dedent("""
             INPUT("fred")
             """)
         self.assertRaises(RpnError, self.parse, dedent(src))
 
-    def test_input_no_args(self):
+    def test_cmd_input_no_args(self):
         # Although this is the original syntax, its not allowed
         src = dedent("""
             INPUT()
             """)
         self.assertRaises(RpnError, self.parse, dedent(src))
 
-    def test_input_regs_not_allowed(self):
+    def test_cmd_input_regs_not_allowed(self):
         # Although specifying registers is in the original syntax, its not allowed
         src = dedent("""
             INPUT(00)
             """)
         self.assertRaises(RpnError, self.parse, dedent(src))
 
-    def test_size(self):
+    def test_cmd_size(self):
         self.parse(dedent("""
             SIZE(50)
             """))
@@ -769,7 +769,7 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    def test_rdx(self):
+    def test_cmd_rdx(self):
         self.parse(dedent("""
             RDXcomma()
             RDXperiod()
@@ -780,7 +780,7 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    def test_real(self):
+    def test_cmd_isreal(self):
         self.parse(dedent("""
             isREAL(20)
             """))
@@ -790,7 +790,7 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    def test_bit(self):
+    def test_cmd_testbit(self):
         self.parse(dedent("""
             testBIT(20,2)
             """))
@@ -822,7 +822,7 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.assertRaises(RpnError, self.parse, dedent(src))
 
-    def test_cpx(self):
+    def test_cmd_iscpx(self):
         self.parse(dedent("""
             isCPX(20)
             """))
@@ -832,7 +832,7 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    def test_matrix(self):
+    def test_cmd_ismatrix(self):
         self.parse(dedent("""
             isMAT(20)
             """))
@@ -842,7 +842,7 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    def test_str(self):
+    def test_cmd_isstr(self):
         self.parse(dedent("""
             isSTR("fred")
             """))
@@ -852,7 +852,7 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    def test_posa(self):
+    def test_cmd_posa(self):
         self.parse(dedent("""
             POSA("C")
             """))
@@ -862,7 +862,7 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    def test_editn_matrix(self):
+    def test_cmd_editn_matrix(self):
         self.parse(dedent("""
             m = NEWMAT(1,4)
             EDITN(m)
@@ -877,7 +877,7 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    def test_edit_matrix(self):
+    def test_cmd_edit_matrix(self):
         # map edit to editn - same thing
         self.parse(dedent("""
             m = NEWMAT(1,4)
@@ -890,6 +890,15 @@ class RpnTests3Cmds(BaseTest):
             STO "m"
 
             EDITN "m"
+            """)
+        self.compare(de_comment(expected))
+
+    def test_cmd_clp(self):
+        self.parse(dedent("""
+            CLP("fred")
+            """))
+        expected = dedent("""
+            CLP "fred"
             """)
         self.compare(de_comment(expected))
 
