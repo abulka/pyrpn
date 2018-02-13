@@ -514,11 +514,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         """
         self.begin(node)
 
-        if isinstance(node.value, ast.Tuple):
-            for elt in reversed(node.value.elts):
-                self.visit(elt)
-        else:
-            self.visit_children(node)
+        # if isinstance(node.value, ast.Tuple):
+        #     for elt in reversed(node.value.elts):
+        #         self.visit(elt)
+        # else:
+        #     self.visit_children(node)
+        self.visit_children(node)
 
         self.astox()
         self.program.insert(f'RTN', comment='return')
@@ -747,7 +748,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         by_ref_to_rhs_var = node.value.id if rhs_is_list_var or rhs_is_dict_var else ''
 
         targets = node.targets[0].elts if isinstance(node.targets[0], ast.Tuple) else node.targets
-        for index, target in enumerate(targets):
+        for index, target in enumerate(reversed(targets)):
             lhs_is_subscript = isinstance(target, ast.Subscript)
             if lhs_is_subscript:
                 self.subscript_is_on_lhs_thus_assign(target)

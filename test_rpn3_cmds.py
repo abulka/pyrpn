@@ -843,24 +843,6 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    def test_cmd_what_dim(self):
-        self.parse(dedent("""
-            m = NEWMAT(1, 4)
-            rows, cols = whatDIM(m)
-            """))
-        expected = dedent("""
-            1
-            4
-            NEWMAT
-            STO "m"        
-            RCL "m"
-            DIM?
-            STO 00  // rows
-            RDN
-            STO 01  // cols          
-            """)
-        self.compare(de_comment(expected))
-
     def test_cmd_posa(self):
         self.parse(dedent("""
             POSA("C")
@@ -974,9 +956,38 @@ class RpnTests3Cmds(BaseTest):
 
     # multiple return values
 
+    """
+    Run this to assert that multiple values from a return statement work
+    both for user defined functions and also for built in 42S commands.
+    
+    def dim_matrix():
+      m = NEWMAT(1, 4)
+      rows, cols = whatDIM(m)
+      assert rows == 1
+      assert cols == 4
+    
+      m.dim(2,3)
+      rows, cols = whatDIM(m)
+      assert rows == 2
+      assert cols == 3
+      PROMPT('matrix dim functions ok')
+      multret()
+      
+    def multret():
+        a, b = calc(1, 2)
+        assert a == 100
+        assert b == 3
+        print("multiple return values works ok")
+        
+    def calc(a,b):
+        c = a * 100
+        return c, b+1    
+    """
+
     def test_multiple_return(self):
         self.parse(dedent("""
             def multret():
+                a = 99
                 a, b = calc(1, 2)
                 assert a == 100
                 assert b == 3
@@ -987,12 +998,14 @@ class RpnTests3Cmds(BaseTest):
             """))
         expected = dedent("""
             LBL "multret"
+            99
+            STO 00          // a
             1
             2
             XEQ A           // calc()
-            STO 00          // a
-            RDN
             STO 01          // b
+            RDN
+            STO 00          // a
             
             RCL 00
             100
@@ -1004,7 +1017,7 @@ class RpnTests3Cmds(BaseTest):
             XEQ "pAssert"
             RTN
             
-            LBL A
+            LBL A           // def calc():
             XEQ "p2Param"
             STO 02
             RDN
@@ -1014,10 +1027,13 @@ class RpnTests3Cmds(BaseTest):
             100
             *
             STO 04
-            RCL 03
+            
+            // return c, b+1
+            
+            RCL 04          // c
+            RCL 03          // b
             1
             +
-            RCL 04
             RTN
             """)
         self.compare(de_comment(expected))
@@ -1026,14 +1042,41 @@ class RpnTests3Cmds(BaseTest):
         # multiple return values used here for the first time
         self.parse(dedent("""
             a, b = toPOL(1, 2)
+            a              # recall a onto the stack to check which register gets recalled
             """))
         expected = dedent("""
             1
             2
             →POL
-            STO 00  // a
+            STO 00  // b (because b is the first to get accessed it gets dibs on reg 00)
             RDN
-            STO 01  // b
+            STO 01  // a
+            RCL 01  // a
             """)
         self.compare(de_comment(expected))
 
+
+    def test_cmd_what_dim(self):
+        # multiple return values used here
+        self.parse(dedent("""
+            rows = 99
+            cols = 98
+            m = NEWMAT(1, 4)
+            rows, cols = whatDIM(m)
+            """))
+        expected = dedent("""
+            99
+            STO 00  // rows
+            98
+            STO 01  // cols
+            1
+            4
+            NEWMAT
+            STO "m"        
+            RCL "m"
+            DIM?
+            STO 01  // cols          
+            RDN
+            STO 00  // rows
+            """)
+        self.compare(de_comment(expected))

@@ -1,0 +1,8 @@
+{
+    "description": "<p>Create, redimension and test the size of matrices.</p>",
+    "public": "yes",
+    "sortnum": 0,
+    "source": "def dim_matrix():\r\n  m = NEWMAT(1, 4)\r\n  rows, cols = whatDIM(m)\r\n  assert rows == 1\r\n  assert cols == 4\r\n\r\n  m.dim(2,3)\r\n  rows, cols = whatDIM(m)\r\n  assert rows == 2\r\n  assert cols == 3\r\n  print('matrix dim functions ok')",
+    "tags": "Matrices",
+    "title": "DIM Matrixes"
+}
