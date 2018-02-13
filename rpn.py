@@ -1432,21 +1432,16 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         # Check the correct number of parameters has been supplied.
         # If cmd info has -1 then param info has not been specified yet
         try:
+            # 'pure' and 'renamed' scenarions (renamed func_name is back to the original 42S name by this point)
             cmd_info = cmd_list[func_name]
         except KeyError:
-            # Not a pure call, might be a 'renamed' call
+            # 'replaced' scenario (e.g. pBIT, which means we have to figure out original 42S command via a few lookups)
             try:
-                orig_func_name = settings.PYTHON_CMD_TO_RPN[func_name]
+                python_func_name = settings.RPN_CMD_TO_PYTHON_RENAMED[func_name]  # rpnlib func to python func
+                orig_func_name = settings.RPN_TO_RPNLIB_SPECIAL_REVERSE[python_func_name]
                 cmd_info = cmd_list[orig_func_name]
-                raise('yey someone called me')
             except KeyError:
-                # Could be a 'replaced' call
-                try:
-                    python_func_name = settings.RPN_CMD_TO_PYTHON_RENAMED[func_name]  # rpnlib func to python func
-                    orig_func_name = settings.RPN_TO_RPNLIB_SPECIAL_REVERSE[python_func_name]
-                    cmd_info = cmd_list[orig_func_name]
-                except KeyError:
-                    return  # ignore failed lookups cos this code is used by more than just built in RPN commands calls
+                return  # ignore failed lookups cos this code is used by more than just built in RPN commands calls
         num_params_needed = cmd_info['num_params']
         if num_params_needed == settings.NUM_PARAMS_UNSPECIFIED:
             return
