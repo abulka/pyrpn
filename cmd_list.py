@@ -2095,17 +2095,17 @@ cmd_list = \
          'suggestion': 'Use built in Python boolean operators instead e.g. '
                        '"not val or val2 and val3"',
          'supported': 'No'},
- 'XTOA': {'class': 'tocheck',
+ 'XTOA': {'class': '',
           'description': ' X to Alpha. Appends a character (specified by the '
                          'code in the x-register) to the Alpha register. If '
                          'the x-register contains an Alpha string, appends the '
                          'entire string.',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
-          'num_params': 0,
-          'params': '',
-          'suggestion': 'being researched',
-          'supported': ''},
+          'num_params': 1,
+          'params': '(n_or_str)',
+          'suggestion': 'Parameter can be an integer or a string',
+          'supported': '✓'},
  'X↑2': {'class': '',
          'description': 'Square. Returns x2.',
          'indirect_allowed': False,

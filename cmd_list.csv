@@ -221,7 +221,7 @@ X≥0?,"X greater than or equal to zero test. If true, execute the next program 
 X≥Y?,"X greater than or equal to y test. If true, execute the next program line; if false, skip the next program line",noflow,
 XEQ,Execute a function or program. Parameter: function or label (indirect allowed),na suggestion: Just call a function e.g. myfunc(),
 XOR,Logical XOR (exclusive OR). Returns x XOR y.,nobool,
-XTOA," X to Alpha. Appends a character (specified by the code in the x-register) to the Alpha register. If the x-register contains an Alpha string, appends the entire string.",tocheck,
+XTOA," X to Alpha. Appends a character (specified by the code in the x-register) to the Alpha register. If the x-register contains an Alpha string, appends the entire string.",ok suggestion: Parameter can be an integer or a string,(n_or_str)
 X↑2,Square. Returns x2.,✓ (renamed) suggestion: y**2,(n)
 YINT,y-intercept. Returns the y-intercept of the curve fitted to the current statistical data.,ok,()
 Y↑X,Power. Returns yx.,✓ (renamed) suggestion: y**x,(n)

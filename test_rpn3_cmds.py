@@ -895,14 +895,27 @@ class RpnTests3Cmds(BaseTest):
 
     def test_cmd_clp_pgmint_take_funcname(self):
         self.parse(dedent("""
-            CLP("fred")
-            PGMINT("fred")
-            PGMSLV("fred")
+            CLP("myfunc")
+            PGMINT("myfunc")
+            PGMSLV("myfunc")
             """))
         expected = dedent("""
-            CLP "fred"
-            PGMINT "fred"
-            PGMSLV "fred"
+            CLP "myfunc"
+            PGMINT "myfunc"
+            PGMSLV "myfunc"
+            """)
+        self.compare(de_comment(expected))
+
+    def test_cmd_x_to_a(self):
+        self.parse(dedent("""
+            XTOA(30)
+            XTOA("somestr")
+            """))
+        expected = dedent("""
+            30
+            XTOA
+            "somestr"
+            XTOA
             """)
         self.compare(de_comment(expected))
 
