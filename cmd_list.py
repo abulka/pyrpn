@@ -6,7 +6,7 @@ cmd_list = \
        'num_arg_fragments': 0,
        'num_params': 2,
        'params': '(num,percent)',
-       'suggestion': 'Percent()',
+       'suggestion': '<code>Percent(num,percent)</code>',
        'supported': '✓ (renamed)'},
  '%CH': {'class': '',
          'description': 'Percent change. Returns (x – y)×(100 / y).',
@@ -14,7 +14,7 @@ cmd_list = \
          'num_arg_fragments': 0,
          'num_params': 2,
          'params': '(y,x)',
-         'suggestion': 'PercentCH()',
+         'suggestion': '<code>PercentCH(y,x)</code>',
          'supported': '✓ (renamed)'},
  '+': {'class': '',
        'description': 'Addition. Returns y + x.',
@@ -40,7 +40,7 @@ cmd_list = \
          'num_arg_fragments': 0,
          'num_params': 1,
          'params': '(n)',
-         'suggestion': 'Reciprocal()',
+         'suggestion': '<code>Reciprocal(n)</code>',
          'supported': '✓ (renamed)'},
  '10↑X': {'class': '',
           'description': 'Common exponential. Returns 10x.',
@@ -48,7 +48,7 @@ cmd_list = \
           'num_arg_fragments': 0,
           'num_params': 1,
           'params': '(n)',
-          'suggestion': 'CommonExp()',
+          'suggestion': '<code>CommonExp(n)</code>',
           'supported': '✓ (renamed)'},
  'ABS': {'class': '',
          'description': 'Absolute value. Returns |x|.',
@@ -125,7 +125,7 @@ cmd_list = \
           'num_arg_fragments': 0,
           'num_params': -1,
           'params': '()',
-          'suggestion': 'ALLStat()',
+          'suggestion': '<code>ALLStat()</code>',
           'supported': '✓ (renamed)'},
  'AND': {'class': 'no',
          'description': '<del>Logical AND. Returns x AND y.</del>',
@@ -264,7 +264,7 @@ cmd_list = \
            'num_arg_fragments': 0,
            'num_params': 2,
            'params': '(y,x)',
-           'suggestion': 'BASEplus()',
+           'suggestion': '<code>BASEplus(y,x)</code>',
            'supported': '✓ (renamed)'},
  'BASE+/–': {'class': '',
              'description': "Base change sign. Returns the 36-bit 2's "
@@ -273,7 +273,7 @@ cmd_list = \
              'num_arg_fragments': 0,
              'num_params': 2,
              'params': '(y,x)',
-             'suggestion': 'BASEplusMinus()',
+             'suggestion': '<code>BASEplusMinus(y,x)</code>',
              'supported': '✓ (renamed)'},
  'BASEx': {'class': '',
            'description': 'Base multiplication. Returns the 36-bit product of '
@@ -282,7 +282,7 @@ cmd_list = \
            'num_arg_fragments': 0,
            'num_params': 2,
            'params': '(y,x)',
-           'suggestion': 'BASEtimes()',
+           'suggestion': '<code>BASEtimes(y,x)</code>',
            'supported': '✓ (renamed)'},
  'BASE÷': {'class': '',
            'description': 'Base division. Returns the 36-bit quotient of y ÷ '
@@ -291,7 +291,7 @@ cmd_list = \
            'num_arg_fragments': 0,
            'num_params': 2,
            'params': '(y,x)',
-           'suggestion': 'BASEdivide()',
+           'suggestion': '<code>BASEdivide(y,x)</code>',
            'supported': '✓ (renamed)'},
  'BASE–': {'class': '',
            'description': 'Base subtraction. Returns the 36-bit difference of '
@@ -300,7 +300,7 @@ cmd_list = \
            'num_arg_fragments': 0,
            'num_params': 2,
            'params': '(y,x)',
-           'suggestion': 'BASEminus()',
+           'suggestion': '<code>BASEminus(y,x)</code>',
            'supported': '✓ (renamed)'},
  'BEEP': {'class': '',
           'description': 'Sound a sequence of four tones.',
@@ -335,7 +335,7 @@ cmd_list = \
           'num_arg_fragments': 0,
           'num_params': 2,
           'params': '(y,xth_bit)',
-          'suggestion': 'testBIT()',
+          'suggestion': '<code>testBIT(y,xth_bit)</code>',
           'supported': '✓ (renamed)'},
  'BST': {'class': 'na',
          'description': 'Back step. Move the program pointer to the previous '
@@ -519,7 +519,7 @@ cmd_list = \
           'num_arg_fragments': 0,
           'num_params': 1,
           'params': '(n)',
-          'suggestion': 'isCPX()',
+          'suggestion': '<code>isCPX(n)</code>',
           'supported': '✓ (renamed)'},
  'CPXRES': {'class': '',
             'description': 'Complex-results. Enable the calculator to return a '
@@ -611,11 +611,11 @@ cmd_list = \
           'num_arg_fragments': 0,
           'num_params': 1,
           'params': '(mvar)',
-          'suggestion': 'whatDIM()<br><br>Returns two values, which need to be '
-                        'assigned to variables e.g. <code>rows, cols = '
-                        'whatDIM(mymatrix)</code>.  Also consider '
-                        '<code>len(mymatrix)</code> if you just want the '
-                        'number of rows.',
+          'suggestion': '<code>whatDIM(mvar)</code><br><br>Returns two values, '
+                        'which need to be assigned to variables e.g. '
+                        '<code>rows, cols = whatDIM(mymatrix)</code>.  Also '
+                        'consider <code>len(mymatrix)</code> if you just want '
+                        'the number of rows.',
           'supported': '✓ (renamed)'},
  'DOT': {'class': '',
          'description': 'Dot Product.  Returns the dot product of two vectors '
@@ -707,7 +707,7 @@ cmd_list = \
          'num_arg_fragments': 0,
          'num_params': 1,
          'params': '(n)',
-         'suggestion': 'Eto()',
+         'suggestion': '<code>Eto(n)</code>',
          'supported': '✓ (renamed)'},
  'E↑X-1': {'class': '',
            'description': 'Natural exponential for values of x which are close '
@@ -717,7 +717,7 @@ cmd_list = \
            'num_arg_fragments': 0,
            'num_params': 1,
            'params': '(n)',
-           'suggestion': 'EtoMinus1()',
+           'suggestion': '<code>EtoMinus1(n)</code>',
            'supported': '✓ (renamed)'},
  'FC?': {'class': '',
          'description': 'Flag clear test. If the specified flag is clear, '
@@ -728,7 +728,7 @@ cmd_list = \
          'num_arg_fragments': 1,
          'num_params': 1,
          'params': '(flag)',
-         'suggestion': 'isFC()',
+         'suggestion': '<code>isFC(flag)</code>',
          'supported': '✓ (renamed)'},
  'FC?C': {'class': 'no',
           'description': '<del>Flag clear test and clear. If the specified '
@@ -795,7 +795,7 @@ cmd_list = \
          'num_arg_fragments': 1,
          'num_params': 1,
          'params': '(flag)',
-         'suggestion': 'isFS()',
+         'suggestion': '<code>isFS(flag)</code>',
          'supported': '✓ (renamed)'},
  'FS?C': {'class': 'no',
           'description': '<del>Flag set test and clear. If the specified flag '
@@ -887,7 +887,7 @@ cmd_list = \
           'num_arg_fragments': 0,
           'num_params': 2,
           'params': '(n,n)',
-          'suggestion': 'HMSplus()',
+          'suggestion': '<code>HMSplus(n,n)</code>',
           'supported': '✓ (renamed)'},
  'HMS–': {'class': '',
           'description': 'Subtract x from y using H.MMSSss format.',
@@ -895,7 +895,7 @@ cmd_list = \
           'num_arg_fragments': 0,
           'num_params': 2,
           'params': '(n,n)',
-          'suggestion': 'HMSminus()',
+          'suggestion': '<code>HMSminus(n,n)</code>',
           'supported': '✓ (renamed)'},
  'I+': {'class': 'no',
         'description': '<del>Increment the row pointer in the indexed '
@@ -1083,7 +1083,7 @@ cmd_list = \
           'num_arg_fragments': 0,
           'num_params': -1,
           'params': '()',
-          'suggestion': 'LINStat()',
+          'suggestion': '<code>LINStat()</code>',
           'supported': '✓ (renamed)'},
  'LIST': {'class': 'na',
           'description': 'Print a portion of a program listing. (Not '
@@ -1110,7 +1110,7 @@ cmd_list = \
            'num_arg_fragments': 0,
            'num_params': 1,
            'params': '(n)',
-           'suggestion': 'LN1plus()',
+           'suggestion': '<code>LN1plus(n)</code>',
            'supported': '✓ (renamed)'},
  'LOG': {'class': '',
          'description': 'Common logarithm. Returns log10(x).',
@@ -1145,7 +1145,7 @@ cmd_list = \
           'num_arg_fragments': 0,
           'num_params': 1,
           'params': '(x)',
-          'suggestion': 'isMAT()',
+          'suggestion': '<code>isMAT(x)</code>',
           'supported': '✓ (renamed)'},
  'MEAN': {'class': '',
           'description': 'Mean. Returns the mean of x-values (Σx / n) and the '
@@ -1190,7 +1190,7 @@ cmd_list = \
         'num_arg_fragments': 0,
         'num_params': 1,
         'params': '(n)',
-        'suggestion': 'Factorial()',
+        'suggestion': '<code>Factorial(n)</code>',
         'supported': '✓ (renamed)'},
  'NEWMAT': {'class': '',
             'description': 'New matrix. Creates a y × x matrix in the '
@@ -1582,7 +1582,7 @@ cmd_list = \
           'num_arg_fragments': 0,
           'num_params': -1,
           'params': '()',
-          'suggestion': 'RDXcomma()',
+          'suggestion': '<code>RDXcomma()</code>',
           'supported': '✓ (renamed)'},
  'RDX.': {'class': '',
           'description': 'Select a period to be used as the radix mark '
@@ -1591,7 +1591,7 @@ cmd_list = \
           'num_arg_fragments': 0,
           'num_params': -1,
           'params': '()',
-          'suggestion': 'RDXperiod()',
+          'suggestion': '<code>RDXperiod()</code>',
           'supported': '✓ (renamed)'},
  'REAL?': {'class': '',
            'description': 'If the x-register contains a real number, '
@@ -1602,7 +1602,7 @@ cmd_list = \
            'num_arg_fragments': 0,
            'num_params': 1,
            'params': '(n)',
-           'suggestion': 'isREAL()',
+           'suggestion': '<code>isREAL(n)</code>',
            'supported': '✓ (renamed)'},
  'REALRES': {'class': '',
              'description': "Real-results. Disables the calculator's ability "
@@ -1889,7 +1889,7 @@ cmd_list = \
           'num_arg_fragments': 0,
           'num_params': 1,
           'params': '(x)',
-          'suggestion': 'isSTR()',
+          'suggestion': '<code>isSTR(x)</code>',
           'supported': '✓ (renamed)'},
  'SUM': {'class': '',
          'description': 'Returns the sums Σx and Σy into the x- and '
@@ -2223,7 +2223,7 @@ cmd_list = \
         'num_arg_fragments': 0,
         'num_params': 2,
         'params': '(y,x)',
-        'suggestion': 'StatPlus()',
+        'suggestion': '<code>StatPlus(y,x)</code>',
         'supported': '✓ (renamed)'},
  'Σ-': {'class': '',
         'description': 'Summation minus. Subtract a pair of x- and y-values '
@@ -2232,7 +2232,7 @@ cmd_list = \
         'num_arg_fragments': 0,
         'num_params': 2,
         'params': '(y,x)',
-        'suggestion': 'StatMinus()',
+        'suggestion': '<code>StatMinus(y,x)</code>',
         'supported': '✓ (renamed)'},
  'ΣREG': {'class': '',
           'description': 'Summation registers. Defines which storage register '
@@ -2242,7 +2242,7 @@ cmd_list = \
           'num_arg_fragments': 1,
           'num_params': 1,
           'params': '(n)',
-          'suggestion': 'StatREG()',
+          'suggestion': '<code>StatREG(n)</code>',
           'supported': '✓ (renamed)'},
  'ΣREG?': {'class': '',
            'description': 'Return the register number of the first summation '
@@ -2251,7 +2251,7 @@ cmd_list = \
            'num_arg_fragments': 0,
            'num_params': -1,
            'params': '()',
-           'suggestion': 'StatWhichREG()',
+           'suggestion': '<code>StatWhichREG()</code>',
            'supported': '✓ (renamed)'},
  '–': {'class': '',
        'description': 'Subtraction. Returns y – x.',
@@ -2296,7 +2296,7 @@ cmd_list = \
           'num_arg_fragments': 0,
           'num_params': 1,
           'params': '(n)',
-          'suggestion': 'toDEC()',
+          'suggestion': '<code>toDEC(n)</code>',
           'supported': '✓ (renamed)'},
  '→DEG': {'class': '',
           'description': 'To degrees. Convert an angle-value from radians to '
@@ -2305,7 +2305,7 @@ cmd_list = \
           'num_arg_fragments': 0,
           'num_params': 1,
           'params': '(n)',
-          'suggestion': 'toDEG()',
+          'suggestion': '<code>toDEG(n)</code>',
           'supported': '✓ (renamed)'},
  '→HMS': {'class': '',
           'description': 'To hours, minutes, and seconds. Convert x from a '
@@ -2314,7 +2314,7 @@ cmd_list = \
           'num_arg_fragments': 0,
           'num_params': 1,
           'params': '(n)',
-          'suggestion': 'toHMS()',
+          'suggestion': '<code>toHMS(n)</code>',
           'supported': '✓ (renamed)'},
  '→HR': {'class': '',
          'description': 'To hours. Converts x from a minutes-seconds format to '
@@ -2323,7 +2323,7 @@ cmd_list = \
          'num_arg_fragments': 0,
          'num_params': 1,
          'params': '(n)',
-         'suggestion': 'toHR()',
+         'suggestion': '<code>toHR(n)</code>',
          'supported': '✓ (renamed)'},
  '→OCT': {'class': '',
           'description': 'To octal. Converts a decimal number to the octal '
@@ -2334,7 +2334,7 @@ cmd_list = \
           'num_arg_fragments': 0,
           'num_params': 1,
           'params': '(n)',
-          'suggestion': 'toOCT()',
+          'suggestion': '<code>toOCT(n)</code>',
           'supported': '✓ (renamed)'},
  '→POL': {'class': '',
           'description': 'To polar. Converts x and y to the corresponding '
@@ -2355,7 +2355,7 @@ cmd_list = \
           'num_arg_fragments': 0,
           'num_params': 1,
           'params': '(n)',
-          'suggestion': 'toRAD()',
+          'suggestion': '<code>toRAD(n)</code>',
           'supported': '✓ (renamed)'},
  '→REC': {'class': '',
           'description': 'To rectangular. Converts r (in the x-register) and θ '

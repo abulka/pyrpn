@@ -53,6 +53,9 @@ with open('cmd_list.csv', newline='') as csvfile:
 
         supported = row[2]
 
+        params = row[3].strip()
+        num_params = calc_num_params(params)
+
         css_class = ''
 
         if supported == 'tocheck':
@@ -97,9 +100,9 @@ with open('cmd_list.csv', newline='') as csvfile:
             supported = '✓ (renamed)'
 
             try:
-                suggestion = f'{settings.RPN_CMD_TO_PYTHON_RENAMED[cmd]}()'
+                suggestion = f'<code>{settings.RPN_CMD_TO_PYTHON_RENAMED[cmd]}{params}</code>'
             except KeyError:
-                suggestion = f'{settings.RPN_TO_RPNLIB_SPECIAL[cmd]}()'
+                suggestion = f'<code>{settings.RPN_TO_RPNLIB_SPECIAL[cmd]}{params}</code>'
             if xtra_suggestion:
                 suggestion += '<br><br>' + xtra_suggestion
 
@@ -112,9 +115,6 @@ with open('cmd_list.csv', newline='') as csvfile:
         else:
             info, suggestion = extract(supported)
             supported = info
-
-        params = row[3].strip()
-        num_params = calc_num_params(params)
 
         # Highlight table lines with css
         if supported == "No":
