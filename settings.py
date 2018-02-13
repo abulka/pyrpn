@@ -27,16 +27,6 @@ LIST_UNSUPPORTED = ('cmp', 'index', 'count', 'extend', 'insert', 'remove', 'reve
 DICT_UNSUPPORTED = ('clear', 'copy', 'fromkeys', 'get', 'items', 'setdefault', 'update', 'values')
 MATRIX_UNSUPPORTED = ('INDEX', 'STOIJ', 'RCLIJ', 'PUTM', 'GETM', 'INSR', 'DELR', 'DIM', 'GROW', 'WRAP', 'SIMQ', 'GROW', 'WRAP')
 
-# Original HP42S commands to Python replacement (only used by cmd list gen)
-RPN_TO_RPNLIB_SPECIAL = {
-    'FS?':          'isFS',
-    'FC?':          'isFC',
-    'REAL?':        'isREAL',
-    'BIT?':         'testBIT',
-    'CPX?':         'isCPX',
-    'MAT?':         'isMAT',
-    'STR?':         'isSTR',
-}
 
 # So that converter knows that these are not user functions - cos these don't exist in PYTHON_CMD_TO_RPN
 PYLIB_INSERTABLE_WHEN_ORIGINAL_REMAPPED = {
@@ -102,6 +92,61 @@ PYTHON_CMD_TO_RPN = {
 }
 # backward lookup so that cmd list gen can show the Python substitute in cmd list table
 RPN_CMD_TO_PYTHON_REPLACEMENT = {v: k for k, v in PYTHON_CMD_TO_RPN.items()}
+# import pprint
+# pprint.pprint(RPN_CMD_TO_PYTHON_REPLACEMENT)
+RPN_TO_PYTHON_CMD_ZZZ = {
+    '%':        'Percent',
+    '%CH':      'PercentCH',
+    '1/X':      'Reciprocal',
+    '10↑X':     'CommonExp',
+    'ALLΣ':     'ALLStat',
+    #'AVIEW': 'print',
+    'BASE+':    'BASEplus',
+    'BASE+/–':  'BASEplusMinus',
+    'BASEx':    'BASEtimes',
+    'BASE÷':    'BASEdivide',
+    'BASE–':    'BASEminus',
+    #'EDITN': 'EDIT',
+    'E↑X':      'Eto',
+    'E↑X-1':    'EtoMinus1',
+    'HMS+':     'HMSplus',
+    'HMS–':     'HMSminus',
+    'LINΣ':     'LINStat',
+    'LN1+X':    'LN1plus',
+    'N!':       'Factorial',
+    'RDX,':     'RDXcomma',
+    'RDX.':     'RDXperiod',
+    'pBIT':     'testBIT',
+    'pCPX':     'isCPX',
+    'pFC':      'isFC',
+    'pFS':      'isFS',
+    'pMAT':     'isMAT',
+    #'pMxLen':   'len',
+    'pREAL':    'isREAL',
+    'pSTR':     'isSTR',
+    'Σ+':       'StatPlus',
+    'Σ-':       'StatMinus',
+    'ΣREG':     'StatREG',
+    'ΣREG?':    'StatWhichREG',
+    '→DEC':     'toDEC',
+    '→DEG':     'toDEG',
+    '→HMS':     'toHMS',
+    '→HR':      'toHR',
+    '→OCT':     'toOCT',
+    '→POL':     'toPOL',
+    '→RAD':     'toRAD',
+    '→REC':     'toREC'
+}
+# Original HP42S commands to Python replacement (only used by cmd list gen)
+RPN_TO_RPNLIB_SPECIAL = {
+    'FS?':      'isFS',
+    'FC?':      'isFC',
+    'REAL?':    'isREAL',
+    'BIT?':     'testBIT',
+    'CPX?':     'isCPX',
+    'MAT?':     'isMAT',
+    'STR?':     'isSTR',
+}
 
 NUM_PARAMS_UNSPECIFIED = -1
 
