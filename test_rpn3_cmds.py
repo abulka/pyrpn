@@ -675,7 +675,7 @@ class RpnTests3Cmds(BaseTest):
 
     # Cmd mapping
 
-    def test_cmd_cmd_EtoX(self):
+    def test_cmd_cmd_e_to_x(self):
         # Converting a Complex Matrix to Real again
         self.parse(dedent("""
             Eto(10)
@@ -893,12 +893,16 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    def test_cmd_clp(self):
+    def test_cmd_clp_pgmint_take_funcname(self):
         self.parse(dedent("""
             CLP("fred")
+            PGMINT("fred")
+            PGMSLV("fred")
             """))
         expected = dedent("""
             CLP "fred"
+            PGMINT "fred"
+            PGMSLV "fred"
             """)
         self.compare(de_comment(expected))
 

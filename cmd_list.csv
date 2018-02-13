@@ -38,7 +38,7 @@ CLD,Clear display. Clear a message from the display.,ok,()
 CLKEYS,Clear all CUSTOM menu key assignments.,ok,()
 CLLCD,Clear LCD (liquid crystal display). Blanks the entire display.,ok,()
 CLMENU,Clear MENU. Deletes all menu key definitions for the programmable menu.,ok,()
-CLP,Clear a program from memory. Parameter: global label,ok suggestion: Pass in the name of the function as a string e.g. CLP('myfunc'),
+CLP,Clear a program from memory. Parameter: global label,ok suggestion: Pass in the name of the function as a string e.g. CLP('myfunc'),(funcname_str)
 CLRG,Clear Registers. Clear all of the numbered storage registers to zero.,ok suggestion: Will clear all Python variables (but not named variables) - use with care.,()
 CLST,Clear Stack. Clear the stack registers to zero.,na,
 CLV,Clear a variable from memory. Parameter: variable name (indirect allowed),ok,(var)
@@ -129,8 +129,8 @@ OLD,Recall the current element from the indexed matrix. (Equivalent to RCLEL.),n
 ON,Continuous on. Prevent the calculator from automatically turning off after ten minutes of inactivity.,ok,()
 OR,Logical OR. Returns x OR y.,nobool,
 PERM,Permutations of y items taken x at a time. Returns y!/(y – x)!,ok,"(y,x)"
-PGMINT,Select a program to integrate. Parameter: global label (indirect allowed),tocheck,
-PGMSLV,"Select a program to solve. Parameter: global label (indirect allowed) ,",tocheck,
+PGMINT,Select a program to integrate. Parameter: global label (indirect allowed),ok suggestion: Pass in the name of the function as a string e.g. PGMINT('myfunc'),(funcname_str)
+PGMSLV,"Select a program to solve. Parameter: global label (indirect allowed) ,",ok suggestion: Pass in the name of the function as a string e.g. PGMSLV('myfunc'),(funcname_str)
 PIXEL,Turn on a single pixel (dot) in the display y: row (y axis) x: col (x axis),ok,"(row, col)"
 PI,Put an approximation of π into the x-register (3.14159265359).,ok,()
 POLAR,Select polar coordinate mode for displaying complex numbers.,ok,()
