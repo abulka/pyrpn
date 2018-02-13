@@ -503,24 +503,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                     op=Add(),
                     right=Num(n=1))],
                 ctx=Load()))],
-
-        if its not a tuple - do normal visit of children
-        if it is a tuple
-            - Loop through the tuple elements
-            - We need to loop in reverse order because of RPN stack parameter assignment - better than
-              assigning things in reverse order I guess.
-            - Could have flaged that are doing a return and allow visit_tuples to do the reversing
-              work for us but easier to do it here and not introduce any more flags.
         """
         self.begin(node)
-
-        # if isinstance(node.value, ast.Tuple):
-        #     for elt in reversed(node.value.elts):
-        #         self.visit(elt)
-        # else:
-        #     self.visit_children(node)
         self.visit_children(node)
-
         self.astox()
         self.program.insert(f'RTN', comment='return')
         self.end(node)
@@ -748,7 +733,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         by_ref_to_rhs_var = node.value.id if rhs_is_list_var or rhs_is_dict_var else ''
 
         targets = node.targets[0].elts if isinstance(node.targets[0], ast.Tuple) else node.targets
-        for index, target in enumerate(reversed(targets)):
+        for index, target in enumerate(reversed(targets)):  # iterate in reverse order so that multiple values from return get assigned correctly
             lhs_is_subscript = isinstance(target, ast.Subscript)
             if lhs_is_subscript:
                 self.subscript_is_on_lhs_thus_assign(target)
@@ -761,7 +746,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             elif lhs_is_subscript:
                 self.scopes.ensure_is_named_matrix_register(var_name=target.value.id, node=node)  # drill into subscript node to get list or dict name
 
-            # pop the stack so that each value on the stack is assigned into a different var
+            # pop the stack so that each value on the stack is assigned into a different var (multiple values from return)
             if len(targets) > 1 and index < len(targets) - 1:
                 self.program.insert('RDN')
 
