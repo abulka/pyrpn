@@ -1,0 +1,8 @@
+{
+    "description": "<p>complex test</p>",
+    "public": "yes",
+    "sortnum": 0,
+    "source": "def complex_play():\r\n  RES = ('res', 5 +3j) + (7 - 9j)\r\n  PROMPT(RES)  # should be 12-i6 or in Python 12-6j\r\n  assert isCPX(RES)\r\n  RES2 = SQRT(-25)  # should be 0+i4.898979\r\n  PROMPT('sqrt res', RES2)\r\n  A, B = toPOL(1, RES2)\r\n  C, D = toREC(1, RES2)\r\n  PROMPT(a,b,'and',c,d)",
+    "tags": "Complex_Numbers",
+    "title": "Complex test"
+}
