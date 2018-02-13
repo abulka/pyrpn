@@ -98,7 +98,7 @@
                     {{ cmd_list[cmd]['supported'] }}
                 </td>
                 <td>
-                    {{ cmd_list[cmd]['suggestion'] }}
+                    {{ cmd_list[cmd]['suggestion'] | safe }}
                 </td>
                 <td style="font-family: monospace">
                     {{ cmd_list[cmd]['params'] }}

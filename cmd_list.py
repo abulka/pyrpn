@@ -609,11 +609,14 @@ cmd_list = \
                          'the x-register).',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
-          'num_params': 0,
-          'params': '',
-          'suggestion': 'Currently len(mymatrix) to get the length. TODO Still '
-                        'working on mymatrix.shape()',
-          'supported': 'len(mymatrix)'},
+          'num_params': 1,
+          'params': '(mvar)',
+          'suggestion': 'whatDIM()<br><br>Returns two values, which need to be '
+                        'assigned to variables e.g. <code>rows, cols = '
+                        'whatDIM(mymatrix)</code>.  Also consider '
+                        '<code>len(mymatrix)</code> if you just want the '
+                        'number of rows.',
+          'supported': '✓ (renamed)'},
  'DOT': {'class': '',
          'description': 'Dot Product.  Returns the dot product of two vectors '
                         '(matrices or complex numbers).',

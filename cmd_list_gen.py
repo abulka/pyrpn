@@ -92,13 +92,16 @@ with open('cmd_list.csv', newline='') as csvfile:
             supported = "No"
             suggestion = 'Use the alpha() function to build up strings in the alpha register, specifying literal strings of any length, and multiple variables. See help for more details'
 
-        elif supported == 'renamed':
+        elif supported.startswith('renamed'):
+            xtra_info, xtra_suggestion = extract(supported)
             supported = '✓ (renamed)'
 
             try:
                 suggestion = f'{settings.RPN_CMD_TO_PYTHON_RENAMED[cmd]}()'
             except KeyError:
                 suggestion = f'{settings.RPN_TO_RPNLIB_SPECIAL[cmd]}()'
+            if xtra_suggestion:
+                suggestion += '<br><br>' + xtra_suggestion
 
         elif supported[0:2] == 'No':
             info, suggestion = extract(supported)

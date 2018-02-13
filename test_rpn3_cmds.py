@@ -843,6 +843,24 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+    def test_cmd_what_dim(self):
+        self.parse(dedent("""
+            m = NEWMAT(1, 4)
+            rows, cols = whatDIM(m)
+            """))
+        expected = dedent("""
+            1
+            4
+            NEWMAT
+            STO "m"        
+            RCL "m"
+            DIM?
+            STO 00  // rows
+            RDN
+            STO 01  // cols          
+            """)
+        self.compare(de_comment(expected))
+
     def test_cmd_posa(self):
         self.parse(dedent("""
             POSA("C")
@@ -1013,9 +1031,9 @@ class RpnTests3Cmds(BaseTest):
             1
             2
             →POL
-            STO 00
+            STO 00  // a
             RDN
-            STO 01
+            STO 01  // b
             """)
         self.compare(de_comment(expected))
 

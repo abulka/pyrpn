@@ -66,6 +66,7 @@ RPN_CMD_TO_PYTHON_RENAMED = {
     '→POL':     'toPOL',
     '→RAD':     'toRAD',
     '→REC':     'toREC',
+    'DIM?':     'whatDIM',
 
     'AVIEW':    'print',            # extras
     'EDITN':    'EDIT',
