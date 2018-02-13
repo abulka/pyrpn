@@ -1784,8 +1784,9 @@ class RpnCodeGenTests(BaseTest):
              Supported, takes a variable as a parameter.  Must have parameter. If param is variable, ok.
              If param is number, ok.  If param is string - no good.
     ASTO   - Stores six chars from the alpha register into any Python variable.  
-             Cannot specify stack registers or addressing specific registers.
-             
+             Cannot specify stack registers or specific registers.
+    ARCL   - Same multi parameter features as alpha, except always appends to the alpha register. Must specify variables and literals, not the stack.
+    
     for loops and number formats 
              - Accessing a range i variable causes that variable to be converted to integer part otherwise all appends 
              to alpha are done in the current FIX etc. mode.  
@@ -2523,6 +2524,36 @@ class RpnCodeGenTests(BaseTest):
             LBL 02
             """)
         self.compare(de_comment(expected), lines, dump=True)
+
+    def test_text_ARCL(self):
+        """
+        ARCL is now the same as alpha() except always appends to the alpha register
+        """
+        src = """
+            n = 100
+            ARCL(n)
+        """
+        expected = dedent("""
+            100
+            STO 00
+            ARCL 00
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines)
+
+    def test_text_ARCL_literal(self):
+        """
+        ARCL is now the same as alpha() except always appends to the alpha register
+        """
+        src = """
+            ARCL(22)
+        """
+        expected = dedent("""
+            22
+            ARCL ST X
+        """)
+        lines = self.parse(dedent(src))
+        self.compare(de_comment(expected), lines)
 
     # Number formats
 

@@ -10,7 +10,7 @@ ALLΣ,"Select ALLΣ (All-statistics) mode, which uses 13 summation coefficients.
 AND,Logical AND. Returns x AND y.,nobool,
 AOFF,Alpha off. Exit from the ALPHA menu.,ok,()
 AON,Alpha on. Select the ALPHA menu.,ok,()
-ARCL,"Alpha recall. Copy data into the Alpha register, appending it to the current contents. Numbers are formatted using the current display format.  Parameter: register or variable.   (indirect allowed)",alpha,(...)
+ARCL,"Alpha recall. Copy data into the Alpha register, appending it to the current contents. Numbers are formatted using the current display format.  Parameter: register or variable.   (indirect allowed)","ok suggestion: Same multi parameter features as <code>alpha()</code> except always appends to the alpha register. Must specify variables and literals, not the stack.",(...)
 AROT,Alpha rotate. Rotate the Alpha register by the number of characters specified in the x-register.,ok,()
 ASHF,Alpha shift. Shifts the six left-most characters out of the Alpha register.,ok,()
 ASIN,Arc sine. Returns sin–1 x.,ok,(n)

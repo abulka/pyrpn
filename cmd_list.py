@@ -152,21 +152,20 @@ cmd_list = \
          'params': '()',
          'suggestion': '',
          'supported': '✓'},
- 'ARCL': {'class': 'no',
-          'description': '<del>Alpha recall. Copy data into the Alpha '
-                         'register, appending it to the current contents. '
-                         'Numbers are formatted using the current display '
-                         'format.  Parameter: register or variable.   '
-                         '(indirect allowed)</del>',
+ 'ARCL': {'class': '',
+          'description': 'Alpha recall. Copy data into the Alpha register, '
+                         'appending it to the current contents. Numbers are '
+                         'formatted using the current display format.  '
+                         'Parameter: register or variable.   <del>(indirect '
+                         'allowed)</del>',
           'indirect_allowed': True,
           'num_arg_fragments': 1,
           'num_params': 1,
           'params': '(...)',
-          'suggestion': 'Use the alpha() function to build up strings in the '
-                        'alpha register, specifying literal strings of any '
-                        'length, and multiple variables. See help for more '
-                        'details',
-          'supported': 'No'},
+          'suggestion': 'Same multi parameter features as <code>alpha()</code> '
+                        'except always appends to the alpha register. Must '
+                        'specify variables and literals, not the stack.',
+          'supported': '✓'},
  'AROT': {'class': '',
           'description': 'Alpha rotate. Rotate the Alpha register by the '
                          'number of characters specified in the x-register.',

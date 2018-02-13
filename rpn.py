@@ -1368,7 +1368,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 self.calling_varmenu(node)
             elif func_name in ('MVAR', 'VARMENU', 'STOP', 'EXITALL'):
                 self.calling_varmenu_mvar(func_name, node)
-            elif func_name in ('alpha', 'AVIEW', 'PROMPT', 'PRA'):
+            elif func_name in ('alpha', 'AVIEW', 'PROMPT', 'PRA', 'ARCL'):
                 self.calling_alpha_family(func_name, node)
             elif func_name in ('INPUT', 'INTEG', 'PRV', 'CLV', 'SOLVE'):
                 self.calling_builtin_param_is_variable(func_name, node)
@@ -1573,6 +1573,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                         raise RpnError(f'append= must be set to True or False, {source_code_line_info(node)}')
                     named_constant_t_f = keyword.value
                     self.alpha_append_mode = named_constant_t_f.value
+
+            if func_name == 'ARCL':
+                self.alpha_append_mode = True
 
             for index, arg in enumerate(node.args):
                 self.visit(arg)  # usual insertion of a literal number, string or variable
