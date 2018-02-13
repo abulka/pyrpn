@@ -99,13 +99,13 @@ class Program(BaseRpnProgram):
         self.insert(f'{cmd} {register}', comment=comment, type_=type_)
 
     def insert_xeq(self, func_name, comment='', type_=''):
-        if func_name in settings.PYLIB_INSERTABLE_WHEN_ORIGINAL_REMAPPED.keys():
-            comment = settings.PYLIB_INSERTABLE_WHEN_ORIGINAL_REMAPPED[func_name]['description']
+        if func_name in settings.PYLIB_INSERTABLE_WHEN_ORIGINAL_REPLACED.keys():
+            comment = settings.PYLIB_INSERTABLE_WHEN_ORIGINAL_REPLACED[func_name]['description']
         self.insert(f'XEQ "{func_name}"', comment=comment, type_=type_)
 
     @property
     def user_insertable_rpn_functions(self):
-        return settings.PYLIB_INSERTABLE_WHEN_ORIGINAL_REMAPPED.keys()
+        return settings.PYLIB_INSERTABLE_WHEN_ORIGINAL_REPLACED.keys()
 
     def emit_needed_rpn_templates(self, as_local_labels=True):
         self.insert('LBL "PyLIB"', comment='PyRPN Support Library of')

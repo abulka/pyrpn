@@ -801,27 +801,6 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    @unittest.skip('no param checking yet for remapped commands')
-    def test_bit_no_args(self):
-        src = dedent("""
-            testBIT()
-            """)
-        self.assertRaises(RpnError, self.parse, dedent(src))
-
-    @unittest.skip('no param checking yet for remapped commands')
-    def test_bit_not_enough_args(self):
-        src = dedent("""
-            testBIT(1)
-            """)
-        self.assertRaises(RpnError, self.parse, dedent(src))
-
-    @unittest.skip('no param checking yet for remapped commands')
-    def test_bit_too_many_args(self):
-        src = dedent("""
-            testBIT(1,2,3,4)
-            """)
-        self.assertRaises(RpnError, self.parse, dedent(src))
-
     def test_cmd_iscpx(self):
         self.parse(dedent("""
             isCPX(20)
@@ -918,6 +897,30 @@ class RpnTests3Cmds(BaseTest):
             XTOA
             """)
         self.compare(de_comment(expected))
+
+    # number of parameters checking for 'pure', 'renamed' and 'replaced' scenarios
+
+    @unittest.skip('no param checking yet for replaced commands')
+    def test_num_args_replaced_no_args(self):
+        src = dedent("""
+            testBIT()
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    @unittest.skip('no param checking yet for remapped commands')
+    def test_bit_not_enough_args(self):
+        src = dedent("""
+            testBIT(1)
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    @unittest.skip('no param checking yet for remapped commands')
+    def test_bit_too_many_args(self):
+        src = dedent("""
+            testBIT(1,2,3,4)
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
 
     # multiple return values
 

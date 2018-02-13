@@ -27,8 +27,15 @@ LIST_UNSUPPORTED = ('cmp', 'index', 'count', 'extend', 'insert', 'remove', 'reve
 DICT_UNSUPPORTED = ('clear', 'copy', 'fromkeys', 'get', 'items', 'setdefault', 'update', 'values')
 MATRIX_UNSUPPORTED = ('INDEX', 'STOIJ', 'RCLIJ', 'PUTM', 'GETM', 'INSR', 'DELR', 'DIM', 'GROW', 'WRAP', 'SIMQ', 'GROW', 'WRAP')
 
-RPN_CMD_TO_PYTHON_REPLACEMENT = {
-    '%':        'Percent',          # mapped to original HP42S commands
+"""
+HP42S commands can be called by an equivalent Python function.  There are three scenarios
+    - pure:     one to one mapping of the name e.g. PSE() to PSE
+    - renamed:  renamed out of symbol necessity e.g. StatREG() to ΣREG
+    - replaced: replaced due to conceptual change e.g. isFS() to pFS rather than FS?
+"""
+
+RPN_CMD_TO_PYTHON_RENAMED = {
+    '%':        'Percent',          # renamed mappings to original HP42S commands
     '%CH':      'PercentCH',
     '1/X':      'Reciprocal',
     '10↑X':     'CommonExp',
@@ -81,8 +88,8 @@ RPN_TO_RPNLIB_SPECIAL = {           # HP42S commands to Python replacement (only
     'MAT?':     'isMAT',
     'STR?':     'isSTR',
 }
-PYTHON_CMD_TO_RPN = {v: k for k, v in RPN_CMD_TO_PYTHON_REPLACEMENT.items()}  # Handy backwards lookup
-PYLIB_INSERTABLE_WHEN_ORIGINAL_REMAPPED = {  # So that converter knows that these are not user functions - cos these don't exist in PYTHON_CMD_TO_RPN
+PYTHON_CMD_TO_RPN = {v: k for k, v in RPN_CMD_TO_PYTHON_RENAMED.items()}  # Handy backwards lookup
+PYLIB_INSERTABLE_WHEN_ORIGINAL_REPLACED = {  # So that converter knows that these are not user functions - cos these don't exist in PYTHON_CMD_TO_RPN
     'pFS': {'description': 'is flag set?'},
     'pFC': {'description': 'is flag clear?'},
     'pREAL': {'description': 'is Real?'},

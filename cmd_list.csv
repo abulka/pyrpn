@@ -6,7 +6,7 @@ AGRAPH,Alpha graphics. Display a graphics image. Each character in the Alpha reg
 AIP,Append Integer part of x to the Alpha register.,ok,(n)
 ALENG,Alpha length. Returns the number of characters in the Alpha register.,ok,()
 ALL,Select the All display format.,ok,()
-ALLΣ,"Select ALLΣ (All-statistics) mode, which uses 13 summation coefficients.",remapped,()
+ALLΣ,"Select ALLΣ (All-statistics) mode, which uses 13 summation coefficients.",renamed,()
 AND,Logical AND. Returns x AND y.,nobool,
 AOFF,Alpha off. Exit from the ALPHA menu.,ok,()
 AON,Alpha on. Select the ALPHA menu.,ok,()
@@ -21,15 +21,15 @@ ATAN,Arc tangent. Returns tan–1 x.,ok,(n)
 ATANH,Arc hyperbolic tangent. Returns tanh–1 x.,ok,(n)
 ATOX,Alpha to X. Convert the left-most character in the Alpha register to its character code (returned to the x-register) and delete the character.,ok,()
 AVIEW,Alpha view. Display the Alpha register.,ok suggestion: Use the new alpha() function to build up strings of any length in the alpha register.,(...)
-BASE+,Base addition. Returns the 36-bit sum of y + x.,remapped,"(y,x)"
-BASE–,Base subtraction. Returns the 36-bit difference of y – x.,remapped,"(y,x)"
-BASEx,Base multiplication. Returns the 36-bit product of y x x.,remapped,"(y,x)"
-BASE÷,Base division. Returns the 36-bit quotient of y ÷ x.,remapped,"(y,x)"
-BASE+/–,Base change sign. Returns the 36-bit 2's complement of x.,remapped,"(y,x)"
+BASE+,Base addition. Returns the 36-bit sum of y + x.,renamed,"(y,x)"
+BASE–,Base subtraction. Returns the 36-bit difference of y – x.,renamed,"(y,x)"
+BASEx,Base multiplication. Returns the 36-bit product of y x x.,renamed,"(y,x)"
+BASE÷,Base division. Returns the 36-bit quotient of y ÷ x.,renamed,"(y,x)"
+BASE+/–,Base change sign. Returns the 36-bit 2's complement of x.,renamed,"(y,x)"
 BEEP,Sound a sequence of four tones.,ok,()
 BEST,Select the best curve-fitting model for the current statistical data.,ok,()
 BINM,Select Binary mode (base 2),ok,()
-BIT?,"Test the xth bit of y. If the bit is set (1), execute the next program line; if the bit is clear (0), skip the next program line.",remapped,"(y,xth_bit)"
+BIT?,"Test the xth bit of y. If the bit is set (1), execute the next program line; if the bit is clear (0), skip the next program line.",renamed,"(y,xth_bit)"
 BST,Back step. Move the program pointer to the previous program line. (Not programmable.),na,
 CF,Clear flag nn (00 ≤  nn ≤ 35 or 81 ≤  nn ≤ 99). Parameter: flag number (indirect allowed),ok,(flag)
 CLA,"Clear Alpha register. If Alpha mode is on and character entry is terminated (no cursor displayed), then  ◄  also executes the CLA function.",ok,()
@@ -50,7 +50,7 @@ CORR,Returns a correlation coefficient using the current statistical data and cu
 COS,Cosine. Returns cos(x).,ok,(n)
 COSH,Hyperbolic cosine. Returns cosh(x).,ok,(n)
 CPXRES,"Complex-results. Enable the calculator to return a complex result, even if the inputs are real numbers.",ok,()
-CPX?,"If the x-register contains a complex number, execute the next program line; if the x-register does not contain a complex number, skip the next program line.",remapped,(n)
+CPX?,"If the x-register contains a complex number, execute the next program line; if the x-register does not contain a complex number, skip the next program line.",renamed,(n)
 CROSS,Returns the cross product of two vectors (matrices or complex numbers).,ok,"(m,m)"
 DECM,Selects Decimal mode (base 10).,ok,()
 DEG,Select the Degrees angular mode.,ok,()
@@ -69,16 +69,16 @@ ENG,Select Engineering display format. Parameter: number of digits (indirect all
 ENTER,"Separate two numbers keyed in sequentially; copies x into the y-register, y into the z-register, and z into the t-register, and loses t.",nostack,
 EXITALL,Exit all menus.,ok,()
 EXPF,Select the exponential curve-fitting model.,ok,()
-E↑X,Natural exponential. Returns ex.,remapped,(n)
-E↑X-1,"Natural exponential for values of x which are close to zero. Returns ex–1, which provides a much higher accuracy in the fractional part of the result.",remapped,(n)
-FC?,"Flag clear test. If the specified flag is clear, executes the next program line; if the flag is set, skips the next program line. Parameter: flag number (indirect allowed)",remapped,(flag)
+E↑X,Natural exponential. Returns ex.,renamed,(n)
+E↑X-1,"Natural exponential for values of x which are close to zero. Returns ex–1, which provides a much higher accuracy in the fractional part of the result.",renamed,(n)
+FC?,"Flag clear test. If the specified flag is clear, executes the next program line; if the flag is set, skips the next program line. Parameter: flag number (indirect allowed)",renamed,(flag)
 FC?C,"Flag clear test and clear. If the specified flag is clear, execute the next program line; if the flag is set, skip the next program line. Cleared after the test is complete. (This function can be used only with flags 00 through 35 and 81 through 99.) Parameter: flag number (indirect allowed)",noflag,
 FCSTX,Forecasts an x-value given a y-value.,ok,(n)
 FCSTY,Forecasts a y-value given an x-value.,ok,(n)
 FIX,Select Fixed-decimal display format. Parameter: number of digits (indirect allowed),ok,(n)
 FNRM,Returns the Frobenius norm of the matrix in the x-register.,ok,(mvar)
 FP,Returns the fractional part of x.,ok,(n)
-FS?,"Flag set test. If the specified flag is set, execute the next program line; if the flag is clear, skip the next program line. Parameter: flag number (indirect allowed)",remapped,(flag)
+FS?,"Flag set test. If the specified flag is set, execute the next program line; if the flag is clear, skip the next program line. Parameter: flag number (indirect allowed)",renamed,(flag)
 FS?C,"Flag set test and clear. If the specified flag is set, execute the next program line; if the flag is clear, skip the next program line. Clear the flag after the test is complete. (This function can be used only with flags 00 through 35 and 81 through 99.) Parameter: flag number (indirect allowed)",noflag,
 GAMMA,Gamma function. Returns Γ(x).,ok,(n)
 GETKEY,"Get key. The calculator waits for you to press a key. When you do, the key number is returned to the x-register. Keys are numbered from 1 through 37 ( Σ+  through  ÷ )for normal keys and 38 through 74 (■ Σ–   through ■CATALOG) for shifted keys.",ok,()
@@ -87,8 +87,8 @@ GRAD,Select Grads angular mode.,ok,()
 GROW,Select Grow mode. Executing  →  or J+ causes the matrix to grow by one new row if the index pointers are at the last (lower-right) element in the matrix.,No suggestion: To compensate use the new command mymatrix.appendr(),
 GTO,"Go to label. From the keyboard, move the program pointer to the specified label. In a running program, cause the program to branch to the specified label. Parameter: local or global label (indirect allowed)",na,
 HEXM,Select Hexadecimal mode (base 16).,ok,()
-HMS+,Add x and y using H.MMSSss (hours-minutes-seconds) format.,remapped,"(n,n)"
-HMS–,Subtract x from y using H.MMSSss format.,remapped,"(n,n)"
+HMS+,Add x and y using H.MMSSss (hours-minutes-seconds) format.,renamed,"(n,n)"
+HMS–,Subtract x from y using H.MMSSss format.,renamed,"(n,n)"
 I+,Increment the row pointer in the indexed matrix.,nomatrix,
 I–,Decrement the row pointer in the indexed matrix.,nomatrix,
 INDEX,Index a named matrix. Parameter: variable name (indirect allowed),nomatrix,
@@ -107,19 +107,19 @@ LASTX,Last x. Recall the last value of x used in a calculation.,nostack,
 LBL,Label. Identify programs and routines for execution and branching. Parameter: local or global label.,na,
 LCLBL,Select Local label mode for the CUSTOM menu (to use CUSTOM menu assignments to execute local Alpha labels within the current program).,ok suggestion: In a RPN program generated from Python local alpha labels represent the user defined Python functions.,()
 LINF,Select the linear curve-fitting model.,ok,()
-LINΣ,"Select Linear statistics mode, which uses six summation coefficients.",remapped,()
+LINΣ,"Select Linear statistics mode, which uses six summation coefficients.",renamed,()
 LIST,Print a portion of a program listing. (Not programmable.) Parameter: number of lines.,na,
 LN,Natural logarithm. Returns ln(x).,ok,(n)
-LN1+X,"Natural logarithm for values close to zero. Returns ln(1 + x), which provides a much higher accuracy in the fractional part of the result.",remapped,(n)
+LN1+X,"Natural logarithm for values close to zero. Returns ln(1 + x), which provides a much higher accuracy in the fractional part of the result.",renamed,(n)
 LOG,Common logarithm. Returns log10(x).,ok,(n)
 LOGF,Select the logarithmic curve-fitting model.,ok,(n)
 MAN,Select Manual print mode.,ok,()
-MAT?,"If the x-register contains a matrix, execute the next program line; if the X-register does not contain a matrix, skip the next program line.",remapped,(x)
+MAT?,"If the x-register contains a matrix, execute the next program line; if the X-register does not contain a matrix, skip the next program line.",renamed,(x)
 MEAN,Mean. Returns the mean of x-values (Σx / n) and the mean of y-values (Σy / n) that have been stored with Σ+. The mean of x is returned to the X-register and the mean of y is returned to the Y-register.,"ok suggestion: Assign the two return values into variables e.g. 'a, b = MEAN()'",()
 MENU,Select the programmable menu.,ok,()
 MOD,Modulo. Returns the remainder for y / x.,ok,"(y,x)"
 MVAR,Declare a menu variable in a SOLVER program. Parameter: variable name.,ok suggestion: MVAR("length") etc.,
-N!,Factorial. Returns x!.,remapped,(n)
+N!,Factorial. Returns x!.,renamed,(n)
 NEWMAT,New matrix. Creates a y × x matrix in the x-register.,ok,"(rows,cols)"
 NORM,"Select Normal print mode, which prints a record of keystrokes.",ok,()
 NOT,Logical NOT. Returns NOT(x).,nobool,
@@ -159,10 +159,10 @@ RCL×,Recall multiplication. Recall data and multiply it by the contents of the 
 RCL÷,Recall division. Recall data and divide it into the contents of the x-register. Parameter: register or variable (indirect allowed),noregs,
 RCLEL,Recall element. Recalls the current matrix element from the indexed matrix.,nomatrix,
 RCLIJ,Recall the row- and column-pointer values (I and J) for the indexed matrix.,nomatrix,
-"RDX,",Select a comma to be used as the radix mark (decimal point).,remapped,()
-RDX.,Select a period to be used as the radix mark (decimal point).,remapped,()
+"RDX,",Select a comma to be used as the radix mark (decimal point).,renamed,()
+RDX.,Select a period to be used as the radix mark (decimal point).,renamed,()
 REALRES,Real-results. Disables the calculator's ability to return a complex result using real-number inputs.,ok,()
-REAL?,"If the x-register contains a real number, execute the next program line; if the x-register does not contain a real number, skip the next program line.",remapped,(n)
+REAL?,"If the x-register contains a real number, execute the next program line; if the x-register does not contain a real number, skip the next program line.",renamed,(n)
 RECT,Select Rectangular coordinate mode for displaying complex numbers.,ok,()
 RND,Round the number in the x-register using the current display format.,ok,(n)
 RNRM,Return the row norm of the matrix in the x-register.,ok,(mvar)
@@ -193,7 +193,7 @@ STO÷,Store division. Divides an existing register or variable by x. Parameter: 
 STOEL,Store element. Stores a copy of x into the current element of the indexed matrix.,nomatrix,
 STOIJ,Moves the row- and column-pointers to I = x and J = y in the indexed matrix.,nomatrix,
 STOP,Stop program execution. (R/S in program entry mode).,ok,()
-STR?,"If the x-register contains an Alpha string, execute the next program line; if the x-register does not contain an Alpha string, skip the next program line.",remapped,(x)
+STR?,"If the x-register contains an Alpha string, execute the next program line; if the x-register does not contain an Alpha string, skip the next program line.",renamed,(x)
 SUM,Returns the sums Σx and Σy into the x- and y-registers.,"ok suggestion: Assign the two return values into variables e.g. 'a, b = SUM()'",()
 TAN,Tangent. Returns tan(x).,ok,(n)
 TANH,Hyperbolic tangent. Returns tanh(x).,ok,(n)
@@ -225,29 +225,29 @@ XTOA," X to Alpha. Appends a character (specified by the code in the x-register)
 X↑2,Square. Returns x2.,✓ (renamed) suggestion: y**2,(n)
 YINT,y-intercept. Returns the y-intercept of the curve fitted to the current statistical data.,ok,()
 Y↑X,Power. Returns yx.,✓ (renamed) suggestion: y**x,(n)
-1/X,Reciprocal. Returns 1/x.,remapped,(n)
-10↑X,Common exponential. Returns 10x.,remapped,(n)
+1/X,Reciprocal. Returns 1/x.,renamed,(n)
+10↑X,Common exponential. Returns 10x.,renamed,(n)
 +,Addition. Returns y + x.,ok,
 –,Subtraction. Returns y – x.,ok,
 ×,Multiplication. Returns x × y.,ok,
 ÷,Division. Returns y / x.,ok,
 +/–,"Change the sign of the number in the x-register. While entering an exponent, can also be used to change the sign of the exponent.",na,
-Σ+,Summation plus. Accumulate a pair of x- and y values into the summation registers.,remapped,"(y,x)"
-Σ-,Summation minus. Subtract a pair of x- and y-values from the summation registers.,remapped,"(y,x)"
-ΣREG,Summation registers. Defines which storage register begins the block of summation registers. Parameter: register number (indirect allowed),remapped,(n)
-ΣREG?,Return the register number of the first summation register.,remapped,()
-→DEC,To decimal. Converts the octal (base 8) representation of a number to decimal (base 10). Note: This function is included to provide program compatibility with the HP-41 (which uses the function name DEC).,remapped,(n)
-→DEG,To degrees. Convert an angle-value from radians to degrees. Returns x×(180/π).,remapped,(n)
-→HMS,"To hours, minutes, and seconds. Convert x from a decimal fraction to a minutes-seconds format.",remapped,(n)
-→HR,To hours. Converts x from a minutes-seconds format to a decimal fraction.,remapped,(n)
-→OCT,To octal. Converts a decimal number to the octal representation. Note: This function is included to provide program compatibility with the HP-41 (which uses the function name OCT).,remapped,(n)
+Σ+,Summation plus. Accumulate a pair of x- and y values into the summation registers.,renamed,"(y,x)"
+Σ-,Summation minus. Subtract a pair of x- and y-values from the summation registers.,renamed,"(y,x)"
+ΣREG,Summation registers. Defines which storage register begins the block of summation registers. Parameter: register number (indirect allowed),renamed,(n)
+ΣREG?,Return the register number of the first summation register.,renamed,()
+→DEC,To decimal. Converts the octal (base 8) representation of a number to decimal (base 10). Note: This function is included to provide program compatibility with the HP-41 (which uses the function name DEC).,renamed,(n)
+→DEG,To degrees. Convert an angle-value from radians to degrees. Returns x×(180/π).,renamed,(n)
+→HMS,"To hours, minutes, and seconds. Convert x from a decimal fraction to a minutes-seconds format.",renamed,(n)
+→HR,To hours. Converts x from a minutes-seconds format to a decimal fraction.,renamed,(n)
+→OCT,To octal. Converts a decimal number to the octal representation. Note: This function is included to provide program compatibility with the HP-41 (which uses the function name OCT).,renamed,(n)
 →POL,"To polar. Converts x and y to the corresponding polar coordinates r and θ. If the x-register contains a complex number, converts the two parts of the number to polar values.","ok suggestion: Assign the two return values into variables e.g. 'a, b = toPOL(1, 2)'","(n,n)"
-→RAD,To radians. Converts a angle value in degrees to radians. Returns x×(π/180).,remapped,(n)
+→RAD,To radians. Converts a angle value in degrees to radians. Returns x×(π/180).,renamed,(n)
 →REC,"To rectangular. Converts r (in the x-register) and θ (in the y-register) to the corresponding rectangular coordinates, x and y. If the X-register contains a complex number, converts the two parts of the number to rectangular values.","ok suggestion: Assign the two return values into variables e.g. 'a, b = toREC(1, 2)'","(θ,r)"
 ◄,"Backspace or clear x-register. In Program entry mode, deletes the current program line. Not programmable",na,
 ←,Move left one element in the indexed matrix.,nomatrix,
 ↑,Move up one element in the indexed matrix.,nomatrix,
 ↓,Move down one element in the indexed matrix.,nomatrix,
 →,Move right one element in the indexed matrix.,nomatrix,
-%,Percent. Returns (x × y) / 100. (Leaves the y value in the y-register.),remapped,"(num,percent)"
-%CH,Percent change. Returns (x – y)×(100 / y).,remapped,"(y,x)"
+%,Percent. Returns (x × y) / 100. (Leaves the y value in the y-register.),renamed,"(num,percent)"
+%CH,Percent change. Returns (x – y)×(100 / y).,renamed,"(y,x)"
