@@ -618,6 +618,18 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+    def test_complex_create_pythonic(self):
+        self.parse(dedent("""
+            x = 1 + 0j
+            """))
+        expected = dedent("""
+            1
+            0
+            COMPLEX        
+            STO 00
+            """)
+        self.compare(de_comment(expected))
+
     @unittest.skip('complex matrix')
     def test_complex_matrix(self):
         self.parse(dedent("""
@@ -992,7 +1004,6 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    # @unittest.skip('multiple params')
     def test_toPOL(self):
         # multiple return values used here for the first time
         self.parse(dedent("""
