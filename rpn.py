@@ -1434,7 +1434,19 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         try:
             cmd_info = cmd_list[func_name]
         except KeyError:
-            return  # ignore failed lookups cos this code is used by more than just built in RPN commands calls
+            # Not a pure call, might be a 'renamed' call
+            try:
+                orig_func_name = settings.PYTHON_CMD_TO_RPN[func_name]
+                cmd_info = cmd_list[orig_func_name]
+                raise('yey someone called me')
+            except KeyError:
+                # Could be a 'replaced' call
+                try:
+                    python_func_name = settings.RPN_CMD_TO_PYTHON_RENAMED[func_name]  # rpnlib func to python func
+                    orig_func_name = settings.RPN_TO_RPNLIB_SPECIAL_REVERSE[python_func_name]
+                    cmd_info = cmd_list[orig_func_name]
+                except KeyError:
+                    return  # ignore failed lookups cos this code is used by more than just built in RPN commands calls
         num_params_needed = cmd_info['num_params']
         if num_params_needed == settings.NUM_PARAMS_UNSPECIFIED:
             return

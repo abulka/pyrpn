@@ -900,27 +900,47 @@ class RpnTests3Cmds(BaseTest):
 
     # number of parameters checking for 'pure', 'renamed' and 'replaced' scenarios
 
-    @unittest.skip('no param checking yet for replaced commands')
-    def test_num_args_replaced_no_args(self):
+    def test_numargs_pure_not_enough_args(self):
+        src = dedent("""
+            SIN()
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    def test_numargs_pure_too_many_args(self):
+        src = dedent("""
+            SIN(1,2,3,4)
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    def test_numargs_renamed_not_enough_args(self):
+        src = dedent("""
+            Reciprocal()
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    def test_numargs_renamed_too_many_args(self):
+        src = dedent("""
+            Reciprocal(1,2,3,4)
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    def test_numargs_replaced_no_args(self):
         src = dedent("""
             testBIT()
             """)
         self.assertRaises(RpnError, self.parse, dedent(src))
 
-    @unittest.skip('no param checking yet for remapped commands')
-    def test_bit_not_enough_args(self):
+    def test_numargs_replaced_not_enough_args(self):
         src = dedent("""
             testBIT(1)
             """)
         self.assertRaises(RpnError, self.parse, dedent(src))
 
-    @unittest.skip('no param checking yet for remapped commands')
-    def test_bit_too_many_args(self):
+    def test_numargs_replaced_too_many_args(self):
         src = dedent("""
             testBIT(1,2,3,4)
             """)
         self.assertRaises(RpnError, self.parse, dedent(src))
-
 
     # multiple return values
 

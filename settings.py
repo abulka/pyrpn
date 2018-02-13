@@ -89,6 +89,7 @@ RPN_TO_RPNLIB_SPECIAL = {           # HP42S commands to Python replacement (only
     'STR?':     'isSTR',
 }
 PYTHON_CMD_TO_RPN = {v: k for k, v in RPN_CMD_TO_PYTHON_RENAMED.items()}  # Handy backwards lookup
+RPN_TO_RPNLIB_SPECIAL_REVERSE = {v: k for k, v in RPN_TO_RPNLIB_SPECIAL.items()}  # Handy backwards lookup
 PYLIB_INSERTABLE_WHEN_ORIGINAL_REPLACED = {  # So that converter knows that these are not user functions - cos these don't exist in PYTHON_CMD_TO_RPN
     'pFS': {'description': 'is flag set?'},
     'pFC': {'description': 'is flag clear?'},
