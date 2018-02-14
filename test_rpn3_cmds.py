@@ -608,13 +608,13 @@ class RpnTests3Cmds(BaseTest):
 
     def test_complex_create(self):
         self.parse(dedent("""
-            x = COMPLEX(1, 0)
+            c = COMPLEX(1, 0)
             """))
         expected = dedent("""
             1
             0
             COMPLEX        
-            STO 00
+            STO "c"
             """)
         self.compare(de_comment(expected))
 
@@ -626,7 +626,7 @@ class RpnTests3Cmds(BaseTest):
             1
             0
             COMPLEX        
-            STO 00
+            STO "x"
             """)
         self.compare(de_comment(expected))
 
@@ -639,7 +639,25 @@ class RpnTests3Cmds(BaseTest):
             9
             +/-
             COMPLEX        
-            STO 00
+            STO "x"
+            """)
+        self.compare(de_comment(expected))
+
+    def test_complex_one_param(self):
+        self.parse(dedent("""
+            c = COMPLEX(0,1)
+            real, imag = COMPLEX(c)  # if one param and its complex, then return real and imag 
+            """))
+        expected = dedent("""
+            0
+            1
+            COMPLEX        
+            STO "c"
+            RCL "c"
+            COMPLEX
+            STO 00  // imaginary
+            RDN
+            STO 01  // real
             """)
         self.compare(de_comment(expected))
 
@@ -1053,9 +1071,10 @@ class RpnTests3Cmds(BaseTest):
 
     def test_toPOL(self):
         # multiple return values used here for the first time
+        # Converts x and y to the corresponding polar coordinates r and θ.
         self.parse(dedent("""
             a, b = toPOL(1, 2)
-            a              # recall a onto the stack to check which register gets recalled
+            a  # recall 'a' onto the stack to check which register gets recalled
             """))
         expected = dedent("""
             1
@@ -1068,6 +1087,77 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+    def test_toPOL_complex(self):
+        # one param version,
+        # If the x-register contains a complex number, converts the two parts of the number to polar values.
+        self.parse(dedent("""
+            c = (0+1j)
+            c2 = toPOL(c)  # complex number into a complex number
+            """))
+        expected = dedent("""
+            0
+            1
+            COMPLEX
+            STO "c"
+            RCL "c"
+            →POL
+            STO "c2"
+            """)
+        self.compare(de_comment(expected))
+
+    def test_toREC(self):
+        self.parse(dedent("""
+            a, b = toREC(1, 2)
+            """))
+        expected = dedent("""
+            1
+            2
+            →REC
+            STO 00  // b (because b is the first to get accessed it gets dibs on reg 00)
+            RDN
+            STO 01  // a
+            """)
+        self.compare(de_comment(expected))
+
+    def test_toREC_complex(self):
+        self.parse(dedent("""
+            c = (0+1j)
+            c2 = toREC(c)  # complex number into a complex number
+            """))
+        expected = dedent("""
+            0
+            1
+            COMPLEX
+            STO "c"
+            RCL "c"
+            →REC
+            STO "c2"
+            """)
+        self.compare(de_comment(expected))
+
+    def test_toPOL_no_args(self):
+        src = dedent("""
+            toPOL()
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    def test_toREC_no_args(self):
+        src = dedent("""
+            toREC()
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    def test_toPOL_too_many_args(self):
+        src = dedent("""
+            toPOL(1,2,3)
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    def test_toREC_too_many_args(self):
+        src = dedent("""
+            toREC(1,2,3)
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
 
     def test_cmd_what_dim(self):
         # multiple return values used here

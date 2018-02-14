@@ -2,7 +2,7 @@
     "description": "<p>complex test</p>",
     "public": "yes",
     "sortnum": 0,
-    "source": "def complex_play():\r\n  RES = ('res', 5 +3j) + (7 - 9j)\r\n  PROMPT(RES)  # should be 12-i6 or in Python 12-6j\r\n  assert isCPX(RES)\r\n  RES2 = SQRT(-25)  # should be 0+i4.898979\r\n  PROMPT('sqrt res', RES2)\r\n  A, B = toPOL(1, RES2)\r\n  C, D = toREC(1, RES2)\r\n  PROMPT(a,b,'and',c,d)",
+    "source": "def complex_play():\r\n  RECT()\r\n  FIX(3)\r\n  RES = (5 + 3j) + (7 - 9j)\r\n  PROMPT('res', RES)  # should be 12-i6 or in Python 12-6j\r\n  assert isCPX(RES)\r\n  assert RES == (12 - 6j)\r\n  \r\n  RES2 = SQRT(-25)  # should be 0+i5\r\n  PROMPT('sqrt res', RES2)\r\n  real, imag = COMPLEX(0,RES2)\r\n  assert real == 0\r\n  assert IP(imag) == 5\r\n  \r\n  RES_POL = toPOL(1, RES2)\r\n  PRA('respol', RES_POL, 'rnd', RND(RES_POL))\r\n  PRA('cpx', COMPLEX(5, 1.571), 'rnd', RND(5 + 1.571j))\r\n  assert RND(RES_POL) == RND(COMPLEX(5, 1.571))  # RND to allow compare to work\r\n  print('complex tests pass ok')",
     "tags": "Complex_Numbers",
     "title": "Complex test"
 }
