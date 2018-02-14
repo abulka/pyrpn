@@ -730,6 +730,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         rhs_is_dict_var = isinstance(node.value, ast.Name) and self.scopes.is_dictionary(node.value.id)
         rhs_is_matrix = 'NEWMAT' in self.program.last_line.text or \
                         'GETM' in self.program.last_line.text
+
+        rhs_is_complex = self.program.last_line.text == 'COMPLEX' and 'COMPLEX arg of 2' in self.program.lines[-2].type_ or \
+                         self.program.last_line.text == '→POL'    and '→POL arg of 1' in self.program.lines[-2].type_ or \
+                         self.program.last_line.text == '→REC'    and '→REC arg of 1' in self.program.lines[-2].type_
+        rhs_is_matrix = rhs_is_matrix or rhs_is_complex  #hack
+
         by_ref_to_rhs_var = node.value.id if rhs_is_list_var or rhs_is_dict_var else ''
 
         targets = node.targets[0].elts if isinstance(node.targets[0], ast.Tuple) else node.targets
@@ -1095,11 +1101,14 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.pending_ops[-1] = 'COMPLEX'
             imaginary_part = self.program.last_line.text
             self.program.last_line.text = imaginary_part.replace('j', '')  # strip the 'j'
+            self.program.last_line.type_ = 'COMPLEX arg of 2 pythonic'
         elif self.pending_ops[-1] == '-' and self.program.last_line.text[-1] == 'j':
             self.pending_ops[-1] = 'COMPLEX'
             imaginary_part = self.program.last_line.text
             self.program.last_line.text = imaginary_part.replace('j', '')  # strip the 'j'
+            self.program.last_line.type_ = 'COMPLEX arg of 2 pythonic'
             self.program.insert('+/-')
+            self.program.last_line.type_ = 'COMPLEX arg of 2 pythonic'
 
     def visit_Compare(self, node):
         """
@@ -1420,6 +1429,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.check_enough_params(func_name, node)
         for item in node.args:
             self.visit(item)
+            self.program.last_line.type_ += f'{func_name} arg of {len(node.args)}'
 
         self.disallow_string_args = False
 
@@ -1440,7 +1450,16 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         num_params_needed = cmd_info['num_params']
         if num_params_needed == settings.NUM_PARAMS_UNSPECIFIED:
             return
-        if len(node.args) != num_params_needed:
+
+        bad_num_args = False
+        num_args = len(node.args)
+        got_one_or_two_args = num_args in (1,2)
+        if num_args != num_params_needed:
+            if func_name in ('COMPLEX', '→POL', '→REC',) and got_one_or_two_args:
+                bad_num_args = False
+            else:
+                bad_num_args = True
+        if bad_num_args:
             raise RpnError(f'Not enough parameters supplied to "{func_name}" which needs {num_params_needed} parameters {cmd_info["params"]}. You supplied {len(node.args)} params. {source_code_line_info(node)}')
 
     def calling_for_range(self, node):
