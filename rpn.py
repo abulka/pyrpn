@@ -1097,18 +1097,14 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         if self.pending_ops[-1] == 'Y↑X' and self.program.last_line.text == '2':
             self.pending_ops[-1] = 'X↑2'
             self.program.lines.pop()
-        elif self.pending_ops[-1] == '+' and self.program.last_line.text[-1] == 'j':
+        elif self.program.last_line.text[-1] == 'j' and self.pending_ops[-1] in '+-':  # Complex number
+            old_op = self.pending_ops[-1]
             self.pending_ops[-1] = 'COMPLEX'
             imaginary_part = self.program.last_line.text
             self.program.last_line.text = imaginary_part.replace('j', '')  # strip the 'j'
-            self.program.last_line.type_ = 'COMPLEX arg of 2 pythonic'
-        elif self.pending_ops[-1] == '-' and self.program.last_line.text[-1] == 'j':
-            self.pending_ops[-1] = 'COMPLEX'
-            imaginary_part = self.program.last_line.text
-            self.program.last_line.text = imaginary_part.replace('j', '')  # strip the 'j'
-            self.program.last_line.type_ = 'COMPLEX arg of 2 pythonic'
-            self.program.insert('+/-')
-            self.program.last_line.type_ = 'COMPLEX arg of 2 pythonic'
+            if old_op == '-':
+                self.program.insert('+/-')
+            self.program.last_line.type_ = 'COMPLEX arg of 2'  #  fake the normal 'arg type tracking' done by visit call, visit arg loop cos this is pythonic
 
     def visit_Compare(self, node):
         """
@@ -1455,12 +1451,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         num_args = len(node.args)
         got_one_or_two_args = num_args in (1,2)
         if num_args != num_params_needed:
-            if func_name in ('COMPLEX', '→POL', '→REC',) and got_one_or_two_args:
+            if func_name in settings.CMDS_WITH_ONE_OR_TWO_ARGS and got_one_or_two_args:
                 bad_num_args = False
             else:
                 bad_num_args = True
         if bad_num_args:
-            raise RpnError(f'Not enough parameters supplied to "{func_name}" which needs {num_params_needed} parameters {cmd_info["params"]}. You supplied {len(node.args)} params. {source_code_line_info(node)}')
+            raise RpnError(f'Wrong number of parameters supplied to "{func_name}" which needs {num_params_needed} parameters {cmd_info["params"]}. You supplied {len(node.args)} params. {source_code_line_info(node)}')
 
     def calling_for_range(self, node):
         def all_literals(nodes):
