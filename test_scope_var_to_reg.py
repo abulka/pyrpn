@@ -154,6 +154,26 @@ class ListDictMatrixTests(BaseTest):
         scopes.var_to_reg('a', is_matrix_var=True)
         self.assertTrue(scopes.is_matrix('a'))
 
+    # Complex names
+
+    def test_complex_numbers(self):
+        scopes = Scopes()
+        register = scopes.var_to_reg('a', is_complex_var=True)
+        self.assertEqual('"a"', scopes.var_to_reg('a'))
+        self.assertTrue(scopes.is_complex('a'))
+
+    def test_complex_matrix(self):
+        scopes = Scopes()
+        register = scopes.var_to_reg('a', is_matrix_var=True)
+        self.assertEqual('"a"', scopes.var_to_reg('a'))
+        self.assertTrue(scopes.is_matrix('a'))
+        self.assertFalse(scopes.is_complex('a'))
+
+        register = scopes.var_to_reg('a', is_complex_var=True)
+        self.assertTrue(scopes.is_matrix('a'))
+        self.assertTrue(scopes.is_complex('a'))
+
+
 
 class RangeVarNames(BaseTest):
     # Track that certain variables have been used in for loop range expressions

@@ -49,6 +49,7 @@ class Scopes(object):
                    is_list_var=False,
                    by_ref_to_var='',
                    is_matrix_var=False,
+                   is_complex_var=False,
                    ):
         """
         Figure out the register to use to store/recall 'var_name' e.g. 00 or "x" - also taking into account our scope system.
@@ -64,8 +65,9 @@ class Scopes(object):
         Will upgrade a mapping from numeric to named if necessary, if is_dict_var / is_list_var is true
 
         Now supports 'by reference' for list and dict vars
-        Now support 'is_matrix'
-        Now support 'force_named' boolean
+        Now supports 'is_matrix_var'
+        Now supports 'force_named' boolean
+        Now supports 'is_complex_var' which can be used in combination with 'is_matrix'
 
         :param var_name: python identifier e.g. 'x'
         :param force_reg_name: force the mapping to be to this
@@ -76,6 +78,9 @@ class Scopes(object):
         :param by_ref_to_var: means accessing the variable will instead access the variable 'by_ref_to_var'
         :return: register name as a string
         """
+
+        short_func = var_name[0:7]
+
         def map_it(var_name, register=None):
             if self._has_mapping(var_name):
                 # Do nothing - mapping already exists
@@ -84,7 +89,7 @@ class Scopes(object):
                 if (is_list_var and var_name not in self.current.list_vars) or \
                         (is_dict_var and var_name not in self.current.dict_vars): # register exists but is not named
                     del self.current.data[var_name]  # delete the mapping
-                    register = f'"{var_name[-7:]}"'
+                    register = f'"{short_func}"'
                     map_it(var_name, register)  # call myself!
             else:
                 # Create new mapping
@@ -111,17 +116,21 @@ class Scopes(object):
                     # Store matrix var so that we know for whom we are an el ref for
                     self.current.for_el_vars[var_name] = ''
 
+        # Track complex vars - can add this attribute on top of any other is_* attribute, thus this code is accessible even if var already mapped
+        if is_complex_var and var_name not in [matrix_var.var_name for matrix_var in self.current.complex_vars]:
+            self.current.complex_vars.append(MatrixVar(var_name, by_ref_to_var))
+
         if force_reg_name:
             register = force_reg_name
             map_it(var_name, register)
         elif force_named:
-            register = f'"{var_name[-7:]}"'
+            register = f'"{short_func}"'
             map_it(var_name, register)
         elif var_name.isupper() or force_named:
-            register = f'"{var_name.upper()[-7:]}"'
+            register = f'"{short_func.upper()}"'
             map_it(var_name, register)
-        elif is_list_var or is_dict_var or is_matrix_var:  # must be a named register, case doesn't matter
-            register = f'"{var_name[-7:]}"'
+        elif is_list_var or is_dict_var or is_matrix_var or is_complex_var:  # must be a named register, case doesn't matter
+            register = f'"{short_func}"'
             map_it(var_name, register)
             register = self.byref_override(var_name, register)
         else:
@@ -198,6 +207,9 @@ class Scopes(object):
     def is_matrix(self, var_name):
         return var_name in [matrix_var.var_name for matrix_var in self.current.matrix_vars]
 
+    def is_complex(self, var_name):
+        return var_name in [matrix_var.var_name for matrix_var in self.current.complex_vars]
+
     # Smarter mappings
 
     def map_el_to_list(self, el_var, list_var):
@@ -233,6 +245,7 @@ class Scope(object):
     list_vars = attrib(default=Factory(list))  # keep track of var names which are lists
     dict_vars = attrib(default=Factory(list))  # keep track of var names which are dictionaries
     matrix_vars = attrib(default=Factory(list))  # keep track of var names which are pure matrices
+    complex_vars = attrib(default=Factory(list))  # keep track of var names which are complex
 
     @property
     def empty(self):
