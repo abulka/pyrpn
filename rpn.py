@@ -611,7 +611,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         if by_ref_to_var:
             comment += f' (is really "{by_ref_to_var}" by reference)'
 
-        self.program.insert(f'{rcl_cmd} {self.scopes.var_to_reg(node.id)}', comment=comment)
+        self.program.insert(f'{rcl_cmd} {self.scopes.var_to_reg(node.id)}', comment=comment, type_=self.scopes.calc_var_type(node.id))
         self.pending_stack_args.append(node.id)
         # Add matrix rcl
         if rcl_cmd == 'RCL' and self.scopes.is_list(node.id):
@@ -729,13 +729,15 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         rhs_is_list_var = isinstance(node.value, ast.Name) and self.scopes.is_list(node.value.id)
         rhs_is_dict_var = isinstance(node.value, ast.Name) and self.scopes.is_dictionary(node.value.id)
         rhs_is_matrix = 'NEWMAT' in self.program.last_line.text or \
-                        'GETM' in self.program.last_line.text
+                        'GETM' in self.program.last_line.text or \
+                        ('COMPLEX' == self.program.last_line.text and 'matrix' in self.program.lines[-2].type_) or \
+                        self.program.last_line.type_ == 'complex matrix'
 
         rhs_is_complex = self.program.last_line.text == 'COMPLEX' and 'COMPLEX arg of 2' in self.program.lines[-2].type_ or \
                          self.program.last_line.text == '→POL'    and '→POL arg of 1' in self.program.lines[-2].type_ or \
                          self.program.last_line.text == '→REC'    and '→REC arg of 1' in self.program.lines[-2].type_ or \
-                         'complex result' in self.program.last_line.type_
-        rhs_is_matrix = rhs_is_matrix or rhs_is_complex  #hack
+                         'complex result' in self.program.last_line.type_ or \
+                         self.program.last_line.type_ == 'complex matrix'
 
         by_ref_to_rhs_var = node.value.id if rhs_is_list_var or rhs_is_dict_var else ''
 
@@ -745,10 +747,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             if lhs_is_subscript:
                 self.subscript_is_on_lhs_thus_assign(target)
             else:
-                self.assign_lhs(node, target, rhs_is_list_var, rhs_is_dict_var, by_ref_to_rhs_var, rhs_is_matrix)  # var is normal (lower=local, upper=named) or matrix (lower=named, upper=named)
+                self.assign_lhs(node, target, rhs_is_list_var, rhs_is_dict_var, by_ref_to_rhs_var, rhs_is_matrix, rhs_is_complex)  # var is normal (lower=local, upper=named) or matrix (lower=named, upper=named)
 
             # Check var types
-            if rhs_is_matrix_rpn_op or rhs_is_list_var or rhs_is_dict_var:
+            if rhs_is_matrix_rpn_op or rhs_is_list_var or rhs_is_dict_var or rhs_is_complex:
                 self.scopes.ensure_is_named_matrix_register(var_name=target.id, node=node)
             elif lhs_is_subscript:
                 self.scopes.ensure_is_named_matrix_register(var_name=target.value.id, node=node)  # drill into subscript node to get list or dict name
@@ -766,7 +768,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.program.insert('ENTER')  # duplicate what's on the stack so it doesn't get clobbered by the ASTO ST X
             self.program.insert('ASTO ST X')
 
-    def assign_lhs(self, node, target, rhs_is_list_var=False, rhs_is_dict_var=False, by_ref_to_rhs_var='', rhs_is_matrix=False):
+    def assign_lhs(self, node, target, rhs_is_list_var=False, rhs_is_dict_var=False, by_ref_to_rhs_var='', rhs_is_matrix=False, rhs_is_complex=False):
         # Create the variable and mark its type
         is_list_var = isinstance(node.value, ast.List) or rhs_is_list_var
         is_dict_var = isinstance(node.value, ast.Dict) or rhs_is_dict_var
@@ -786,8 +788,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                                    is_dict_var=is_dict_var,
                                    by_ref_to_var=by_ref_to_var,
                                    is_matrix_var=is_matrix_var,
+                                   is_complex_var=rhs_is_complex,
                                    ),
-            comment=f'{target.id} {friendly_type}'
+            comment=f'{target.id} {friendly_type}',
+            type_=self.scopes.calc_var_type(target.id)
         )
 
     def subscript_is_on_lhs_thus_assign(self, target):
@@ -835,7 +839,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             code = 'GETM' if isinstance(subscript_node.ctx, ast.Load) else 'PUTM'
         else:
             code = 'RCLEL' if isinstance(subscript_node.ctx, ast.Load) else 'STOEL'
-        self.program.insert_raw_lines(code)
+        self.program.insert(code, type_=self.scopes.calc_var_type(var_name_mtx))
 
         if isinstance(subscript_node.ctx, ast.Store) and not self.scopes.is_matrix(var_name_mtx):  # pure matrix access doesn't work via ZLIST, just via INDEXing directly.
             self.program.insert_sto(self.scopes.var_to_reg(var_name_mtx), comment=f'{var_name_mtx}')
@@ -1553,7 +1557,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                     assert not self.scopes.is_el_var(node.id)  # Haven't implemented this yet - look to rcl_var_index() for inspiration/DRY
                     comment_to_emit = var_name + ' (loop var)'
                     register = self.scopes.var_to_reg(var_name)
-                    self.program.insert(f'RCL {register}', comment=comment_to_emit)
+                    self.program.insert(f'RCL {register}', comment=comment_to_emit, type_=self.scopes.calc_var_type(var_name))
                     self.program.insert('IP')  # just get the integer portion of isg counter
                     register = 'ST X'  # access the value in stack x rather than in the register
                 else:
