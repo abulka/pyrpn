@@ -692,7 +692,6 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    @unittest.skip('complex matrix')
     def test_complex_matrix(self):
         self.parse(dedent("""
             a = NEWMAT(1,4)
@@ -715,7 +714,6 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
-    @unittest.skip('complex matrix')
     def test_complex_matrix_to_real(self):
         # Converting a Complex Matrix to Real again
         self.parse(dedent("""
@@ -742,7 +740,7 @@ class RpnTests3Cmds(BaseTest):
             RCL "x"
             COMPLEX        
             STO "b"
-            X<>Y
+            RDN
             STO "a"
             """)
         self.compare(de_comment(expected))
