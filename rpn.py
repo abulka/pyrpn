@@ -1112,6 +1112,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.program.last_line.text = imaginary_part.replace('j', '')  # strip the 'j'
             if old_op == '-':
                 self.program.insert('+/-')
+            if self.program.last_line.type_:
+                self.program.last_line.type_ += ' '
             self.program.last_line.type_ = 'COMPLEX arg of 2'  #  fake the normal 'arg type tracking' done by visit call, visit arg loop cos this is pythonic
 
     def visit_Compare(self, node):
@@ -1433,6 +1435,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.check_enough_params(func_name, node)
         for item in node.args:
             self.visit(item)
+            if self.program.last_line.type_:
+                self.program.last_line.type_ += ' '
             self.program.last_line.type_ += f'{func_name} arg of {len(node.args)}'
 
         self.disallow_string_args = False

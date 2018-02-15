@@ -33,7 +33,14 @@ class BaseRpnProgram:
     def insert(self, text, comment='', type_=''):
         line = Line(text=str(text), comment=comment, type_=type_)
         self._add_line(line)
-        log.debug(line.text)
+        self.insert_logging(line)
+
+    def insert_logging(self, line):
+        # debug
+        xtra_info = f'    [ {line.type_} ]' if line.type_ else ''
+        xtra_info2 = f'    // {line.comment}' if line.comment else ''
+        # xtra_info2 = f'    // {xtra_info2}' if xtra_info2 and not xtra_info else f' {xtra_info2}'
+        log.debug(f'{line.text}{xtra_info}{xtra_info2}')
 
     def insert_raw_lines(self, text):
         # inserts rpn text, removes any blank lines, preserves comments
