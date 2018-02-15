@@ -45,7 +45,7 @@ CLV,Clear a variable from memory. Parameter: variable name (indirect allowed),ok
 CLX,"Clear x-register to zero. If digit entry is terminated (no cursor in the display), then  ◄  also executes CLX.",na,
 CLZ,Clear statistics. Clear the accumulated statistical data in the summation registers.,ok,()
 COMB,Combinations of y items taken x at a time = y! / [x!(y-x)!],ok suggestion: As usual pass in two parameters instead of referring to the stack x and y.,"(y,x)"
-COMPLEX,Convert two real numbers (or matrices) into a complex number (or matrix). Converts a complex number (or matrix) into two real numbers (or matrices).,ok,"(n,n)"
+COMPLEX,Convert two real numbers (or matrices) into a complex number (or matrix). Converts a complex number (or matrix) into two real numbers (or matrices).,"ok suggestion: Takes one or two parameters. If the parameters are two normal numbers <code>(real,imaginary)</code>, returns a complex number e.g. <code>complex_num = COMPLEX(0, 1)</code>.  <b>Note:</b> You can also enter complex numbers without this COMPLEX function using native Python syntax e.g. <code>0 + 1j</code> which is engineering notation for <code>0 + i1</code>. Yes, Python uses the letter 'j' not the letter 'i' and puts it after the imaginary number, not before.<BR> If the parameter is a single complex number, returns two normal numbers - assign the two return values into variables e.g. <code>real, imaginary = COMPLEX(complex_num)</code>",(...)
 CORR,Returns a correlation coefficient using the current statistical data and curve-fitting model.,ok,()
 COS,Cosine. Returns cos(x).,ok,(n)
 COSH,Hyperbolic cosine. Returns cosh(x).,ok,(n)
@@ -241,9 +241,9 @@ Y↑X,Power. Returns yx.,✓ (renamed) suggestion: y**x,(n)
 →HMS,"To hours, minutes, and seconds. Convert x from a decimal fraction to a minutes-seconds format.",renamed,(n)
 →HR,To hours. Converts x from a minutes-seconds format to a decimal fraction.,renamed,(n)
 →OCT,To octal. Converts a decimal number to the octal representation. Note: This function is included to provide program compatibility with the HP-41 (which uses the function name OCT).,renamed,(n)
-→POL,"To polar. Converts x and y to the corresponding polar coordinates r and θ. If the x-register contains a complex number, converts the two parts of the number to polar values.","ok suggestion: Assign the two return values into variables e.g. 'a, b = toPOL(1, 2)'","(n,n)"
+→POL,"To polar. Converts x and y to the corresponding polar coordinates r and θ. If the x-register contains a complex number, converts the two parts of the number to polar values.","ok suggestion: Takes one or two parameters. If the parameter is a single complex number, returns a single complex number e.g. <code>complex_num = toPOL(complex_num)</code>.  If the parameters are two normal numbers, returns two normal numbers - assign the two return values into variables e.g. <code>a, b = toPOL(1, 2)</code>",(...)
 →RAD,To radians. Converts a angle value in degrees to radians. Returns x×(π/180).,renamed,(n)
-→REC,"To rectangular. Converts r (in the x-register) and θ (in the y-register) to the corresponding rectangular coordinates, x and y. If the X-register contains a complex number, converts the two parts of the number to rectangular values.","ok suggestion: Assign the two return values into variables e.g. 'a, b = toREC(1, 2)'","(θ,r)"
+→REC,"To rectangular. Converts r (in the x-register) and θ (in the y-register) to the corresponding rectangular coordinates, x and y. If the X-register contains a complex number, converts the two parts of the number to rectangular values.","ok suggestion: Takes one or two parameters. If the parameter is a single complex number, returns a single complex number e.g. <code>complex_num = toREC(complex_num)</code>.  If the parameters are two normal numbers <code>(θ,r)</code>, returns two normal numbers - assign the two return values into variables e.g. <code>a, b = toREC(1, 2)</code>",(...)
 ◄,"Backspace or clear x-register. In Program entry mode, deletes the current program line. Not programmable",na,
 ←,Move left one element in the indexed matrix.,nomatrix,
 ↑,Move up one element in the indexed matrix.,nomatrix,

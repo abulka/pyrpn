@@ -480,9 +480,22 @@ cmd_list = \
                             'matrices).',
              'indirect_allowed': False,
              'num_arg_fragments': 0,
-             'num_params': 2,
-             'params': '(n,n)',
-             'suggestion': '',
+             'num_params': 1,
+             'params': '(...)',
+             'suggestion': 'Takes one or two parameters. If the parameters are '
+                           'two normal numbers <code>(real,imaginary)</code>, '
+                           'returns a complex number e.g. <code>complex_num = '
+                           'COMPLEX(0, 1)</code>.  <b>Note:</b> You can also '
+                           'enter complex numbers without this COMPLEX '
+                           'function using native Python syntax e.g. <code>0 + '
+                           '1j</code> which is engineering notation for '
+                           '<code>0 + i1</code>. Yes, Python uses the letter '
+                           "'j' not the letter 'i' and puts it after the "
+                           'imaginary number, not before.<BR> If the parameter '
+                           'is a single complex number, returns two normal '
+                           'numbers - assign the two return values into '
+                           'variables e.g. <code>real, imaginary = '
+                           'COMPLEX(complex_num)</code>',
              'supported': '✓'},
  'CORR': {'class': '',
           'description': 'Returns a correlation coefficient using the current '
@@ -2342,10 +2355,15 @@ cmd_list = \
                          'the number to polar values.',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
-          'num_params': 2,
-          'params': '(n,n)',
-          'suggestion': "Assign the two return values into variables e.g. 'a, "
-                        "b = toPOL(1, 2)'",
+          'num_params': 1,
+          'params': '(...)',
+          'suggestion': 'Takes one or two parameters. If the parameter is a '
+                        'single complex number, returns a single complex '
+                        'number e.g. <code>complex_num = '
+                        'toPOL(complex_num)</code>.  If the parameters are two '
+                        'normal numbers, returns two normal numbers - assign '
+                        'the two return values into variables e.g. <code>a, b '
+                        '= toPOL(1, 2)</code>',
           'supported': '✓'},
  '→RAD': {'class': '',
           'description': 'To radians. Converts a angle value in degrees to '
@@ -2364,10 +2382,15 @@ cmd_list = \
                          'to rectangular values.',
           'indirect_allowed': False,
           'num_arg_fragments': 0,
-          'num_params': 2,
-          'params': '(θ,r)',
-          'suggestion': "Assign the two return values into variables e.g. 'a, "
-                        "b = toREC(1, 2)'",
+          'num_params': 1,
+          'params': '(...)',
+          'suggestion': 'Takes one or two parameters. If the parameter is a '
+                        'single complex number, returns a single complex '
+                        'number e.g. <code>complex_num = '
+                        'toREC(complex_num)</code>.  If the parameters are two '
+                        'normal numbers <code>(θ,r)</code>, returns two normal '
+                        'numbers - assign the two return values into variables '
+                        'e.g. <code>a, b = toREC(1, 2)</code>',
           'supported': '✓'},
  '↓': {'class': 'no',
        'description': '<del>Move down one element in the indexed matrix.</del>',
