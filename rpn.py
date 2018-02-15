@@ -733,7 +733,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         rhs_is_complex = self.program.last_line.text == 'COMPLEX' and 'COMPLEX arg of 2' in self.program.lines[-2].type_ or \
                          self.program.last_line.text == '→POL'    and '→POL arg of 1' in self.program.lines[-2].type_ or \
-                         self.program.last_line.text == '→REC'    and '→REC arg of 1' in self.program.lines[-2].type_
+                         self.program.last_line.text == '→REC'    and '→REC arg of 1' in self.program.lines[-2].type_ or \
+                         'complex result' in self.program.last_line.type_
         rhs_is_matrix = rhs_is_matrix or rhs_is_complex  #hack
 
         by_ref_to_rhs_var = node.value.id if rhs_is_list_var or rhs_is_dict_var else ''
@@ -1065,7 +1066,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             raise RpnError(f"Potential RPN stack overflow detected - we blew our expression operator stack {self.pending_ops}, {source_code_line_info(node)}")
 
         self.adjust_pending_op_if_necessary()
+        complex_result = self.program.last_line.text == 'COMPLEX'
         self.program.insert(self.pending_ops[-1])
+        if complex_result:
+            self.program.last_line.type_ = 'complex result'
         self.pending_ops.pop()
 
         if len(self.pending_stack_args) >= 2:
