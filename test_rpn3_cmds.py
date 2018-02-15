@@ -656,6 +656,24 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+    def test_complex_add(self):
+        # Don't get tricked by the last letter of a variable being 'j'
+        self.parse(dedent("""
+            c = (5 + 3j) + (7 - 9j)
+            """))
+        expected = dedent("""
+            5
+            3
+            COMPLEX
+            7
+            9
+            +/-
+            COMPLEX
+            +
+            STO "c"
+            """)
+        self.compare(de_comment(expected))
+
     def test_complex_one_param(self):
         self.parse(dedent("""
             c = COMPLEX(0,1)
