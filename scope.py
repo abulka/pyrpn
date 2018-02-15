@@ -11,6 +11,42 @@ Scope is a dictionary and can contain name value pairs which map variables to re
 Whenever we go nested, we create another scope which gets added to a scope stack.
 
 The stack cannot be empty, there is always one permanent scope which is our global scope.
+
+Note that a scope stack is only necessary to handle the trickling of scope back to global scope
+and also to handle nested scopes due to nested functions.  Viz referring to 'x' which doesn't
+exist in the current scope might be satisfied by looking at the previous scope or two.
+You are typically only ever going to get two or three scopes on this sort of stack.   
+
+This compile time scope stack has nothing to do with runtime stack frame pushing and popping.  Each scope is only a 
+compile time concept equivalent to a "code object”, described below: 
+
+Hi Janis,
+
+Thank for the link - I read your article, you explain it well and I understand.  
+
+You use a phrase "code object” which looks like the compile time information about each python function - the offset 
+values to use for each variable etc. Then at runtime we push a frame onto the stack based on that code object 
+information - including the optimisations Python 3 does that you describe. 
+ 
+Now that we have some terms synchronised I can explain my Python to RPN translator architecture more clearly.  When I 
+create code objects, for each Python function that is compiled, instead of mapping variables to offsets that always 
+start at ‘0’ (indicating the memory location on a newly pushed stack frame) I instead map to offsets into a fixed 
+piece of memory, continually incrementing the offsets and never going backwards. The first Python function’s code 
+object might use offsets 0..5, the next Python function’s code object would use 6..8 etc. 
+
+At runtime there are no stack frames created and destroyed. Each function runs and uses its bit of the fixed memory. 
+This precludes recursion, as you pointed out. And it uses up more memory because the fixed memory area where 
+variables store their stuff is always at maximum size.  But it has been simpler to implement. 
+
+This morning I sketched out a proper dynamic stack frame based approach for my Python to RPN converter, and it looks 
+possible.  RPN does support data structures that grow and shrink, and I can implement offsets using a certain RPN 
+indirection mechanism. However the price will be the added complexity and the overhead for each function call.  Might 
+give it a go sometime anyway! 
+
+cheers,
+Andy
+www.andypatterns.com  
+
 """
 
 
