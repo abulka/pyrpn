@@ -31,16 +31,21 @@ class BaseRpnProgram:
         self.next_lineno += 1
 
     def insert(self, text, comment='', type_=''):
+        comment = self.remove_html(comment)
         line = Line(text=str(text), comment=comment, type_=type_)
         self._add_line(line)
         self.insert_logging(line)
 
+    def remove_html(self, comment):
+        comment = comment.replace('<del>', '')
+        comment = comment.replace('</del>', '')
+        return comment
+
     def insert_logging(self, line):
         # debug
-        xtra_info = f'    [ {line.type_} ]' if line.type_ else ''
-        xtra_info2 = f'    // {line.comment}' if line.comment else ''
-        # xtra_info2 = f'    // {xtra_info2}' if xtra_info2 and not xtra_info else f' {xtra_info2}'
-        log.debug(f'{line.text}{xtra_info}{xtra_info2}')
+        info = f'    [ {line.type_} ]' if line.type_ else '' + \
+               f'    // {line.comment}' if line.comment else ''
+        log.debug(f'{line.text}{info}')
 
     def insert_raw_lines(self, text):
         # inserts rpn text, removes any blank lines, preserves comments
