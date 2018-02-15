@@ -745,6 +745,39 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+    def test_complex_matrix_subscript(self):
+        # Accessing a complex matrix cell should store the value into a named variable
+        self.parse(dedent("""
+            a = NEWMAT(1,4)
+            b = NEWMAT(1,4)
+            cm = COMPLEX(a, b)
+            val = cm[0,0]
+            """))
+        expected = dedent("""
+            1
+            4
+            NEWMAT
+            STO "a"
+            1
+            4
+            NEWMAT
+            STO "b"
+            RCL "a"
+            RCL "b"
+            COMPLEX        
+            STO "cm"
+            
+            INDEX "cm"
+            1
+            1
+            STOIJ
+            RDN
+            RDN
+            RCLEL
+            STO "val"   // <--- this is the trick, to make this named
+            """)
+        self.compare(de_comment(expected))
+
     # Cmd mapping
 
     def test_cmd_cmd_e_to_x(self):

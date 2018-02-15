@@ -1,0 +1,8 @@
+{
+    "description": "<p>Complex matrices test.</p>",
+    "public": "yes",
+    "sortnum": 0,
+    "source": "def matrix_complex_play():\r\n  RAD()\r\n  RECT()\r\n  FIX(4)\r\n\r\n  m1 = NEWMAT(1,4)\r\n  m2 = NEWMAT(1,4)\r\n  complex_matrix = COMPLEX(m1, m2)\r\n  #assert isCPX(complex_matrix)  # HP42S does not say yes to this\r\n\r\n  complex_matrix[0,0] = (5 + 3j)  # remember Python matrices are 0 based\r\n  val = complex_matrix[0,0]\r\n  assert val == (5 + 3j)\r\n  assert val == COMPLEX(5, 3)\r\n  STOP()\r\n  \r\n  # Convert complex matrix into two normal matrices\r\n  m1, m2 = COMPLEX(complex_matrix)\r\n  assert not isCPX(m1)\r\n  assert not isCPX(m2)\r\n  \r\n  # Check the contents of the individual matrices\r\n  assert m1[0,0] == 5\r\n  assert m2[0,0] == 3\r\n\r\n  print('complex matrix tests pass ok')",
+    "tags": "Matrices,Complex_Numbers",
+    "title": "Complex Matrices"
+}
