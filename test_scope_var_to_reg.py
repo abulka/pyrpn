@@ -174,6 +174,37 @@ class ListDictMatrixTests(BaseTest):
         self.assertTrue(scopes.is_complex('a'))
 
 
+class CalcVarTypes(BaseTest):
+
+    # calc_var_type
+
+    def test_calc_var_type_default(self):
+        scopes = Scopes()
+        register = scopes.var_to_reg('a')
+        self.assertEqual('', scopes.calc_var_type('a'))
+
+    def test_calc_var_type_matrix(self):
+        scopes = Scopes()
+        register = scopes.var_to_reg('a', is_matrix_var=True)
+        self.assertEqual('matrix', scopes.calc_var_type('a'))
+
+    def test_calc_var_type_matrix_complex(self):
+        scopes = Scopes()
+        register = scopes.var_to_reg('a', is_matrix_var=True, is_complex_var=True)
+        self.assertEqual('complex matrix', scopes.calc_var_type('a'))
+
+    def test_calc_var_type_list(self):
+        scopes = Scopes()
+        register = scopes.var_to_reg('a', is_list_var=True)
+        self.assertEqual('list', scopes.calc_var_type('a'))
+
+    def test_calc_var_type_dict(self):
+        scopes = Scopes()
+        register = scopes.var_to_reg('a', is_dict_var=True)
+        self.assertEqual('dict', scopes.calc_var_type('a'))
+
+    # need more cases, e.g. by ref, looping el
+
 
 class RangeVarNames(BaseTest):
     # Track that certain variables have been used in for loop range expressions

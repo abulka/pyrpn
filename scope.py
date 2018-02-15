@@ -222,6 +222,20 @@ class Scopes(object):
 
     # Util
 
+    def calc_var_type(self, var_name):
+        if self.is_complex(var_name) and self.is_matrix(var_name):
+            return 'complex matrix'
+        elif self.is_complex(var_name):
+            return 'complex'
+        elif self.is_matrix(var_name):
+            return 'matrix'
+        elif self.is_list(var_name):
+            return 'list'
+        elif self.is_dictionary(var_name):
+            return 'dict'
+        else:
+            return ''
+
     def dump(self):
         result_scopes_list = ['-' if scope.empty else str(scope.data) for scope in self.stack]
         return '[' + ', '.join(result_scopes_list) + ']'
