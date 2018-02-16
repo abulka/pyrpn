@@ -27,7 +27,7 @@ LIST_UNSUPPORTED = ('cmp', 'index', 'count', 'extend', 'insert', 'remove', 'reve
 DICT_UNSUPPORTED = ('clear', 'copy', 'fromkeys', 'get', 'items', 'setdefault', 'update', 'values')
 MATRIX_UNSUPPORTED = ('INDEX', 'STOIJ', 'RCLIJ', 'PUTM', 'GETM', 'INSR', 'DELR', 'DIM', 'GROW', 'WRAP', 'SIMQ', 'GROW', 'WRAP')
 CMDS_WITH_ONE_OR_TWO_ARGS = ('COMPLEX', '→POL', '→REC',)
-CMDS_MATRIX_RETURN_NORMAL = ('DIM?', )  # need to add more
+CMDS_MATRIX_RETURN_NORMAL = ('DIM?', 'DET', 'FNRM', 'RNRM', 'DOT', )  # need to add more
 
 """
 HP42S commands can be called by an equivalent Python function.  There are three scenarios
