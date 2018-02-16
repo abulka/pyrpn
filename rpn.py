@@ -731,6 +731,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         rhs_is_matrix = 'NEWMAT' in self.program.last_line.text or \
                         'GETM' in self.program.last_line.text or \
                         ('COMPLEX' == self.program.last_line.text and 'matrix' in self.program.lines[-2].type_) or \
+                        'matrix result' in self.program.last_line.type_ or \
                         self.program.last_line.type_ == 'complex matrix'
 
         rhs_is_complex = self.program.last_line.text == 'COMPLEX' and 'COMPLEX arg of 2' in self.program.lines[-2].type_ or \
@@ -782,7 +783,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         force_reg_name = f'"{var_name}"' if 'rpn: ' in comment and 'named' in comment else None
 
         self.program.insert_sto(
-            self.scopes.var_to_reg(target.id,
+            self.scopes.var_to_reg(var_name,
                                    force_reg_name=force_reg_name,
                                    is_list_var=is_list_var,
                                    is_dict_var=is_dict_var,
@@ -1071,9 +1072,13 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         self.adjust_pending_op_if_necessary()
         complex_result = self.program.last_line.text == 'COMPLEX'
+        matrix_result = 'matrix' in self.program.last_line.type_  # and self.pending_ops[-1] in ('+-*/')
         self.program.insert(self.pending_ops[-1])
         if complex_result:
             self.program.last_line.type_ = 'complex result'
+        self.type_space()
+        if matrix_result:
+            self.program.last_line.type_ += 'matrix result'
         self.pending_ops.pop()
 
         if len(self.pending_stack_args) >= 2:
@@ -1084,6 +1089,11 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
         self.inside_calculation = False
         self.end(node)
+
+    def type_space(self):
+        if self.program.last_line.type_:
+            self.program.last_line.type_ += ' '
+
     # Most of these operators map to rpn in the opposite way, because of the stack order etc.
     # There are 12 RPN operators, p332
     cmpops = {
@@ -1112,8 +1122,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.program.last_line.text = imaginary_part.replace('j', '')  # strip the 'j'
             if old_op == '-':
                 self.program.insert('+/-')
-            if self.program.last_line.type_:
-                self.program.last_line.type_ += ' '
+            self.type_space()
             self.program.last_line.type_ = 'COMPLEX arg of 2'  #  fake the normal 'arg type tracking' done by visit call, visit arg loop cos this is pythonic
 
     def visit_Compare(self, node):
@@ -1435,8 +1444,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.check_enough_params(func_name, node)
         for item in node.args:
             self.visit(item)
-            if self.program.last_line.type_:
-                self.program.last_line.type_ += ' '
+            self.type_space()
             self.program.last_line.type_ += f'{func_name} arg of {len(node.args)}'
 
         self.disallow_string_args = False
