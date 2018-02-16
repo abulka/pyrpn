@@ -1,5 +1,5 @@
 {
-    "description": "<p>Multiply two matrices.</p>\r\n<pre class=\"language-markup\"><code>[ 1, 2   x  [3, 4    =  [3, 4   \r\n  0, 0 ]     0, 0 ]      0, 0 ]\r\n</code></pre></p>",
+    "description": "<p>Multiply two matrices.</p>\r\n<pre class=\"language-markup\"><code>[ 1, 2   x  [3, 4    =  [3, 4   \r\n  0, 0 ]     0, 0 ]      0, 0 ]\r\n</code></pre>\r\n<p>Its a kind of boring example. Note that there is a special technique to multiplying matrices, click <a href=\"https://www.mathsisfun.com/algebra/matrix-multiplying.html\">here</a> to learn about it.</p>\r\n<p>Explore this example in <a href=\"https://www.wolframalpha.com/input/?i=%7B%7B1,2%7D,%7B0,0%7D%7D+*+%7B%7B3,4%7D,%7B0,0%7D%7D\">Wolfram</a>.</p>\r\n<p>For the curious, the Desktop Python equivalent is&nbsp;</p>\r\n<pre class=\"language-python\"><code>import numpy as np\r\nm1 = np.array([[1,2],[0,0]])\r\nm2 = np.array([3,4],[0,0]])\r\nm1 @ m2\r\n\r\n#result\r\narray([[3, 4],\r\n       [0, 0]])</code></pre>",
     "public": "yes",
     "sortnum": 0,
     "source": "def matrix_multiply():\r\n  m1 = NEWMAT(2,2)\r\n  m1[0,0] = 1\r\n  m1[0,1] = 2\r\n  m2 = NEWMAT(2,2)\r\n  m2[0,0] = 3\r\n  m2[0,1] = 4\r\n  mresult = m1 * m2\r\n  PRV(mresult)\r\n  assert mresult[0,0] == 3\r\n  assert mresult[0,1] == 4\r\n  assert mresult[1,0] == 0\r\n  assert mresult[1,1] == 0\r\n  return mresult",
