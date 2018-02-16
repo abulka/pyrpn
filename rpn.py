@@ -1434,7 +1434,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         if func_name in settings.CMDS_WHO_NEED_PARAM_SWAPPING:
             self.program.insert('X<>Y', comment='change order of params to be more algebraic friendly')
         arg_val = ' ST X' if self.cmd_st_x_situation(func_name, node) else ''  # e.g. VIEW
-        self.program.insert(f'{func_name}{arg_val}', comment=cmd_list[func_name]['description'])
+
+        type_ = 'matrix result' if len(self.program.lines) and 'matrix' in self.program.last_line.type_ and not func_name in settings.CMDS_MATRIX_RETURN_NORMAL else ''
+        self.program.insert(f'{func_name}{arg_val}', comment=cmd_list[func_name]['description'], type_=type_)
 
     def process_call_args(self, func_name, node):
         # Process arguments to functions by visiting them.
