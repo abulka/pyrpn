@@ -1411,7 +1411,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 if func_name in cmd_list:
                     self.calling_builtin_cmd(func_name, node)
                 elif func_name in self.program.user_insertable_rpn_functions:
-                    self.program.insert_xeq(func_name)
+                    self.program.insert_xeq(func_name, type_=self.calc_type(func_name))
                 else:
                     self.calling_user_def(func_name)
 
@@ -1435,8 +1435,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.program.insert('X<>Y', comment='change order of params to be more algebraic friendly')
         arg_val = ' ST X' if self.cmd_st_x_situation(func_name, node) else ''  # e.g. VIEW
 
-        type_ = 'matrix result' if len(self.program.lines) and 'matrix' in self.program.last_line.type_ and not func_name in settings.CMDS_MATRIX_RETURN_NORMAL else ''
-        self.program.insert(f'{func_name}{arg_val}', comment=cmd_list[func_name]['description'], type_=type_)
+        self.program.insert(f'{func_name}{arg_val}', comment=cmd_list[func_name]['description'], type_=self.calc_type(func_name))
+
+    def calc_type(self, func_name):
+        type_ = 'matrix result' if len(
+            self.program.lines) and 'matrix' in self.program.last_line.type_ and not func_name in settings.CMDS_MATRIX_RETURN_NORMAL else ''
+        return type_
 
     def process_call_args(self, func_name, node):
         # Process arguments to functions by visiting them.

@@ -853,6 +853,23 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+    def test_matrix_len(self):
+        # multiply two matrices
+        self.parse(dedent("""
+            m1 = NEWMAT(2,2)
+            mresult = len(m1)
+            """))
+        expected = dedent("""
+            2
+            2
+            NEWMAT
+            STO "m1"
+            RCL "m1"
+            XEQ "pMxLen"
+            STO "mresult"
+            """)
+        self.compare(de_comment(expected))
+
     # Cmd mapping
 
     def test_cmd_cmd_e_to_x(self):
