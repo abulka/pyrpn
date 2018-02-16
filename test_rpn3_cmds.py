@@ -778,6 +778,41 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.compare(de_comment(expected))
 
+    def test_complex_matrix_subscript_store(self):
+        # Storing complex number into a complex matrix cell
+        self.parse(dedent("""
+            a = NEWMAT(1,4)
+            b = NEWMAT(1,4)
+            cm = COMPLEX(a, b)
+            cm[0,0] = (5 + 3j)
+            """))
+        expected = dedent("""
+            1
+            4
+            NEWMAT
+            STO "a"
+            1
+            4
+            NEWMAT
+            STO "b"
+            RCL "a"
+            RCL "b"
+            COMPLEX        
+            STO "cm"
+            
+            5
+            3
+            COMPLEX
+            INDEX "cm"
+            1
+            1
+            STOIJ
+            RDN
+            RDN
+            STOEL
+            """)
+        self.compare(de_comment(expected))
+
     # Cmd mapping
 
     def test_cmd_cmd_e_to_x(self):

@@ -750,10 +750,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 self.assign_lhs(node, target, rhs_is_list_var, rhs_is_dict_var, by_ref_to_rhs_var, rhs_is_matrix, rhs_is_complex)  # var is normal (lower=local, upper=named) or matrix (lower=named, upper=named)
 
             # Check var types
-            if rhs_is_matrix_rpn_op or rhs_is_list_var or rhs_is_dict_var or rhs_is_complex:
-                self.scopes.ensure_is_named_matrix_register(var_name=target.id, node=node)
-            elif lhs_is_subscript:
+            if lhs_is_subscript:
                 self.scopes.ensure_is_named_matrix_register(var_name=target.value.id, node=node)  # drill into subscript node to get list or dict name
+            elif rhs_is_matrix_rpn_op or rhs_is_list_var or rhs_is_dict_var or rhs_is_complex:
+                self.scopes.ensure_is_named_matrix_register(var_name=target.id, node=node)
 
             # pop the stack so that each value on the stack is assigned into a different var (multiple values from return)
             if len(targets) > 1 and index < len(targets) - 1:
