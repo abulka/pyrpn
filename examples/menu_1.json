@@ -1,0 +1,8 @@
+{
+    "description": "<p>Programmable menu.&nbsp; Note that each function you call must be a named global function, hence the need to mark each function with the&nbsp;# rpn: export directive.</p>\r\n<p>It may be possible in the future to call local functions without exposing them to the global namespace.</p>",
+    "public": "yes",
+    "sortnum": 0,
+    "source": "def ui1():\r\n  \"blah1\"\r\n  KEYG(1, \"blah1\")\r\n  \"blah2\"\r\n  KEYG(2, \"blah2\")\r\n  MENU()\r\n\r\ndef blah1():  # rpn: export\r\n  print('you chose blah1')\r\n\r\ndef blah2():  # rpn: export\r\n  print('you chose blah2')",
+    "tags": "User_Interface",
+    "title": "Menu"
+}

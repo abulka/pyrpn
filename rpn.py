@@ -1590,6 +1590,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                     arg_val = f'{arg_val}'
                 elif func_name == 'SIZE':
                     arg_val = f'{arg_val:04d}'
+                elif func_name == 'KEYG':
+                    arg_val = f'{arg_val:01d} GTO'
+                    func_name = 'KEY'
+                elif func_name == 'KEYX':
+                    arg_val = f'{arg_val:01d} XEQ'
+                    func_name = 'KEY'
                 else:
                     arg_val = f'{arg_val:02d}'  # TODO probably need more formats e.g. nnnn
 

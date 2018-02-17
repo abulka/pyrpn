@@ -1033,10 +1033,12 @@ class RpnCodeGenTests(BaseTest):
         """
         lines = self.parse(dedent("""
             KEYG(1, "doblah")
+            KEYX(1, "doblah")
             ASSIGN("someprog", 18)
             """))
         expected = dedent("""
-            KEYG 01 "doblah"
+            KEY 1 GTO "doblah"
+            KEY 1 XEQ "doblah"
             ASSIGN "someprog" 18
         """)
         self.compare(de_comment(expected), lines, dump=True)
@@ -1762,6 +1764,7 @@ class RpnCodeGenTests(BaseTest):
     Normal string assignment to variables, long strings can be specified but only six chars make it into whatever variable 
 
     VIEW   - Normal VIEW, specify Python variables only.  Viewing stack or indirect not supported.
+             Does not support multiple parameters.
              Nothing to do with alpha register.  Any strings in variables will only be 6 chars. 
              Must have param.  If param is integer literal - it will evaluate and show stack X.
              
