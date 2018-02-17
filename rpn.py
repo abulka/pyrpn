@@ -10,6 +10,7 @@ import tokenize
 import logging
 from rpn_exceptions import RpnError, source_code_line_info
 from textwrap import dedent
+import re
 
 log = logging.getLogger(__name__)
 config_log(log)
@@ -399,6 +400,17 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     def finish(self):
         self.program.emit_needed_rpn_templates()
+
+    def replace_global_calls_with_local_calls(self):
+        pattern = re.compile(r"^(KEY.*)\"(.*)\"")
+        for line in self.program.lines:
+            if line.text.startswith('KEY'):
+                m = pattern.search(line.text)
+                func_name = m.group(2)  # 0 is the entire string, 1 is the first parenthesised match
+                label = self.labels.func_to_lbl(func_name)
+                if label != f'"{func_name}"':
+                    line.text = re.sub(pattern, rf'\1{label}', line.text)  # fix
+                    log.debug(f'Repaired forward reference {line.text}')
 
     # Visit functions
 

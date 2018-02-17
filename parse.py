@@ -37,6 +37,7 @@ def parse(text, debug_options={}):
     visitor.debug_gen_descriptive_labels = debug_options.get('gen_descriptive_labels', False)
     visitor.atok = atok
     visitor.visit(tree)
+    visitor.replace_global_calls_with_local_calls()
     if debug_options.get('emit_pyrpn_lib', True):
         visitor.finish()
 

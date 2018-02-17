@@ -988,8 +988,8 @@ class RpnCodeGenTests(BaseTest):
             ASSIGN("someprog", 18)
             """))
         expected = dedent("""
-            KEY 1 GTO "doblah"
-            KEY 1 XEQ "doblah"
+            KEY 1 GTO A
+            KEY 1 XEQ A
             ASSIGN "someprog" 18
         """)
         self.compare(de_comment(expected), lines, dump=True)
@@ -1055,16 +1055,16 @@ class RpnCodeGenTests(BaseTest):
             """))
         expected = dedent("""
             "blah1"
-            KEY 1 XEQ "blah1"
+            KEY 1 XEQ A
             "blah2"
-            KEY 2 XEQ "blah2"
+            KEY 2 XEQ B
             "blah3"
-            KEY 3 XEQ "blah3"
+            KEY 3 XEQ C
             MENU
         """)
         self.compare(de_comment(expected), lines, dump=True)
 
-    @unittest.skip('maybe one day - tricky')
+    # @unittest.skip('maybe one day - tricky')
     def test_menu_programmable_local(self):
         """
         """
