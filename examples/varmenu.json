@@ -3,6 +3,6 @@
     "public": "yes",
     "sortnum": 0,
     "source": "def area_app():\r\n  varmenu(\"length\", \"width\")  # new easy technique\r\n  return length * width \r\n\r\ndef area_traditional():  # traditional technique - rpn: export\r\n  MVAR(\"length\")\r\n  MVAR(\"width\")\r\n  VARMENU(\"mvadd\")\r\n  STOP()\r\n  EXITALL()\r\n  return length * width ",
-    "tags": "Introductory_Examples",
+    "tags": "Introductory_Examples, User_Interface",
     "title": "Varmenu"
 }
