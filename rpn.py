@@ -1395,6 +1395,8 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             self.check_cmd_enough_arg_fragments(func_name, node)
             if func_name == 'varmenu':
                 self.calling_varmenu(node)
+            # if func_name == 'menu':
+            #     self.calling_menu(node)
             elif func_name in ('MVAR', 'VARMENU', 'STOP', 'EXITALL'):
                 self.calling_varmenu_mvar(func_name, node)
             elif func_name in ('alpha', 'AVIEW', 'PROMPT', 'PRA', 'ARCL'):
@@ -1763,6 +1765,19 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.program.insert('STOP')
         self.program.insert('EXITALL')
         for arg in node.args:
+            self.scopes.var_to_reg(arg.s, force_reg_name=f'"{arg.s}"')
+        self.end(node)
+
+    def calling_menu(self, node):
+        """
+        for each param
+
+            "blah1"
+            KEY 1 XEQ "blah1"
+        """
+        for index,arg in enumerate(node.args):
+            self.program.insert(f'"{arg.s}"')
+            self.program.insert(f'KEY {index} XEQ "{arg.s}"')
             self.scopes.var_to_reg(arg.s, force_reg_name=f'"{arg.s}"')
         self.end(node)
 

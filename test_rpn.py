@@ -890,55 +890,6 @@ class RpnCodeGenTests(BaseTest):
             """)
         self.compare(de_comment(expected), lines, dump=True)
 
-    # Calls to HP42s mvar and varmenu methods
-
-    def test_mvar(self):
-        lines = self.parse(dedent("""
-            def mvadd():
-                MVAR("length")
-                MVAR("width")
-                VARMENU("mvadd")
-                STOP()
-                EXITALL()
-                return length * width 
-            """))
-        expected = dedent("""
-            LBL "mvadd"
-            MVAR "length"
-            MVAR "width"
-            VARMENU "mvadd"
-            STOP
-            EXITALL
-            RCL "length"
-            RCL "width"
-            *
-            RTN
-            """)
-        self.compare(de_comment(expected), lines, dump=True)
-
-    def test_varmenu(self):
-        """
-        new construct - to save time
-        """
-        lines = self.parse(dedent("""
-            def myvmnu():
-                varmenu("length", "width")
-                return length * width 
-            """))
-        expected = dedent("""
-            LBL "myvmnu"
-            MVAR "length"
-            MVAR "width"
-            VARMENU "myvmnu"
-            STOP
-            EXITALL
-            RCL "length"
-            RCL "width"
-            *
-            RTN
-            """)
-        self.compare(de_comment(expected), lines, dump=True)
-
     # play with default scope
 
     def test_no_def(self):
@@ -1043,28 +994,98 @@ class RpnCodeGenTests(BaseTest):
         """)
         self.compare(de_comment(expected), lines, dump=True)
 
-    # MENU
+    # Calls to HP42s mvar and varmenu methods
+
+    def test_mvar(self):
+        lines = self.parse(dedent("""
+            def mvadd():
+                MVAR("length")
+                MVAR("width")
+                VARMENU("mvadd")
+                STOP()
+                EXITALL()
+                return length * width 
+            """))
+        expected = dedent("""
+            LBL "mvadd"
+            MVAR "length"
+            MVAR "width"
+            VARMENU "mvadd"
+            STOP
+            EXITALL
+            RCL "length"
+            RCL "width"
+            *
+            RTN
+            """)
+        self.compare(de_comment(expected), lines, dump=True)
+
+    def test_varmenu(self):
+        """
+        new construct - to save time
+        """
+        lines = self.parse(dedent("""
+            def myvmnu():
+                varmenu("length", "width")
+                return length * width 
+            """))
+        expected = dedent("""
+            LBL "myvmnu"
+            MVAR "length"
+            MVAR "width"
+            VARMENU "myvmnu"
+            STOP
+            EXITALL
+            RCL "length"
+            RCL "width"
+            *
+            RTN
+            """)
+        self.compare(de_comment(expected), lines, dump=True)
+
+    # Programmable MENU
 
     @unittest.skip('maybe one day - but how to choose gto vs xeq?')
     def test_menu_programmable(self):
         """
+        Actually - why is GTO useful at all?  We don't even support GTO ! So maybe leave it out?
+        Just support xeq - if you want mixed and gto's build it manually!
+
+        Other syntax options I was musing about:
+
+            menu("blah1", "blah2", "blah3", goto=(1,3), xeq=2) # hmmm
+
+            # or
+
+            menu("blah1", "blah2")
+            menu("blah1", append=True, goto=True)
+
+            # or
+
+            menux("blah1", "blah2")
+            menug("blah1", append=True)
+            menux("blah3", append=True)
+
+            # or
+
+            menu(('goto', "blah1"), ('xeq', "blah2"))
         """
         lines = self.parse(dedent("""
-            menu("blah1", "blah2", "blah3", goto=(1,3), xeq=2) # hmmm
+            menu("blah1", "blah2", "blah3")
             """))
         expected = dedent("""
             "blah1"
-            KEY 1 GTO "blah1"
+            KEY 1 XEQ "blah1"
             "blah2"
             KEY 2 XEQ "blah2"
             "blah3"
-            KEY 3 GTO "blah3"
+            KEY 3 XEQ "blah3"
             MENU
         """)
         self.compare(de_comment(expected), lines, dump=True)
 
     @unittest.skip('maybe one day - tricky')
-    def test_menu_programmable(self):
+    def test_menu_programmable_local(self):
         """
         """
         lines = self.parse(dedent("""
