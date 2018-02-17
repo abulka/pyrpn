@@ -1784,9 +1784,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             "blah1"
             KEY 1 XEQ "blah1"
         """
+        self.program.insert('CLMENU')
         for index,arg in enumerate(node.args):
             self.program.insert(f'"{arg.s}"')
-            self.program.insert(f'KEY {index + 1} XEQ "{arg.s}"')
+            self.program.insert(f'KEY {index + 1} GTO "{arg.s}"')
             self.scopes.var_to_reg(arg.s, force_reg_name=f'"{arg.s}"')
         self.program.insert('MENU')
         self.end(node)

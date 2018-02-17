@@ -1054,12 +1054,13 @@ class RpnCodeGenTests(BaseTest):
             menu("blah1", "blah2", "blah3")
             """))
         expected = dedent("""
+            CLMENU
             "blah1"
-            KEY 1 XEQ A
+            KEY 1 GTO A
             "blah2"
-            KEY 2 XEQ B
+            KEY 2 GTO B
             "blah3"
-            KEY 3 XEQ C
+            KEY 3 GTO C
             MENU
         """)
         self.compare(de_comment(expected), lines, dump=True)
@@ -1073,7 +1074,7 @@ class RpnCodeGenTests(BaseTest):
               "blah1"
               KEYG(1, "blah1")
               "blah2"
-              KEYG(2, "blah2")
+              KEYX(2, "blah2")
               MENU()
             
             def blah1():    # <---- notice no export thus local def
@@ -1087,7 +1088,7 @@ class RpnCodeGenTests(BaseTest):
             "blah1"
             KEY 1 GTO A
             "blah2"
-            KEY 2 GTO "blah2"
+            KEY 2 XEQ "blah2"
             MENU
             RTN
             
