@@ -1043,6 +1043,65 @@ class RpnCodeGenTests(BaseTest):
         """)
         self.compare(de_comment(expected), lines, dump=True)
 
+    # MENU
+
+    @unittest.skip('maybe one day - but how to choose gto vs xeq?')
+    def test_menu_programmable(self):
+        """
+        """
+        lines = self.parse(dedent("""
+            menu("blah1", "blah2", "blah3", goto=(1,3), xeq=2) # hmmm
+            """))
+        expected = dedent("""
+            "blah1"
+            KEY 1 GTO "blah1"
+            "blah2"
+            KEY 2 XEQ "blah2"
+            "blah3"
+            KEY 3 GTO "blah3"
+            MENU
+        """)
+        self.compare(de_comment(expected), lines, dump=True)
+
+    @unittest.skip('maybe one day - tricky')
+    def test_menu_programmable(self):
+        """
+        """
+        lines = self.parse(dedent("""
+            def ui1():
+              "blah1"
+              KEYG(1, "blah1")
+              "blah2"
+              KEYG(2, "blah2")
+              MENU()
+            
+            def blah1():    # <---- notice no export thus local def
+              print('you chose blah1')
+            
+            def blah2():  # rpn: export
+              print('you chose blah2')
+            """))
+        expected = dedent("""
+            LBL "ui1"
+            "blah1"
+            KEY 1 GTO A
+            "blah2"
+            KEY 2 GTO "blah2"
+            MENU
+            RTN
+            
+            LBL A
+            "you chose blah1"
+            AVIEW
+            RTN
+
+            LBL "blah2"
+            "you chose blah2"
+            AVIEW
+            RTN
+        """)
+        self.compare(de_comment(expected), lines, dump=True)
+
     # if
 
     def test_if_isFS(self):
