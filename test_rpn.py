@@ -1045,30 +1045,10 @@ class RpnCodeGenTests(BaseTest):
 
     # Programmable MENU
 
-    @unittest.skip('maybe one day - but how to choose gto vs xeq?')
     def test_menu_programmable(self):
         """
-        Actually - why is GTO useful at all?  We don't even support GTO ! So maybe leave it out?
-        Just support xeq - if you want mixed and gto's build it manually!
-
-        Other syntax options I was musing about:
-
-            menu("blah1", "blah2", "blah3", goto=(1,3), xeq=2) # hmmm
-
-            # or
-
-            menu("blah1", "blah2")
-            menu("blah1", append=True, goto=True)
-
-            # or
-
-            menux("blah1", "blah2")
-            menug("blah1", append=True)
-            menux("blah3", append=True)
-
-            # or
-
-            menu(('goto', "blah1"), ('xeq', "blah2"))
+        Actually - why is KEYG GTO useful at all?  We don't even support GTO ! So we leave it out
+        and just support xeq - if you want mixed KEYX and KEYG build it in the traditional way.
         """
         lines = self.parse(dedent("""
             menu("blah1", "blah2", "blah3")

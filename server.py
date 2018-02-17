@@ -123,6 +123,8 @@ def prepare_examples_and_tags(examples):
                    'tags': eg_tags}
         all_examples.append(eg_dict)
     all_tags = sorted(all_tags)
+    all_tags.remove('User_Interface')
+    all_tags.insert(0, 'User_Interface')
     all_tags.remove('Introductory_Examples')
     all_tags.insert(0, 'Introductory_Examples')
     all_tags.remove('Advanced')
