@@ -14,6 +14,7 @@
         </ul>
         <section class="container custom-container">
           <div class="left-half">
+              <pre class="parse_errors" style="display: none">{{ parse_errors }}</pre>
               <article>
                     <h3>Enter Python Source Code:</h3>
                     <form id="mainform" method="POST" action="/">
@@ -54,7 +55,6 @@
                 </div>
             </article>
           </div>
-        <pre class="parse_errors">{{ parse_errors }}</pre>
         </section>
 
 
@@ -83,9 +83,14 @@
         });
 
          $(document).ready(function () {
-             myCodeMirror1.focus()
-             myCodeMirror1.setCursor(myCodeMirror1.lineCount(), 0)
-
+             let $errs = $('pre.parse_errors')
+             if ($errs.text() == '') {
+                 $errs.hide()
+                 myCodeMirror1.focus()
+                 myCodeMirror1.setCursor(myCodeMirror1.lineCount(), 0)
+             }
+             else
+                 $errs.show()
          })
 
         // Clipboard Copy
