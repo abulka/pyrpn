@@ -4,18 +4,22 @@ from textwrap import dedent
 
 class ConverterForm(FlaskForm):
     source = TextAreaField('Source code', validators=[], default=dedent("""
-        def demo():
-            total = 0
-            for i in range(10):
-                result = calc_something(i, 5)
-                print('Counter', i, 'result=', total)
-                total += result
-            print('Final total was:', total)
-            
-        def calc_something(a,b):
-            # adds two numbers then squares them
-            return (a + b)**2
-    """).strip())
+        LBL("untitled")
+        
+    """).lstrip())
+    # source = TextAreaField('Source code', validators=[], default=dedent("""
+    #     def demo():
+    #         total = 0
+    #         for i in range(10):
+    #             result = calc_something(i, 5)
+    #             print('Counter', i, 'result=', total)
+    #             total += result
+    #         print('Final total was:', total)
+    #
+    #     def calc_something(a,b):
+    #         # adds two numbers then squares them
+    #         return (a + b)**2
+    # """).strip())
     comments = BooleanField('Generate comments', default=False)
     line_numbers = BooleanField('Generate line numbers', default=False)
     emit_pyrpn_lib = BooleanField('Auto include needed Python RPN Utility Functions', default=True)
