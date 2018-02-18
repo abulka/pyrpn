@@ -159,21 +159,22 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         comment = self.find_comment(node)
         return 'rpn: ' in comment and 'int' in comment
 
-    def check_rpn_def_directives(self, node):
-        # Adds an additional string label to the rpn code
-        comment = self.find_comment(node)
-        if 'rpn: export' in comment:
-            label = node.name[:7]
-            self.program.insert(f'LBL "{label}"', comment=f'def {node.name} (rpn: export)')
-
-    def make_global_label(self, node):
-        label = f'"{node.name[:7]}"'
-        self.program.insert(f'LBL {label}')
-        self.labels.func_to_lbl(node.name, label=label, called_from_def=True)
+    def make_global_label(self, func_name, insert_rpn=True):
+        label = f'"{func_name[:7]}"'
+        if insert_rpn:
+            self.program.insert(f'LBL {label}')
+        if not self.labels.has_function_mapping(func_name):  # may already be there cos of lookahead
+            self.labels.func_to_lbl(func_name, label=label, are_defining_a_def=True)
         return label
 
-    def make_local_label(self, node):
-        self.program.insert(f'LBL {self.labels.func_to_lbl(node.name, called_from_def=True)}', comment=f'def {node.name}')
+    def make_local_label(self, func_name):
+        if self.program.last_line.text != 'RTN':
+            self.program.insert('RTN')
+        if not self.labels.has_function_mapping(func_name):  # may already be there cos of lookahead
+            lbl = self.labels.func_to_lbl(func_name, are_defining_a_def=True)
+        else:
+            lbl = self.labels.get_label(func_name)
+        self.program.insert(f'LBL {lbl}', comment=f'def {func_name}')
 
     def split_alpha_text(self, alpha_text, append=False):
         if alpha_text == '':
@@ -396,6 +397,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             result += ')'
         return result
 
+    def check_loose_code_allowed(self, node):
+        if not self.scopes.current.loose_code_allowed:
+            raise RpnError(f'Loose code not allowed after a def, it will never get executed.  Move it up before the first def() in that scope, {source_code_line_info(node)}')
+
     # Finishing up
 
     def finish(self):
@@ -438,16 +443,14 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.begin(node)
 
         if not self.first_def_label:
-            self.first_def_label = self.make_global_label(node)  # main entry point to rpn program
+            self.first_def_label = self.make_global_label(node.name)  # main entry point to rpn program
         else:
             if not self.has_rpn_def_directive(node):
-                self.make_local_label(node)
-            elif self.labels.has_function_mapping(node.name):
-                self.make_local_label(node)
-                self.check_rpn_def_directives(node)
+                self.make_local_label(node.name)
             else:
-                self.make_global_label(node)
+                self.make_global_label(node.name)
 
+        self.scopes.current.loose_code_allowed = False
         self.scopes.push()
 
         if self.has_rpn_int_directive(node):
@@ -733,6 +736,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             - value
         """
         self.begin(node)
+        self.check_loose_code_allowed(node)
 
         self.assign_push_rhs(node)
         rhs_is_matrix_rpn_op = 'pMxPrep' in self.program.last_line.text or \
@@ -1003,6 +1007,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         Probably don't need to track pending_stack_args here cos of this smart strategy.
         """
         self.begin(node)
+        self.check_loose_code_allowed(node)
         two_count = 0
         for child in node.values:
             self.visit(child)
@@ -1025,6 +1030,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
 
     @recursive
     def visit_Expr(self, node):
+        self.check_loose_code_allowed(node)
         self.pending_stack_args = []
 
     @recursive
@@ -1165,6 +1171,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             - comparators
         """
         self.begin(node)
+        self.check_loose_code_allowed(node)
         self.visit(node.test)
         self.program.insert_xeq('pAssert', comment='Python assert')
         self.pending_stack_args = []  # they seem to accumulate here, so clear them
@@ -1180,6 +1187,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         or the orelse list might be empty (no else situation).
         """
         self.begin(node)
+        self.check_loose_code_allowed(node)
         log.debug(f'{self.indent} if')
 
         f = LabelFactory(local_label_allocator=self.local_labels, descriptive=self.debug_gen_descriptive_labels)
@@ -1257,6 +1265,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             - orelse
         """
         self.begin(node)
+        self.check_loose_code_allowed(node)
 
         f = LabelFactory(local_label_allocator=self.local_labels, descriptive=self.debug_gen_descriptive_labels)
         insert = self.insert
@@ -1377,6 +1386,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
                 Manually looped through and visited.  Each visit emits a register rcl or literal onto the stack.
         """
         self.begin(node)
+        self.check_loose_code_allowed(node)
         self.inside_calculation = True
         err_msg = lambda s : f'The built-in Python {s} command "{node.func.attr}" is not supported yet, sorry. If you are willing to handcraft an algorithm in RPN that implements this functionality please submit to Andy. {source_code_line_info(node)}'
 
@@ -1616,6 +1626,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             args += ' ' if arg_val else ''
             args += arg_val
         self.program.insert(f'{func_name}{args}', comment=comment_to_emit)
+
+        if func_name == 'LBL':
+            if self.first_def_label != None:
+                raise RpnError(f'Can only define a single main global label before any other defs, {source_code_line_info(node)}')
+            lbl_name = arg_val.replace('"', '')
+            self.first_def_label = self.make_global_label(lbl_name, insert_rpn=False)  # main entry point to rpn program
 
     def calling_alpha_family(self, func_name, node):
         old_inside_calculation = self.inside_calculation

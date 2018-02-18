@@ -2,6 +2,7 @@ import ast
 import asttokens
 import astunparse
 from rpn import RecursiveRpnVisitor
+from lookahead_rpn import LookaheadRpnVisitor
 import logging
 from logger import config_log
 from rpn_exceptions import RpnError
@@ -33,7 +34,11 @@ def parse(text, debug_options={}):
     if debug_options.get('dump_ast', False):
         dump_ast(tree)
 
+    labels = get_lookahead_func_labels(tree, atok)
+    log.debug(f'lookahead labels {labels}')
+
     visitor = RecursiveRpnVisitor()
+    visitor.labels = labels  # override the empty labels with the lookahead labels info
     visitor.debug_gen_descriptive_labels = debug_options.get('gen_descriptive_labels', False)
     visitor.atok = atok
     visitor.visit(tree)
@@ -42,6 +47,12 @@ def parse(text, debug_options={}):
         visitor.finish()
 
     return visitor.program
+
+def get_lookahead_func_labels(tree, atok):
+    visitor = LookaheadRpnVisitor()
+    visitor.atok = atok
+    visitor.visit(tree)
+    return visitor.labels
 
 def dump_ast(tree):
     """Pretty dump AST"""

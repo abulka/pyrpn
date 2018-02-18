@@ -794,7 +794,7 @@ class RpnCodeGenTests(BaseTest):
             """)
         self.compare(de_comment(expected), lines, dump=True)
 
-    def test_xeq_add_subroutine(self):
+    def test_xeq_subroutine(self):
         lines = self.parse(dedent("""
             def main():
                 add(1,2)
@@ -821,28 +821,21 @@ class RpnCodeGenTests(BaseTest):
             """)
         self.compare(de_comment(expected), lines, dump=True)
 
-    def test_nested_defs(self):
-        """
-        Nested defs are ok but they aren't really private
-        and use up a label within the program, so future functions with the
-        same name would refer to the same label!  Workaround is that
-        if you redefine a def, no matter the scope, it gets a new label mapping.
-        """
+    def test_xeq_subroutine_inner(self):
         lines = self.parse(dedent("""
             def main():
-            
+                add(1,2)
+
                 def add(a,b):
-                    # print('inner')
                     return a + b
-                    
-                add(1,2)  # will call the inner add()
-            
-            def add(a,b):
-                pass
             """))
         expected = dedent("""
             LBL "main"
-            LBL A  // inner def add()
+            1
+            2
+            XEQ A
+            RTN
+            LBL A  // def add()
             XEQ "p2Param"
             STO 00
             RDN
@@ -852,19 +845,94 @@ class RpnCodeGenTests(BaseTest):
             RCL 01
             +
             RTN
-            1
-            2
-            XEQ A  // will call inner add, viz A
-            RTN
-            LBL B  // def add()
-            XEQ "p2Param"
-            STO 02
-            RDN
-            STO 03
-            RDN
-            RTN
             """)
         self.compare(de_comment(expected), lines, dump=True)
+
+    def test_def_declared_twice(self):
+        """
+        Cannot define a function with the same name, even if its in another scope.  In real Python you can, though.
+        Used to have a workaround for this but it was unwieldy - easier to have this rule.
+        """
+        src = dedent("""
+            def main():
+                def add():
+                    pass
+            def add(a,b):
+                pass
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    def test_code_after_def_illegal(self):
+        """
+        Loose code after a def has no chance of being executed, unfortunately.
+
+        - Unless we specifically jump over def functions somehow and keep the execution going
+            on the off chance that there mat be some code lying around.  Tricky to do.
+        - Or unless we inject all loose code before the def lines we generate.  Tricky to do.
+
+        So we protect against it and warn the user:
+        what we do track is scopes, so if we could mark the scope stack to track it
+
+        Example:
+            x = 1  # ok
+
+            def func():
+                x = 2  # still ok
+                def func2():
+                    pass
+                x = 100 # not ok ******
+
+                def func3():
+                    x = 10  # obviously ok
+                    def func4():
+                        pass
+                    x = 20 # not ok ******
+
+            x = 2 # not ok ******
+
+        Algorithm:
+            initially         scope1.loose_code_allowed = True (default)
+            enter a def       scope1.loose_code_allowed = False, push scope, scope2.loose_code_allowed = True (default)
+            exit a def        pop scope, and we find that loose_code_allowed == False
+                              thus any assigns or calls must raise an exception
+            enter a def       scope1.loose_code_allowed = False, push scope, scope2.loose_code_allowed = True (default)
+                              adding code is ok again
+                              etc.
+        """
+        src = """
+            x = 1
+            def func():
+                x = 1
+            x = 100  # <-- will never get executed 
+        """
+        self.assertRaisesRegex(RpnError, ".*line: 5.*", self.parse, dedent(src))
+
+    def test_code_after_def_illegal_nested(self):
+        src = """
+            x = 1
+            def func():
+                x = 1
+                def func2():
+                    x = 1
+                x = 99  # <-- will never get executed 
+        """
+        self.assertRaisesRegex(RpnError, ".*line: 7.*", self.parse, dedent(src))
+
+    def test_code_after_def_illegal_nested_deep(self):
+        src = """
+            x = 1
+            def func():
+                x = 1
+                def func2():
+                    x = 1
+                def func3():
+                    x = 1  
+                    def func4():
+                        x = 1
+                    x = 99  # not ok ******        
+            """
+        self.assertRaisesRegex(RpnError, ".*line: 11.*", self.parse, dedent(src))
+
 
     # Variable assignment
 
@@ -1065,7 +1133,6 @@ class RpnCodeGenTests(BaseTest):
         """)
         self.compare(de_comment(expected), lines, dump=True)
 
-    # @unittest.skip('maybe one day - tricky')
     def test_menu_programmable_local(self):
         """
         """
@@ -1469,34 +1536,32 @@ class RpnCodeGenTests(BaseTest):
         """
         expected = dedent("""
             LBL "main"
-            XEQ A
+            XEQ "useful"
             RTN
-            LBL A
             LBL "useful"
             RTN
         """)
         lines = self.parse(dedent(src))
         self.compare(expected, lines, dump=True, keep_comments=False)
 
-    def test_def_double_export_no_calls_till_later(self):
-        # two clean definitions, no calls till later
+    def test_def_forward_reference_intelligence(self):
         src = """
+            main()
+            useful()
+
             def main():
                 pass
                 
             def useful():  # rpn: export
-                pass
-                
-            main()
-            useful()
+                pass                
         """
         expected = dedent("""
+            XEQ "main"
+            XEQ "useful"
             LBL "main"
             RTN
             LBL "useful"
             RTN
-            XEQ "main"
-            XEQ "useful"
         """)
         lines = self.parse(dedent(src))
         self.compare(expected, lines, dump=True, keep_comments=False)
@@ -2666,6 +2731,47 @@ class RpnCodeGenTests(BaseTest):
             """)
         self.compare(de_comment(expected), lines, dump=True)
 
+    def test_scope_global(self):
+        """
+        Every variable should be given a new register, unless that variable is named the same and we are in the
+        same scope.
+        """
+        lines = self.parse(dedent("""
+            x = 20
+            def main():
+                x = 100
+            """))
+        expected = dedent("""
+            20
+            STO 00
+            LBL "main"
+            100
+            STO 00
+            RTN
+            """)
+        self.compare(de_comment(expected), lines, dump=True)
+
+    def test_scope_lbl(self):
+        """
+        New lbl feature to allow global scope to be accessed
+        """
+        lines = self.parse(dedent("""
+            LBL("scope1")
+            sub1()            
+            def sub1():
+                pass
+            """))
+        expected = dedent("""
+            LBL "scope1"
+            XEQ A
+            RTN
+            LBL A
+            RTN
+            """)
+        self.compare(de_comment(expected), lines, dump=True)
+
+    # Power and Squared function
+
     def test_Pow(self):
         """
         Power function
@@ -2692,6 +2798,8 @@ class RpnCodeGenTests(BaseTest):
             X↑2
             """)
         self.compare(de_comment(expected), lines, dump=True)
+
+    # Binop inside print
 
     def test_add_binop_vars_inside_print(self):
         lines = self.parse(dedent("""

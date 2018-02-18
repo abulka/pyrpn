@@ -28,22 +28,13 @@ class VarnameLowerTests(BaseTest):
         register_x = scopes.var_to_reg('x')
         self.assertEqual('00', register_x)
 
-    def test_lowercase_varname_two_x_two_scopes(self):
-        scopes = Scopes()
-        register_x = scopes.var_to_reg('x')
-        self.assertEqual('00', register_x)
-        scopes.push()
-        register_x = scopes.var_to_reg('x')
-        self.assertEqual('01', register_x)
-
     def test_lowercase_varname_two_x_two_scopes_pop(self):
         scopes = Scopes()
         scopes.var_to_reg('x')
         scopes.push()
         scopes.var_to_reg('x')
         scopes.pop()
-        register_x = scopes.var_to_reg('x')
-        self.assertEqual('00', register_x)
+        self.assertEqual('00', scopes.var_to_reg('x'))  # back to original mapping
 
 
 class ListDictMatrixTests(BaseTest):

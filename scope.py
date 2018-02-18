@@ -208,12 +208,27 @@ class Scopes(object):
         self.current.data[var] = register
 
     def _has_mapping(self, var):
-        if len(self.stack) == 0:
-            return False
-        return var in self.current.data
+        # if len(self.stack) == 0:
+        #     return False
+
+        # old original
+        # return var in self.current.data
+
+        # new stage 1 trickle scope
+        for scope in reversed(self.stack):
+            if var in scope.data:
+                return True
+        return False
 
     def get_register(self, var):
-        return self.current.data[var]
+        # old original
+        # return self.current.data[var]
+
+        # new stage 1 trickle scope
+        for scope in reversed(self.stack):
+            if var in scope.data:
+                return scope.data[var]
+        raise RpnError(f'no such variable {var}')
 
     # Is named matrix - has mapping and varname has "
 
@@ -296,6 +311,7 @@ class Scope(object):
     dict_vars = attrib(default=Factory(list))  # keep track of var names which are dictionaries
     matrix_vars = attrib(default=Factory(list))  # keep track of var names which are pure matrices
     complex_vars = attrib(default=Factory(list))  # keep track of var names which are complex
+    loose_code_allowed = attrib(default=True)  # set to false once have pushed past this point in the stack with a def
 
     @property
     def empty(self):
