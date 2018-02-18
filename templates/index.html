@@ -11,6 +11,7 @@
             <li><a href="/examples">Examples</a></li>
             <li><a href="/help">Help</a></li>
             <li><a href="/subscribe">Subscribe to new feature announcements</a></li>
+            <li><a href="/">New Project</a></li>
         </ul>
         <section class="container custom-container">
           <div class="left-half">
@@ -34,6 +35,8 @@
                         <br>
                         <!--<a href="/example" id="save_to_examples">Save</a>-->
                     </form>
+                    <br>
+                    <button id="clear_code" class="btn util_button">Clear</button>
 
               </article>
           </div>
@@ -87,7 +90,10 @@
              if ($errs.text() == '') {
                  $errs.hide()
                  myCodeMirror1.focus()
-                 myCodeMirror1.setCursor(myCodeMirror1.lineCount(), 0)
+                 if (myCodeMirror1.getValue().trim() == '')
+                    myCodeMirror1.setCursor(0, 0)
+                 else
+                    myCodeMirror1.setCursor(myCodeMirror1.lineCount(), 0)
              }
              else
                  $errs.show()
@@ -135,6 +141,8 @@
         }
         $('#emit_pyrpn_lib').on('click', function () { display_emit_pyrpn_lib_help() })
         display_emit_pyrpn_lib_help()  // when page loads or hit back button
+
+        $('#clear_code').on('click', function () { myCodeMirror1.setValue('LBL("untitled")\n\n') })
 
     </script>
 
