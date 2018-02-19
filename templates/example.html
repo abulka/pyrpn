@@ -78,6 +78,13 @@
                        <td> {{ form.tags.label }} </td>
                        <td> {{ form.tags() }} </td>
                     </tr>
+                {% else %}
+                    <div style="display: none">
+                        {{ form.filename() }}
+                        {{ form.public() }}
+                        {{ form.sortnum() }}
+                        {{ form.tags() }}
+                    </div>
                 {% endif %}
             </table>
 

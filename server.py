@@ -174,6 +174,8 @@ def example_create():
             return redirect(url_for('example_edit', id=example.id))
     else:  # GET
         form = ExampleForm()
+        if not admin:
+            form.tags.process_data(settings.EDITOR_USER_EXAMPLES_TAGS)
     return render_template('example.html', form=form, title='Example Edit', admin=admin, example_id='')
 
 @app.route('/example/<int:id>', methods=['GET', 'POST'])
@@ -197,7 +199,8 @@ def example_edit(id):
         return redirect(request.referrer)
 
     if request.method == 'GET' and clone:
-        example_clone = evolve(example, id=None, title=example.title + ' copy')  # hopefully will reallocate id and save it to redis
+        example_clone = evolve(example, id=None, title=example.title + ' copy', filename='', tags=settings.EDITOR_USER_EXAMPLES_TAGS, description='Enter new description here')  # hopefully will reallocate id and save it to redis
+        print(example_clone)
         return redirect(url_for('example_edit', id=example_clone.id))
 
     if request.method == 'GET' and to_rpn:

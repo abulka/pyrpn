@@ -16,6 +16,7 @@ ADMIN = LOCAL
 # ADMIN = False
 # ADMIN = True
 
+EDITOR_USER_EXAMPLES_TAGS = 'CLONED_And_User_Examples'
 
 # Parsing related
 CMDS_WHO_NEED_LITERAL_NUM_ON_STACK_X = ('VIEW',)
