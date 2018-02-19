@@ -171,10 +171,11 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         if self.program.last_line.text != 'RTN':
             self.program.insert('RTN')
         if not self.labels.has_function_mapping(func_name):  # may already be there cos of lookahead
-            lbl = self.labels.func_to_lbl(func_name, are_defining_a_def=True)
+            label = self.labels.func_to_lbl(func_name, are_defining_a_def=True)
         else:
-            lbl = self.labels.get_label(func_name)
-        self.program.insert(f'LBL {lbl}', comment=f'def {func_name}')
+            label = self.labels.get_label(func_name)
+        self.program.insert(f'LBL {label}', comment=f'def {func_name}')
+        return label
 
     def split_alpha_text(self, alpha_text, append=False):
         if alpha_text == '':
@@ -443,15 +444,16 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.begin(node)
 
         if not self.first_def_label:
-            self.first_def_label = self.make_global_label(node.name)  # main entry point to rpn program
+            label = self.first_def_label = self.make_global_label(node.name)  # main entry point to rpn program
         else:
             if not self.has_rpn_def_directive(node):
-                self.make_local_label(node.name)
+                label = self.make_local_label(node.name)
             else:
-                self.make_global_label(node.name)
+                label = self.make_global_label(node.name)
 
         self.scopes.current.loose_code_allowed = False
         self.scopes.push()
+        self.scopes.current.def_name = label
 
         if self.has_rpn_int_directive(node):
             self.def_params_as_ints = True
@@ -1789,7 +1791,10 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         for arg in node.args:
             self.program.insert(f'MVAR "{arg.s}"')
             self.scopes.var_to_reg(arg.s, force_reg_name=f'"{arg.s}"')
-        self.program.insert(f'VARMENU {self.first_def_label}')
+        # self.program.insert(f'VARMENU {self.first_def_label}')
+        if '"' not in self.scopes.current.def_name:
+            raise RpnError(f'varmenu() needs to be inside a function with a named label, perhaps you need add a "rpn: export" comment directive to the def above?, {source_code_line_info(node)}')
+        self.program.insert(f'VARMENU {self.scopes.current.def_name}')
         self.program.insert('STOP')
         self.program.insert('EXITALL')
         self.end(node)

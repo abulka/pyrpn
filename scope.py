@@ -312,6 +312,7 @@ class Scope(object):
     matrix_vars = attrib(default=Factory(list))  # keep track of var names which are pure matrices
     complex_vars = attrib(default=Factory(list))  # keep track of var names which are complex
     loose_code_allowed = attrib(default=True)  # set to false once have pushed past this point in the stack with a def
+    def_name = attrib(default='')  # name of def responsible for this scope/namespace
 
     @property
     def empty(self):

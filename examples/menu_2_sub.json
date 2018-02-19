@@ -1,0 +1,8 @@
+{
+    "description": "<p>An example of using a master menu in the global scope, launching various sub functions, including a sub menu.&nbsp; Hit the Exit button on Free42 to back out of the submenu.</p>",
+    "public": "yes",
+    "sortnum": 0,
+    "source": "LBL(\"nested_menus\")\r\n\r\nlength = 10\r\nwidth = 20\r\n\r\nmenu(\"hello\", \"report\", \"add\", \"sub\")\r\n\r\ndef hello():\r\n  print('you chose hello')\r\n  \r\ndef report():\r\n  print('length is', length, '[LF]width is', width)\r\n\r\ndef add(a, b):\r\n  return a + b\r\n\r\ndef sub():\r\n  menu(\"ha1\", \"hello\")\r\n  KEYG(9, \"nested_menus\")  # sets Exit button to jump to start\r\n\r\ndef ha1():\r\n  print('you laughed ha')",
+    "tags": "User_Interface",
+    "title": "Nested Menus"
+}
