@@ -25,7 +25,7 @@
         {% for tag, tag_with_spaces in all_tags %}
             <option value="category_{{tag}}">{{tag_with_spaces}}</option>
         {% endfor %}
-        <option value="">All</option>
+        <option value="category_All">All</option>
     </select>
     <br>
     <br>
@@ -172,6 +172,10 @@
         function display_examples(category) {
             if (category == '')
                 $('.category').show()
+            else if (category == 'category_All') {
+                $('.category').show()
+                $("select#example_category").val(category)
+            }
             else {
                 $('.category').hide()
                 $('.' + category).show()
