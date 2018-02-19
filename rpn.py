@@ -1589,7 +1589,7 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             arg_val = self.get_node_name_id_or_n(arg)
 
             if isinstance(arg, ast.Str):   # literal string
-                arg_val = f'"{arg_val}"'
+                arg_val = f'"{arg_val[:7]}"' if func_name == 'LBL' else f'"{arg_val}"'
 
             if isinstance(arg, ast.Name):  # reference to a variable, thus pull out a register name
                 var_name = comment_to_emit = arg_val

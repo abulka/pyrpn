@@ -2756,13 +2756,13 @@ class RpnCodeGenTests(BaseTest):
         New lbl feature to allow global scope to be accessed
         """
         lines = self.parse(dedent("""
-            LBL("scope1")
+            LBL("scope1_in_france")
             sub1()            
             def sub1():
                 pass
             """))
         expected = dedent("""
-            LBL "scope1"
+            LBL "scope1_"
             XEQ A
             RTN
             LBL A
