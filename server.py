@@ -117,7 +117,7 @@ def prepare_examples_and_tags(examples):
     all_examples = []
     all_tags = set()
     for eg in examples:
-        eg_tags = [tag.strip() for tag in eg.tags.split(',') if eg.tags.strip() != '']
+        eg_tags = tags_to_list(eg)
         all_tags = all_tags | set(eg_tags)
         eg_dict = {'example': eg,
                    'tags': eg_tags}
@@ -132,6 +132,17 @@ def prepare_examples_and_tags(examples):
     all_tags = [(tag, tag.replace('_', ' ')) for tag in all_tags]
     return all_examples, all_tags
 
+
+def tags_to_list(eg):
+    eg_tags = [tag.strip() for tag in eg.tags.split(',') if eg.tags.strip() != '']
+    return eg_tags
+
+def get_first_tag(eg):
+    eg_tags = tags_to_list(eg)
+    if eg_tags:
+        return eg_tags[0]
+    else:
+        return 'All'
 
 @app.route('/sync')
 def examples_sync():
@@ -223,7 +234,7 @@ def example_edit(id):
         dic['public'] = Example.redis_bool_to_bool(example.public)
         form = ExampleForm(**dic)
         log.debug('id %s', id)
-        return render_template('example.html', form=form, title='Example Edit', admin=admin, example_id=id)
+        return render_template('example.html', form=form, title='Example Edit', admin=admin, example_id=id, main_tag=get_first_tag(example))
 
     elif request.method == 'POST':  # Wish forms could send put verb properly...
         form = ExampleForm(request.form)
@@ -241,7 +252,7 @@ def example_edit(id):
             es.save_to_file(example)
         else:
             log.warning('form did not validate')
-        return render_template('example.html', form=form, title='Example Edit', admin=admin, example_id=id)
+        return render_template('example.html', form=form, title='Example Edit', admin=admin, example_id=id, main_tag=get_first_tag(example))
 
 def vote_via_email(example):
     dic = example.asdict
