@@ -1337,3 +1337,17 @@ class RpnTests3Cmds(BaseTest):
             STO 00  // rows
             """)
         self.compare(de_comment(expected))
+
+    # Mod
+
+    def test_cmd_mod(self):
+        # % operator
+        self.parse(dedent("""
+            7 % 2
+            """))
+        expected = dedent("""
+            7
+            2
+            MOD
+            """)
+        self.compare(de_comment(expected))

@@ -971,6 +971,12 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
         self.pending_ops.append('Y↑X')
         self.end(node)
 
+    def visit_Mod(self,node):
+        # triggered by %
+        self.begin(node)
+        self.pending_ops.append('MOD')
+        self.end(node)
+
     def visit_Delete(self,node):
         """ visit a Power node """
         self.begin(node)
