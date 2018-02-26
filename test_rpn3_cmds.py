@@ -1351,3 +1351,24 @@ class RpnTests3Cmds(BaseTest):
             MOD
             """)
         self.compare(de_comment(expected))
+
+    # warn about nonexistent python features
+
+    def test_no_import(self):
+        src = dedent("""
+            import blah
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    def test_no_math(self):
+        src = dedent("""
+            math.sin(20)
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
+    def test_no_sin(self):
+        src = dedent("""
+            sin(20)
+            """)
+        self.assertRaises(RpnError, self.parse, dedent(src))
+
