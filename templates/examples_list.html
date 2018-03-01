@@ -7,7 +7,9 @@
 
 {% block content %}
 <ul>
+    {% if admin %}
     <li><a href="/example">Create Example</a></li>
+    {% endif %}
     <li><a href="/help">Help</a></li>
     <li><a href="/">Converter</a></li>
     <li><a href="/subscribe">Subscribe to new feature announcements</a></li>
@@ -61,7 +63,7 @@
                         {% if not (admin and e.example.filename) %}
                         <span class="examples_action_link"><a href="/example/{{ e.example.id }}?vote=1" title="Send request to make this example permanent">Vote</a></span>
                         {% endif %}
-                    {% elif not admin and e.example.filename %}
+                    {% elif not admin and e.example.filename and False %}
                         <span class="examples_action_link"><a href="/example/{{ e.example.id }}?clone=1" title="Make a new, editable copy of this example">Clone</a></span>
                     {% endif %}
                 </div>
