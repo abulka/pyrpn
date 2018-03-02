@@ -1,4 +1,5 @@
 from flask import Flask, render_template, redirect, url_for, request, jsonify
+from flask import abort
 from parse import parse
 from rpn_exceptions import RpnError
 import logging
@@ -168,6 +169,7 @@ def example_create():
     if FORCE_ADMIN: admin = True
 
     if request.method == 'POST':
+        if settings.PRODUCTION: return abort(400, 'go away you robots')
         log.debug(f'example_create POST public {request.values.get("public")}')
         form = ExampleForm(request.form)
         # example = Example(**dict(request.values))  # why doesn't this work?
@@ -206,10 +208,12 @@ def example_edit(id):
     # log.info(f'example_edit: id {id} delete flag {delete} example is {example}')
 
     if request.method == 'GET' and delete:
+        if settings.PRODUCTION: return abort(400, 'go away you robots')
         example.delete()
         return redirect(request.referrer)
 
     if request.method == 'GET' and clone:
+        if settings.PRODUCTION: return abort(400, 'go away you robots')
         example_clone = evolve(example, id=None, title=example.title + ' copy', filename='', tags=settings.EDITOR_USER_EXAMPLES_TAGS, description='Enter new description here')  # hopefully will reallocate id and save it to redis
         print(example_clone)
         return redirect(url_for('example_edit', id=example_clone.id))
@@ -222,6 +226,7 @@ def example_edit(id):
         return jsonify(rpn=rpn, rpn_free42=rpn_free42)
 
     if request.method == 'GET' and vote:
+        if settings.PRODUCTION: return abort(400, 'go away you robots')
         try:
             vote_via_email(example)
         except:
