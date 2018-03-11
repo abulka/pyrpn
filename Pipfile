@@ -1,0 +1,30 @@
+[[source]]
+
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+
+[packages]
+
+astunparse = "*"
+attrs = "*"
+asttokens = ">=1.1.8"
+flask = "*"
+flask-wtf = "*"
+gunicorn = "*"
+redis = "*"
+sendgrid = "*"
+maya = "*"
+werkzeug = "*"
+"jinja2" = "*"
+wtforms = "*"
+
+
+[dev-packages]
+
+
+
+[requires]
+
+python_version = "3.6"
