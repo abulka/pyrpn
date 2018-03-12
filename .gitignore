@@ -32,3 +32,4 @@ local_settings.py
 /selenium_examples/geckodriver.log
 /node_modules/
 .ipynb_checkpoints
+.vscode
