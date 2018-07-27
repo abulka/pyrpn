@@ -206,6 +206,8 @@ def example_edit(id):
 
     example = Example.get(id)
     # log.info(f'example_edit: id {id} delete flag {delete} example is {example}')
+    if not example:
+        abort(404, f'Example {id} not found.')
 
     if request.method == 'GET' and delete:
         if settings.PRODUCTION: return abort(400, 'go away you robots')
