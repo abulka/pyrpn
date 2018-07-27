@@ -57,6 +57,8 @@ def index(id=None):
         form = ConverterForm()
         if id:
             example = Example.get(id)
+            if not example:
+                abort(404, f'Example {id} not found.')
             form.source.process_data(example.source)
     elif request.method == 'POST':
         # We are asking for the source to be converted to RPN
