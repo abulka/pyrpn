@@ -1372,3 +1372,20 @@ class RpnTests3Cmds(BaseTest):
             """)
         self.assertRaises(RpnError, self.parse, dedent(src))
 
+    # 2018
+
+    def test_node_has_no_lineno_attr(self):
+        from rpn_exceptions import source_code_line_info
+
+        # should probably mock this instead
+        class Token:
+            def __init__(self):
+                self.line = 'hi there   '
+        class Node:
+            def __init__(self):
+                self.first_token = Token()
+
+        node = Node()
+        s = source_code_line_info(node)
+        self.assertEqual(s, 'line unknown - (missing lineno from node object):\nhi there')
+
