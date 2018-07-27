@@ -1,0 +1,2 @@
+User-Agent: The Knowledge AI
+Disallow: /
