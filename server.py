@@ -71,6 +71,10 @@ def index(id=None):
                 rpn_free42 = program.lines_to_str(comments=False, linenos=True)
             except RpnError as e:
                 parse_errors = str(e)
+    else:
+        msg = f'server index route - method {request.method} not supported.'
+        log.error(msg)
+        abort(404, msg)
     return render_template('index.html', form=form, rpn=rpn, rpn_free42=rpn_free42, title='source code converter', parse_errors=parse_errors)
 
 def spy(source, default_source):
