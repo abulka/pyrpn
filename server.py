@@ -57,6 +57,8 @@ def index(id=None):
         form = ConverterForm()
         if id:
             example = Example.get(id)
+            if not example:
+                abort(404, f'Example {id} not found.')
             form.source.process_data(example.source)
     elif request.method == 'POST':
         # We are asking for the source to be converted to RPN
@@ -69,6 +71,10 @@ def index(id=None):
                 rpn_free42 = program.lines_to_str(comments=False, linenos=True)
             except RpnError as e:
                 parse_errors = str(e)
+    else:
+        msg = f'server index route - method {request.method} not supported.'
+        log.error(msg)
+        abort(404, msg)
     return render_template('index.html', form=form, rpn=rpn, rpn_free42=rpn_free42, title='source code converter', parse_errors=parse_errors)
 
 def spy(source, default_source):
@@ -206,6 +212,8 @@ def example_edit(id):
 
     example = Example.get(id)
     # log.info(f'example_edit: id {id} delete flag {delete} example is {example}')
+    if not example:
+        abort(404, f'Example {id} not found.')
 
     if request.method == 'GET' and delete:
         if settings.PRODUCTION: return abort(400, 'go away you robots')

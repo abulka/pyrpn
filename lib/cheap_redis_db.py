@@ -116,8 +116,11 @@ class CheapRecord:
     def get(cls, id):
         # returns actual instance
         data = cls.get_data(id)
-        instance = cls(**data)
-        return instance
+        if data:
+            instance = cls(**data)
+            return instance
+        else:
+            return None
 
     @classmethod
     def delete_id(cls, id):
