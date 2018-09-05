@@ -743,6 +743,9 @@ class RecursiveRpnVisitor(ast.NodeVisitor):
             - ctx - Load or Store
         """
         self.begin(node)
+
+        if isinstance(node.ctx, ast.Store):
+            raise RpnError(f'Assignment Operators (e.g. += -= etc.) on matrix/list elements not currently supported - try using the longer explicit syntax (e.g. a[0] = a[0] + 1), {source_code_line_info(node)}')
         self.subscript_is_on_rhs_thus_read(node)
         self.end(node)
 
