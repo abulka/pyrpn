@@ -21,8 +21,8 @@ def extract(supported):
 
 def calc_num_params(params):
     if params:
-        assert params[0] == '('
-        assert params[-1] == ')'
+        assert params[0] == '(', params
+        assert params[-1] == ')', params
         params_no_brackets = params[1:-1]
         num_params = len(params_no_brackets.split(',')) if params_no_brackets else -1
     else:

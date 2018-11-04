@@ -940,8 +940,14 @@ cmd_list = \
            'num_params': 1,
            'params': '(var)',
            'suggestion': 'Now takes a normal Python variable as a parameter - '
-                         'do not put variable in quotes. Specifying registers '
-                         'not supported.',
+                         'do not put variable in quotes. Specifying HP42S '
+                         'registers not supported.  Note: The variable '
+                         'referred to as the parameter will be converted into '
+                         'RPN as a named variable rather than converted into '
+                         'an auto allocated numbered RPN register - unless '
+                         'that variable has previously been assigned to - in '
+                         'which case it will be converted into RPN as an auto '
+                         'allocated numbered register.',
            'supported': '✓'},
  'INSR': {'class': '',
           'description': 'Insert a row in the indexed matrix.',
@@ -1370,11 +1376,13 @@ cmd_list = \
            'supported': '✓'},
  'PROMPT': {'class': '',
             'description': 'Display the Alpha register and halt program '
-                           'execution.',
+                           'execution.  To store the value entered during the '
+                           'prompt into a variable simply assign to that '
+                           "variable e.g. myvar = PROMPT('enter val')",
             'indirect_allowed': False,
             'num_arg_fragments': 0,
-            'num_params': -1,
-            'params': '()',
+            'num_params': 1,
+            'params': '(str)',
             'suggestion': '',
             'supported': '✓'},
  'PRON': {'class': '',
