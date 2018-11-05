@@ -1,0 +1,61 @@
+LBL "hi there"
+CLA
+123
+STO "fred"
+STO 01
+RCL "fred"
+LBL A
+X<>Y
+RTN
+LBL "demo"
+0
+STO 00
+-1.009
+STO 01
+LBL 00
+ISG 01
+GTO 01
+GTO 02
+LBL 01
+RCL 01
+IP
+5
+XEQ A
+STO 02
+"Counter"
+⊢" "
+RCL 01
+IP
+ARCL ST X
+⊢" "
+⊢"result="
+⊢" "
+ARCL 00
+AVIEW
+RCL 02
+STO+ 00
+GTO 00
+LBL 02
+"Final total was"
+⊢":"
+⊢" "
+ARCL 00
+AVIEW
+RTN
+LBL A
+XEQ 65
+STO 03
+RDN
+STO 04
+RDN
+RCL 03
+RCL 04
++
+X↑2
+RTN
+LBL 50
+"-Utility Funcs-"
+RTN
+LBL 65
+X<>Y
+RTN

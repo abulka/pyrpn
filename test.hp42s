@@ -1,0 +1,13 @@
+LBL "hi there"
+CLA
+X<0?
+LBL D
+GTO 22
+AVIEW
+AVIEW
+ADV
+AND
+NOT
+123
+STO "fred"
+RTN
