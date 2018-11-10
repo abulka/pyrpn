@@ -1,61 +1,61 @@
-LBL "hi there"
-CLA
-123
-STO "fred"
-STO 01
-RCL "fred"
-LBL A
-X<>Y
-RTN
-LBL "demo"
-0
-STO 00
--1.009
-STO 01
-LBL 00
-ISG 01
-GTO 01
-GTO 02
-LBL 01
-RCL 01
-IP
-5
-XEQ A
-STO 02
-"Counter"
-⊢" "
-RCL 01
-IP
-ARCL ST X
-⊢" "
-⊢"result="
-⊢" "
-ARCL 00
-AVIEW
-RCL 02
-STO+ 00
-GTO 00
-LBL 02
-"Final total was"
-⊢":"
-⊢" "
-ARCL 00
-AVIEW
-RTN
-LBL A
-XEQ 65
-STO 03
-RDN
-STO 04
-RDN
-RCL 03
-RCL 04
-+
-X↑2
-RTN
-LBL 50
-"-Utility Funcs-"
-RTN
-LBL 65
-X<>Y
-RTN
+01 LBL "hi there"
+02 CLA
+
+03 STO "fred"
+04 STO 01
+05 RCL "fred"
+06 LBL A
+07 X<>Y
+08 RTN
+09 LBL "demo"
+
+10 STO 00
+11 -1.009
+12 STO 01
+13 LBL 00
+14 ISG 01
+15 GTO 01
+16 GTO 02
+17 LBL 01
+18 RCL 01
+19 IP
+
+20 XEQ A
+21 STO 02
+22 "Counter"
+23 ⊢" "
+24 RCL 01
+25 IP
+26 ARCL ST X
+27 ⊢" "
+28 ⊢"result="
+29 ⊢" "
+30 ARCL 00
+31 AVIEW
+32 RCL 02
+33 STO+ 00
+34 GTO 00
+35 LBL 02
+36 "Final total was"
+37 ⊢":"
+38 ⊢" "
+39 ARCL 00
+40 AVIEW
+41 RTN
+42 LBL A
+43 XEQ 65
+44 STO 03
+45 RDN
+46 STO 04
+47 RDN
+48 RCL 03
+49 RCL 04
+50 +
+51 X↑2
+52 RTN
+53 LBL 50
+54 "-Utility Funcs-"
+55 RTN
+56 LBL 65
+57 X<>Y
+58 RTN
