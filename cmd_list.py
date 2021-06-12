@@ -1518,17 +1518,23 @@ cmd_list = \
          'params': '()',
          'suggestion': '',
          'supported': '✓'},
- 'RCL': {'class': 'no',
-         'description': '<del>Recall data into the x-register. Parameter: '
-                        'register or variable (indirect allowed)</del>',
-         'indirect_allowed': True,
+ 'RCL': {'class': '',
+         'description': 'Recall data into the x-register. Parameter: register '
+                        'or variable',
+         'indirect_allowed': False,
          'num_arg_fragments': 1,
-         'num_params': 0,
-         'params': '',
-         'suggestion': 'Use Python variables instead, e.g. "myar = 100, myvar '
-                       '+= 1, var2 = myvar" or even expressions like "myvar *= '
-                       'var3/(2-1)"',
-         'supported': 'No'},
+         'num_params': 1,
+         'params': '(register_num)',
+         'suggestion': 'Whilst register use is generally not supported (use '
+                       'Python variables instead) sometimes it is useful to '
+                       'access a specific RPN calculator register e.g. a '
+                       'statistical register like 11 or 12 etc. You can do '
+                       "this with e.g. 'RCL(12)' and this instruction will be "
+                       'inserted into the converted RPN program. Typically '
+                       "entering the Python code 'x = RCL(12)' is more useful "
+                       'since you can then use that value somewhere or even '
+                       'display it e.g. print(x)',
+         'supported': '✓'},
  'RCL+': {'class': 'no',
           'description': '<del>Recall addition. Recall data and add it to the '
                          'contents of the x-register. Parameter: register or '

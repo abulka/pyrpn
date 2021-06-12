@@ -1408,3 +1408,13 @@ class RpnTests3Cmds(BaseTest):
             CLΣ
             """)
         self.compare(de_comment(expected))    
+
+
+    def test_rcl(self):
+        self.parse(dedent("""
+            RCL(12)
+            """))
+        expected = dedent("""
+            RCL 12
+            """)
+        self.compare(de_comment(expected))

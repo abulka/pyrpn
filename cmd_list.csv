@@ -153,6 +153,7 @@ QUIET,Toggle flag 26 to disable or enable the beeper (Not programmable ),na,
 RAD,Select Radians angular mode,ok,()
 RAN,Returns a random number (0 ≤ x < 1),ok,()
 RCL,Recall data into the x-register. Parameter: register or variable (indirect allowed),noregs,
+RCL,Recall data into the x-register. Parameter: register or variable,ok suggestion: Whilst register use is generally not supported (use Python variables instead) sometimes it is useful to access a specific RPN calculator register e.g. a statistical register like 11 or 12 etc. You can do this with e.g. 'RCL(12)' and this instruction will be inserted into the converted RPN program. Typically entering the Python code 'x = RCL(12)' is more useful since you can then use that value somewhere or even display it e.g. print(x),(register_num)
 RCL+,Recall addition. Recall data and add it to the contents of the x-register. Parameter: register or variable (indirect allowed),noregs,
 RCL-,Recall subtraction. Recall data and subtract it from the contents of the x-register. Parameter: register or variable (indirect allowed),noregs,
 RCL×,Recall multiplication. Recall data and multiply it by the contents of the x-register. Parameter: register or variable (indirect allowed),noregs,
