@@ -43,6 +43,7 @@ RPN_CMD_TO_PYTHON_RENAMED = {
     '1/X':      'Reciprocal',
     '10↑X':     'CommonExp',
     'ALLΣ':     'ALLStat',
+    'CLΣ':      'CLStat',
     'BASE+':    'BASEplus',
     'BASE+/–':  'BASEplusMinus',
     'BASEx':    'BASEtimes',

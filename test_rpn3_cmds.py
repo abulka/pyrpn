@@ -1389,3 +1389,22 @@ class RpnTests3Cmds(BaseTest):
         s = source_code_line_info(node)
         self.assertEqual(s, 'line unknown - (missing lineno from node object):\nhi there')
 
+    # 2021
+
+    # def test_CLΣ(self):
+    #     self.parse(dedent("""
+    #         CLΣ
+    #         """))
+    #     expected = dedent("""
+    #         CLΣ
+    #         """)
+    #     self.compare(de_comment(expected))    
+
+    def test_statsclear(self):
+        self.parse(dedent("""
+            CLStat()
+            """))
+        expected = dedent("""
+            CLΣ
+            """)
+        self.compare(de_comment(expected))    

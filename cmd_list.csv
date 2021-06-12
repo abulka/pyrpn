@@ -43,7 +43,7 @@ CLRG,Clear Registers. Clear all of the numbered storage registers to zero.,ok su
 CLST,Clear Stack. Clear the stack registers to zero.,na,
 CLV,Clear a variable from memory. Parameter: variable name (indirect allowed),ok,(var)
 CLX,"Clear x-register to zero. If digit entry is terminated (no cursor in the display), then  ◄  also executes CLX.",na,
-CLZ,Clear statistics. Clear the accumulated statistical data in the summation registers.,ok,()
+CLΣ,Clear statistics. Clear the accumulated statistical data in the summation registers.,renamed,()
 COMB,Combinations of y items taken x at a time = y! / [x!(y-x)!],ok suggestion: As usual pass in two parameters instead of referring to the stack x and y.,"(y,x)"
 COMPLEX,Convert two real numbers (or matrices) into a complex number (or matrix). Converts a complex number (or matrix) into two real numbers (or matrices).,"ok suggestion: Takes one or two parameters. If the parameters are two normal numbers <code>(real,imaginary)</code>, returns a complex number e.g. <code>complex_num = COMPLEX(0, 1)</code>.  <b>Note:</b> You can also enter complex numbers without this COMPLEX function using native Python syntax e.g. <code>0 + 1j</code> which is engineering notation for <code>0 + i1</code>. Yes, Python uses the letter 'j' not the letter 'i' and puts it after the imaginary number, not before.<BR> If the parameter is a single complex number, returns two normal numbers - assign the two return values into variables e.g. <code>real, imaginary = COMPLEX(complex_num)</code>",(...)
 CORR,Returns a correlation coefficient using the current statistical data and curve-fitting model.,ok,()

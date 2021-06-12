@@ -19,9 +19,23 @@
         <ul>
             <li>
                 HP42S commands which include symbols like <code>?!,.<>+-×÷≤≠↑Σ→</code>
-                <i>etc.</i> are not valid Python syntax, so alternative names have been invented.
-                Something like <code>FS?</code> is exposed as e.g. <code>isFS()</code>.
-                The table below lists all renamed commands.
+                <i>etc.</i> are not valid Python syntax, so alternative names have been invented. E.g.
+                <ul>
+                    <li>
+                        E.g. <code>FS?</code> is exposed as e.g. <code>isFS()</code>.
+                    </li>
+                    <li>
+                        Another example is <code>CLΣ</code> where it is difficult to type in the unicode Sigma Σ symbol, 
+                        so the command has been renamed <code>CLStat()</code>.
+                    </li>
+                    <li>👉 Remember that all Python calls to functions need to have brackets <code>( )</code> after the function, 
+                        so even RPN commands that <i>are</i> supported by the Python to RPN translator, like <code>ABS</code>,
+                        need to be called with brackets e.g. <code>ABS(n)</code>. And if those RPN commands traditionally take
+                        parameters from the 'stack' then you will need to supply those parameters inside the brackets e.g. <code>ABS(n)</code>.</li>       
+                </ul>
+                              
+                
+                <u>The table below lists all renamed commands.</u>
             </li>
             <li>
                 Where it makes overwhelming sense, a more modern, time saving or Pythonic alternative is provided. For

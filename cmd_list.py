@@ -454,15 +454,15 @@ cmd_list = \
          'params': '',
          'suggestion': 'Not applicable, please use native Python.',
          'supported': 'N/A'},
- 'CLZ': {'class': '',
+ 'CLΣ': {'class': '',
          'description': 'Clear statistics. Clear the accumulated statistical '
                         'data in the summation registers.',
          'indirect_allowed': False,
          'num_arg_fragments': 0,
          'num_params': -1,
          'params': '()',
-         'suggestion': '',
-         'supported': '✓'},
+         'suggestion': '<code>CLStat()</code>',
+         'supported': '✓ (renamed)'},
  'COMB': {'class': '',
           'description': 'Combinations of y items taken x at a time = y! / '
                          '[x!(y-x)!]',
