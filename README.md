@@ -4,7 +4,7 @@ Python to RPN converter for generating programs for the HP42S and DM42 calculato
 
 ![main image](doco/images/python_rpn_ui_02small.png)
 
-Converter is available at http://pyrpn.atug.com
+Converter is available at [http://pyrpn.atug.com](http://pyrpn.atug.com)
 
 ## Purpose
 
@@ -81,7 +81,7 @@ In other words, this is a fun project but of little value to anyone doing real w
 ## Running the converter
 
 Simply visit 
-http://pyrpn.atug.com
+[http://pyrpn.atug.com](http://pyrpn.atug.com)
 
 ## Running the converter locally using Docker
 
@@ -95,9 +95,9 @@ cd python_to_rpn
 docker compose up
 ```
 
-Then visit http://localhost:5001
+Then visit [http://localhost:5001](http://localhost:5001)
 
-You can also visit http://localhost:8001 to examine the redis database containing the examples.
+You can also visit [http://localhost:8001](http://localhost:8001) to examine the redis database containing the examples.
 
 ### Stopping the converter
 
@@ -226,7 +226,7 @@ I hope people like it.
 
 Here are [the slides](https://docs.google.com/presentation/d/1_qNKLofUwPhs_LsF-AQM-0WstS2jeYrusU5El4RLfnc/edit?usp=sharing) of a talk I gave to a local Python User Group in Melbourne, Australia, about how I used the Python AST capabilities to build the Python to Rpn converter. 
 
-The reception to the talk was good, but became fun and buoyant once the audience realised I had targeted an old HP calculator with this fancy Python technology - especially when I pulled out my HP calcs for all to see and touch.
+The reception to the talk was good, and then became super fun and buoyant once the audience realised I had targeted an old HP calculator with this fancy Python technology - especially when I pulled out my real HP calcs for all to see and touch.
 
 # Documentation
 
@@ -238,9 +238,8 @@ Direct link to in-depth [documentation](https://docs.google.com/document/d/e/2PA
 
 # Author
 
-Andrew Bulka
-
-https://abulka.github.io/
+Andy Bulka
+[https://abulka.github.io/](https://abulka.github.io/)
 
 # License
 
