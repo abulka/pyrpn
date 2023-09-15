@@ -88,11 +88,11 @@ Simply visit
 Install docker on your computer then run the following commands:
 
 ```
-git clone git@bitbucket.org:abulka/python_to_rpn.git
+git clone git@github.com:abulka/pyrpn.git
 
-cd python_to_rpn
+cd pyrpn
 
-docker compose up
+docker-compose up
 ```
 
 Then visit [http://localhost:5001](http://localhost:5001)
