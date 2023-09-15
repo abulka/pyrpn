@@ -46,6 +46,52 @@ python server.py
 
 Then visit http://localhost:5001
 
+# CLI Usage
+
+```
+python pyrpn.py cli-examples/eg1.py
+```
+
+where `cli-examples/eg1.py` is a Python file containing the following code:
+
+```python
+LBL("main")
+
+length = 10
+width = 20
+
+report()
+
+def report():
+  print('length is', length, '[LF]width is', width)
+```
+
+which should generate the following output:
+
+```
+Generated 20 lines.
+01 LBL "main"
+02 10
+03 STO 00
+04 20
+05 STO 01
+06 XEQ A
+07 RTN
+08 LBL A
+09 "length is"
+10 ├" "
+11 ARCL 00
+12 ├" "
+13 ├"[LF]width is"
+14 ├" "
+15 ARCL 01
+16 AVIEW
+17 RTN
+18 LBL 50
+19 "-Utility Funcs-"
+20 RTN
+```
+
 # Announcement
 ![Image 1](https://www.dropbox.com/s/nqfq01xaxvi4xnv/python_rpn_ui_01.png?raw=1)
 
