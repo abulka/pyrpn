@@ -1,11 +1,82 @@
 # PyRPN - Python to RPN converter
 
-Python to RPN converter for HP42S and DM42 calculators (and emulators like Free42)
-http://pyrpn.atug.com
+Python to RPN converter for generating programs for the HP42S and DM42 calculators (and emulators like Free42)
+
+![main image](doco/images/python_rpn_ui_02small.png)
+
+Converter is available at http://pyrpn.atug.com
 
 ## Purpose
 
-Converts Python code to RPN for use in HP42S/DM42 calculators (and emulators like Free42). This allows for easy programming of the HP42S/DM42 using Python syntax.  HP 42S is a programmable RPN calculator from the 1980s.  DM42 is a modern clone of the HP42S.  Free42 is a free emulator of the HP42S.
+Converts Python code to RPN for use in HP42S/DM42 calculators (and emulators like Free42). This allows for easy programming of the HP42S/DM42 using Python syntax.  
+
+[HP 42S](https://en.wikipedia.org/wiki/HP-42S) is a programmable RPN calculator from the 1980s.  
+
+![HP42S](https://upload.wikimedia.org/wikipedia/commons/b/bb/Hp42s_face.jpeg)
+
+[DM42](https://www.swissmicros.com/product/dm42) is a modern clone of the HP42S.  
+
+![DM42](https://global-uploads.webflow.com/5e3bcb8b5549c74b8b60a3c8/60d0be76d5ac8aeccfe7603e_drw_dm42_front_600_on-p-500.png)
+
+[Free42](https://thomasokken.com/free42/) is a free emulator of the HP42S.
+
+![Free42](https://thomasokken.com/free42/images/States.png)
+
+### Why convert Python to RPN?
+
+Programming a HP calculator in RPN is a joy for those who know how - but for most of us it is like programming in assembler code.  e.g.
+
+```
+RDN
+0
+STO 01
+1
+STO 02
+0
+RCL 00
+1
+XEQ 78
+STO 03
+LBL 00
+ISG 03
+GTO 01
+GTO 02
+LBL 01
+RCL 02
+STO 04
+RCL 01
+RCL 02
++
+...
+...
+etc.
+```
+
+
+You have to deal with GOTO statements, no while loops etc. It is not easy to write complex programs in RPN.  Python is a modern, high-level, structured programming language.  It is much easier to write complex programs in Python than in RPN.  This converter allows you to write your program in Python, then convert it to RPN for use in your HP calculator.
+
+Here is the same program in Python:
+
+```python
+def fib(n):
+  a = 0
+  b = 1
+  for i in range(0, n):
+    old_b = b
+    b = a + b
+    a = old_b
+  return a
+```
+
+### Why not just run Python on a laptop?
+
+Yep. You should.
+
+My first computational programming device was a HP calculator.  I have fond memories of it.  
+
+This project is for those of us who have nostalgia and love for those old HP calculators.  We want to write programs for them, but we don't want to write them in RPN.  We want to write them in Python.  This project allows us to do that.
+
+In other words, this is a fun project but of little value to anyone doing real work. 
 
 ## Running the converter
 
@@ -18,7 +89,9 @@ Install docker on your computer then run the following commands:
 
 ```
 git clone git@bitbucket.org:abulka/python_to_rpn.git
+
 cd python_to_rpn
+
 docker compose up
 ```
 
@@ -52,7 +125,7 @@ Then visit http://localhost:5001
 python pyrpn.py cli-examples/eg1.py
 ```
 
-where `cli-examples/eg1.py` is a Python file containing the following code:
+where `cli-examples/eg1.py` is a Python file containing e.g. the following code:
 
 ```python
 LBL("main")
@@ -92,7 +165,8 @@ Generated 20 lines.
 20 RTN
 ```
 
-# Announcement
+# First Release Announcement
+
 ![Image 1](https://www.dropbox.com/s/nqfq01xaxvi4xnv/python_rpn_ui_01.png?raw=1)
 
 You write code in a high-level structured language (which happens to be Python 3 syntax), hit a button, and RPN is generated.
@@ -136,11 +210,11 @@ The converter supports core Python syntax (which is very powerful) but does not 
 
 Included in the [examples](http://pyrpn.atug.com/examples) are some graphic primitive routines originally written for the Raspberry Pi in C rewritten into Python and converted to RPN. This now gives the 42S a small graphics library to generate lines, circles, rectangles, filled shapes, etc. More information in [this related thread](http://www.hpmuseum.org/forum/thread-10160.html). This would be of particular interest to owners of the DM42 calculator, which has the larger screen, crying out to be taken advantage of.
 
-![Image 3](https://www.dropbox.com/s/96apddulijhrl84/20180127-11561967.png?raw=1)
+![Image 3](doco/images/dm42-1.png)
 
 and targeting the larger screen size of the DM42 - this image:
 
-![Image 4](https://www.dropbox.com/s/pbumtrunh9y12ny/20180127-12134373.png?raw=1)
+![Image 4](doco/images/dm42-2.png)
 
 The purpose of the Python to RPN converter is not to usurp the beauty and role of handcrafted RPN; it is to provide an alternative way of programming the HP42S for those who prefer to use if statements and for loops, rather than GTO's and ISG. The purpose is also to provide powerful new features to make programming the 42S easier: lists, dictionaries, matrix access syntax, native complex number syntax, alpha messages easily built with multiple parameters in one line, simpler menu support using `aview()`, etc.
 
@@ -148,9 +222,27 @@ My hope is that the Python to RPN converter will contribute to keeping this wond
 
 I hope people like it.
 
+# Architecture & Design of this App
+
+Here are [the slides](https://docs.google.com/presentation/d/1_qNKLofUwPhs_LsF-AQM-0WstS2jeYrusU5El4RLfnc/edit?usp=sharing) of a talk I gave to a local Python User Group in Melbourne, Australia, about how I used the Python AST capabilities to build the Python to Rpn converter. 
+
+The reception to the talk was good, but became fun and buoyant once the audience realised I had targeted an old HP calculator with this fancy Python technology - especially when I pulled out my HP calcs for all to see and touch.
+
 # Documentation
 
 There is an extensive list of examples and tutorials, and API reference accessible via the main menu in the app.
 
 ![help](doco/images/screenshot-help.png)
+
+Direct link to in-depth [documentation](https://docs.google.com/document/d/e/2PACX-1vRV7G4VAQtATvpJ7VaNlN5kjdTMHI97FVybvPjeEwHnPqttnkqa9zRMbym4h--0QAlltgadqO4fDnAX/pub).
+
+# Author
+
+Andrew Bulka
+
+https://abulka.github.io/
+
+# License
+
+MIT License
 
