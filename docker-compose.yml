@@ -21,15 +21,24 @@ services:
       - DOCKER=1  # Set an environment variable to indicate that the app is running in Docker
     command: python server.py  # Specify the command to run when the container starts
   redis_insight:
+      # buggy on some keys e.g. HGETALL pyrpn.example:24 (CLI works, GUI doesn't)
       image: redislabs/redisinsight:latest
       container_name: redis_insight
       restart: always
       ports:
-        - 8001:8001
+        - 8082:8001
       depends_on:
         - redis
       volumes:
         - redis_insight_volume_data:/db
+  redis-commander:
+    # nice and reliable
+    image: "rediscommander/redis-commander:latest"
+    ports:
+      - "8081:8081"
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379        
 volumes:
   redis_volume_data:
   redis_insight_volume_data:
