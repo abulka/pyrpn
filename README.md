@@ -222,6 +222,12 @@ My hope is that the Python to RPN converter will contribute to keeping this wond
 
 I hope people like it.
 
+# Hp Forum Thread
+
+Initial announcement and discussion on the HP Forum:
+
+https://www.hpmuseum.org/forum/thread-10178.html
+
 # Architecture & Design of this App
 
 Here are [the slides](https://docs.google.com/presentation/d/1_qNKLofUwPhs_LsF-AQM-0WstS2jeYrusU5El4RLfnc/edit?usp=sharing) of a talk I gave to a local Python User Group in Melbourne, Australia, about how I used the Python AST capabilities to build the Python to Rpn converter. 
