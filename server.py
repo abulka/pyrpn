@@ -26,7 +26,9 @@ FORCE_ADMIN = settings.ADMIN
 
 if os.environ.get("REDIS_URL"):
     # Heroku
-    db = redis.from_url(os.environ.get("REDIS_URL"), charset="utf-8", decode_responses=True)
+    print('using redis via REDIS_URL')
+    # db = redis.from_url(os.environ.get("REDIS_URL"), charset="utf-8", decode_responses=True)
+    db = redis.from_url(os.environ.get("REDIS_URL"), decode_responses=True)
 else:
     db = redis.StrictRedis('localhost', 6379, charset="utf-8", decode_responses=True)
 
@@ -329,4 +331,10 @@ def test():
 if __name__ == '__main__':
     # This code does not run if running via gunicorn on heroku
     app.jinja_env.auto_reload = True
-    app.run(debug=True)
+    print('running flask app directly - not via gunicorn')
+    if os.environ.get("DOCKER"):
+        print('running in docker')
+        # Need to run on 0.0.0.0 because localhost is not accessible from outside the container
+        app.run(host='0.0.0.0', port=5000, debug=True)
+    else:
+        app.run(debug=True)

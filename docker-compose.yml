@@ -1,0 +1,40 @@
+version: '3'
+services:
+  redis:
+    image: redis:latest
+    ports:
+      - '6379:6379'
+    restart: always
+    volumes:
+      - redis_volume_data:/data
+  web-app:
+    build:
+      context: .  # Specify the context for building the web app container
+    ports:
+      - "5001:5000"  # Map host port 5001 to container port 5000 for Flask
+    volumes:
+      - .:/code
+    depends_on:
+      - redis
+    environment:
+      - REDIS_URL=redis://redis:6379/  # Use the service name of the Redis container as the hostname
+      - DOCKER=1  # Set an environment variable to indicate that the app is running in Docker
+    command: python server.py  # Specify the command to run when the container starts
+  redis_insight:
+      image: redislabs/redisinsight:latest
+      container_name: redis_insight
+      restart: always
+      ports:
+        - 8001:8001
+      depends_on:
+        - redis
+      volumes:
+        - redis_insight_volume_data:/db
+volumes:
+  redis_volume_data:
+  redis_insight_volume_data:
+  
+# To run
+# docker-compose up
+# To stop
+# docker-compose down
