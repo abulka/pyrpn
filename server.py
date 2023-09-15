@@ -41,10 +41,7 @@ app.config.update(dict(
     WTF_CSRF_SECRET_KEY="a csrf secret key"
 ))
 
-SENDGRID_API_KEY = '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'
-# app.config['SENDGRID_API_KEY'] = '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'
-# app.config['SENDGRID_DEFAULT_FROM'] = 'abulka@gmail.com'
-# mail = SendGrid(app)
+SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY', 'no key found')
 
 es = ExamplesSync.create(settings.APP_DIR, settings.PRODUCTION)
 
@@ -278,6 +275,8 @@ def vote_via_email(example):
     body = json.dumps(dic, sort_keys=True, indent=4)
     # email it
     try:
+        if SENDGRID_API_KEY == 'no key found':
+            raise Exception('no sendgrid api key found')
         sg = sendgrid.SendGridAPIClient(apikey=SENDGRID_API_KEY)
         from_email = Email("pyrpn-donotreply@gmail.com")
         to_email = Email("abulka@gmail.com")

@@ -19,6 +19,7 @@ services:
     environment:
       - REDIS_URL=redis://redis:6379/  # Use the service name of the Redis container as the hostname
       - DOCKER=1  # Set an environment variable to indicate that the app is running in Docker
+      - SENDGRID_API_KEY=up-to-you-to-get-a-key
     command: python server.py  # Specify the command to run when the container starts
   redis-commander:
     # nice and reliable
